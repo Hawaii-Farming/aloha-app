@@ -1,2 +1,2 @@
 # aloha-app
-Multi-organization agricultural ERP: database schema, Supabase backend, and React codebase for farm-to-customer operations
+Multi-organization agricultural ERP built on Supabase and React for farm-to-customer operations.
