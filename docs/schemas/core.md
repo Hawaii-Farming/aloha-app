@@ -1,0 +1,451 @@
+# Core Schema
+
+Core tables that form the foundation of the Aloha ERP system. These include global reference tables shared across all organizations, identity and access management, customer management, farm structure, product catalog, and pricing.
+
+## Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    %% ========================================
+    %% GLOBAL REFERENCE TABLES
+    %% ========================================
+
+    unit_of_measure {
+        UUID id PK
+        VARCHAR name UK
+        VARCHAR abbreviation UK
+        VARCHAR category
+    }
+
+    role {
+        UUID id PK
+        VARCHAR name UK
+        INT level UK
+        TEXT description
+    }
+
+    %% ========================================
+    %% IDENTITY AND ACCESS
+    %% ========================================
+
+    profile {
+        UUID id PK "FK auth.users"
+        VARCHAR first_name
+        VARCHAR last_name
+        VARCHAR phone
+        JSONB metadata
+        BOOLEAN is_active
+    }
+
+    organization {
+        UUID id PK
+        VARCHAR name UK
+        VARCHAR slug UK
+        TEXT address
+        JSONB metadata
+        BOOLEAN is_active
+        TIMESTAMPTZ created_at
+    }
+
+    org_member {
+        UUID id PK
+        UUID org_id FK
+        UUID user_id FK
+        UUID role_id FK
+        BOOLEAN is_active
+        TIMESTAMPTZ joined_at
+    }
+
+    %% ========================================
+    %% CUSTOMER MANAGEMENT
+    %% ========================================
+
+    customer_group {
+        UUID id PK
+        UUID org_id FK
+        VARCHAR name
+    }
+
+    freight_on_board {
+        UUID id PK
+        UUID org_id FK
+        VARCHAR name
+    }
+
+    customer {
+        UUID id PK
+        UUID org_id FK
+        UUID customer_group_id FK
+        UUID fob_id FK
+        VARCHAR external_id
+        VARCHAR name
+        VARCHAR email
+        JSONB metadata
+        TEXT billing_address
+        BOOLEAN is_active
+    }
+
+    %% ========================================
+    %% FARM STRUCTURE
+    %% ========================================
+
+    farm {
+        UUID id PK
+        UUID org_id FK
+        VARCHAR name
+        JSONB metadata
+        BOOLEAN is_active
+    }
+
+    farm_site {
+        UUID id PK
+        UUID org_id FK
+        UUID farm_id FK
+        VARCHAR name
+        VARCHAR type "nursery growing packing storage"
+        JSONB metadata
+        BOOLEAN is_active
+    }
+
+    farm_variety {
+        UUID id PK
+        UUID org_id FK
+        UUID farm_id FK
+        VARCHAR code
+        VARCHAR name
+    }
+
+    farm_grade {
+        UUID id PK
+        UUID org_id FK
+        UUID farm_id FK
+        VARCHAR code
+        VARCHAR name
+    }
+
+    %% ========================================
+    %% PRODUCTS AND PRICING
+    %% ========================================
+
+    farm_product {
+        UUID id PK
+        UUID org_id FK
+        UUID farm_id FK
+        UUID grade_id FK
+        VARCHAR code
+        VARCHAR name
+        UUID weight_unit_id FK
+        UUID product_item_unit_id FK
+        UUID pack_unit_id FK
+        NUMERIC product_item_per_pack_unit
+        NUMERIC pack_unit_net_weight
+        UUID sale_unit_id FK
+        NUMERIC pack_per_sale_unit
+        NUMERIC sale_unit_net_weight
+        NUMERIC minimum_order_quantity
+        BOOLEAN is_catch_weight
+        UUID shipping_unit_id FK
+        NUMERIC sale_per_shipping_unit_max
+        NUMERIC shipping_unit_net_weight
+        NUMERIC shipping_unit_ti
+        NUMERIC shipping_unit_hi
+        JSONB metadata
+        INT display_order
+        BOOLEAN is_active
+    }
+
+    farm_product_price {
+        UUID id PK
+        UUID org_id FK
+        UUID product_id FK
+        UUID fob_id FK
+        UUID customer_id FK
+        UUID customer_group_id FK
+        NUMERIC price
+        DATE effective_from
+        DATE effective_to
+        BOOLEAN is_active
+    }
+
+    %% ========================================
+    %% RELATIONSHIPS
+    %% ========================================
+
+    %% Identity and Access
+    organization ||--o{ org_member : "has members"
+    profile ||--o{ org_member : "belongs to orgs"
+    role ||--o{ org_member : "assigned to"
+
+    %% Customer Management
+    organization ||--o{ customer_group : "defines groups"
+    organization ||--o{ freight_on_board : "defines delivery methods"
+    organization ||--o{ customer : "has customers"
+    customer_group ||--o{ customer : "classifies"
+    freight_on_board ||--o{ customer : "preferred delivery"
+
+    %% Farm Structure
+    organization ||--o{ farm : "operates farms"
+    farm ||--o{ farm_site : "has sites"
+    farm ||--o{ farm_variety : "grows varieties"
+    farm ||--o{ farm_grade : "uses grades"
+
+    %% Products
+    farm ||--o{ farm_product : "sells products"
+    farm_grade ||--o{ farm_product : "graded as"
+    unit_of_measure ||--o{ farm_product : "weight unit"
+    unit_of_measure ||--o{ farm_product : "item unit"
+    unit_of_measure ||--o{ farm_product : "pack unit"
+    unit_of_measure ||--o{ farm_product : "sale unit"
+    unit_of_measure ||--o{ farm_product : "shipping unit"
+
+    %% Pricing
+    farm_product ||--o{ farm_product_price : "has prices"
+    freight_on_board ||--o{ farm_product_price : "priced by FOB"
+    customer ||--o{ farm_product_price : "customer-specific"
+    customer_group ||--o{ farm_product_price : "group-specific"
+```
+
+---
+
+## Table Overview
+
+| Table | Purpose |
+|-------|---------|
+| unit_of_measure | Standardized measurement units (kg, L, °C, etc.) shared across all organizations for consistent data entry and calculations. |
+| organization | Root entity for multi-org support. Every org-scoped record traces back to this table. Stores org-level settings like default currency in metadata. |
+| role | Defines the five access levels (Owner, Admin, Manager, Verifier, Worker) used to control what users can see and do within an organization. |
+| profile | Extends Supabase Auth with app-specific user data like name, phone, and preferences. One-to-one with auth.users. |
+| org_member | Links users to organizations with a specific role. Enables a single user to belong to multiple organizations with different access levels in each. |
+| customer_group | Allows each organization to classify customers into groups (e.g. Wholesale, Retail, Restaurant) for reporting and group-based pricing. |
+| freight_on_board | Defines each organization's available delivery methods (e.g. Farm Pick-up, Local Delivery, Distributor). Used in customer setup and pricing. |
+| customer | Stores an organization's customers with their preferred delivery method, group classification, billing address, and a link to external accounting software. |
+| farm | Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuce Farm). Each farm has its own sites, varieties, grades, and products. |
+| farm_site | Physical locations within a farm where operations happen — nurseries for seedlings, growing sites for production, packing sites, and storage facilities. |
+| farm_variety | Crop varieties grown on a specific farm, each with a short code for quick reference during data entry (e.g. "K" for Keiki). |
+| farm_grade | Harvest quality grades used by a specific farm, each with a short code (e.g. "A" for Grade A). Applied during harvest and carried through to sales. |
+| farm_product | The sellable products from each farm, combining grade and packaging configuration. Contains the full packaging hierarchy (content → pack → sale → shipping) used for inventory math. |
+| farm_product_price | Manages product pricing with three tiers of specificity (default, group, customer) and date ranges to track price changes over time. Currency uses the org default. |
+
+---
+
+## unit_of_measure
+
+Standardized measurement units shared across all organizations for consistent data entry and calculations throughout the system.
+
+| Column       | Type        | Constraints          | Description                          |
+|-------------|-------------|----------------------|--------------------------------------|
+| id          | UUID        | PK, auto-generated   | Unique identifier                    |
+| name        | VARCHAR(50) | NOT NULL, UNIQUE     | Full name, e.g. "Kilogram"           |
+| abbreviation| VARCHAR(10) | NOT NULL, UNIQUE     | Short form, e.g. "kg"               |
+| category    | VARCHAR(30) | NOT NULL             | Grouping: weight, volume, length, etc.|
+
+## role
+
+Defines the access levels used to control what users can see and do within an organization. Shared across all organizations.
+
+| Column      | Type        | Constraints          | Description                              |
+|------------|-------------|----------------------|------------------------------------------|
+| id         | UUID        | PK, auto-generated   | Unique identifier                        |
+| name       | VARCHAR(30) | NOT NULL, UNIQUE     | Role name: Owner, Admin, Manager, etc.   |
+| level      | INT         | NOT NULL, UNIQUE     | Numeric access level (lower = more access) |
+| description| TEXT        | nullable             | What this role can do                    |
+
+Defined roles: Owner (1), Admin (2), Manager (3), Verifier (4), Worker (5). Lowest levels inherit permissions of higher levels.
+
+## organization
+
+Root entity for multi-org support. Every org-scoped table references this. Stores org-level settings such as default currency in the metadata JSONB column.
+
+| Column     | Type         | Constraints          | Description                          |
+|-----------|-------------|----------------------|--------------------------------------|
+| id        | UUID         | PK, auto-generated   | Unique identifier                    |
+| name      | VARCHAR(100) | NOT NULL, UNIQUE     | Organization name                    |
+| slug      | VARCHAR(100) | NOT NULL, UNIQUE     | URL-friendly identifier              |
+| address   | TEXT         | nullable             | Physical address                     |
+| metadata  | JSONB        | NOT NULL, default {} | Org-level settings (currency, etc.)  |
+| is_active | BOOLEAN      | NOT NULL, default true| Soft-disable without deleting        |
+| created_at| TIMESTAMPTZ  | NOT NULL, default now | When the organization was onboarded  |
+
+
+## profile
+
+Extends Supabase Auth with app-specific user data. Stores user preferences like dark mode and language in the metadata JSONB column. One-to-one with auth.users.
+
+| Column     | Type        | Constraints                  | Description                          |
+|-----------|-------------|------------------------------|--------------------------------------|
+| id        | UUID        | PK, references auth.users(id)| Same ID as Supabase Auth user        |
+| first_name| VARCHAR(50) | NOT NULL                     | User's first name                    |
+| last_name | VARCHAR(50) | NOT NULL                     | User's last name                     |
+| phone     | VARCHAR(20) | nullable                     | Contact number                       |
+| metadata    | JSONB     | NOT NULL, default {}         | User preferences (dark mode, etc.)   |
+| is_active | BOOLEAN     | NOT NULL, default true       | Soft-disable without deleting        |
+
+## org_member
+
+Links users to organizations with a specific role. Enables a single user to belong to multiple organizations with different access levels in each.
+
+| Column    | Type        | Constraints                      | Description                          |
+|----------|-------------|----------------------------------|--------------------------------------|
+| id       | UUID        | PK, auto-generated               | Unique identifier                    |
+| org_id   | UUID        | NOT NULL, FK → organization(id)  | The organization                     |
+| user_id  | UUID        | NOT NULL, FK → profile(id)       | The user                             |
+| role_id  | UUID        | NOT NULL, FK → role(id)          | Their role in this organization      |
+| is_active| BOOLEAN     | NOT NULL, default true           | Soft-disable membership              |
+| joined_at| TIMESTAMPTZ | NOT NULL, default now            | When they joined the organization    |
+
+Unique constraint on `(org_id, user_id)` — a user can only have one role per organization.
+
+## customer_group
+
+Allows each organization to classify customers into groups for reporting and group-based pricing (e.g. Wholesale, Retail, Restaurant).
+
+| Column | Type        | Constraints                     | Description                |
+|--------|-------------|--------------------------------|----------------------------|
+| id     | UUID        | PK, auto-generated             | Unique identifier          |
+| org_id | UUID        | NOT NULL, FK → organization(id)| The organization           |
+| name   | VARCHAR(50) | NOT NULL                       | Group name                 |
+
+Unique constraint on `(org_id, name)` — no duplicate group names within an org.
+
+## freight_on_board
+
+Defines each organization's available delivery methods. Used in customer setup to set a customer's preferred delivery and in pricing to set FOB-specific prices.
+
+| Column | Type        | Constraints                     | Description                |
+|--------|-------------|--------------------------------|----------------------------|
+| id     | UUID        | PK, auto-generated             | Unique identifier          |
+| org_id | UUID        | NOT NULL, FK → organization(id)| The organization           |
+| name   | VARCHAR(50) | NOT NULL                       | Delivery method name       |
+
+Unique constraint on `(org_id, name)` — no duplicate delivery methods within an org.
+
+## customer
+
+Stores an organization's customers with their group classification, preferred delivery method, billing address, and a link to external accounting software via external_id. Additional display fields like store number, store name, and CC emails are stored in metadata.
+
+| Column           | Type         | Constraints                        | Description                              |
+|-----------------|--------------|------------------------------------|------------------------------------------|
+| id              | UUID         | PK, auto-generated                 | Unique identifier                        |
+| org_id          | UUID         | NOT NULL, FK → organization(id)    | The organization                         |
+| customer_group_id| UUID        | FK → customer_group(id), nullable  | Customer classification for reporting    |
+| fob_id          | UUID         | FK → freight_on_board(id), nullable| Preferred delivery method                |
+| external_id     | VARCHAR(50)  | nullable                           | Links to accounts management software    |
+| name            | VARCHAR(100) | NOT NULL                           | Customer/business name                   |
+| email           | VARCHAR(100) | nullable                           | Primary email                            |
+| metadata        | JSONB        | NOT NULL, default {}               | Flexible fields: store_number, store_name, cc_emails, etc. |
+| billing_address | TEXT         | nullable                           | Billing address                          |
+| is_active       | BOOLEAN      | NOT NULL, default true             | Soft-disable without deleting            |
+
+Unique constraint on `(org_id, name)` — no duplicate customer names within an org.
+
+## farm
+
+Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuce Farm). Each farm has its own sites, varieties, grades, and products. Farm-level defaults like weighing and growing units are stored in metadata.
+
+| Column   | Type         | Constraints                     | Description                                  |
+|---------|--------------|---------------------------------|----------------------------------------------|
+| id      | UUID         | PK, auto-generated              | Unique identifier                            |
+| org_id  | UUID         | NOT NULL, FK → organization(id) | The organization                             |
+| name    | VARCHAR(100) | NOT NULL                        | Farm name, e.g. "Cuke Farm"                  |
+| metadata| JSONB        | NOT NULL, default {}            | Farm-level settings (weighing_uom_id, growing_uom_id, etc.) |
+| is_active| BOOLEAN     | NOT NULL, default true          | Soft-disable without deleting                |
+
+Unique constraint on `(org_id, name)` — no duplicate farm names within an org.
+
+## farm_site
+
+Physical locations within a farm where operations happen. Each site has a type (nursery, growing, packing, storage) and type-specific data in metadata such as acres, total rows, and monitoring stations for growing sites.
+
+| Column   | Type         | Constraints              | Description                    |
+|---------|--------------|--------------------------|--------------------------------|
+| id      | UUID         | PK, auto-generated                | Unique identifier              |
+| org_id  | UUID         | NOT NULL, FK → organization(id)   | The organization               |
+| farm_id | UUID         | NOT NULL, FK → farm(id)           | The farm this site belongs to  |
+| name    | VARCHAR(100) | NOT NULL                          | Site name, e.g. "Greenhouse A" |
+| type    | VARCHAR(20)  | NOT NULL, CHECK                   | One of: nursery, growing, packing, storage |
+| metadata| JSONB        | NOT NULL, default {}              | Type-specific data (acres, rows, monitoring stations, etc.) |
+| is_active| BOOLEAN     | NOT NULL, default true            | Soft-disable without deleting  |
+
+Unique constraint on `(farm_id, name)` — no duplicate site names within a farm.
+
+## farm_variety
+
+Crop varieties grown on a specific farm, each with a short code for quick reference during data entry. Used across seeding, growing, and harvest modules.
+
+| Column  | Type        | Constraints             | Description                   |
+|---------|-------------|-------------------------|-------------------------------|
+| id      | UUID        | PK, auto-generated              | Unique identifier             |
+| org_id  | UUID        | NOT NULL, FK → organization(id) | The organization              |
+| farm_id | UUID        | NOT NULL, FK → farm(id)         | The farm this variety belongs to |
+| code    | VARCHAR(10) | NOT NULL                | Short code, e.g. "K"         |
+| name    | VARCHAR(50) | NOT NULL                | Full name, e.g. "Keiki"      |
+
+Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
+
+## farm_grade
+
+Harvest quality grades for a specific farm, each with a short code. Applied during harvest logging and carried through to product definition, packing, and sales.
+
+| Column  | Type        | Constraints             | Description                   |
+|---------|-------------|-------------------------|-------------------------------|
+| id      | UUID        | PK, auto-generated              | Unique identifier             |
+| org_id  | UUID        | NOT NULL, FK → organization(id) | The organization              |
+| farm_id | UUID        | NOT NULL, FK → farm(id)         | The farm this grade belongs to |
+| code    | VARCHAR(10) | NOT NULL                | Short code, e.g. "A"         |
+| name    | VARCHAR(50) | NOT NULL                | Full name, e.g. "Grade A"    |
+
+Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
+
+## farm_product
+
+The sellable products from each farm. Combines a grade with a full packaging hierarchy (content → pack → sale → shipping) that drives inventory calculations. Display-only fields like description, manufacturer, GTIN, UPC, dimensions, photos, and spec sheet data are stored in metadata.
+
+| Column                      | Type         | Constraints                          | Description                              |
+|----------------------------|--------------|--------------------------------------|------------------------------------------|
+| id                         | UUID         | PK, auto-generated                   | Unique identifier                        |
+| org_id                     | UUID         | NOT NULL, FK → organization(id)      | The organization                         |
+| farm_id                    | UUID         | NOT NULL, FK → farm(id)              | The farm this product belongs to         |
+| grade_id                   | UUID         | FK → farm_grade(id), nullable        | Product grade                            |
+| code                       | VARCHAR(20)  | NOT NULL                             | Product code/abbreviation                |
+| name                       | VARCHAR(100) | NOT NULL                             | Product name                             |
+| weight_unit_id             | UUID         | FK → unit_of_measure(id), nullable   | Weight unit for content                  |
+| product_item_unit_id       | UUID         | FK → unit_of_measure(id), nullable   | Item unit for content                    |
+| pack_unit_id               | UUID         | FK → unit_of_measure(id), nullable   | Consumer pack unit                       |
+| product_item_per_pack_unit | NUMERIC      | nullable                             | Items per pack                           |
+| pack_unit_net_weight       | NUMERIC      | nullable                             | Net weight per pack                      |
+| sale_unit_id               | UUID         | FK → unit_of_measure(id), nullable   | Primary selling unit                     |
+| pack_per_sale_unit         | NUMERIC      | nullable                             | Packs per sale unit                      |
+| sale_unit_net_weight       | NUMERIC      | nullable                             | Net weight per sale unit                 |
+| minimum_order_quantity     | NUMERIC      | nullable                             | Minimum order quantity                   |
+| is_catch_weight            | BOOLEAN      | NOT NULL, default false              | Whether product is sold by catch weight  |
+| shipping_unit_id           | UUID         | FK → unit_of_measure(id), nullable   | Shipping unit                            |
+| sale_per_shipping_unit_max | NUMERIC      | nullable                             | Max sale units per shipping unit         |
+| shipping_unit_net_weight   | NUMERIC      | nullable                             | Net weight per shipping unit             |
+| shipping_unit_ti           | NUMERIC      | nullable                             | Pallet TI (layers per tier)              |
+| shipping_unit_hi           | NUMERIC      | nullable                             | Pallet HI (tiers high)                   |
+| metadata                   | JSONB        | NOT NULL, default {}                 | Description, segment, manufacturer, gtin, upc, packaging_type, dimensions, photos, spec sheet, shipping requirements |
+| display_order              | INT          | nullable                             | Sort order for display                   |
+| is_active                  | BOOLEAN      | NOT NULL, default true               | Soft-disable without deleting            |
+
+Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
+
+> **TODO (Inventory Module):** Add `farm_product_inventory_item` junction table to link products to inventory items at pack and sale levels for inventory tracking and reporting. This allows a single product to be associated with multiple inventory items based on packaging configurations.
+
+## farm_product_price
+
+Manages product pricing with three tiers of specificity and date ranges to track price changes over time. When a price changes, the current row gets an effective_to date and a new row is created. Currency always uses the org default from organization.metadata.
+
+| Column           | Type    | Constraints                          | Description                              |
+|-----------------|---------|--------------------------------------|------------------------------------------|
+| id              | UUID    | PK, auto-generated                   | Unique identifier                        |
+| org_id          | UUID    | NOT NULL, FK → organization(id)      | The organization                         |
+| product_id      | UUID    | NOT NULL, FK → farm_product(id)      | The product being priced                 |
+| fob_id          | UUID    | NOT NULL, FK → freight_on_board(id)  | Delivery method this price applies to    |
+| customer_id     | UUID    | FK → customer(id), nullable          | Customer-specific price (tier 1)         |
+| customer_group_id| UUID   | FK → customer_group(id), nullable    | Group-specific price (tier 2)            |
+| price           | NUMERIC | NOT NULL                             | The price amount                         |
+| effective_from  | DATE    | NOT NULL                             | When this price starts                   |
+| effective_to    | DATE    | nullable                             | When this price ends (null = current)    |
+| is_active       | BOOLEAN | NOT NULL, default true               | Soft-disable without deleting            |
+
+Pricing lookup priority: customer price (tier 1) → group price (tier 2) → default price (tier 3), filtered by `effective_from <= today AND (effective_to IS NULL OR effective_to > today)`.
