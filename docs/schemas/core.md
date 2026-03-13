@@ -6,203 +6,25 @@ Core tables that form the foundation of the Aloha ERP system. These include glob
 
 ```mermaid
 erDiagram
-    %% ========================================
-    %% GLOBAL REFERENCE TABLES
-    %% ========================================
-
-    unit_of_measure {
-        UUID id PK
-        VARCHAR name UK
-        VARCHAR abbreviation UK
-        VARCHAR category
-    }
-
-    role {
-        UUID id PK
-        VARCHAR name UK
-        INT level UK
-        TEXT description
-    }
-
-    %% ========================================
-    %% IDENTITY AND ACCESS
-    %% ========================================
-
-    profile {
-        UUID id PK "FK auth.users"
-        VARCHAR first_name
-        VARCHAR last_name
-        VARCHAR phone
-        JSONB metadata
-        BOOLEAN is_active
-    }
-
-    organization {
-        UUID id PK
-        VARCHAR name UK
-        VARCHAR slug UK
-        TEXT address
-        JSONB metadata
-        BOOLEAN is_active
-        TIMESTAMPTZ created_at
-    }
-
-    org_member {
-        UUID id PK
-        UUID org_id FK
-        UUID user_id FK
-        UUID role_id FK
-        BOOLEAN is_active
-        TIMESTAMPTZ joined_at
-    }
-
-    %% ========================================
-    %% CUSTOMER MANAGEMENT
-    %% ========================================
-
-    customer_group {
-        UUID id PK
-        UUID org_id FK
-        VARCHAR name
-    }
-
-    freight_on_board {
-        UUID id PK
-        UUID org_id FK
-        VARCHAR name
-    }
-
-    customer {
-        UUID id PK
-        UUID org_id FK
-        UUID customer_group_id FK
-        UUID fob_id FK
-        VARCHAR external_id
-        VARCHAR name
-        VARCHAR email
-        JSONB metadata
-        TEXT billing_address
-        BOOLEAN is_active
-    }
-
-    %% ========================================
-    %% FARM STRUCTURE
-    %% ========================================
-
-    farm {
-        UUID id PK
-        UUID org_id FK
-        VARCHAR name
-        JSONB metadata
-        BOOLEAN is_active
-    }
-
-    farm_site {
-        UUID id PK
-        UUID org_id FK
-        UUID farm_id FK
-        VARCHAR name
-        VARCHAR type "nursery growing packing storage"
-        JSONB metadata
-        BOOLEAN is_active
-    }
-
-    farm_variety {
-        UUID id PK
-        UUID org_id FK
-        UUID farm_id FK
-        VARCHAR code
-        VARCHAR name
-    }
-
-    farm_grade {
-        UUID id PK
-        UUID org_id FK
-        UUID farm_id FK
-        VARCHAR code
-        VARCHAR name
-    }
-
-    %% ========================================
-    %% PRODUCTS AND PRICING
-    %% ========================================
-
-    farm_product {
-        UUID id PK
-        UUID org_id FK
-        UUID farm_id FK
-        UUID grade_id FK
-        VARCHAR code
-        VARCHAR name
-        UUID weight_unit_id FK
-        UUID product_item_unit_id FK
-        UUID pack_unit_id FK
-        NUMERIC product_item_per_pack_unit
-        NUMERIC pack_unit_net_weight
-        UUID sale_unit_id FK
-        NUMERIC pack_per_sale_unit
-        NUMERIC sale_unit_net_weight
-        NUMERIC minimum_order_quantity
-        BOOLEAN is_catch_weight
-        UUID shipping_unit_id FK
-        NUMERIC sale_per_shipping_unit_max
-        NUMERIC shipping_unit_net_weight
-        NUMERIC shipping_unit_ti
-        NUMERIC shipping_unit_hi
-        JSONB metadata
-        INT display_order
-        BOOLEAN is_active
-    }
-
-    farm_product_price {
-        UUID id PK
-        UUID org_id FK
-        UUID product_id FK
-        UUID fob_id FK
-        UUID customer_id FK
-        UUID customer_group_id FK
-        NUMERIC price
-        DATE effective_from
-        DATE effective_to
-        BOOLEAN is_active
-    }
-
-    %% ========================================
-    %% RELATIONSHIPS
-    %% ========================================
-
-    %% Identity and Access
-    organization ||--o{ org_member : "has members"
-    profile ||--o{ org_member : "belongs to orgs"
-    role ||--o{ org_member : "assigned to"
-
-    %% Customer Management
-    organization ||--o{ customer_group : "defines groups"
-    organization ||--o{ freight_on_board : "defines delivery methods"
-    organization ||--o{ customer : "has customers"
-    customer_group ||--o{ customer : "classifies"
-    freight_on_board ||--o{ customer : "preferred delivery"
-
-    %% Farm Structure
-    organization ||--o{ farm : "operates farms"
-    farm ||--o{ farm_site : "has sites"
-    farm ||--o{ farm_variety : "grows varieties"
-    farm ||--o{ farm_grade : "uses grades"
-
-    %% Products
-    farm ||--o{ farm_product : "sells products"
-    farm_grade ||--o{ farm_product : "graded as"
-    unit_of_measure ||--o{ farm_product : "weight unit"
-    unit_of_measure ||--o{ farm_product : "item unit"
-    unit_of_measure ||--o{ farm_product : "pack unit"
-    unit_of_measure ||--o{ farm_product : "sale unit"
-    unit_of_measure ||--o{ farm_product : "shipping unit"
-
-    %% Pricing
-    farm_product ||--o{ farm_product_price : "has prices"
-    freight_on_board ||--o{ farm_product_price : "priced by FOB"
-    customer ||--o{ farm_product_price : "customer-specific"
-    customer_group ||--o{ farm_product_price : "group-specific"
+    organization ||--o{ org_member : has
+    profile ||--o{ org_member : joins
+    role ||--o{ org_member : assigned
+    organization ||--o{ customer_group : defines
+    organization ||--o{ freight_on_board : defines
+    organization ||--o{ customer : has
+    customer_group ||--o{ customer : classifies
+    freight_on_board ||--o{ customer : delivery
+    organization ||--o{ farm : operates
+    farm ||--o{ farm_site : contains
+    farm ||--o{ farm_variety : grows
+    farm ||--o{ farm_grade : grades
+    farm ||--o{ farm_product : sells
+    farm_grade ||--o{ farm_product : graded
+    unit_of_measure ||--o{ farm_product : units
+    farm_product ||--o{ farm_product_price : priced
+    freight_on_board ||--o{ farm_product_price : by-fob
+    customer ||--o{ farm_product_price : customer
+    customer_group ||--o{ farm_product_price : group
 ```
 
 ---
@@ -212,8 +34,8 @@ erDiagram
 | Table | Purpose |
 |-------|---------|
 | unit_of_measure | Standardized measurement units (kg, L, °C, etc.) shared across all organizations for consistent data entry and calculations. |
-| organization | Root entity for multi-org support. Every org-scoped record traces back to this table. Stores org-level settings like default currency in metadata. |
 | role | Defines the five access levels (Owner, Admin, Manager, Verifier, Worker) used to control what users can see and do within an organization. |
+| organization | Root entity for multi-org support. Every org-scoped record traces back to this table. Stores org-level settings like default currency in metadata. |
 | profile | Extends Supabase Auth with app-specific user data like name, phone, and preferences. One-to-one with auth.users. |
 | org_member | Links users to organizations with a specific role. Enables a single user to belong to multiple organizations with different access levels in each. |
 | customer_group | Allows each organization to classify customers into groups (e.g. Wholesale, Retail, Restaurant) for reporting and group-based pricing. |
