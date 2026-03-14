@@ -317,8 +317,6 @@ The sellable products from each farm. Combines a grade with a full packaging hie
 
 Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
 
-> **TODO (Inventory Module):** Add `farm_product_inventory_item` junction table to link products to inventory items at pack and sale levels for inventory tracking and reporting. This allows a single product to be associated with multiple inventory items based on packaging configurations.
-
 ## farm_product_price
 
 Manages product pricing with three tiers of specificity and date ranges to track price changes over time. When a price changes, the current row gets an effective_to date and a new row is created. Currency always uses the org default from organization.metadata.

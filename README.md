@@ -61,13 +61,14 @@ These tables are shared across all organizations.
 - **farm_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping)
 - **farm_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 
-## Inventory Module (5 tables, 2 views) — [Docs](docs/schemas/inventory.md)
+## Inventory Module (6 tables, 2 views) — [Docs](docs/schemas/inventory.md)
 
 - **inventory_category** — Hierarchical categories with self-referencing parent for unlimited nesting
 - **inventory_item** — Items (seed, chemical, part) with unit conversions, burn rates, reorder settings
 - **inventory_order** — Order requests with workflow (requested → approved → ordered → received) and snapshot pricing
 - **inventory_order_receipt** — Individual deliveries against an order with lot tracking and partial receipt support
 - **inventory_transaction** — Every stock change (receipt, count, usage) with snapshots and generic reference back to source
+- **farm_product_inventory_item** — Links farm products to inventory items at pack and sale levels for inventory tracking
 - **inventory_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 - **inventory_lot_summary** (view) — Current on-hand quantity per lot with expiry dates
 

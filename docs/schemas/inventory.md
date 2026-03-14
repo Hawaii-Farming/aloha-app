@@ -20,6 +20,8 @@ erDiagram
     supplier ||--o{ inventory_order : from
     inventory_order ||--o{ inventory_order_receipt : received
     inventory_item ||--o{ inventory_transaction : tracked
+    farm_product ||--o{ farm_product_inventory_item : linked
+    inventory_item ||--o{ farm_product_inventory_item : linked
 ```
 
 ---
@@ -33,6 +35,7 @@ erDiagram
 | inventory_order | Tracks order requests through a workflow: requested → approved/rejected → ordered → partial/received. Snapshots item name, units, and cost at order time. Supports both catalog items and general/ad-hoc purchases. |
 | inventory_order_receipt | Individual deliveries received against an order. Captures quantity, lot number, expiry date, and acceptance details. Multiple receipts per order enable partial delivery tracking. |
 | inventory_transaction | Records every stock change (receipt, count, usage). Snapshots on-hand quantity and burn units at each transaction. Source of truth for computed totals like current stock, burn-per-week, and weeks-on-hand. Uses reference_table/reference_id to link back to the source (order receipt, grow schedule, etc.). |
+| farm_product_inventory_item | Junction table linking farm products to inventory items at pack and sale packaging levels. Enables inventory tracking when products are packed or sold. |
 
 ---
 
@@ -181,9 +184,38 @@ Records every stock change for an item. Each transaction snapshots the on-hand q
 | updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
 | updated_by           | UUID         | FK → profile(id), nullable            | Who last updated the record              |
 
+## farm_product_inventory_item
+
+Junction table linking farm products to inventory items at pack and sale packaging levels. When a product is packed or sold, this mapping determines which inventory items are consumed and in what quantity.
+
+| Column                | Type         | Constraints                           | Description                              |
+|----------------------|--------------|---------------------------------------|------------------------------------------|
+| id                   | UUID         | PK, auto-generated                    | Unique identifier                        |
+| org_id               | UUID         | NOT NULL, FK → organization(id)       | The organization                         |
+| product_id           | UUID         | NOT NULL, FK → farm_product(id)       | The farm product                         |
+| item_id              | UUID         | NOT NULL, FK → inventory_item(id)     | The inventory item consumed              |
+| packaging_level      | VARCHAR(10)  | NOT NULL, CHECK                       | One of: pack, sale                       |
+| quantity_per_unit    | NUMERIC      | nullable                              | How much of this item is used per unit at this packaging level |
+| is_active            | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
+| created_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
+| created_by           | UUID         | FK → profile(id), nullable            | Who created the record                   |
+| updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
+| updated_by           | UUID         | FK → profile(id), nullable            | Who last updated the record              |
+
+Unique constraint on `(product_id, item_id, packaging_level)` — one link per item per packaging level per product.
+
 ---
 
 ## Views
+
+### View Overview
+
+| View | Purpose |
+|------|---------|
+| inventory_item_summary | Provides a complete picture of each active inventory item with computed on-hand quantities, on-order totals, weeks-on-hand, days since last transaction, and next order date. Primary query target for dashboards and reorder alerts. |
+| inventory_lot_summary | Shows current on-hand quantity per lot for each item. Only includes lots with positive stock. Used for lot traceability, expiry tracking, and FIFO usage decisions. |
+
+---
 
 ### inventory_item_summary
 
@@ -247,6 +279,3 @@ When an order receipt is logged, the system should automatically create a `usage
 
 This keeps the estimated usage visible as an explicit transaction in the history rather than silently adjusting the on-hand during receipt. Can be implemented as a Supabase database function or in the application layer.
 
-### Junction table: farm_product_inventory_item
-
-Links farm products to inventory items at pack and sale levels for inventory tracking and reporting. Allows a single product to be associated with multiple inventory items based on packaging configurations.
