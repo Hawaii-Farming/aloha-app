@@ -10,10 +10,10 @@ erDiagram
     profile ||--o{ org_member : joins
     role ||--o{ org_member : assigned
     organization ||--o{ customer_group : defines
-    organization ||--o{ freight_on_board : defines
+    organization ||--o{ delivery_method : defines
     organization ||--o{ customer : has
     customer_group ||--o{ customer : classifies
-    freight_on_board ||--o{ customer : delivery
+    delivery_method ||--o{ customer : delivery
     organization ||--o{ farm : operates
     farm ||--o{ farm_site : contains
     farm ||--o{ farm_variety : grows
@@ -22,7 +22,7 @@ erDiagram
     farm_grade ||--o{ farm_product : graded
     unit_of_measure ||--o{ farm_product : units
     farm_product ||--o{ farm_product_price : priced
-    freight_on_board ||--o{ farm_product_price : by-fob
+    delivery_method ||--o{ farm_product_price : by-delivery
     customer ||--o{ farm_product_price : customer
     customer_group ||--o{ farm_product_price : group
 ```
@@ -39,7 +39,7 @@ erDiagram
 | profile | Extends Supabase Auth with app-specific user data like name, phone, and preferences. One-to-one with auth.users. |
 | org_member | Links users to organizations with a specific role. Enables a single user to belong to multiple organizations with different access levels in each. |
 | customer_group | Allows each organization to classify customers into groups (e.g. Wholesale, Retail, Restaurant) for reporting and group-based pricing. |
-| freight_on_board | Defines each organization's available delivery methods (e.g. Farm Pick-up, Local Delivery, Distributor). Used in customer setup and pricing. |
+| delivery_method | Defines each organization's available delivery methods (e.g. Farm Pick-up, Local Delivery, Distributor). Used in customer setup and pricing. |
 | customer | Stores an organization's customers with their preferred delivery method, group classification, billing address, and a link to external accounting software. |
 | farm | Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuce Farm). Each farm has its own sites, varieties, grades, and products. |
 | farm_site | Physical locations within a farm where operations happen — nurseries for seedlings, growing sites for production, packing sites, and storage facilities. |
@@ -129,9 +129,9 @@ Allows each organization to classify customers into groups for reporting and gro
 
 Unique constraint on `(org_id, name)` — no duplicate group names within an org.
 
-## freight_on_board
+## delivery_method
 
-Defines each organization's available delivery methods. Used in customer setup to set a customer's preferred delivery and in pricing to set FOB-specific prices.
+Defines each organization's available delivery methods (e.g. Farm Pick-up, Local Delivery, Distributor). Used in customer setup to set a preferred delivery and in pricing to set delivery-specific prices.
 
 | Column | Type        | Constraints                     | Description                |
 |--------|-------------|--------------------------------|----------------------------|
@@ -150,7 +150,7 @@ Stores an organization's customers with their group classification, preferred de
 | id              | UUID         | PK, auto-generated                 | Unique identifier                        |
 | org_id          | UUID         | NOT NULL, FK → organization(id)    | The organization                         |
 | customer_group_id| UUID        | FK → customer_group(id), nullable  | Customer classification for reporting    |
-| fob_id          | UUID         | FK → freight_on_board(id), nullable| Preferred delivery method                |
+| delivery_method_id          | UUID         | FK → delivery_method(id), nullable| Preferred delivery method                |
 | external_id     | VARCHAR(50)  | nullable                           | Links to accounts management software    |
 | name            | VARCHAR(100) | NOT NULL                           | Customer/business name                   |
 | email           | VARCHAR(100) | nullable                           | Primary email                            |
@@ -262,7 +262,7 @@ Manages product pricing with three tiers of specificity and date ranges to track
 | id              | UUID    | PK, auto-generated                   | Unique identifier                        |
 | org_id          | UUID    | NOT NULL, FK → organization(id)      | The organization                         |
 | product_id      | UUID    | NOT NULL, FK → farm_product(id)      | The product being priced                 |
-| fob_id          | UUID    | NOT NULL, FK → freight_on_board(id)  | Delivery method this price applies to    |
+| delivery_method_id | UUID   | NOT NULL, FK → delivery_method(id)   | Delivery method this price applies to    |
 | customer_id     | UUID    | FK → customer(id), nullable          | Customer-specific price (tier 1)         |
 | customer_group_id| UUID   | FK → customer_group(id), nullable    | Group-specific price (tier 2)            |
 | price           | NUMERIC | NOT NULL                             | The price amount                         |

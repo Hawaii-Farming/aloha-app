@@ -47,7 +47,7 @@ These tables are shared across all organizations.
 ### Organization and Customers
 - **organization** — Root entity for multi-org support with org-level settings in metadata
 - **customer_group** — Org-specific customer classifications for reporting and group pricing
-- **freight_on_board** — Org-specific delivery methods (Farm Pick-up, Local Delivery, Distributor)
+- **delivery_method** — Org-specific delivery methods (Farm Pick-up, Local Delivery, Distributor)
 - **customer** — Org customers with group, delivery preference, billing, and external accounting link
 
 ### Farm Structure

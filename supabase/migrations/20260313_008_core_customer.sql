@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS customer (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id            UUID NOT NULL REFERENCES organization(id) ON DELETE CASCADE,
     customer_group_id UUID REFERENCES customer_group(id),
-    fob_id            UUID REFERENCES freight_on_board(id),
+    delivery_method_id UUID REFERENCES delivery_method(id),
     external_id       VARCHAR(50),
     name              VARCHAR(100) NOT NULL,
     email             VARCHAR(100),
