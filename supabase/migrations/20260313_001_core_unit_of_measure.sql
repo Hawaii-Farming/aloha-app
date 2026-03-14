@@ -1,8 +1,3 @@
--- ============================================
--- Migration: 20260313_001_core_unit_of_measure
--- Description: Global unit of measure reference table
--- ============================================
-
 CREATE TABLE IF NOT EXISTS unit_of_measure (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name         VARCHAR(50) NOT NULL,
@@ -13,5 +8,4 @@ CREATE TABLE IF NOT EXISTS unit_of_measure (
     CONSTRAINT uq_unit_of_measure_abbreviation UNIQUE (abbreviation)
 );
 
--- Index on category for filtering
 CREATE INDEX idx_unit_of_measure_category ON unit_of_measure (category);

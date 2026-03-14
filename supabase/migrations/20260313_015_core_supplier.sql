@@ -1,8 +1,3 @@
--- ============================================
--- Migration: 20260313_015_core_supplier
--- Description: Organization-level suppliers for procurement
--- ============================================
-
 CREATE TABLE IF NOT EXISTS supplier (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id         UUID NOT NULL REFERENCES organization(id) ON DELETE CASCADE,
@@ -12,6 +7,10 @@ CREATE TABLE IF NOT EXISTS supplier (
     phone          VARCHAR(20),
     metadata       JSONB NOT NULL DEFAULT '{}',
     is_active      BOOLEAN NOT NULL DEFAULT true,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by     UUID REFERENCES profile(id),
+    updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by     UUID REFERENCES profile(id),
 
     CONSTRAINT uq_supplier UNIQUE (org_id, name)
 );

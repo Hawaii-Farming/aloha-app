@@ -1,8 +1,3 @@
--- ============================================
--- Migration: 20260313_003_core_role
--- Description: Global role reference table with access levels
--- ============================================
-
 CREATE TABLE IF NOT EXISTS role (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(30) NOT NULL,

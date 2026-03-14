@@ -32,7 +32,7 @@ aloha-app/
   src/                   # React application (coming soon)
 ```
 
-## Core Schema (15 tables)
+## Core Schema (15 tables) — [Docs](docs/schemas/core.md)
 
 ### Global Reference Tables
 These tables are shared across all organizations.
@@ -61,28 +61,39 @@ These tables are shared across all organizations.
 - **farm_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping)
 - **farm_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 
+## Inventory Module (5 tables, 2 views) — [Docs](docs/schemas/inventory.md)
+
+- **inventory_category** — Hierarchical categories with self-referencing parent for unlimited nesting
+- **inventory_item** — Items (seed, chemical, part) with unit conversions, burn rates, reorder settings
+- **inventory_order** — Order requests with workflow (requested → approved → ordered → received) and snapshot pricing
+- **inventory_order_receipt** — Individual deliveries against an order with lot tracking and partial receipt support
+- **inventory_transaction** — Every stock change (receipt, count, usage) with snapshots and generic reference back to source
+- **inventory_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
+- **inventory_lot_summary** (view) — Current on-hand quantity per lot with expiry dates
+
 ## Planned Modules
 
-- [ ] **Inventory** — Inventory items, stock movements, product-inventory junction table
-- [ ] **Growing Operations** — Seeding, grow batches, growth stage tracking, nutrient recipes
-- [ ] **Environmental Monitoring** — Sensor readings (water EC, pH) linked to monitoring stations at growing sites
-- [ ] **Harvest** — Harvest logging by variety and grade, yield tracking
-- [ ] **Orders and Sales** — Customer orders, order lines with price snapshots, invoicing
-- [ ] **Packing** — Pack runs, label generation, lot tracking (FSMA traceability)
-- [ ] **Shipping** — Shipment scheduling, BOL generation, delivery confirmation
-- [ ] **Maintenance** — Equipment and site maintenance scheduling and tracking
+- [x] **Inventory** — Item catalog, categories, orders with partial receipt workflow, transactions, and computed views for dashboards
+- [ ] **HR** — Employee records, scheduling, certifications, and labor tracking
+- [ ] **Sales** — Customer orders, order lines with price snapshots, invoicing
+- [ ] **Pack** — Pack runs, label generation, lot tracking (FSMA traceability)
+- [ ] **Grow** — Seeding, grow batches, growth stage tracking, nutrient recipes, environmental monitoring
 - [ ] **Food Safety** — Compliance checks, audit trails, corrective actions
-- [ ] **Reporting and Analytics** — Cost-per-batch, yield forecasting, revenue dashboards
+- [ ] **Global** — Cross-module shared configuration, reporting, and analytics
 
 ## Database Conventions
 
 - **UUIDs** for all primary keys (`gen_random_uuid()`)
 - **org_id** on every org-scoped table for direct RLS filtering
 - **is_active** boolean for soft deletes (no records are physically deleted)
+- **Audit fields** (`created_at`, `created_by`, `updated_at`, `updated_by`) on all org-scoped tables
 - **metadata** JSONB columns for flexible, display-only fields that don't require indexing or calculations
 - **Proper FK columns** for anything used in calculations, filtering, or joins
 - Sequential migration files in `supabase/migrations/` with naming: `YYYYMMDD_NNN_module_tablename.sql`
 
 ## Schema Documentation
 
-Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`. Start with [Core Schema](docs/schemas/core.md).
+Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
+
+- [Core Schema](docs/schemas/core.md) — 15 foundation tables
+- [Inventory Schema](docs/schemas/inventory.md) — Items, orders, transactions, and views

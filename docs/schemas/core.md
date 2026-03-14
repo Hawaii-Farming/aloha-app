@@ -88,7 +88,10 @@ Root entity for multi-org support. Every org-scoped table references this. Store
 | address   | TEXT         | nullable             | Physical address                     |
 | metadata  | JSONB        | NOT NULL, default {} | Org-level settings (currency, etc.)  |
 | is_active | BOOLEAN      | NOT NULL, default true| Soft-disable without deleting        |
-| created_at| TIMESTAMPTZ  | NOT NULL, default now | When the organization was onboarded  |
+| created_at| TIMESTAMPTZ  | NOT NULL, default now | When the record was created          |
+| created_by| UUID         | FK → profile(id), nullable | Who created the record          |
+| updated_at| TIMESTAMPTZ  | NOT NULL, default now | When the record was last updated     |
+| updated_by| UUID         | FK → profile(id), nullable | Who last updated the record     |
 
 
 ## profile
@@ -103,6 +106,8 @@ Extends Supabase Auth with app-specific user data. Stores user preferences like 
 | phone     | VARCHAR(20) | nullable                     | Contact number                       |
 | metadata    | JSONB     | NOT NULL, default {}         | User preferences (dark mode, etc.)   |
 | is_active | BOOLEAN     | NOT NULL, default true       | Soft-disable without deleting        |
+| created_at| TIMESTAMPTZ | NOT NULL, default now        | When the record was created          |
+| updated_at| TIMESTAMPTZ | NOT NULL, default now        | When the record was last updated     |
 
 ## org_member
 
@@ -115,7 +120,11 @@ Links users to organizations with a specific role. Enables a single user to belo
 | user_id  | UUID        | NOT NULL, FK → profile(id)       | The user                             |
 | role_id  | UUID        | NOT NULL, FK → role(id)          | Their role in this organization      |
 | is_active| BOOLEAN     | NOT NULL, default true           | Soft-disable membership              |
-| joined_at| TIMESTAMPTZ | NOT NULL, default now            | When they joined the organization    |
+| joined_at  | TIMESTAMPTZ | NOT NULL, default now            | When they joined the organization    |
+| created_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was created          |
+| created_by | UUID        | FK → profile(id), nullable       | Who created the record               |
+| updated_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was last updated     |
+| updated_by | UUID        | FK → profile(id), nullable       | Who last updated the record          |
 
 Unique constraint on `(org_id, user_id)` — a user can only have one role per organization.
 
@@ -127,7 +136,11 @@ Allows each organization to classify customers into groups for reporting and gro
 |--------|-------------|--------------------------------|----------------------------|
 | id     | UUID        | PK, auto-generated             | Unique identifier          |
 | org_id | UUID        | NOT NULL, FK → organization(id)| The organization           |
-| name   | VARCHAR(50) | NOT NULL                       | Group name                 |
+| name       | VARCHAR(50)  | NOT NULL                       | Group name                 |
+| created_at | TIMESTAMPTZ  | NOT NULL, default now          | When the record was created|
+| created_by | UUID         | FK → profile(id), nullable     | Who created the record     |
+| updated_at | TIMESTAMPTZ  | NOT NULL, default now          | When the record was last updated |
+| updated_by | UUID         | FK → profile(id), nullable     | Who last updated the record|
 
 Unique constraint on `(org_id, name)` — no duplicate group names within an org.
 
@@ -139,7 +152,11 @@ Defines each organization's available delivery methods (e.g. Farm Pick-up, Local
 |--------|-------------|--------------------------------|----------------------------|
 | id     | UUID        | PK, auto-generated             | Unique identifier          |
 | org_id | UUID        | NOT NULL, FK → organization(id)| The organization           |
-| name   | VARCHAR(50) | NOT NULL                       | Delivery method name       |
+| name       | VARCHAR(50)  | NOT NULL                       | Delivery method name       |
+| created_at | TIMESTAMPTZ  | NOT NULL, default now          | When the record was created|
+| created_by | UUID         | FK → profile(id), nullable     | Who created the record     |
+| updated_at | TIMESTAMPTZ  | NOT NULL, default now          | When the record was last updated |
+| updated_by | UUID         | FK → profile(id), nullable     | Who last updated the record|
 
 Unique constraint on `(org_id, name)` — no duplicate delivery methods within an org.
 
@@ -157,6 +174,10 @@ Organization-level suppliers used for procurement across all farms. Stores conta
 | phone         | VARCHAR(20)  | nullable                       | Contact phone                      |
 | metadata      | JSONB        | NOT NULL, default {}           | Address, payment terms, lead times, etc. |
 | is_active     | BOOLEAN      | NOT NULL, default true         | Soft-disable without deleting      |
+| created_at    | TIMESTAMPTZ  | NOT NULL, default now          | When the record was created        |
+| created_by    | UUID         | FK → profile(id), nullable     | Who created the record             |
+| updated_at    | TIMESTAMPTZ  | NOT NULL, default now          | When the record was last updated   |
+| updated_by    | UUID         | FK → profile(id), nullable     | Who last updated the record        |
 
 Unique constraint on `(org_id, name)` — no duplicate supplier names within an org.
 
@@ -176,6 +197,10 @@ Stores an organization's customers with their group classification, preferred de
 | metadata        | JSONB        | NOT NULL, default {}               | Flexible fields: store_number, store_name, cc_emails, etc. |
 | billing_address | TEXT         | nullable                           | Billing address                          |
 | is_active       | BOOLEAN      | NOT NULL, default true             | Soft-disable without deleting            |
+| created_at      | TIMESTAMPTZ  | NOT NULL, default now              | When the record was created              |
+| created_by      | UUID         | FK → profile(id), nullable         | Who created the record                   |
+| updated_at      | TIMESTAMPTZ  | NOT NULL, default now              | When the record was last updated         |
+| updated_by      | UUID         | FK → profile(id), nullable         | Who last updated the record              |
 
 Unique constraint on `(org_id, name)` — no duplicate customer names within an org.
 
@@ -189,7 +214,11 @@ Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuc
 | org_id  | UUID         | NOT NULL, FK → organization(id) | The organization                             |
 | name    | VARCHAR(100) | NOT NULL                        | Farm name, e.g. "Cuke Farm"                  |
 | metadata| JSONB        | NOT NULL, default {}            | Farm-level settings (weighing_uom_id, growing_uom_id, etc.) |
-| is_active| BOOLEAN     | NOT NULL, default true          | Soft-disable without deleting                |
+| is_active  | BOOLEAN     | NOT NULL, default true          | Soft-disable without deleting                |
+| created_at | TIMESTAMPTZ | NOT NULL, default now           | When the record was created                  |
+| created_by | UUID        | FK → profile(id), nullable      | Who created the record                       |
+| updated_at | TIMESTAMPTZ | NOT NULL, default now           | When the record was last updated             |
+| updated_by | UUID        | FK → profile(id), nullable      | Who last updated the record                  |
 
 Unique constraint on `(org_id, name)` — no duplicate farm names within an org.
 
@@ -205,7 +234,11 @@ Physical locations within a farm where operations happen. Each site has a type (
 | name    | VARCHAR(100) | NOT NULL                          | Site name, e.g. "Greenhouse A" |
 | type    | VARCHAR(20)  | NOT NULL, CHECK                   | One of: nursery, growing, packing, storage |
 | metadata| JSONB        | NOT NULL, default {}              | Type-specific data (acres, rows, monitoring stations, etc.) |
-| is_active| BOOLEAN     | NOT NULL, default true            | Soft-disable without deleting  |
+| is_active  | BOOLEAN     | NOT NULL, default true            | Soft-disable without deleting  |
+| created_at | TIMESTAMPTZ | NOT NULL, default now             | When the record was created    |
+| created_by | UUID        | FK → profile(id), nullable        | Who created the record         |
+| updated_at | TIMESTAMPTZ | NOT NULL, default now             | When the record was last updated |
+| updated_by | UUID        | FK → profile(id), nullable        | Who last updated the record    |
 
 Unique constraint on `(farm_id, name)` — no duplicate site names within a farm.
 
@@ -219,7 +252,12 @@ Crop varieties grown on a specific farm, each with a short code for quick refere
 | org_id  | UUID        | NOT NULL, FK → organization(id) | The organization              |
 | farm_id | UUID        | NOT NULL, FK → farm(id)         | The farm this variety belongs to |
 | code    | VARCHAR(10) | NOT NULL                | Short code, e.g. "K"         |
-| name    | VARCHAR(50) | NOT NULL                | Full name, e.g. "Keiki"      |
+| name       | VARCHAR(50)  | NOT NULL                | Full name, e.g. "Keiki"      |
+| is_active  | BOOLEAN      | NOT NULL, default true  | Soft-disable without deleting|
+| created_at | TIMESTAMPTZ  | NOT NULL, default now   | When the record was created  |
+| created_by | UUID         | FK → profile(id), nullable | Who created the record    |
+| updated_at | TIMESTAMPTZ  | NOT NULL, default now   | When the record was last updated |
+| updated_by | UUID         | FK → profile(id), nullable | Who last updated the record |
 
 Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
 
@@ -233,7 +271,12 @@ Harvest quality grades for a specific farm, each with a short code. Applied duri
 | org_id  | UUID        | NOT NULL, FK → organization(id) | The organization              |
 | farm_id | UUID        | NOT NULL, FK → farm(id)         | The farm this grade belongs to |
 | code    | VARCHAR(10) | NOT NULL                | Short code, e.g. "A"         |
-| name    | VARCHAR(50) | NOT NULL                | Full name, e.g. "Grade A"    |
+| name       | VARCHAR(50)  | NOT NULL                | Full name, e.g. "Grade A"    |
+| is_active  | BOOLEAN      | NOT NULL, default true  | Soft-disable without deleting|
+| created_at | TIMESTAMPTZ  | NOT NULL, default now   | When the record was created  |
+| created_by | UUID         | FK → profile(id), nullable | Who created the record    |
+| updated_at | TIMESTAMPTZ  | NOT NULL, default now   | When the record was last updated |
+| updated_by | UUID         | FK → profile(id), nullable | Who last updated the record |
 
 Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
 
@@ -267,6 +310,10 @@ The sellable products from each farm. Combines a grade with a full packaging hie
 | metadata                   | JSONB        | NOT NULL, default {}                 | Description, segment, manufacturer, gtin, upc, packaging_type, dimensions, photos, spec sheet, shipping requirements |
 | display_order              | INT          | nullable                             | Sort order for display                   |
 | is_active                  | BOOLEAN      | NOT NULL, default true               | Soft-disable without deleting            |
+| created_at                 | TIMESTAMPTZ  | NOT NULL, default now                | When the record was created              |
+| created_by                 | UUID         | FK → profile(id), nullable           | Who created the record                   |
+| updated_at                 | TIMESTAMPTZ  | NOT NULL, default now                | When the record was last updated         |
+| updated_by                 | UUID         | FK → profile(id), nullable           | Who last updated the record              |
 
 Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
 
@@ -287,6 +334,10 @@ Manages product pricing with three tiers of specificity and date ranges to track
 | price           | NUMERIC | NOT NULL                             | The price amount                         |
 | effective_from  | DATE    | NOT NULL                             | When this price starts                   |
 | effective_to    | DATE    | nullable                             | When this price ends (null = current)    |
-| is_active       | BOOLEAN | NOT NULL, default true               | Soft-disable without deleting            |
+| is_active       | BOOLEAN     | NOT NULL, default true               | Soft-disable without deleting            |
+| created_at      | TIMESTAMPTZ | NOT NULL, default now                | When the record was created              |
+| created_by      | UUID        | FK → profile(id), nullable           | Who created the record                   |
+| updated_at      | TIMESTAMPTZ | NOT NULL, default now                | When the record was last updated         |
+| updated_by      | UUID        | FK → profile(id), nullable           | Who last updated the record              |
 
 Pricing lookup priority: customer price (tier 1) → group price (tier 2) → default price (tier 3), filtered by `effective_from <= today AND (effective_to IS NULL OR effective_to > today)`.

@@ -1,8 +1,3 @@
--- ============================================
--- Migration: 20260313_008_core_customer
--- Description: Organization customers with group and delivery method
--- ============================================
-
 CREATE TABLE IF NOT EXISTS customer (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id            UUID NOT NULL REFERENCES organization(id) ON DELETE CASCADE,
@@ -14,9 +9,12 @@ CREATE TABLE IF NOT EXISTS customer (
     metadata          JSONB NOT NULL DEFAULT '{}',
     billing_address   TEXT,
     is_active         BOOLEAN NOT NULL DEFAULT true,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by        UUID REFERENCES profile(id),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by        UUID REFERENCES profile(id),
 
     CONSTRAINT uq_customer_org_name UNIQUE (org_id, name)
 );
 
--- Index for looking up customers by organization
 CREATE INDEX idx_customer_org_id ON customer (org_id);
