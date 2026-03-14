@@ -32,7 +32,7 @@ aloha-app/
   src/                   # React application (coming soon)
 ```
 
-## Core Schema (14 tables)
+## Core Schema (15 tables)
 
 ### Global Reference Tables
 These tables are shared across all organizations.
@@ -49,6 +49,7 @@ These tables are shared across all organizations.
 - **customer_group** — Org-specific customer classifications for reporting and group pricing
 - **delivery_method** — Org-specific delivery methods (Farm Pick-up, Local Delivery, Distributor)
 - **customer** — Org customers with group, delivery preference, billing, and external accounting link
+- **supplier** — Org-level suppliers for procurement, referenced by inventory items across farms
 
 ### Farm Structure
 - **farm** — Crop/product lines within an org (e.g. Cuke Farm, Lettuce Farm)

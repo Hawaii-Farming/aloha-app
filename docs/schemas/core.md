@@ -14,6 +14,7 @@ erDiagram
     organization ||--o{ customer : has
     customer_group ||--o{ customer : classifies
     delivery_method ||--o{ customer : delivery
+    organization ||--o{ supplier : has
     organization ||--o{ farm : operates
     farm ||--o{ farm_site : contains
     farm ||--o{ farm_variety : grows
@@ -40,6 +41,7 @@ erDiagram
 | org_member | Links users to organizations with a specific role. Enables a single user to belong to multiple organizations with different access levels in each. |
 | customer_group | Allows each organization to classify customers into groups (e.g. Wholesale, Retail, Restaurant) for reporting and group-based pricing. |
 | delivery_method | Defines each organization's available delivery methods (e.g. Farm Pick-up, Local Delivery, Distributor). Used in customer setup and pricing. |
+| supplier | Organization-level suppliers for procurement. Referenced by inventory items across all farms. |
 | customer | Stores an organization's customers with their preferred delivery method, group classification, billing address, and a link to external accounting software. |
 | farm | Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuce Farm). Each farm has its own sites, varieties, grades, and products. |
 | farm_site | Physical locations within a farm where operations happen — nurseries for seedlings, growing sites for production, packing sites, and storage facilities. |
@@ -140,6 +142,23 @@ Defines each organization's available delivery methods (e.g. Farm Pick-up, Local
 | name   | VARCHAR(50) | NOT NULL                       | Delivery method name       |
 
 Unique constraint on `(org_id, name)` — no duplicate delivery methods within an org.
+
+## supplier
+
+Organization-level suppliers used for procurement across all farms. Stores contact details and flexible fields like address, payment terms, and lead times in metadata.
+
+| Column         | Type         | Constraints                     | Description                        |
+|---------------|--------------|--------------------------------|------------------------------------|
+| id            | UUID         | PK, auto-generated             | Unique identifier                  |
+| org_id        | UUID         | NOT NULL, FK → organization(id)| The organization                   |
+| name          | VARCHAR(100) | NOT NULL                       | Supplier/company name              |
+| contact_person| VARCHAR(100) | nullable                       | Primary contact                    |
+| email         | VARCHAR(100) | nullable                       | Contact email                      |
+| phone         | VARCHAR(20)  | nullable                       | Contact phone                      |
+| metadata      | JSONB        | NOT NULL, default {}           | Address, payment terms, lead times, etc. |
+| is_active     | BOOLEAN      | NOT NULL, default true         | Soft-disable without deleting      |
+
+Unique constraint on `(org_id, name)` — no duplicate supplier names within an org.
 
 ## customer
 
