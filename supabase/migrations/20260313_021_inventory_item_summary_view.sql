@@ -27,7 +27,7 @@ SELECT
     i.name,
     i.type,
     i.category_id,
-    i.supplier_id,
+    i.vendor_id,
     i.is_frequently_used,
     i.auto_order_enabled,
     i.burn_per_week,
