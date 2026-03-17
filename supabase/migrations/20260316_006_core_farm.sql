@@ -1,14 +1,14 @@
 CREATE TABLE IF NOT EXISTS farm (
     id               TEXT PRIMARY KEY,
     org_id           TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
-    name             VARCHAR(100) NOT NULL,
-    weighing_uom  VARCHAR(10) REFERENCES util_uom(code),
-    growing_uom   VARCHAR(10) REFERENCES util_uom(code),
+    name             TEXT NOT NULL,
+    weighing_uom  TEXT REFERENCES util_uom(code),
+    growing_uom   TEXT REFERENCES util_uom(code),
     is_active        BOOLEAN NOT NULL DEFAULT true,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by       UUID REFERENCES auth.users(id),
+    created_by       TEXT,
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by       UUID REFERENCES auth.users(id),
+    updated_by       TEXT,
     CONSTRAINT uq_farm UNIQUE (org_id, name)
 );
 
@@ -20,6 +20,6 @@ COMMENT ON COLUMN farm.weighing_uom IS 'Default unit of measure for weighing ope
 COMMENT ON COLUMN farm.growing_uom IS 'Default unit of measure for growing/harvest tracking on this farm';
 COMMENT ON COLUMN farm.is_active IS 'Soft delete flag; false hides the farm from active use';
 COMMENT ON COLUMN farm.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN farm.created_by IS 'User who created the record, references auth.users(id)';
+COMMENT ON COLUMN farm.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN farm.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN farm.updated_by IS 'User who last updated the record, references auth.users(id)';
+COMMENT ON COLUMN farm.updated_by IS 'Email of the user who last updated the record';

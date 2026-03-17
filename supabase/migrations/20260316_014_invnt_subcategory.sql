@@ -2,12 +2,12 @@ CREATE TABLE IF NOT EXISTS invnt_subcategory (
     id          TEXT PRIMARY KEY,
     org_id      TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     category_id TEXT NOT NULL REFERENCES invnt_category(id) ON DELETE CASCADE,
-    name        VARCHAR(100) NOT NULL,
+    name        TEXT NOT NULL,
     is_active   BOOLEAN NOT NULL DEFAULT true,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by  UUID REFERENCES auth.users(id),
+    created_by  TEXT,
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by  UUID REFERENCES auth.users(id),
+    updated_by  TEXT,
     CONSTRAINT uq_invnt_subcategory UNIQUE (category_id, name)
 );
 
@@ -21,6 +21,6 @@ COMMENT ON COLUMN invnt_subcategory.category_id IS 'Parent main category this su
 COMMENT ON COLUMN invnt_subcategory.name IS 'Display name of the subcategory, unique within its parent category';
 COMMENT ON COLUMN invnt_subcategory.is_active IS 'Soft delete flag; false hides the subcategory from active use';
 COMMENT ON COLUMN invnt_subcategory.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN invnt_subcategory.created_by IS 'User who created the record, references auth.users(id)';
+COMMENT ON COLUMN invnt_subcategory.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN invnt_subcategory.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN invnt_subcategory.updated_by IS 'User who last updated the record, references auth.users(id)';
+COMMENT ON COLUMN invnt_subcategory.updated_by IS 'Email of the user who last updated the record';

@@ -2,22 +2,20 @@
 
 Core tables that form the foundation of the Aloha ERP system. These include global reference tables shared across all organizations, identity and access management, customer management, farm structure, product catalog, and pricing.
 
+> **Standard audit fields:** Every table includes `created_at` (TIMESTAMPTZ, default now), `created_by` (TEXT, user email), `updated_at` (TIMESTAMPTZ, default now), and `updated_by` (TEXT, user email). These are omitted from the column listings below for brevity.
+
 ## Entity Relationship Diagram
 
 ```mermaid
 erDiagram
-    org ||--o{ org_member : has
-    auth.users ||--o{ org_member : joins
-    util_role ||--o{ org_member : assigned
     org ||--o{ sales_cust_group : defines
     org ||--o{ sales_fob : defines
     org ||--o{ sales_cust : has
     sales_cust_group ||--o{ sales_cust : classifies
     sales_fob ||--o{ sales_cust : delivery
-    org ||--o{ invnt_vendor : has
     org ||--o{ farm : operates
-    org ||--o{ org_site : has
-    farm ||--o{ org_site : scoped
+    org ||--o{ site : has
+    farm ||--o{ site : scoped
     farm ||--o{ grow_variety : grows
     farm ||--o{ grow_grade : grades
     farm ||--o{ sales_product : sells
@@ -36,15 +34,12 @@ erDiagram
 | Table | Purpose |
 |-------|---------|
 | util_uom | Standardized measurement units (kg, L, °C, etc.) shared across all organizations for consistent data entry and calculations. |
-| util_role | Defines the five access levels (Owner, Admin, Manager, Verifier, Worker) used to control what users can see and do within an organization. |
 | org | Root entity for multi-org support. Every org-scoped record traces back to this table. Stores org-level settings like default currency. |
-| org_member | Links users to organizations with a specific role. Enables a single user to belong to multiple organizations with different access levels in each. |
 | sales_cust_group | Allows each organization to classify customers into groups (e.g. Wholesale, Retail, Restaurant) for reporting and group-based pricing. |
 | sales_fob | Defines each organization's available delivery methods (e.g. Farm Pick-up, Local Delivery, Distributor). Used in customer setup and pricing. |
 | sales_cust | Stores an organization's customers with their preferred delivery method, group classification, billing address, and a link to external accounting software. |
-| invnt_vendor | Organization-level suppliers for procurement. Referenced by inventory items across all farms. |
 | farm | Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuce Farm). Each farm has its own sites, varieties, grades, and products. |
-| org_site | Physical locations within a farm where operations happen — nurseries for seedlings, growing sites for production, packing sites, and storage facilities. |
+| site | Physical locations within a farm where operations happen — nurseries for seedlings, growing sites for production, packing sites, and storage facilities. |
 | grow_variety | Crop varieties grown on a specific farm, each with a short code for quick reference during data entry (e.g. "K" for Keiki). |
 | grow_grade | Harvest quality grades used by a specific farm, each with a short code (e.g. "A" for Grade A). Applied during harvest and carried through to sales. |
 | sales_product | The sellable products from each farm, combining grade and packaging configuration. Contains the full packaging hierarchy (content → pack → sale → shipping), product identification (GTIN, UPC), and shipping requirements. |
@@ -58,22 +53,9 @@ Standardized measurement units shared across all organizations for consistent da
 
 | Column  | Type        | Constraints          | Description                          |
 |---------|-------------|----------------------|--------------------------------------|
-| code    | VARCHAR(10) | PK                   | Short form, e.g. "kg"               |
-| name    | VARCHAR(50) | NOT NULL, UNIQUE     | Full name, e.g. "Kilogram"           |
-| category| VARCHAR(30) | NOT NULL             | Grouping: weight, volume, length, etc.|
-
-## util_role
-
-Defines the access levels used to control what users can see and do within an organization. Shared across all organizations.
-
-| Column      | Type        | Constraints          | Description                              |
-|-------------|-------------|----------------------|------------------------------------------|
-| id          | UUID        | PK, auto-generated   | Unique identifier                        |
-| name        | VARCHAR(30) | NOT NULL, UNIQUE     | Role name: Owner, Admin, Manager, etc.   |
-| level       | INT         | NOT NULL, UNIQUE     | Numeric access level (higher = more access) |
-| description | TEXT        | nullable             | What this role can do                    |
-
-Defined roles: Owner (5), Admin (4), Manager (3), Verifier (2), Worker (1). Higher levels inherit permissions of lower levels.
+| code    | TEXT | PK                   | Short form, e.g. "kg"               |
+| name    | TEXT | NOT NULL, UNIQUE     | Full name, e.g. "Kilogram"           |
+| category| TEXT | NOT NULL             | Grouping: weight, volume, length, etc.|
 
 ## org
 
@@ -82,33 +64,11 @@ Root entity for multi-org support. Every org-scoped table references this. Store
 | Column     | Type         | Constraints          | Description                          |
 |------------|--------------|----------------------|--------------------------------------|
 | id         | TEXT         | PK                   | Human-readable identifier derived from org name (lowercase, underscores) |
-| name       | VARCHAR(100) | NOT NULL, UNIQUE     | Organization name                    |
-| slug       | VARCHAR(100) | NOT NULL, UNIQUE     | Short initials derived from org name (e.g. HF for Hawaii Farming) |
+| name       | TEXT | NOT NULL, UNIQUE     | Organization name                    |
+| slug       | TEXT | NOT NULL, UNIQUE     | Short initials derived from org name (e.g. HF for Hawaii Farming) |
 | address    | TEXT         | nullable             | Physical address                     |
-| currency   | VARCHAR(10)  | nullable             | Default currency for org             |
+| currency   | TEXT  | nullable             | Default currency for org             |
 | is_active  | BOOLEAN      | NOT NULL, default true| Soft-disable without deleting        |
-| created_at | TIMESTAMPTZ  | NOT NULL, default now | When the record was created          |
-| created_by | UUID         | FK → auth.users(id), nullable | Who created the record          |
-| updated_at | TIMESTAMPTZ  | NOT NULL, default now | When the record was last updated     |
-| updated_by | UUID         | FK → auth.users(id), nullable | Who last updated the record     |
-
-## org_member
-
-Links users to organizations with a specific role. Enables a single user to belong to multiple organizations with different access levels in each.
-
-| Column     | Type        | Constraints                      | Description                          |
-|------------|-------------|----------------------------------|--------------------------------------|
-| id         | UUID        | PK, auto-generated               | Unique identifier                    |
-| org_id     | TEXT        | NOT NULL, FK → org(id)           | The organization                     |
-| user_id    | UUID        | NOT NULL, FK → auth.users(id)    | The user                             |
-| role_id    | UUID        | NOT NULL, FK → util_role(id)     | Their role in this organization      |
-| is_active  | BOOLEAN     | NOT NULL, default true           | Soft-disable membership              |
-| created_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was created          |
-| created_by | UUID        | FK → auth.users(id), nullable    | Who created the record               |
-| updated_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was last updated     |
-| updated_by | UUID        | FK → auth.users(id), nullable    | Who last updated the record          |
-
-Unique constraint on `(org_id, user_id)` — a user can only have one role per organization.
 
 ## sales_cust_group
 
@@ -118,11 +78,7 @@ Allows each organization to classify customers into groups for reporting and gro
 |------------|-------------|------------------------------|----------------------------|
 | id         | TEXT        | PK                           | Human-readable identifier derived from group name |
 | org_id     | TEXT        | NOT NULL, FK → org(id)       | The organization           |
-| name       | VARCHAR(50) | NOT NULL                     | Group name                 |
-| created_at | TIMESTAMPTZ | NOT NULL, default now        | When the record was created|
-| created_by | UUID        | FK → auth.users(id), nullable| Who created the record     |
-| updated_at | TIMESTAMPTZ | NOT NULL, default now        | When the record was last updated |
-| updated_by | UUID        | FK → auth.users(id), nullable| Who last updated the record|
+| name       | TEXT | NOT NULL                     | Group name                 |
 
 Unique constraint on `(org_id, name)` — no duplicate group names within an org.
 
@@ -134,36 +90,9 @@ Defines each organization's available delivery methods (e.g. Farm Pick-up, Local
 |------------|-------------|------------------------------|----------------------------|
 | id         | TEXT        | PK                           | Human-readable identifier derived from FOB name |
 | org_id     | TEXT        | NOT NULL, FK → org(id)       | The organization           |
-| name       | VARCHAR(50) | NOT NULL                     | Delivery method name       |
-| created_at | TIMESTAMPTZ | NOT NULL, default now        | When the record was created|
-| created_by | UUID        | FK → auth.users(id), nullable| Who created the record     |
-| updated_at | TIMESTAMPTZ | NOT NULL, default now        | When the record was last updated |
-| updated_by | UUID        | FK → auth.users(id), nullable| Who last updated the record|
+| name       | TEXT | NOT NULL                     | Delivery method name       |
 
 Unique constraint on `(org_id, name)` — no duplicate delivery methods within an org.
-
-## invnt_vendor
-
-Organization-level suppliers used for procurement across all farms. Stores contact details and additional fields like address, payment terms, and lead times.
-
-| Column          | Type         | Constraints                  | Description                        |
-|-----------------|--------------|------------------------------|------------------------------------|
-| id              | TEXT         | PK                           | Human-readable identifier derived from vendor name |
-| org_id          | TEXT         | NOT NULL, FK → org(id)       | The organization                   |
-| name            | VARCHAR(100) | NOT NULL                     | Supplier/company name              |
-| contact_person  | VARCHAR(100) | nullable                     | Primary contact                    |
-| email           | VARCHAR(100) | nullable                     | Contact email                      |
-| phone           | VARCHAR(20)  | nullable                     | Contact phone                      |
-| address         | TEXT         | nullable                     | Supplier address                   |
-| payment_terms   | VARCHAR(50)  | nullable                     | Payment terms (e.g., Net 30)      |
-| lead_time       | NUMERIC      | nullable                     | Lead time in days                  |
-| is_active       | BOOLEAN      | NOT NULL, default true       | Soft-disable without deleting      |
-| created_at      | TIMESTAMPTZ  | NOT NULL, default now        | When the record was created        |
-| created_by      | UUID         | FK → auth.users(id), nullable| Who created the record             |
-| updated_at      | TIMESTAMPTZ  | NOT NULL, default now        | When the record was last updated   |
-| updated_by      | UUID         | FK → auth.users(id), nullable| Who last updated the record        |
-
-Unique constraint on `(org_id, name)` — no duplicate supplier names within an org.
 
 ## sales_cust
 
@@ -175,16 +104,12 @@ Stores an organization's customers with their group classification, preferred de
 | org_id       | TEXT         | NOT NULL, FK → org(id)             | The organization                         |
 | cust_group_id| TEXT         | FK → sales_cust_group(id), nullable| Customer classification for reporting    |
 | fob_id       | TEXT         | FK → sales_fob(id), nullable             | Preferred delivery method                |
-| external_id  | VARCHAR(50)  | nullable                           | Links to accounts management software    |
-| name         | VARCHAR(100) | NOT NULL                           | Customer/business name                   |
-| email        | VARCHAR(100) | nullable                           | Primary email                            |
+| accounting_id| TEXT  | nullable                           | Identifier used to link this customer to the accounting system |
+| name         | TEXT | NOT NULL                           | Customer/business name                   |
+| email        | TEXT | nullable                           | Primary email                            |
 | cc_emails    | JSONB        | NOT NULL, default '[]'             | Additional contact emails                |
 | billing_address | TEXT      | nullable                           | Billing address                          |
 | is_active    | BOOLEAN      | NOT NULL, default true             | Soft-disable without deleting            |
-| created_at   | TIMESTAMPTZ  | NOT NULL, default now              | When the record was created              |
-| created_by   | UUID         | FK → auth.users(id), nullable      | Who created the record                   |
-| updated_at   | TIMESTAMPTZ  | NOT NULL, default now              | When the record was last updated         |
-| updated_by   | UUID         | FK → auth.users(id), nullable      | Who last updated the record              |
 
 Unique constraint on `(org_id, name)` — no duplicate customer names within an org.
 
@@ -196,18 +121,14 @@ Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuc
 |------------------|--------------|--------------------------------|----------------------------------------------|
 | id               | TEXT         | PK                              | Human-readable identifier derived from farm name (lowercase trimmed) |
 | org_id           | TEXT         | NOT NULL, FK → org(id)          | The organization                             |
-| name             | VARCHAR(100) | NOT NULL                        | Farm name, e.g. "Cuke Farm"                  |
-| weighing_uom  | VARCHAR(10)  | FK → util_uom(code), nullable | Default unit for weighing operations      |
-| growing_uom   | VARCHAR(10)  | FK → util_uom(code), nullable | Default unit for growing operations        |
+| name             | TEXT | NOT NULL                        | Farm name, e.g. "Cuke Farm"                  |
+| weighing_uom  | TEXT  | FK → util_uom(code), nullable | Default unit for weighing operations      |
+| growing_uom   | TEXT  | FK → util_uom(code), nullable | Default unit for growing operations        |
 | is_active        | BOOLEAN      | NOT NULL, default true          | Soft-disable without deleting                |
-| created_at       | TIMESTAMPTZ  | NOT NULL, default now           | When the record was created                  |
-| created_by       | UUID         | FK → auth.users(id), nullable   | Who created the record                       |
-| updated_at       | TIMESTAMPTZ  | NOT NULL, default now           | When the record was last updated             |
-| updated_by       | UUID         | FK → auth.users(id), nullable   | Who last updated the record                  |
 
 Unique constraint on `(org_id, name)` — no duplicate farm names within an org.
 
-## org_site
+## site
 
 Unified site register for all physical locations and assets across the organization. The `category` and `subcategory` fields drive which additional fields are relevant in the UI. Sites can be scoped to a specific farm or shared org-wide.
 
@@ -215,29 +136,25 @@ Categories and subcategories: growing (greenhouse, nursery), packaging (packroom
 
 | Column         | Type         | Constraints                      | Description                    |
 |----------------|--------------|----------------------------------|--------------------------------|
-| id             | UUID         | PK, auto-generated               | Unique identifier              |
+| id             | TEXT         | PK                               | Human-readable identifier derived from site name (trimmed lowercase) |
 | org_id         | TEXT         | NOT NULL, FK → org(id)           | The organization               |
 | farm_id        | TEXT         | FK → farm(id), nullable          | Optional farm scope (null = org-wide) |
-| name           | VARCHAR(100) | NOT NULL                         | Site name, e.g. "Greenhouse A" |
+| name           | TEXT | NOT NULL                         | Site name, e.g. "Greenhouse A" |
 | category       | TEXT         | NOT NULL                         | Top-level classification from dropdown (e.g. growing, packaging, storage, maintenance) |
 | subcategory    | TEXT         | nullable                         | Second-level classification within category (e.g. greenhouse, nursery, equipment) |
 | acres          | NUMERIC      | nullable                         | Acreage of the growing site    |
 | total_rows     | INT          | nullable                         | Total number of growing rows in the site |
 | avg_units_per_row | NUMERIC   | nullable                         | Average number of growing units (plants/pots) per row |
-| code           | VARCHAR(20)  | nullable                         | Short identifier for equipment/assets (e.g. PUMP-01) |
-| manufacturer   | VARCHAR(100) | nullable                         | Manufacturer or brand name for equipment/assets |
-| model          | VARCHAR(100) | nullable                         | Model name or number for equipment/assets |
-| serial_number  | VARCHAR(100) | nullable                         | Manufacturer serial number for equipment/assets |
+| code           | TEXT  | nullable                         | Short identifier for equipment/assets (e.g. PUMP-01) |
+| manufacturer   | TEXT | nullable                         | Manufacturer or brand name for equipment/assets |
+| model          | TEXT | nullable                         | Model name or number for equipment/assets |
+| serial_number  | TEXT | nullable                         | Manufacturer serial number for equipment/assets |
 | purchase_date  | DATE         | nullable                         | Date the equipment/asset was acquired |
 | manual_url     | TEXT         | nullable                         | URL or path to equipment manual or site documentation |
 | notes          | TEXT         | nullable                         | General notes about the site or asset |
 | photos         | JSONB        | NOT NULL, default []             | JSON array of photo URLs       |
 | metadata       | JSONB        | NOT NULL, default {}             | Flexible JSON for display-only details (dimensions, capacity, environmental settings) |
 | is_active      | BOOLEAN      | NOT NULL, default true           | Soft-disable without deleting  |
-| created_at     | TIMESTAMPTZ  | NOT NULL, default now            | When the record was created    |
-| created_by     | UUID         | FK → auth.users(id), nullable    | Who created the record         |
-| updated_at     | TIMESTAMPTZ  | NOT NULL, default now            | When the record was last updated |
-| updated_by     | UUID         | FK → auth.users(id), nullable    | Who last updated the record    |
 
 Unique constraint on `(org_id, farm_id, name)` — no duplicate site names within an org+farm combination.
 
@@ -250,14 +167,10 @@ Crop varieties grown on a specific farm, each with a short code for quick refere
 | id         | TEXT        | PK                               | Human-readable identifier derived from variety name |
 | org_id     | TEXT        | NOT NULL, FK → org(id)           | The organization              |
 | farm_id    | TEXT        | NOT NULL, FK → farm(id)          | The farm this variety belongs to |
-| code       | VARCHAR(10) | NOT NULL                         | Short code, e.g. "K"         |
-| name       | VARCHAR(50) | NOT NULL                         | Full name, e.g. "Keiki"      |
+| code       | TEXT | NOT NULL                         | Short code, e.g. "K"         |
+| name       | TEXT | NOT NULL                         | Full name, e.g. "Keiki"      |
 | description| TEXT        | nullable                         | Optional notes about the variety |
 | is_active  | BOOLEAN     | NOT NULL, default true           | Soft-disable without deleting|
-| created_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was created  |
-| created_by | UUID        | FK → auth.users(id), nullable    | Who created the record    |
-| updated_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was last updated |
-| updated_by | UUID        | FK → auth.users(id), nullable    | Who last updated the record |
 
 Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
 
@@ -270,13 +183,9 @@ Harvest quality grades for a specific farm, each with a short code. Applied duri
 | id         | TEXT        | PK                               | Human-readable identifier derived from grade name |
 | org_id     | TEXT        | NOT NULL, FK → org(id)           | The organization              |
 | farm_id    | TEXT        | NOT NULL, FK → farm(id)          | The farm this grade belongs to |
-| code       | VARCHAR(10) | NOT NULL                         | Short code, e.g. "A"         |
-| name       | VARCHAR(50) | NOT NULL                         | Full name, e.g. "Grade A"    |
+| code       | TEXT | NOT NULL                         | Short code, e.g. "A"         |
+| name       | TEXT | NOT NULL                         | Full name, e.g. "Grade A"    |
 | is_active  | BOOLEAN     | NOT NULL, default true           | Soft-disable without deleting|
-| created_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was created  |
-| created_by | UUID        | FK → auth.users(id), nullable    | Who created the record    |
-| updated_at | TIMESTAMPTZ | NOT NULL, default now            | When the record was last updated |
-| updated_by | UUID        | FK → auth.users(id), nullable    | Who last updated the record |
 
 Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
 
@@ -290,30 +199,30 @@ The sellable products from each farm. Combines a grade with a full packaging hie
 | org_id                      | TEXT         | NOT NULL, FK → org(id)             | The organization                         |
 | farm_id                     | TEXT         | NOT NULL, FK → farm(id)            | The farm this product belongs to         |
 | grade_id                    | TEXT         | FK → grow_grade(id), nullable      | Product grade                            |
-| code                        | VARCHAR(20)  | NOT NULL                           | Product code/abbreviation                |
-| name                        | VARCHAR(100) | NOT NULL                           | Product name                             |
-| segment                     | VARCHAR(20)  | CHECK                              | Market segment: wholesale, retail, or food_service |
+| code                        | TEXT  | NOT NULL                           | Product code/abbreviation                |
+| name                        | TEXT | NOT NULL                           | Product name                             |
+| segment                     | TEXT         | CHECK                              | Market segment: wholesale, retail, or food_service |
 | description                 | TEXT         | nullable                           | Product description for catalogs and labels |
-| packaging                   | VARCHAR(50)  | nullable                           | Packaging format (e.g. clamshell, bag, sleeve, tray wrap) |
-| item_uom                    | VARCHAR(10)  | FK → util_uom(code), nullable      | Unit for the individual product item (e.g. each, head) |
-| pack_uom                    | VARCHAR(10)  | FK → util_uom(code), nullable      | Unit for the consumer pack (e.g. bag, clamshell) |
-| pack_item_quantity          | NUMERIC      | nullable                           | Number of items per pack                 |
-| sale_uom                    | VARCHAR(10)  | FK → util_uom(code), nullable      | Unit for the sale level (e.g. case, box) |
-| sale_pack_quantity          | NUMERIC      | nullable                           | Number of packs per sale unit            |
-| shipping_uom                | VARCHAR(10)  | FK → util_uom(code), nullable      | Unit for the shipping level (e.g. pallet) |
-| shipping_sale_capacity      | NUMERIC      | nullable                           | Max sale units the shipping unit can physically hold beyond TI x HI |
+| packaging                   | TEXT  | nullable                           | Packaging format (e.g. clamshell, bag, sleeve, tray wrap) |
+| item_uom                    | TEXT  | FK → util_uom(code), nullable      | Unit for the individual product item (e.g. each, head) |
+| pack_uom                    | TEXT  | FK → util_uom(code), nullable      | Unit for the consumer pack (e.g. bag, clamshell) |
+| item_per_pack_uom          | NUMERIC      | nullable                           | Number of items per pack                 |
+| sale_uom                    | TEXT  | FK → util_uom(code), nullable      | Unit for the sale level (e.g. case, box) |
+| pack_per_sale_uom          | NUMERIC      | nullable                           | Number of packs per sale unit            |
+| shipping_uom                | TEXT  | FK → util_uom(code), nullable      | Unit for the shipping level (e.g. pallet) |
+| max_sale_per_shipping_uom      | NUMERIC      | nullable                           | Max sale units the shipping unit can physically hold beyond TI x HI |
 | pack_net_weight             | NUMERIC      | nullable                           | Net weight of one pack in weight_uom     |
 | sale_net_weight             | NUMERIC      | nullable                           | Net weight of one sale unit in weight_uom |
 | shipping_net_weight         | NUMERIC      | nullable                           | Net weight of one full shipping unit in weight_uom |
-| weight_uom                  | VARCHAR(10)  | FK → util_uom(code), nullable      | Unit for all net weight values (e.g. lb, kg) |
+| weight_uom                  | TEXT  | FK → util_uom(code), nullable      | Unit for all net weight values (e.g. lb, kg) |
 | sale_uom_length             | NUMERIC      | nullable                           | Length of the sale unit in dimension_uom  |
 | sale_uom_width              | NUMERIC      | nullable                           | Width of the sale unit in dimension_uom   |
 | sale_uom_height             | NUMERIC      | nullable                           | Height of the sale unit in dimension_uom  |
-| dimension_uom               | VARCHAR(10)  | FK → util_uom(code), nullable      | Unit for all dimension values (e.g. in, cm) |
-| manufacture_storage_method  | VARCHAR(50)  | nullable                           | How the product should be stored (e.g. refrigerated, frozen, ambient) |
+| dimension_uom               | TEXT  | FK → util_uom(code), nullable      | Unit for all dimension values (e.g. in, cm) |
+| manufacture_storage_method  | TEXT  | nullable                           | How the product should be stored (e.g. refrigerated, frozen, ambient) |
 | minimum_storage_temperature | NUMERIC      | nullable                           | Minimum storage temperature in temperature_uom |
 | maximum_storage_temperature | NUMERIC      | nullable                           | Maximum storage temperature in temperature_uom |
-| temperature_uom             | VARCHAR(10)  | FK → util_uom(code), nullable      | Unit for storage temperature values (e.g. F, C) |
+| temperature_uom             | TEXT  | FK → util_uom(code), nullable      | Unit for storage temperature values (e.g. F, C) |
 | shelf_life_days             | INT          | nullable                           | Product shelf life in days from manufacture |
 | shipping_ti                 | NUMERIC      | nullable                           | TI — sale units per layer on the shipping unit |
 | shipping_hi                 | NUMERIC      | nullable                           | HI — layers stacked on the shipping unit |
@@ -321,15 +230,11 @@ The sellable products from each farm. Combines a grade with a full packaging hie
 | is_catch_weight             | BOOLEAN      | NOT NULL, default false            | Whether product is sold by actual weight |
 | is_hazardous                | BOOLEAN      | NOT NULL, default false            | Whether product is classified as hazardous material |
 | is_fsma_traceable           | BOOLEAN      | NOT NULL, default false            | Whether product is on the FDA FSMA 204 Food Traceability List |
-| gtin                        | VARCHAR(14)  | nullable                           | Global Trade Item Number (up to 14 digits) |
-| upc                         | VARCHAR(12)  | nullable                           | Universal Product Code (up to 12 digits) |
+| gtin                        | TEXT  | nullable                           | Global Trade Item Number (up to 14 digits) |
+| upc                         | TEXT  | nullable                           | Universal Product Code (up to 12 digits) |
 | photos                      | JSONB        | NOT NULL, default []               | JSON array of photo URLs                 |
 | display_order               | INT          | nullable                           | Sort order for display                   |
 | is_active                   | BOOLEAN      | NOT NULL, default true             | Soft-disable without deleting            |
-| created_at                  | TIMESTAMPTZ  | NOT NULL, default now              | When the record was created              |
-| created_by                  | UUID         | FK → auth.users(id), nullable      | Who created the record                   |
-| updated_at                  | TIMESTAMPTZ  | NOT NULL, default now              | When the record was last updated         |
-| updated_by                  | UUID         | FK → auth.users(id), nullable      | Who last updated the record              |
 
 Unique constraints on `(farm_id, code)` and `(farm_id, name)`.
 
@@ -343,15 +248,11 @@ Manages product pricing with three tiers of specificity and date ranges to track
 | org_id            | TEXT        | NOT NULL, FK → org(id)              | The organization                         |
 | product_id        | TEXT        | NOT NULL, FK → sales_product(id)    | The product being priced                 |
 | fob_id            | TEXT        | NOT NULL, FK → sales_fob(id)              | Delivery method this price applies to    |
-| cust_id           | TEXT        | FK → sales_cust(id), nullable       | Customer-specific price (tier 1)         |
 | cust_group_id     | TEXT        | FK → sales_cust_group(id), nullable | Group-specific price (tier 2)            |
+| cust_id           | TEXT        | FK → sales_cust(id), nullable       | Customer-specific price (tier 1)         |
 | price             | NUMERIC     | NOT NULL                            | The price amount                         |
 | effective_from    | DATE        | NOT NULL                            | When this price starts                   |
 | effective_to      | DATE        | nullable                            | When this price ends (null = current)    |
 | is_active         | BOOLEAN     | NOT NULL, default true              | Soft-disable without deleting            |
-| created_at        | TIMESTAMPTZ | NOT NULL, default now               | When the record was created              |
-| created_by        | UUID        | FK → auth.users(id), nullable       | Who created the record                   |
-| updated_at        | TIMESTAMPTZ | NOT NULL, default now               | When the record was last updated         |
-| updated_by        | UUID        | FK → auth.users(id), nullable       | Who last updated the record              |
 
 Pricing lookup priority: customer price (tier 1) → group price (tier 2) → default price (tier 3), filtered by `effective_from <= today AND (effective_to IS NULL OR effective_to > today)`.

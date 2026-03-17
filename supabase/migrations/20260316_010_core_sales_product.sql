@@ -3,41 +3,41 @@ CREATE TABLE IF NOT EXISTS sales_product (
     org_id                     TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     farm_id                    TEXT NOT NULL REFERENCES farm(id) ON DELETE CASCADE,
     grade_id                   TEXT REFERENCES grow_grade(id),
-    code                       VARCHAR(20) NOT NULL,
-    name                       VARCHAR(100) NOT NULL,
-    segment                    VARCHAR(20) CHECK (segment IN ('wholesale', 'retail', 'food_service')),
+    code                       TEXT NOT NULL,
+    name                       TEXT NOT NULL,
+    segment                    TEXT CHECK (segment IN ('wholesale', 'retail', 'food_service')),
     description                TEXT,
-    packaging                  VARCHAR(50),
+    packaging                  TEXT,
 
     -- Packaging hierarchy: item -> pack -> sale -> shipping
-    item_uom                   VARCHAR(10) REFERENCES util_uom(code),
+    item_uom                   TEXT REFERENCES util_uom(code),
 
-    pack_uom                   VARCHAR(10) REFERENCES util_uom(code),
-    pack_item_quantity         NUMERIC,
+    pack_uom                   TEXT REFERENCES util_uom(code),
+    item_per_pack_uom         NUMERIC,
 
-    sale_uom                   VARCHAR(10) REFERENCES util_uom(code),
-    sale_pack_quantity         NUMERIC,
+    sale_uom                   TEXT REFERENCES util_uom(code),
+    pack_per_sale_uom         NUMERIC,
 
-    shipping_uom               VARCHAR(10) REFERENCES util_uom(code),
-    shipping_sale_capacity     NUMERIC,
+    shipping_uom               TEXT REFERENCES util_uom(code),
+    max_sale_per_shipping_uom     NUMERIC,
 
     -- Net weights (all in weight_uom)
     pack_net_weight            NUMERIC,
     sale_net_weight            NUMERIC,
     shipping_net_weight        NUMERIC,
-    weight_uom                 VARCHAR(10) REFERENCES util_uom(code),
+    weight_uom                 TEXT REFERENCES util_uom(code),
 
     -- Sale unit dimensions (all in dimension_uom)
     sale_uom_length            NUMERIC,
     sale_uom_width             NUMERIC,
     sale_uom_height            NUMERIC,
-    dimension_uom              VARCHAR(10) REFERENCES util_uom(code),
+    dimension_uom              TEXT REFERENCES util_uom(code),
 
     -- Storage & shelf life
-    manufacture_storage_method VARCHAR(50),
+    manufacture_storage_method TEXT,
     minimum_storage_temperature NUMERIC,
     maximum_storage_temperature NUMERIC,
-    temperature_uom            VARCHAR(10) REFERENCES util_uom(code),
+    temperature_uom            TEXT REFERENCES util_uom(code),
     shelf_life_days            INT,
 
     -- Shipping
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS sales_product (
     is_fsma_traceable          BOOLEAN NOT NULL DEFAULT false,
 
     -- Identification
-    gtin                       VARCHAR(14),
-    upc                        VARCHAR(12),
+    gtin                       TEXT,
+    upc                        TEXT,
 
     -- Display & status
     photos                     JSONB NOT NULL DEFAULT '[]',
@@ -61,9 +61,9 @@ CREATE TABLE IF NOT EXISTS sales_product (
 
     -- Audit
     created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by                 UUID REFERENCES auth.users(id),
+    created_by                 TEXT,
     updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by                 UUID REFERENCES auth.users(id),
+    updated_by                 TEXT,
 
     CONSTRAINT uq_sales_product_code UNIQUE (farm_id, code),
     CONSTRAINT uq_sales_product_name UNIQUE (farm_id, name)
@@ -83,11 +83,11 @@ COMMENT ON COLUMN sales_product.description IS 'Product description for catalogs
 COMMENT ON COLUMN sales_product.packaging IS 'Packaging format (e.g. clamshell, bag, sleeve, tray wrap)';
 COMMENT ON COLUMN sales_product.item_uom IS 'Unit of measure for the individual product item (e.g. each, head)';
 COMMENT ON COLUMN sales_product.pack_uom IS 'Unit of measure for the consumer pack level (e.g. bag, clamshell)';
-COMMENT ON COLUMN sales_product.pack_item_quantity IS 'Number of items per pack';
+COMMENT ON COLUMN sales_product.item_per_pack_uom IS 'Number of items per pack';
 COMMENT ON COLUMN sales_product.sale_uom IS 'Unit of measure for the sale level (e.g. case, box)';
-COMMENT ON COLUMN sales_product.sale_pack_quantity IS 'Number of packs per sale unit';
+COMMENT ON COLUMN sales_product.pack_per_sale_uom IS 'Number of packs per sale unit';
 COMMENT ON COLUMN sales_product.shipping_uom IS 'Unit of measure for the shipping level (e.g. pallet)';
-COMMENT ON COLUMN sales_product.shipping_sale_capacity IS 'Maximum number of sale units the shipping unit can physically hold beyond the standard TI x HI configuration';
+COMMENT ON COLUMN sales_product.max_sale_per_shipping_uom IS 'Maximum number of sale units the shipping unit can physically hold beyond the standard TI x HI configuration';
 COMMENT ON COLUMN sales_product.pack_net_weight IS 'Net weight of one pack in weight_uom';
 COMMENT ON COLUMN sales_product.sale_net_weight IS 'Net weight of one sale unit in weight_uom';
 COMMENT ON COLUMN sales_product.shipping_net_weight IS 'Net weight of one full shipping unit in weight_uom';
@@ -113,6 +113,6 @@ COMMENT ON COLUMN sales_product.photos IS 'JSON array of photo URLs for the prod
 COMMENT ON COLUMN sales_product.display_order IS 'Sort order for UI display within the farm';
 COMMENT ON COLUMN sales_product.is_active IS 'Soft delete flag; false hides the product from active use';
 COMMENT ON COLUMN sales_product.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN sales_product.created_by IS 'User who created the record, references auth.users(id)';
+COMMENT ON COLUMN sales_product.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_product.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN sales_product.updated_by IS 'User who last updated the record, references auth.users(id)';
+COMMENT ON COLUMN sales_product.updated_by IS 'Email of the user who last updated the record';

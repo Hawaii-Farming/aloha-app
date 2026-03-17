@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS invnt_category (
     id         TEXT PRIMARY KEY,
     org_id     TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
-    name       VARCHAR(100) NOT NULL,
+    name       TEXT NOT NULL,
     is_active  BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by UUID REFERENCES auth.users(id),
+    created_by TEXT,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by UUID REFERENCES auth.users(id),
+    updated_by TEXT,
     CONSTRAINT uq_invnt_category UNIQUE (org_id, name)
 );
 
@@ -18,6 +18,6 @@ COMMENT ON COLUMN invnt_category.org_id IS 'Owning organization for RLS filterin
 COMMENT ON COLUMN invnt_category.name IS 'Display name of the category, unique within the org';
 COMMENT ON COLUMN invnt_category.is_active IS 'Soft delete flag; false hides the category from active use';
 COMMENT ON COLUMN invnt_category.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN invnt_category.created_by IS 'User who created the record, references auth.users(id)';
+COMMENT ON COLUMN invnt_category.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN invnt_category.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN invnt_category.updated_by IS 'User who last updated the record, references auth.users(id)';
+COMMENT ON COLUMN invnt_category.updated_by IS 'Email of the user who last updated the record';

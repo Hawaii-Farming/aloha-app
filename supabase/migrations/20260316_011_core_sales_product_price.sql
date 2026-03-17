@@ -3,16 +3,16 @@ CREATE TABLE IF NOT EXISTS sales_product_price (
     org_id         TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     product_id     TEXT NOT NULL REFERENCES sales_product(id),
     fob_id         TEXT NOT NULL REFERENCES sales_fob(id),
-    cust_id        TEXT REFERENCES sales_cust(id),
     cust_group_id  TEXT REFERENCES sales_cust_group(id),
+    cust_id        TEXT REFERENCES sales_cust(id),
     price          NUMERIC NOT NULL,
     effective_from DATE NOT NULL,
     effective_to   DATE,
     is_active      BOOLEAN NOT NULL DEFAULT true,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by     UUID REFERENCES auth.users(id),
+    created_by     TEXT,
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by     UUID REFERENCES auth.users(id)
+    updated_by     TEXT
 );
 
 CREATE INDEX idx_sales_product_price_lookup ON sales_product_price (product_id, fob_id);
@@ -31,6 +31,6 @@ COMMENT ON COLUMN sales_product_price.effective_from IS 'Start date when this pr
 COMMENT ON COLUMN sales_product_price.effective_to IS 'End date when this price expires; NULL means no expiry';
 COMMENT ON COLUMN sales_product_price.is_active IS 'Soft delete flag; false hides the price from active use';
 COMMENT ON COLUMN sales_product_price.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN sales_product_price.created_by IS 'User who created the record, references auth.users(id)';
+COMMENT ON COLUMN sales_product_price.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_product_price.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN sales_product_price.updated_by IS 'User who last updated the record, references auth.users(id)';
+COMMENT ON COLUMN sales_product_price.updated_by IS 'Email of the user who last updated the record';

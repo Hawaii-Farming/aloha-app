@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS util_uom (
-    code         VARCHAR(10) PRIMARY KEY,
-    name         VARCHAR(50) NOT NULL,
-    category     VARCHAR(30) NOT NULL,
+    code         TEXT PRIMARY KEY,
+    name         TEXT NOT NULL,
+    category     TEXT NOT NULL,
     CONSTRAINT uq_util_uom_name UNIQUE (name)
 );
 

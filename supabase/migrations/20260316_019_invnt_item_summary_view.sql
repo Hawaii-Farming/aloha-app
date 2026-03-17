@@ -4,7 +4,7 @@ WITH latest_onhand AS (
         invnt_item_id,
         onhand_quantity,
         onhand_uom,
-        onhand_burn_quantity,
+        burn_per_onhand_uom,
         onhand_date
     FROM invnt_onhand
     WHERE is_active = true
@@ -13,13 +13,13 @@ WITH latest_onhand AS (
 open_orders AS (
     SELECT
         po.invnt_item_id,
-        COALESCE(SUM(po.order_quantity * po.order_burn_quantity), 0) AS ordered_burn,
+        COALESCE(SUM(po.order_quantity * po.burn_per_order_uom), 0) AS ordered_burn,
         COALESCE(SUM(r.received_burn), 0) AS received_burn
     FROM invnt_po po
     LEFT JOIN (
         SELECT
             invnt_po_id,
-            SUM(receipt_quantity * receipt_burn_quantity) AS received_burn
+            SUM(receipt_quantity * burn_per_receipt_uom) AS received_burn
         FROM invnt_po_receipt
         WHERE is_active = true
         GROUP BY invnt_po_id
@@ -42,8 +42,8 @@ SELECT
     i.burn_uom,
     i.onhand_uom,
     i.order_uom,
-    i.onhand_burn_quantity,
-    i.order_burn_quantity,
+    i.burn_per_onhand_uom,
+    i.burn_per_order_uom,
 
     -- Forecasting settings
     i.is_frequently_used,
@@ -57,7 +57,7 @@ SELECT
 
     -- Current on-hand (from latest invnt_onhand record)
     COALESCE(lo.onhand_quantity, 0) AS onhand_quantity,
-    COALESCE(lo.onhand_quantity * lo.onhand_burn_quantity, 0) AS onhand_burn,
+    COALESCE(lo.onhand_quantity * lo.burn_per_onhand_uom, 0) AS onhand_burn,
     lo.onhand_date,
     CURRENT_DATE - lo.onhand_date AS days_since_onhand,
 
@@ -69,14 +69,14 @@ SELECT
     -- Computed forecasts
     CASE
         WHEN COALESCE(i.burn_per_week, 0) > 0
-        THEN COALESCE(lo.onhand_quantity * lo.onhand_burn_quantity, 0) / i.burn_per_week
+        THEN COALESCE(lo.onhand_quantity * lo.burn_per_onhand_uom, 0) / i.burn_per_week
         ELSE NULL
     END AS weeks_on_hand,
 
     CASE
         WHEN COALESCE(i.burn_per_week, 0) > 0 AND lo.onhand_date IS NOT NULL
         THEN lo.onhand_date + (
-            COALESCE(lo.onhand_quantity * lo.onhand_burn_quantity, 0) / i.burn_per_week * 7
+            COALESCE(lo.onhand_quantity * lo.burn_per_onhand_uom, 0) / i.burn_per_week * 7
             - COALESCE(i.cushion_weeks, 0) * 7
         )::INT
         ELSE NULL
