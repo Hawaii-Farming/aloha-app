@@ -16,15 +16,15 @@ Migration: `supabase/migrations_future/20260316_001_invnt_sales_product_item.sql
 
 | Column               | Type         | Constraints                           | Description                              |
 |---------------------|--------------|---------------------------------------|------------------------------------------|
-| id                  | UUID         | PK, auto-generated                    | Unique identifier                        |
-| org_id              | TEXT         | NOT NULL, FK → org(id)                | The organization                         |
+| id                  | UUID         | PK, auto-generated                    | Unique identifier for the link record    |
+| org_id              | TEXT         | NOT NULL, FK → org(id)                | Owning organization for RLS filtering    |
 | farm_id             | TEXT         | FK → farm(id), nullable               | Optional farm scope                      |
-| product_id          | TEXT         | NOT NULL, FK → sales_product(id)      | The sales product                        |
-| invnt_item_id       | UUID         | NOT NULL, FK → invnt_item(id)         | The inventory item consumed              |
-| packaging_level     | TEXT         | NOT NULL, CHECK                       | One of: pack, sale                       |
-| sale_uom            | TEXT         | FK → util_uom(code), nullable         | Unit of measure for the sale quantity    |
-| quantity_per_sale_uom | NUMERIC    | nullable                              | How much of this item is used per sale unit at this packaging level |
-| is_active           | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
+| product_id          | TEXT         | NOT NULL, FK → sales_product(id)      | Sales product that uses this inventory item |
+| invnt_item_id       | UUID         | NOT NULL, FK → invnt_item(id)         | Inventory item consumed by the product   |
+| packaging_level     | TEXT         | NOT NULL, CHECK                       | Which packaging level consumes this item: pack or sale |
+| sale_uom            | TEXT         | FK → util_uom(code), nullable         | Unit of measure for the sale quantity at this packaging level |
+| quantity_per_sale_uom | NUMERIC    | nullable                              | Quantity of the inventory item consumed per unit at the specified packaging level |
+| is_active           | BOOLEAN      | NOT NULL, default true                | Soft delete flag; false hides the link from active use |
 
 Unique constraint on `(product_id, invnt_item_id, packaging_level)` — one link per item per packaging level per product.
 
@@ -38,16 +38,16 @@ Migration: `supabase/migrations_future/20260316_002_invnt_usage.sql`
 
 | Column          | Type         | Constraints                   | Description                              |
 |----------------|--------------|-------------------------------|------------------------------------------|
-| id             | UUID         | PK, auto-generated            | Unique identifier                        |
-| org_id         | TEXT         | NOT NULL, FK → org(id)        | The organization                         |
+| id             | UUID         | PK, auto-generated            | Unique identifier for the usage record   |
+| org_id         | TEXT         | NOT NULL, FK → org(id)        | Owning organization for RLS filtering    |
 | farm_id        | TEXT         | FK → farm(id), nullable       | Optional farm scope                      |
 | invnt_item_id  | UUID         | NOT NULL, FK → invnt_item(id) | Inventory item that was consumed         |
-| reference_table| TEXT         | nullable                      | Source table that triggered the usage    |
+| reference_table| TEXT         | nullable                      | Source table that triggered the usage (e.g. grow_fertigation_schedule, harvest_batch) |
 | reference_id   | UUID         | nullable                      | Source record ID in the reference_table  |
 | usage_date     | DATE         | NOT NULL                      | Date the consumption occurred            |
 | burn_uom       | TEXT         | FK → util_uom(code), nullable | Unit of measure for the burn quantity    |
 | quantity_burn  | NUMERIC      | NOT NULL                      | Quantity consumed in burn units          |
-| is_active      | BOOLEAN      | NOT NULL, default true        | Soft-disable without deleting            |
+| is_active      | BOOLEAN      | NOT NULL, default true        | Soft delete flag; false hides the record from active use |
 
 ---
 
@@ -61,23 +61,23 @@ Migration: `supabase/migrations_future/20260316_003_hr_travel_request.sql`
 
 | Column             | Type         | Constraints                       | Description                              |
 |-------------------|--------------|-----------------------------------|------------------------------------------|
-| id                | UUID         | PK, auto-generated                | Unique identifier                        |
-| org_id            | TEXT         | NOT NULL, FK → org(id)            | The organization                         |
-| employee_id       | TEXT         | NOT NULL, FK → hr_employee(id)    | Employee submitting the request          |
+| id                | UUID         | PK, auto-generated                | Unique identifier for the travel request |
+| org_id            | TEXT         | NOT NULL, FK → org(id)            | Owning organization for RLS filtering    |
+| employee_id       | TEXT         | NOT NULL, FK → hr_employee(id)    | Employee submitting the travel request   |
 | request_type      | TEXT         | nullable                          | Type of travel (e.g. Business Trip, Training, Conference, Site Visit) |
 | travel_purpose    | TEXT         | nullable                          | Description of the purpose for the trip  |
 | travel_from       | TEXT         | nullable                          | Departure location                       |
 | travel_to         | TEXT         | nullable                          | Destination location                     |
 | travel_start_date | DATE         | nullable                          | First day of travel                      |
 | travel_return_date| DATE         | nullable                          | First day the employee returns           |
-| status            | TEXT         | NOT NULL, default pending, CHECK  | One of: pending, approved, denied        |
+| status            | TEXT         | NOT NULL, default pending, CHECK  | Approval status: pending, approved, denied |
 | requested_by      | UUID         | NOT NULL, FK → auth.users(id)     | Auth user who submitted the request      |
-| requested_at      | TIMESTAMPTZ  | NOT NULL, default now             | When the request was submitted           |
+| requested_at      | TIMESTAMPTZ  | NOT NULL, default now             | Timestamp when the request was submitted |
 | denial_reason     | TEXT         | nullable                          | Reason provided when the request is denied |
 | notes             | TEXT         | nullable                          | Additional notes about the request       |
-| reviewed_by       | TEXT         | FK → hr_employee(id), nullable    | Employee who approved or denied          |
-| reviewed_at       | TIMESTAMPTZ  | nullable                          | When the request was reviewed            |
-| is_active         | BOOLEAN      | NOT NULL, default true            | Soft-disable without deleting            |
+| reviewed_by       | TEXT         | FK → hr_employee(id), nullable    | Employee who approved or denied the request |
+| reviewed_at       | TIMESTAMPTZ  | nullable                          | Timestamp when the request was reviewed  |
+| is_active         | BOOLEAN      | NOT NULL, default true            | Soft delete flag; false hides the request from active use |
 
 ---
 
@@ -89,25 +89,25 @@ Migration: `supabase/migrations_future/20260316_004_hr_disciplinary_warning.sql`
 
 | Column                          | Type         | Constraints                       | Description                              |
 |--------------------------------|--------------|-----------------------------------|------------------------------------------|
-| id                             | UUID         | PK, auto-generated                | Unique identifier                        |
-| org_id                         | TEXT         | NOT NULL, FK → org(id)            | The organization                         |
+| id                             | UUID         | PK, auto-generated                | Unique identifier for the disciplinary warning |
+| org_id                         | TEXT         | NOT NULL, FK → org(id)            | Owning organization for RLS filtering    |
 | employee_id                    | TEXT         | NOT NULL, FK → hr_employee(id)    | Employee receiving the warning           |
 | warning_date                   | DATE         | nullable                          | Date the warning was issued              |
-| warning_type                   | TEXT         | CHECK                             | One of: verbal_warning, written_warning, final_warning, suspension, termination |
+| warning_type                   | TEXT         | CHECK                             | Severity level: verbal_warning, written_warning, final_warning, suspension, termination |
 | offense_type                   | TEXT         | nullable                          | Category of offense (e.g. Attendance, Performance, Conduct, Safety, Policy Violation) |
 | offense_description            | TEXT         | nullable                          | Detailed description of the offense or incident |
 | plan_for_improvement           | TEXT         | nullable                          | Agreed steps or plan for the employee to improve |
 | further_infraction_consequences| TEXT         | nullable                          | Stated consequences if further infractions occur |
 | notes                          | TEXT         | nullable                          | Additional notes about the warning       |
-| is_acknowledged                | BOOLEAN      | NOT NULL, default false           | Whether the employee has acknowledged receipt |
-| acknowledged_at                | TIMESTAMPTZ  | nullable                          | When the employee acknowledged the warning |
+| is_acknowledged                | BOOLEAN      | NOT NULL, default false           | Whether the employee has acknowledged receipt of the warning |
+| acknowledged_at                | TIMESTAMPTZ  | nullable                          | Timestamp when the employee acknowledged the warning |
 | employee_signature_url         | TEXT         | nullable                          | URL to the employee signature image stored in Supabase Storage |
-| status                         | TEXT         | NOT NULL, default pending, CHECK  | One of: pending, reviewed                |
-| reported_by                    | TEXT         | FK → hr_employee(id), nullable    | Manager or HR who filed the warning      |
-| reported_at                    | TIMESTAMPTZ  | NOT NULL, default now             | When the warning was filed               |
-| reviewed_by                    | TEXT         | FK → hr_employee(id), nullable    | Employee who reviewed and finalized      |
-| reviewed_at                    | TIMESTAMPTZ  | nullable                          | When the warning was reviewed            |
-| is_active                      | BOOLEAN      | NOT NULL, default true            | Soft-disable without deleting            |
+| status                         | TEXT         | NOT NULL, default pending, CHECK  | Review status: pending, reviewed         |
+| reported_by                    | TEXT         | FK → hr_employee(id), nullable    | Employee (manager/HR) who filed the warning |
+| reported_at                    | TIMESTAMPTZ  | NOT NULL, default now             | Timestamp when the warning was filed     |
+| reviewed_by                    | TEXT         | FK → hr_employee(id), nullable    | Employee who reviewed and finalized the warning |
+| reviewed_at                    | TIMESTAMPTZ  | nullable                          | Timestamp when the warning was reviewed  |
+| is_active                      | BOOLEAN      | NOT NULL, default true            | Soft delete flag; false hides the record from active use |
 
 ---
 

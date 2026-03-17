@@ -1,11 +1,8 @@
 CREATE TABLE IF NOT EXISTS hr_employee (
-    -- Identity & access
     id                           TEXT PRIMARY KEY,
     org_id                       TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     user_id                      UUID REFERENCES auth.users(id),
     payroll_id                   TEXT,
-
-    -- Personal info
     first_name                   TEXT NOT NULL,
     last_name                    TEXT NOT NULL,
     preferred_name               TEXT,
@@ -13,8 +10,6 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     date_of_birth                DATE,
     is_minority                  BOOLEAN NOT NULL DEFAULT false,
     profile_photo_url            TEXT,
-
-    -- Employment
     title                        TEXT,
     department                   TEXT,
     work_authorization           TEXT,
@@ -22,28 +17,18 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     end_date                     DATE,
     is_verifier                  BOOLEAN NOT NULL DEFAULT false,
     is_active                    BOOLEAN NOT NULL DEFAULT true,
-    access_level                 TEXT CHECK (access_level IN ('owner', 'manager', 'team_lead', 'employee')),
-
-    -- Reporting structure
-    team_lead_id         TEXT REFERENCES hr_employee(id),
+    access_level                 TEXT NOT NULL CHECK (access_level IN ('owner', 'manager', 'team_lead', 'employee')),
+    team_lead_id                 TEXT REFERENCES hr_employee(id),
     compensation_manager_id      TEXT REFERENCES hr_employee(id),
-
-    -- Compensation
-    pay_structure                TEXT,
+    pay_structure                TEXT CHECK (pay_structure IN ('hourly', 'salary')),
     overtime_threshold           NUMERIC,
     wc                           TEXT,
     payroll_admin                TEXT,
     payslip_delivery_method      TEXT,
-
-    -- Contact
     phone                        TEXT,
     email                        TEXT,
     company_email                TEXT,
-
-    -- Other
     site_id_housing              TEXT REFERENCES site(id),
-
-    -- Audit
     created_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                   TEXT,
     updated_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -74,12 +59,12 @@ COMMENT ON COLUMN hr_employee.department IS 'Department the employee belongs to'
 COMMENT ON COLUMN hr_employee.work_authorization IS 'Visa/work authorization type (e.g. LOCAL, WFE, FURTE, H1B). Values driven by frontend dropdown.';
 COMMENT ON COLUMN hr_employee.start_date IS 'Employment start date';
 COMMENT ON COLUMN hr_employee.end_date IS 'Employment end date; NULL if currently employed';
-COMMENT ON COLUMN hr_employee.is_verifier IS 'Whether this employee is authorized to verify work or records';
+COMMENT ON COLUMN hr_employee.is_verifier IS 'Whether this employee is authorized to verify records';
 COMMENT ON COLUMN hr_employee.is_active IS 'Soft delete flag; false disables the employee without removing the record';
 COMMENT ON COLUMN hr_employee.access_level IS 'System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection.';
 COMMENT ON COLUMN hr_employee.team_lead_id IS 'Self-referencing TEXT FK to direct team_lead; stores readable employee id (e.g. jane_doe)';
 COMMENT ON COLUMN hr_employee.compensation_manager_id IS 'Self-referencing TEXT FK to compensation manager; stores readable employee id';
-COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type (e.g. hourly, salary, piece-rate)';
+COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type: hourly or salary';
 COMMENT ON COLUMN hr_employee.overtime_threshold IS 'Hours threshold before overtime kicks in';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';
 COMMENT ON COLUMN hr_employee.payroll_admin IS 'Payroll administrator responsible for employee compensation (e.g. HRB, HF)';

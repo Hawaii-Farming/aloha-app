@@ -53,7 +53,7 @@ Org-specific departments used to classify employees. Each org defines its own se
 | org_id     | TEXT         | NOT NULL, FK → org(id)         | Owning organization for RLS filtering    |
 | name       | TEXT  | NOT NULL                       | Department name, unique within the org (e.g. GH, PH, Lettuce) |
 | description| TEXT         | nullable                       | Optional description of the department   |
-| is_active  | BOOLEAN      | NOT NULL, default true         | Soft-disable without deleting            |
+| is_active  | BOOLEAN      | NOT NULL, default true         | Soft delete flag; false hides the department from active use |
 
 Unique constraint on `(org_id, name)`.
 
@@ -69,7 +69,7 @@ Org-specific work authorization types used to classify employees. Each org defin
 | org_id     | TEXT         | NOT NULL, FK → org(id)         | Owning organization for RLS filtering    |
 | name       | TEXT  | NOT NULL                       | Authorization type name, unique within the org (e.g. Local, FURTE, WFE, H1B) |
 | description| TEXT         | nullable                       | Optional description of the authorization type |
-| is_active  | BOOLEAN      | NOT NULL, default true         | Soft-disable without deleting            |
+| is_active  | BOOLEAN      | NOT NULL, default true         | Soft delete flag; false hides the type from active use |
 
 Unique constraint on `(org_id, name)`.
 
@@ -81,59 +81,52 @@ Flat task catalog for labor tracking. Tasks can be org-wide or scoped to a speci
 
 | Column      | Type         | Constraints                     | Description                              |
 |------------|--------------|--------------------------------|------------------------------------------|
-| id         | TEXT         | PK                             | Human-readable identifier derived from task code |
-| org_id     | TEXT         | NOT NULL, FK → org(id)         | The organization                         |
-| farm_id    | TEXT         | FK → farm(id), nullable        | Optional farm scope (null = org-wide)    |
-| name       | TEXT  | NOT NULL                       | Task name, unique within the org         |
+| id         | TEXT         | PK                             | Human-readable identifier derived from task name (lowercase trimmed) |
+| org_id     | TEXT         | NOT NULL, FK → org(id)         | Owning organization for RLS filtering    |
+| farm_id    | TEXT         | FK → farm(id), nullable        | Optional farm scope; NULL if task applies to all farms |
+| name       | TEXT  | NOT NULL                       | Short name for the task, unique within the org (e.g. HARV, PICK) |
 | description| TEXT         | nullable                       | Description of the task                  |
 | accounting_id| TEXT | nullable                       | Identifier used to link this task to the accounting system |
-| is_active  | BOOLEAN      | NOT NULL, default true         | Soft-disable without deleting            |
+| is_active  | BOOLEAN      | NOT NULL, default true         | Soft delete flag; false hides the task from active use |
 
 Unique constraint on `(org_id, name)`.
 
 ## hr_employee
 
-Unified employee register and org membership table. Every user who needs system access gets a row here with a `user_id` and `access_level`. Employees without system access have null `user_id`/`access_level`. A user can belong to multiple orgs by having one row per org. Tracks employment details, management hierarchy, compensation, and access level.
+Unified employee register and org membership table. Every employee gets a row here with a required `access_level` that defines their role (owner, manager, team_lead, employee). Employees without app access have a null `user_id`. A user can belong to multiple orgs by having one row per org. Tracks employment details, management hierarchy, and compensation.
 
 | Column                       | Type         | Constraints                     | Description                              |
 |-----------------------------|--------------|--------------------------------|------------------------------------------|
-| **Identity & access** |
-| id                          | TEXT         | PK                             | Human-readable identifier derived from name (e.g. john_smith) |
-| org_id                      | TEXT         | NOT NULL, FK → org(id)         | The organization                         |
-| user_id                     | UUID         | FK → auth.users(id), nullable  | Links to app user account; nullable for employees without system access |
-| payroll_id                  | TEXT  | nullable                       | External payroll system identifier       |
-| **Personal info** |
-| first_name                  | TEXT  | NOT NULL                       | First name                               |
-| last_name                   | TEXT  | NOT NULL                       | Last name                                |
-| preferred_name              | TEXT  | nullable                       | Preferred or nickname used day-to-day    |
-| gender                      | TEXT  | nullable                       | Gender                                   |
-| date_of_birth               | DATE         | nullable                       | Date of birth                            |
-| is_minority                 | BOOLEAN      | NOT NULL, default false        | Minority status                          |
+| id                          | TEXT         | PK                             | Human-readable identifier derived from employee name (e.g. john_smith) |
+| org_id                      | TEXT         | NOT NULL, FK → org(id)         | Owning organization for RLS filtering    |
+| user_id                     | UUID         | FK → auth.users(id), nullable  | Link to Supabase auth user; nullable for employees without system access |
+| payroll_id                  | TEXT         | nullable                       | External payroll system identifier       |
+| first_name                  | TEXT         | NOT NULL                       | Employee first name                      |
+| last_name                   | TEXT         | NOT NULL                       | Employee last name                       |
+| preferred_name              | TEXT         | nullable                       | Preferred or nickname used in day-to-day communication |
+| gender                      | TEXT         | nullable                       | Employee gender                          |
+| date_of_birth               | DATE         | nullable                       | Employee date of birth                   |
+| is_minority                 | BOOLEAN      | NOT NULL, default false        | Whether the employee is classified as a minority for compliance reporting |
 | profile_photo_url           | TEXT         | nullable                       | URL to employee profile photo            |
-| **Employment** |
-| title                       | TEXT | nullable                       | Job title or position                    |
-| department                  | TEXT  | nullable                       | Primary department                       |
-| work_authorization          | TEXT  | nullable                       | Visa/work authorization type (e.g. LOCAL, WFE, FURTE, H1B) |
+| title                       | TEXT         | nullable                       | Job title or position                    |
+| department                  | TEXT         | nullable                       | Department the employee belongs to       |
+| work_authorization          | TEXT         | nullable                       | Visa/work authorization type (e.g. LOCAL, WFE, FURTE, H1B). Values driven by frontend dropdown. |
 | start_date                  | DATE         | nullable                       | Employment start date                    |
-| end_date                    | DATE         | nullable                       | Employment end date                      |
-| is_verifier                 | BOOLEAN      | NOT NULL, default false        | Whether this employee is authorized to verify work or records |
-| is_active                   | BOOLEAN      | NOT NULL, default true         | Soft-disable without deleting            |
-| access_level                | TEXT         | CHECK                          | System access level: owner, manager, team_lead, employee |
-| **Reporting structure** |
-| team_lead_id        | TEXT         | FK → hr_employee(id), nullable | Direct team_lead; stores readable employee id (e.g. jane_doe) |
-| compensation_manager_id     | TEXT         | FK → hr_employee(id), nullable | Compensation manager; stores readable employee id |
-| **Compensation** |
-| pay_structure               | TEXT  | nullable                       | Pay structure type                       |
+| end_date                    | DATE         | nullable                       | Employment end date; NULL if currently employed |
+| is_verifier                 | BOOLEAN      | NOT NULL, default false        | Whether this employee is authorized to verify records |
+| is_active                   | BOOLEAN      | NOT NULL, default true         | Soft delete flag; false disables the employee without removing the record |
+| access_level                | TEXT         | NOT NULL, CHECK                | System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection. |
+| team_lead_id                | TEXT         | FK → hr_employee(id), nullable | Self-referencing TEXT FK to direct team_lead; stores readable employee id (e.g. jane_doe) |
+| compensation_manager_id     | TEXT         | FK → hr_employee(id), nullable | Self-referencing TEXT FK to compensation manager; stores readable employee id |
+| pay_structure               | TEXT         | nullable, CHECK                | Pay structure type: hourly or salary     |
 | overtime_threshold          | NUMERIC      | nullable                       | Hours threshold before overtime kicks in |
-| wc                          | TEXT  | nullable                       | Workers compensation code                |
-| payroll_admin               | TEXT | nullable                       | Payroll administrator responsible for employee compensation (e.g. HRB, HF) |
-| payslip_delivery_method     | TEXT  | nullable                       | How pay stubs are delivered (e.g. email, print, portal) |
-| **Contact** |
-| phone                       | TEXT  | nullable                       | Employee phone number                    |
-| email                       | TEXT | nullable                       | Employee email address                   |
-| company_email               | TEXT | nullable                       | Company-issued email address             |
-| **Other** |
-| site_id_housing             | TEXT         | FK → site(id), nullable        | Site record assigned as the employee's housing        |
+| wc                          | TEXT         | nullable                       | Workers compensation code identifying the compensation plan or pay grade |
+| payroll_admin               | TEXT         | nullable                       | Payroll administrator responsible for employee compensation (e.g. HRB, HF) |
+| payslip_delivery_method     | TEXT         | nullable                       | How pay stubs are delivered (e.g. email, print, portal) |
+| phone                       | TEXT         | nullable                       | Employee phone number                    |
+| email                       | TEXT         | nullable                       | Employee email address                   |
+| company_email               | TEXT         | nullable                       | Company-issued email address             |
+| site_id_housing             | TEXT         | FK → site(id), nullable        | Reference to the site record used as the employee housing assignment |
 
 Unique constraint on `(org_id, first_name, last_name)` — no duplicate employee names within an org.
 
@@ -145,17 +138,17 @@ Header record for a task event. One record per task session — captures what ta
 
 | Column       | Type         | Constraints                       | Description                              |
 |-------------|--------------|-----------------------------------|------------------------------------------|
-| id          | UUID         | PK, auto-generated                | Unique identifier                        |
-| org_id      | TEXT         | NOT NULL, FK → org(id)            | The organization                         |
+| id          | UUID         | PK, auto-generated                | Unique identifier for the task event     |
+| org_id      | TEXT         | NOT NULL, FK → org(id)            | Owning organization for RLS filtering    |
 | farm_id     | TEXT         | FK → farm(id), nullable           | Farm where the task was performed        |
 | site_id     | TEXT         | FK → site(id), nullable           | Specific site where the task was performed |
-| task_id     | TEXT         | NOT NULL, FK → hr_task(id)        | Task performed                           |
+| task_id     | TEXT         | NOT NULL, FK → hr_task(id)        | Task performed, references hr_task catalog |
 | date        | DATE         | NOT NULL                          | Date the task was performed              |
-| start_time  | TIMESTAMPTZ  | NOT NULL                          | Time the task started; default for roster entries |
-| stop_time   | TIMESTAMPTZ  | nullable                          | Time the task ended; default for roster entries |
-| status      | TEXT         | NOT NULL, default open, CHECK     | One of: open, in_progress, completed     |
+| start_time  | TIMESTAMPTZ  | NOT NULL                          | Time the task started; used as the default for roster entries |
+| stop_time   | TIMESTAMPTZ  | nullable                          | Time the task ended; used as the default for roster entries |
+| status      | TEXT         | NOT NULL, default open, CHECK     | Workflow status: open, in_progress, completed |
 | notes       | TEXT         | nullable                          | Free-text notes about the task event     |
-| is_active   | BOOLEAN      | NOT NULL, default true            | Soft-disable without deleting            |
+| is_active   | BOOLEAN      | NOT NULL, default true            | Soft delete flag; false hides the record from active use |
 
 ---
 
@@ -165,14 +158,14 @@ One row per employee per task event. Times are pre-filled from the task tracker 
 
 | Column           | Type         | Constraints                           | Description                              |
 |-----------------|--------------|---------------------------------------|------------------------------------------|
-| id              | UUID         | PK, auto-generated                    | Unique identifier                        |
-| org_id          | TEXT         | NOT NULL, FK → org(id)                | The organization                         |
-| task_tracker_id | UUID         | NOT NULL, FK → hr_task_tracker(id)    | Parent task event                        |
-| employee_id     | TEXT         | NOT NULL, FK → hr_employee(id)        | Employee who participated                |
-| start_time      | TIMESTAMPTZ  | NOT NULL                              | Start time for this employee; overridable if they started late |
-| stop_time       | TIMESTAMPTZ  | nullable                              | Stop time for this employee; overridable if they left early |
-| units_completed | NUMERIC      | nullable                              | Generic output quantity (e.g. lbs picked, trays seeded, rows cleaned) |
-| is_active       | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
+| id              | UUID         | PK, auto-generated                    | Unique identifier for the roster entry   |
+| org_id          | TEXT         | NOT NULL, FK → org(id)                | Owning organization for RLS filtering    |
+| task_tracker_id | UUID         | NOT NULL, FK → hr_task_tracker(id)    | Parent task event this roster entry belongs to |
+| employee_id     | TEXT         | NOT NULL, FK → hr_employee(id)        | Employee who performed the task          |
+| start_time      | TIMESTAMPTZ  | NOT NULL                              | Time this employee started; pre-filled from task tracker, overridable if they started late |
+| stop_time       | TIMESTAMPTZ  | nullable                              | Time this employee stopped; pre-filled from task tracker, overridable if they left early |
+| units_completed | NUMERIC      | nullable                              | Generic output quantity for this employee (e.g. lbs picked, trays seeded, rows cleaned) |
+| is_active       | BOOLEAN      | NOT NULL, default true                | Soft delete flag; false removes the employee from the roster without deleting the record |
 
 Unique constraint on `(task_tracker_id, employee_id)` — one roster entry per employee per task event.
 
@@ -184,23 +177,23 @@ Employee time off requests with PTO and sick leave breakdown and a simple approv
 
 | Column           | Type         | Constraints                       | Description                              |
 |-----------------|--------------|-----------------------------------|------------------------------------------|
-| id              | UUID         | PK, auto-generated                | Unique identifier                        |
-| org_id          | TEXT         | NOT NULL, FK → org(id)            | The organization                         |
+| id              | UUID         | PK, auto-generated                | Unique identifier for the time off request |
+| org_id          | TEXT         | NOT NULL, FK → org(id)            | Owning organization for RLS filtering    |
 | employee_id     | TEXT         | NOT NULL, FK → hr_employee(id)    | Employee submitting the request          |
 | start_date      | DATE         | NOT NULL                          | First day of the requested time off      |
 | return_date     | DATE         | nullable                          | First day the employee returns to work   |
 | total_days      | NUMERIC      | nullable                          | Total number of days off requested       |
-| pto_days        | NUMERIC      | nullable                          | Days charged to PTO balance              |
-| sick_leave_days | NUMERIC      | nullable                          | Days charged to sick leave balance       |
+| pto_days        | NUMERIC      | nullable                          | Number of days charged to PTO balance    |
+| sick_leave_days | NUMERIC      | nullable                          | Number of days charged to sick leave balance |
 | request_reason  | TEXT         | nullable                          | Employee-provided reason for the time off |
-| status          | TEXT         | NOT NULL, default pending, CHECK  | One of: pending, approved, denied        |
+| status          | TEXT         | NOT NULL, default pending, CHECK  | Approval status: pending, approved, denied |
 | requested_by    | UUID         | NOT NULL, FK → auth.users(id)     | Auth user who submitted the request      |
-| requested_at    | TIMESTAMPTZ  | NOT NULL, default now             | When the request was submitted           |
-| reviewed_by     | TEXT         | FK → hr_employee(id), nullable    | Employee who approved or denied          |
-| reviewed_at     | TIMESTAMPTZ  | nullable                          | When the request was reviewed            |
+| requested_at    | TIMESTAMPTZ  | NOT NULL, default now             | Timestamp when the request was submitted |
+| reviewed_by     | TEXT         | FK → hr_employee(id), nullable    | Employee who approved or denied the request |
+| reviewed_at     | TIMESTAMPTZ  | nullable                          | Timestamp when the request was reviewed  |
 | denial_reason   | TEXT         | nullable                          | Reason provided when the request is denied |
 | notes           | TEXT         | nullable                          | Additional notes about the request       |
-| is_active       | BOOLEAN      | NOT NULL, default true            | Soft-disable without deleting            |
+| is_active       | BOOLEAN      | NOT NULL, default true            | Soft delete flag; false hides the request from active use |
 
 ---
 
