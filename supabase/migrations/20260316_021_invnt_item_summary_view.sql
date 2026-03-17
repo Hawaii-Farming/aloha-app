@@ -1,0 +1,90 @@
+CREATE OR REPLACE VIEW invnt_item_summary AS
+WITH latest_onhand AS (
+    SELECT DISTINCT ON (invnt_item_id)
+        invnt_item_id,
+        onhand_quantity,
+        onhand_uom,
+        onhand_burn_quantity,
+        onhand_date
+    FROM invnt_onhand
+    WHERE is_active = true
+    ORDER BY invnt_item_id, onhand_date DESC, created_at DESC
+),
+open_orders AS (
+    SELECT
+        po.invnt_item_id,
+        COALESCE(SUM(po.order_quantity * po.order_burn_quantity), 0) AS ordered_burn,
+        COALESCE(SUM(r.received_burn), 0) AS received_burn
+    FROM invnt_po po
+    LEFT JOIN (
+        SELECT
+            invnt_po_id,
+            SUM(receipt_quantity * receipt_burn_quantity) AS received_burn
+        FROM invnt_po_receipt
+        WHERE is_active = true
+        GROUP BY invnt_po_id
+    ) r ON r.invnt_po_id = po.id
+    WHERE po.is_active = true
+      AND po.invnt_item_id IS NOT NULL
+      AND po.status IN ('approved', 'ordered', 'partial')
+    GROUP BY po.invnt_item_id
+)
+SELECT
+    -- Item identification
+    i.org_id,
+    i.farm_id,
+    i.id AS invnt_item_id,
+    i.category_id,
+    i.subcategory_id,
+    i.vendor_id,
+
+    -- Item UOMs & conversions
+    i.burn_uom,
+    i.onhand_uom,
+    i.order_uom,
+    i.onhand_burn_quantity,
+    i.order_burn_quantity,
+
+    -- Forecasting settings
+    i.is_frequently_used,
+    i.burn_per_week,
+    i.cushion_weeks,
+
+    -- Reorder settings
+    i.is_auto_reorder,
+    i.reorder_point_burn,
+    i.reorder_quantity_burn,
+
+    -- Current on-hand (from latest invnt_onhand record)
+    COALESCE(lo.onhand_quantity, 0) AS onhand_quantity,
+    COALESCE(lo.onhand_quantity * lo.onhand_burn_quantity, 0) AS onhand_burn,
+    lo.onhand_date,
+    CURRENT_DATE - lo.onhand_date AS days_since_onhand,
+
+    -- Open orders (from invnt_po + invnt_po_receipt)
+    COALESCE(oo.ordered_burn, 0) AS ordered_burn,
+    COALESCE(oo.received_burn, 0) AS received_burn,
+    COALESCE(oo.ordered_burn, 0) - COALESCE(oo.received_burn, 0) AS remaining_burn,
+
+    -- Computed forecasts
+    CASE
+        WHEN COALESCE(i.burn_per_week, 0) > 0
+        THEN COALESCE(lo.onhand_quantity * lo.onhand_burn_quantity, 0) / i.burn_per_week
+        ELSE NULL
+    END AS weeks_on_hand,
+
+    CASE
+        WHEN COALESCE(i.burn_per_week, 0) > 0 AND lo.onhand_date IS NOT NULL
+        THEN lo.onhand_date + (
+            COALESCE(lo.onhand_quantity * lo.onhand_burn_quantity, 0) / i.burn_per_week * 7
+            - COALESCE(i.cushion_weeks, 0) * 7
+        )::INT
+        ELSE NULL
+    END AS next_order_date
+
+FROM invnt_item i
+LEFT JOIN latest_onhand lo ON lo.invnt_item_id = i.id
+LEFT JOIN open_orders oo ON oo.invnt_item_id = i.id
+WHERE i.is_active = true;
+
+COMMENT ON VIEW invnt_item_summary IS 'Dashboard view combining latest on-hand snapshot, open order totals with receipts, and computed forecasts (weeks-on-hand, next-order-date) per active inventory item';

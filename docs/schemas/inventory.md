@@ -6,22 +6,27 @@ Tables for managing inventory items, categories, and procurement across all farm
 
 ```mermaid
 erDiagram
-    org ||--o{ inventory_category : has
-    inventory_category ||--o{ inventory_category : parent
-    org ||--o{ inventory_item : has
-    inventory_category ||--o{ inventory_item : classifies
-    invnt_vendor ||--o{ inventory_item : supplies
-    farm ||--o{ inventory_item : scoped
-    unit_of_measure ||--o{ inventory_item : burn-unit
-    unit_of_measure ||--o{ inventory_item : onhand-unit
-    unit_of_measure ||--o{ inventory_item : order-unit
-    org ||--o{ inventory_order : has
-    inventory_item ||--o{ inventory_order : ordered
-    invnt_vendor ||--o{ inventory_order : from
-    inventory_order ||--o{ inventory_order_receipt : received
-    inventory_item ||--o{ inventory_transaction : tracked
-    sales_product ||--o{ sales_product_inventory_item : linked
-    inventory_item ||--o{ sales_product_inventory_item : linked
+    org ||--o{ invnt_category : has
+    invnt_category ||--o{ invnt_subcategory : has
+    org ||--o{ invnt_item : has
+    invnt_category ||--o{ invnt_item : classifies
+    invnt_subcategory ||--o{ invnt_item : classifies
+    invnt_vendor ||--o{ invnt_item : supplies
+    farm ||--o{ invnt_item : scoped
+    org_site ||--o{ invnt_item : stored
+    org_site ||--o{ invnt_item : equipment
+    util_uom ||--o{ invnt_item : burn-unit
+    util_uom ||--o{ invnt_item : onhand-unit
+    util_uom ||--o{ invnt_item : order-unit
+    org ||--o{ invnt_po : has
+    invnt_item ||--o{ invnt_po : ordered
+    invnt_vendor ||--o{ invnt_po : from
+    invnt_category ||--o{ invnt_po : classifies
+    invnt_po ||--o{ invnt_po_receipt : received
+    invnt_item ||--o{ invnt_onhand : tracked
+    invnt_item ||--o{ invnt_usage : consumed
+    sales_product ||--o{ invnt_sales_product_item : linked
+    invnt_item ||--o{ invnt_sales_product_item : linked
 ```
 
 ---
@@ -30,171 +35,219 @@ erDiagram
 
 | Table | Purpose |
 |-------|---------|
-| inventory_category | Hierarchical categories for organizing inventory items (e.g. Seeds > Cucumber Seeds, Chemicals > Fertilizer). Self-referencing parent allows unlimited nesting depth. |
-| inventory_item | The main inventory record for each item. Tracks units and conversions, burn rates for forecasting, reorder settings, and costing. Type-specific fields (variety, seed maker, part number, etc.) are stored in metadata. Cached totals like on-hand and on-order quantities are computed from transaction data, not stored here. |
-| inventory_order | Tracks order requests through a workflow: requested → approved/rejected → ordered → partial/received. Snapshots item name, units, and cost at order time. Supports both catalog items and general/ad-hoc purchases. |
-| inventory_order_receipt | Individual deliveries received against an order. Captures quantity, lot number, expiry date, and acceptance details. Multiple receipts per order enable partial delivery tracking. |
-| inventory_transaction | Records every stock change (receipt, count, usage). Snapshots on-hand quantity and burn units at each transaction. Source of truth for computed totals like current stock, burn-per-week, and weeks-on-hand. Uses reference_table/reference_id to link back to the source (order receipt, grow schedule, etc.). |
-| sales_product_inventory_item | Junction table linking sales products to inventory items at pack and sale packaging levels. Enables inventory tracking when products are packed or sold. |
+| invnt_category | Top-level categories for organizing inventory items (e.g. Fertilizers, Seeds, Packaging Materials). |
+| invnt_subcategory | Second-level categories under invnt_category for finer classification (e.g. Nitrogen Fertilizers under Fertilizers). |
+| invnt_item | The main inventory record for each item. Tracks units and conversions, burn rates for forecasting, reorder settings, and item details (variety, manufacturer, part number, etc.) as proper columns. Classification is handled by category/subcategory. On-hand and on-order quantities are computed from transaction data, not stored here. |
+| invnt_po | Tracks purchase order requests through a workflow: requested → approved/rejected → ordered → partial/received. Snapshots item name, units, and cost at order time. Supports both catalog items and general/ad-hoc purchases. |
+| invnt_po_receipt | Individual deliveries received against a purchase order. Captures quantity, lot number, expiry date, and acceptance details. Multiple receipts per order enable partial delivery tracking. |
+| invnt_onhand | Records on-hand inventory snapshots per item. Captures quantity in onhand units with burn unit conversion and lot tracking. Source of truth for computed totals like current stock, burn-per-week, and weeks-on-hand. |
+| invnt_usage | Tracks inventory consumption linked back to the source module via reference_table and reference_id. Records burn quantity used per event. |
+| invnt_sales_product_item | Junction table linking sales products to inventory items at pack and sale packaging levels. Enables inventory tracking when products are packed or sold. |
 
 ---
 
-## inventory_category
+## invnt_category
 
-Hierarchical categories for organizing inventory items. Uses a self-referencing parent_id for unlimited nesting (e.g. Seeds > Cucumber Seeds > Organic Cucumber Seeds). The level column tracks depth for display and query purposes.
+Top-level categories for organizing inventory items (e.g. Fertilizers, Seeds, Packaging Materials).
 
 | Column     | Type         | Constraints                     | Description                              |
 |-----------|--------------|--------------------------------|------------------------------------------|
-| id        | UUID         | PK, auto-generated             | Unique identifier                        |
-| org_id    | UUID         | NOT NULL, FK → org(id)         | The organization                         |
-| parent_id | UUID         | FK → inventory_category(id), nullable | Parent category (null = top level) |
+| id        | TEXT         | PK                             | Human-readable identifier derived from category name |
+| org_id    | TEXT         | NOT NULL, FK → org(id)         | The organization                         |
 | name      | VARCHAR(100) | NOT NULL                       | Category name                            |
-| level     | INT          | NOT NULL, default 0            | Nesting depth (0 = root)                 |
 | is_active | BOOLEAN      | NOT NULL, default true         | Soft-disable without deleting            |
 | created_at| TIMESTAMPTZ  | NOT NULL, default now          | When the record was created              |
 | created_by| UUID         | FK → auth.users(id), nullable  | Who created the record                   |
 | updated_at| TIMESTAMPTZ  | NOT NULL, default now          | When the record was last updated         |
 | updated_by| UUID         | FK → auth.users(id), nullable  | Who last updated the record              |
 
-Unique constraint on `(org_id, parent_id, name)` — no duplicate category names under the same parent within an org.
+Unique constraint on `(org_id, name)`.
 
-## inventory_item
+## invnt_subcategory
 
-The main inventory record. Each item has a type (seed, chemical, part) that determines which metadata fields are relevant. Items belong to an organization and optionally to a specific farm.
+Second-level categories under invnt_category for finer classification (e.g. Nitrogen Fertilizers under Fertilizers).
 
-| Column                | Type         | Constraints                           | Description                              |
-|----------------------|--------------|---------------------------------------|------------------------------------------|
-| id                   | UUID         | PK, auto-generated                    | Unique identifier                        |
-| org_id               | UUID         | NOT NULL, FK → org(id)                | The organization                         |
-| farm_id              | UUID         | FK → farm(id), nullable               | Optional farm scope (null = org-wide)    |
-| category_id          | UUID         | FK → inventory_category(id), nullable | Item category                            |
-| vendor_id            | UUID         | FK → invnt_vendor(id), nullable       | Primary vendor                           |
-| external_id          | VARCHAR(50)  | nullable                              | Links to external accounting/inventory system |
-| name                 | VARCHAR(150) | NOT NULL                              | Item name                                |
-| type                 | VARCHAR(20)  | NOT NULL, CHECK                       | One of: seed, chemical, part             |
-| burn_unit_id         | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Smallest usage unit (e.g. seeds, ml)     |
-| onhand_unit_id       | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Stock counting unit (e.g. pack of 1000)  |
-| order_unit_id        | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Purchase unit (e.g. case of 10 packs)    |
-| burn_per_onhand_unit | NUMERIC      | nullable                              | How many burn units in one on-hand unit  |
-| burn_per_order_unit  | NUMERIC      | nullable                              | How many burn units in one order unit    |
-| order_per_pallet     | NUMERIC      | nullable                              | Order units per pallet                   |
-| pallets_per_truckload| NUMERIC      | nullable                              | Pallets per truckload                    |
-| is_frequently_used   | BOOLEAN      | NOT NULL, default false               | Whether this item is used regularly      |
-| burn_per_week        | NUMERIC      | nullable                              | Average weekly usage in burn units       |
-| burn_per_year        | NUMERIC      | nullable                              | Average yearly usage in burn units       |
-| cushion_weeks        | NUMERIC      | nullable                              | Safety stock buffer in weeks (includes lead time) |
-| auto_order_enabled   | BOOLEAN      | NOT NULL, default false               | Whether automatic reorder is on          |
-| reorder_point_burn   | NUMERIC      | nullable                              | Reorder trigger level in burn units      |
-| reorder_quantity_burn| NUMERIC      | nullable                              | How much to reorder in burn units        |
-| requires_lot_tracking| BOOLEAN      | NOT NULL, default false               | Whether lot numbers must be recorded     |
-| requires_expiry_date | BOOLEAN      | NOT NULL, default false               | Whether expiry dates must be tracked     |
-| metadata             | JSONB        | NOT NULL, default {}                  | Type-specific fields: variety_id, is_pelleted, seed_maker, part_type, part_number, model, serial_number, manufacturer, description, storage_location, is_palletized, photos |
-| is_active            | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
-| created_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
-| created_by           | UUID         | FK → auth.users(id), nullable         | Who created the record                   |
-| updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
-| updated_by           | UUID         | FK → auth.users(id), nullable         | Who last updated the record              |
+| Column      | Type         | Constraints                      | Description                              |
+|------------|--------------|----------------------------------|------------------------------------------|
+| id         | TEXT         | PK                               | Human-readable identifier derived from subcategory name |
+| org_id     | TEXT         | NOT NULL, FK → org(id)           | The organization                         |
+| category_id| TEXT         | NOT NULL, FK → invnt_category(id)| Parent main category                     |
+| name       | VARCHAR(100) | NOT NULL                         | Subcategory name                         |
+| is_active  | BOOLEAN      | NOT NULL, default true           | Soft-disable without deleting            |
+| created_at | TIMESTAMPTZ  | NOT NULL, default now            | When the record was created              |
+| created_by | UUID         | FK → auth.users(id), nullable    | Who created the record                   |
+| updated_at | TIMESTAMPTZ  | NOT NULL, default now            | When the record was last updated         |
+| updated_by | UUID         | FK → auth.users(id), nullable    | Who last updated the record              |
+
+Unique constraint on `(category_id, name)`.
+
+## invnt_item
+
+The main inventory record. Items belong to an organization and optionally to a specific farm. Classification is handled by the category/subcategory structure. All item details are proper columns grouped by logical sections.
+
+| Column                    | Type         | Constraints                           | Description                              |
+|--------------------------|--------------|---------------------------------------|------------------------------------------|
+| id                       | UUID         | PK, auto-generated                    | Unique identifier                        |
+| org_id                   | UUID         | NOT NULL, FK → org(id)                | The organization                         |
+| farm_id                  | TEXT         | FK → farm(id), nullable               | Optional farm scope (null = org-wide)    |
+| category_id              | TEXT         | FK → invnt_category(id), nullable     | Main category for item classification    |
+| subcategory_id           | TEXT         | FK → invnt_subcategory(id), nullable  | Subcategory for finer classification     |
+| name                     | VARCHAR(150) | NOT NULL                              | Item name                                |
+| external_id              | VARCHAR(50)  | nullable                              | Links to external accounting/inventory system |
+| description              | TEXT         | nullable                              | Detailed description of the item         |
+| burn_uom                 | VARCHAR(10)  | FK → util_uom(code), nullable         | Smallest usage unit (e.g. seeds, ml)     |
+| onhand_uom               | VARCHAR(10)  | FK → util_uom(code), nullable         | Stock counting unit (e.g. pack of 1000)  |
+| order_uom                | VARCHAR(10)  | FK → util_uom(code), nullable         | Purchase unit (e.g. case of 10 packs)    |
+| onhand_burn_quantity     | NUMERIC      | nullable                              | Number of burn units in one onhand unit  |
+| order_burn_quantity      | NUMERIC      | nullable                              | Number of burn units in one order unit   |
+| is_palletized            | BOOLEAN      | NOT NULL, default false               | Whether item is received/stored on pallets |
+| pallet_order_quantity    | NUMERIC      | nullable                              | Number of order units per pallet         |
+| truckload_pallet_quantity| NUMERIC      | nullable                              | Number of pallets per truckload          |
+| is_frequently_used       | BOOLEAN      | NOT NULL, default false               | Whether this item is used regularly      |
+| burn_per_week            | NUMERIC      | nullable                              | Average weekly usage in burn units       |
+| cushion_weeks            | NUMERIC      | nullable                              | Safety stock buffer in weeks (includes lead time) |
+| is_auto_reorder          | BOOLEAN      | NOT NULL, default false               | Whether automatic reorder is enabled     |
+| reorder_point_burn       | NUMERIC      | nullable                              | Reorder trigger level in burn units      |
+| reorder_quantity_burn    | NUMERIC      | nullable                              | How much to reorder in burn units        |
+| requires_lot_tracking    | BOOLEAN      | NOT NULL, default false               | Whether lot numbers must be recorded     |
+| requires_expiry_date     | BOOLEAN      | NOT NULL, default false               | Whether expiry dates must be tracked     |
+| org_site_id_storage      | UUID         | FK → org_site(id), nullable           | Storage site where this item is kept     |
+| vendor_id                | TEXT         | FK → invnt_vendor(id), nullable       | Primary vendor for procurement           |
+| manufacturer             | VARCHAR(100) | nullable                              | Manufacturer or brand name               |
+| variety_id               | TEXT         | FK → grow_variety(id), nullable       | Linked crop variety for seed items       |
+| is_pelleted              | BOOLEAN      | NOT NULL, default false               | Whether seed item is pelleted            |
+| org_site_id_equipment    | UUID         | FK → org_site(id), nullable           | Equipment site this part belongs to      |
+| part_type                | VARCHAR(50)  | nullable                              | Type classification for parts (e.g. electrical, mechanical) |
+| part_number              | VARCHAR(50)  | nullable                              | Manufacturer part number or catalog SKU  |
+| photos                   | JSONB        | NOT NULL, default []                  | JSON array of photo URLs                 |
+| is_active                | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
+| created_at               | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
+| created_by               | UUID         | FK → auth.users(id), nullable         | Who created the record                   |
+| updated_at               | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
+| updated_by               | UUID         | FK → auth.users(id), nullable         | Who last updated the record              |
 
 Unique constraint on `(org_id, name)` — no duplicate item names within an org.
 
-## inventory_order
+## invnt_po
 
-Tracks order requests through a workflow from request to receipt. Each order snapshots the item name, units, and cost at order time so the record stays accurate even if the item changes later. When `item_id` is null, it's a general/ad-hoc purchase — `item_name` is always populated either way.
+Tracks purchase order requests through a workflow from request to receipt. Each order snapshots the item name, units, and cost at order time so the record stays accurate even if the item changes later. `request_type` determines whether it's a general purchase (classified by `category_id`) or an inventory item purchase (linked via `invnt_item_id`). `item_name` is always populated either way.
 
 | Column                | Type         | Constraints                           | Description                              |
 |----------------------|--------------|---------------------------------------|------------------------------------------|
 | id                   | UUID         | PK, auto-generated                    | Unique identifier                        |
-| org_id               | UUID         | NOT NULL, FK → org(id)                | The organization                         |
-| farm_id              | UUID         | FK → farm(id), nullable               | Optional farm scope                      |
-| item_id              | UUID         | FK → inventory_item(id), nullable     | Catalog item (null = general/ad-hoc)     |
-| vendor_id            | UUID         | FK → invnt_vendor(id), nullable       | Vendor for this order                    |
-| external_id          | VARCHAR(50)  | nullable                              | Links to external system                 |
-| item_name            | VARCHAR(150) | NOT NULL                              | Snapshot of item name or manual entry for general items |
+| org_id               | TEXT         | NOT NULL, FK → org(id)                | The organization                         |
+| farm_id              | TEXT         | FK → farm(id), nullable               | Optional farm scope                      |
+| request_type         | VARCHAR(20)  | NOT NULL, default inventory_item, CHECK | Whether general or inventory_item purchase |
+| urgency_level        | TEXT         | nullable                              | Urgency selected from dropdown (e.g. 1 day, 2 days, 7 days) |
+| category_id          | TEXT         | FK → invnt_category(id), nullable     | Category for general requests (classification when no linked item) |
+| invnt_item_id        | UUID         | FK → invnt_item(id), nullable         | Linked inventory item; NULL for general requests |
+| item_name            | VARCHAR(150) | NOT NULL                              | Snapshot of item name or manual entry for general requests |
+| burn_uom             | VARCHAR(10)  | FK → util_uom(code), nullable         | Snapshot of burn unit from item at order time |
+| order_uom            | VARCHAR(10)  | FK → util_uom(code), nullable         | Snapshot of order unit from item at order time |
+| order_quantity       | NUMERIC      | NOT NULL                              | Quantity ordered in order units           |
+| order_burn_quantity  | NUMERIC      | nullable                              | Snapshot of burn units per order unit at order time |
 | status               | VARCHAR(20)  | NOT NULL, default requested, CHECK    | One of: requested, approved, rejected, ordered, partial, received, cancelled |
-| quantity_order       | NUMERIC      | NOT NULL                              | How much was ordered                     |
-| order_unit_id        | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Snapshot of order unit                   |
-| quantity_burn        | NUMERIC      | nullable                              | Order quantity in burn units             |
-| burn_unit_id         | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Snapshot of burn unit                    |
-| burn_per_order_unit  | NUMERIC      | nullable                              | Snapshot of conversion at order time     |
-| total_cost           | NUMERIC      | nullable                              | Total order cost                         |
-| burn_unit_cost       | NUMERIC      | nullable                              | Cost per burn unit at order time         |
 | requested_by         | UUID         | NOT NULL, FK → auth.users(id)         | Who requested the order                  |
 | requested_at         | TIMESTAMPTZ  | NOT NULL, default now                 | When it was requested                    |
 | reviewed_by          | UUID         | FK → auth.users(id), nullable         | Who approved or rejected                 |
 | reviewed_at          | TIMESTAMPTZ  | nullable                              | When it was reviewed                     |
 | order_placed_by      | UUID         | FK → auth.users(id), nullable         | Who placed the order with the vendor     |
 | order_placed_at      | TIMESTAMPTZ  | nullable                              | When the order was placed                |
-| delivery_expected_date| DATE        | nullable                              | Expected delivery date                   |
-| metadata             | JSONB        | NOT NULL, default {}                  | urgency_level, operations_module, request_type, tracking_number, cost_includes_freight, order_notes, rejected_reason, request_photos |
+| external_id          | VARCHAR(50)  | nullable                              | External PO number or vendor reference   |
+| expected_delivery_date | DATE       | nullable                              | Expected delivery date from vendor       |
+| tracking_number      | VARCHAR(100) | nullable                              | Shipping or freight tracking number      |
+| order_notes          | TEXT         | nullable                              | Free-text notes about the order          |
+| rejected_reason      | TEXT         | nullable                              | Reason for rejection when status is rejected |
+| request_photos       | JSONB        | NOT NULL, default []                  | JSON array of photo URLs attached to the request |
 | is_active            | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
-| created_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
-| created_by           | UUID         | FK → auth.users(id), nullable         | Who created the record                   |
+| vendor_id            | TEXT         | FK → invnt_vendor(id), nullable       | Vendor for this order                    |
+| total_cost           | NUMERIC      | nullable                              | Total order cost                         |
+| is_freight_included  | BOOLEAN      | NOT NULL, default false               | Whether total_cost includes freight      |
 | updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
 | updated_by           | UUID         | FK → auth.users(id), nullable         | Who last updated the record              |
 
-## inventory_order_receipt
+## invnt_po_receipt
 
-Individual deliveries received against an order. One order can have multiple receipts to handle partial deliveries. Each receipt captures its own lot number, expiry date, quantity, and acceptance details.
+Individual deliveries received against a purchase order. One order can have multiple receipts to handle partial deliveries. Each receipt captures its own lot number, expiry date, quantity, and acceptance details.
 
 | Column                | Type         | Constraints                           | Description                              |
 |----------------------|--------------|---------------------------------------|------------------------------------------|
 | id                   | UUID         | PK, auto-generated                    | Unique identifier                        |
-| org_id               | UUID         | NOT NULL, FK → org(id)                | The organization                         |
-| order_id             | UUID         | NOT NULL, FK → inventory_order(id)    | The order this receipt belongs to        |
-| received_by          | UUID         | NOT NULL, FK → auth.users(id)         | Who received the delivery                |
-| received_at          | TIMESTAMPTZ  | NOT NULL, default now                 | When it was logged                       |
-| received_date        | DATE         | NOT NULL                              | Actual delivery date                     |
-| quantity_received    | NUMERIC      | NOT NULL                              | How much was received                    |
-| received_unit_id     | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Unit of the received quantity            |
-| burn_per_received_unit| NUMERIC     | nullable                              | Conversion for this receipt              |
+| org_id               | TEXT         | NOT NULL, FK → org(id)                | The organization                         |
+| invnt_po_id          | UUID         | NOT NULL, FK → invnt_po(id)           | The purchase order this receipt belongs to |
+| receipt_date         | DATE         | NOT NULL                              | Actual date the delivery arrived         |
+| receipt_uom          | VARCHAR(10)  | FK → util_uom(code), nullable         | Unit of the received quantity            |
+| receipt_quantity     | NUMERIC      | NOT NULL                              | Quantity received in receipt units        |
+| receipt_burn_quantity| NUMERIC      | nullable                              | Burn units per receipt unit at time of receipt |
 | lot_number           | VARCHAR(50)  | nullable                              | Lot code from vendor                     |
 | lot_expiry_date      | DATE         | nullable                              | Expiry date for this lot                 |
-| metadata             | JSONB        | NOT NULL, default {}                  | delivery_truck_clean, delivery_acceptable, receipt_notes, receipt_photos |
+| delivery_truck_clean | BOOLEAN      | nullable                              | Whether the delivery truck was clean     |
+| delivery_acceptable  | BOOLEAN      | nullable                              | Whether the delivery was in acceptable condition |
+| receipt_notes        | TEXT         | nullable                              | Free-text notes about the receipt        |
+| receipt_photos       | JSONB        | NOT NULL, default []                  | JSON array of photo URLs documenting the delivery |
 | is_active            | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
 | created_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
 | created_by           | UUID         | FK → auth.users(id), nullable         | Who created the record                   |
 | updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
 | updated_by           | UUID         | FK → auth.users(id), nullable         | Who last updated the record              |
 
-## inventory_transaction
+## invnt_onhand
 
-Records every stock change for an item. Each transaction snapshots the on-hand quantity and burn units at that point in time. The `reference_table` and `reference_id` columns link back to whatever triggered the transaction — an order receipt, a grow schedule usage, a manual count, etc.
+Records on-hand inventory snapshots per item. Each record captures the quantity in onhand units with burn unit conversion and optional lot tracking. Source of truth for computed totals like current stock, burn-per-week, and weeks-on-hand.
 
 | Column                | Type         | Constraints                           | Description                              |
 |----------------------|--------------|---------------------------------------|------------------------------------------|
 | id                   | UUID         | PK, auto-generated                    | Unique identifier                        |
-| org_id               | UUID         | NOT NULL, FK → org(id)                | The organization                         |
-| farm_id              | UUID         | FK → farm(id), nullable               | Optional farm scope                      |
-| item_id              | UUID         | NOT NULL, FK → inventory_item(id)     | The item this transaction is for         |
-| type                 | VARCHAR(20)  | NOT NULL, CHECK                       | One of: receipt, count, usage            |
-| transaction_date     | DATE         | NOT NULL                              | When the transaction occurred            |
-| quantity_onhand      | NUMERIC      | NOT NULL                              | On-hand quantity after this transaction (in on-hand units) |
-| onhand_unit_id       | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Snapshot of on-hand unit                 |
-| quantity_burn        | NUMERIC      | NOT NULL                              | The change amount in burn units          |
-| burn_unit_id         | VARCHAR(10)  | FK → unit_of_measure(code), nullable  | Snapshot of burn unit                    |
-| burn_per_onhand_unit | NUMERIC      | nullable                              | Snapshot of conversion                   |
-| lot_number           | VARCHAR(50)  | nullable                              | Lot code                                 |
+| org_id               | TEXT         | NOT NULL, FK → org(id)                | The organization                         |
+| farm_id              | TEXT         | FK → farm(id), nullable               | Optional farm scope                      |
+| invnt_item_id        | UUID         | NOT NULL, FK → invnt_item(id)         | The item this record tracks              |
+| onhand_date          | DATE         | NOT NULL                              | Date of the on-hand snapshot             |
+| onhand_uom           | VARCHAR(10)  | FK → util_uom(code), nullable         | Unit of measure for the on-hand quantity |
+| onhand_quantity      | NUMERIC      | NOT NULL                              | Quantity on hand in onhand units         |
+| onhand_burn_quantity | NUMERIC      | nullable                              | Burn units per onhand unit at time of record |
+| lot_number           | VARCHAR(50)  | nullable                              | Lot code from vendor                     |
 | lot_expiry_date      | DATE         | nullable                              | Expiry date for this lot                 |
-| reference_table      | VARCHAR(50)  | nullable                              | Source table (e.g. inventory_order_receipt, grow_fertigation_schedule) |
-| reference_id         | UUID         | nullable                              | Source record ID                         |
-| metadata             | JSONB        | NOT NULL, default {}                  | additional_notes, photos                 |
+| additional_notes     | TEXT         | nullable                              | Free-text notes about this on-hand record |
 | is_active            | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
 | created_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
 | created_by           | UUID         | FK → auth.users(id), nullable         | Who created the record                   |
 | updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
 | updated_by           | UUID         | FK → auth.users(id), nullable         | Who last updated the record              |
 
-## sales_product_inventory_item
+## invnt_usage
+
+Tracks inventory consumption linked back to the source module that triggered it. The `reference_table` and `reference_id` columns provide a generic FK to any table (e.g. grow_fertigation_schedule, harvest_batch) so usage can be traced to its origin.
+
+| Column                | Type         | Constraints                           | Description                              |
+|----------------------|--------------|---------------------------------------|------------------------------------------|
+| id                   | UUID         | PK, auto-generated                    | Unique identifier                        |
+| org_id               | TEXT         | NOT NULL, FK → org(id)                | The organization                         |
+| farm_id              | TEXT         | FK → farm(id), nullable               | Optional farm scope                      |
+| invnt_item_id        | UUID         | NOT NULL, FK → invnt_item(id)         | Inventory item that was consumed         |
+| reference_table      | VARCHAR(50)  | nullable                              | Source table that triggered the usage    |
+| reference_id         | UUID         | nullable                              | Source record ID in the reference_table   |
+| usage_date           | DATE         | NOT NULL                              | Date the consumption occurred            |
+| burn_uom             | VARCHAR(10)  | FK → util_uom(code), nullable         | Unit of measure for the burn quantity    |
+| quantity_burn        | NUMERIC      | NOT NULL                              | Quantity consumed in burn units           |
+| is_active            | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
+| created_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
+| created_by           | UUID         | FK → auth.users(id), nullable         | Who created the record                   |
+| updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
+| updated_by           | UUID         | FK → auth.users(id), nullable         | Who last updated the record              |
+
+## invnt_sales_product_item
 
 Junction table linking sales products to inventory items at pack and sale packaging levels. When a product is packed or sold, this mapping determines which inventory items are consumed and in what quantity.
 
 | Column                | Type         | Constraints                           | Description                              |
 |----------------------|--------------|---------------------------------------|------------------------------------------|
 | id                   | UUID         | PK, auto-generated                    | Unique identifier                        |
-| org_id               | UUID         | NOT NULL, FK → org(id)                | The organization                         |
-| product_id           | UUID         | NOT NULL, FK → sales_product(id)      | The sales product                        |
-| item_id              | UUID         | NOT NULL, FK → inventory_item(id)     | The inventory item consumed              |
+| org_id               | TEXT         | NOT NULL, FK → org(id)                | The organization                         |
+| farm_id              | TEXT         | FK → farm(id), nullable               | Optional farm scope                      |
+| product_id           | TEXT         | NOT NULL, FK → sales_product(id)      | The sales product                        |
+| invnt_item_id        | UUID         | NOT NULL, FK → invnt_item(id)         | The inventory item consumed              |
 | packaging_level      | VARCHAR(10)  | NOT NULL, CHECK                       | One of: pack, sale                       |
+| sale_uom             | VARCHAR(10)  | FK → util_uom(code), nullable         | Unit of measure for the sale quantity    |
 | quantity_per_unit    | NUMERIC      | nullable                              | How much of this item is used per unit at this packaging level |
 | is_active            | BOOLEAN      | NOT NULL, default true                | Soft-disable without deleting            |
 | created_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was created              |
@@ -202,7 +255,7 @@ Junction table linking sales products to inventory items at pack and sale packag
 | updated_at           | TIMESTAMPTZ  | NOT NULL, default now                 | When the record was last updated         |
 | updated_by           | UUID         | FK → auth.users(id), nullable         | Who last updated the record              |
 
-Unique constraint on `(product_id, item_id, packaging_level)` — one link per item per packaging level per product.
+Unique constraint on `(product_id, invnt_item_id, packaging_level)` — one link per item per packaging level per product.
 
 ---
 
@@ -212,69 +265,77 @@ Unique constraint on `(product_id, item_id, packaging_level)` — one link per i
 
 | View | Purpose |
 |------|---------|
-| inventory_item_summary | Provides a complete picture of each active inventory item with computed on-hand quantities, on-order totals, weeks-on-hand, days since last transaction, and next order date. Primary query target for dashboards and reorder alerts. |
-| inventory_lot_summary | Shows current on-hand quantity per lot for each item. Only includes lots with positive stock. Used for lot traceability, expiry tracking, and FIFO usage decisions. |
+| invnt_item_summary | Dashboard view combining latest on-hand snapshot, open order totals with receipts, and computed forecasts (weeks-on-hand, next-order-date) per active inventory item. |
+| invnt_lot_summary | Latest on-hand snapshot per item and lot number combination. Only includes lots with positive stock. Used for lot traceability, expiry tracking, and FIFO usage. |
 
 ---
 
-### inventory_item_summary
+### invnt_item_summary
 
-Computed view that provides a complete picture of each active inventory item by joining the latest transaction data with open order quantities. Intended as the primary query target for inventory dashboards and reorder alerts.
+Dashboard view combining latest on-hand snapshot, open order totals with receipt progress, and computed forecasts. Joins `invnt_item` with the latest `invnt_onhand` record and aggregated open `invnt_po` orders (factoring in `invnt_po_receipt` deliveries).
 
 | Column                       | Source                              | Description                              |
 |------------------------------|-------------------------------------|------------------------------------------|
-| item_id                      | inventory_item.id                   | The item                                 |
-| org_id                       | inventory_item.org_id               | The organization                         |
-| farm_id                      | inventory_item.farm_id              | Optional farm scope                      |
-| name                         | inventory_item.name                 | Item name                                |
-| type                         | inventory_item.type                 | Item type                                |
-| category_id                  | inventory_item.category_id          | Item category                            |
-| vendor_id                    | inventory_item.vendor_id            | Primary vendor                           |
-| is_frequently_used           | inventory_item                      | Whether item is used regularly            |
-| auto_order_enabled           | inventory_item                      | Whether auto-reorder is on               |
-| burn_per_week                | inventory_item                      | Configured weekly burn rate              |
-| cushion_weeks                | inventory_item                      | Safety stock buffer in weeks             |
-| reorder_point_burn           | inventory_item                      | Reorder trigger level                    |
-| reorder_quantity_burn        | inventory_item                      | Reorder quantity                         |
-| current_onhand_units         | Latest transaction                  | Current on-hand in on-hand units         |
-| current_onhand_burn          | Latest transaction (computed)       | Current on-hand in burn units            |
-| last_transaction_date        | Latest transaction                  | Date of most recent transaction          |
-| days_since_last_transaction  | Computed                            | Days since last transaction              |
-| on_order_burn                | inventory_order (aggregated)        | Total burn units on open orders (approved, ordered, partial) |
+| org_id                       | invnt_item.org_id                   | The organization                         |
+| farm_id                      | invnt_item.farm_id                  | Optional farm scope                      |
+| invnt_item_id                | invnt_item.id                       | The item                                 |
+| category_id                  | invnt_item.category_id              | Main category                            |
+| subcategory_id               | invnt_item.subcategory_id           | Item subcategory                         |
+| vendor_id                    | invnt_item.vendor_id                | Primary vendor                           |
+| burn_uom                     | invnt_item.burn_uom                 | Burn unit of measure                     |
+| onhand_uom                   | invnt_item.onhand_uom               | On-hand unit of measure                  |
+| order_uom                    | invnt_item.order_uom                | Order unit of measure                    |
+| onhand_burn_quantity         | invnt_item.onhand_burn_quantity     | Burn units per onhand unit               |
+| order_burn_quantity          | invnt_item.order_burn_quantity      | Burn units per order unit                |
+| is_frequently_used           | invnt_item                          | Whether item is used regularly            |
+| burn_per_week                | invnt_item                          | Configured weekly burn rate              |
+| cushion_weeks                | invnt_item                          | Safety stock buffer in weeks             |
+| is_auto_reorder              | invnt_item                          | Whether auto-reorder is enabled          |
+| reorder_point_burn           | invnt_item                          | Reorder trigger level in burn units      |
+| reorder_quantity_burn        | invnt_item                          | Reorder quantity in burn units           |
+| onhand_quantity              | Latest invnt_onhand                 | Current on-hand in onhand units          |
+| onhand_burn                  | Computed                            | Current on-hand in burn units (onhand_quantity × onhand_burn_quantity) |
+| onhand_date                  | Latest invnt_onhand                 | Date of most recent on-hand record       |
+| days_since_onhand            | Computed                            | Days since last on-hand record           |
+| ordered_burn                 | invnt_po (aggregated)               | Total burn units on open orders (approved, ordered, partial) |
+| received_burn                | invnt_po_receipt (aggregated)       | Total burn units received against open orders |
+| remaining_burn               | Computed                            | Outstanding burn units still on order (ordered − received) |
 | weeks_on_hand                | Computed                            | Current stock / burn_per_week            |
 | next_order_date              | Computed                            | Estimated date to place next order based on burn rate and cushion weeks |
 
-### inventory_lot_summary
+### invnt_lot_summary
 
-Computed view that shows the current on-hand quantity per lot for each item. Only includes lots that still have positive stock. Useful for lot traceability, expiry tracking, and FIFO usage.
+Latest on-hand snapshot per unique item and lot number combination. Uses `DISTINCT ON (invnt_item_id, lot_number)` ordered by `onhand_date DESC` to pick the most recent record. Only includes lots with positive stock.
 
 | Column                  | Source                        | Description                              |
 |------------------------|-------------------------------|------------------------------------------|
-| item_id                | inventory_transaction.item_id | The item                                 |
-| org_id                 | inventory_transaction.org_id  | The organization                         |
-| lot_number             | inventory_transaction         | Lot code from vendor                     |
-| lot_expiry_date        | inventory_transaction         | Expiry date for this lot                 |
-| burn_unit_id           | inventory_transaction         | Burn unit for the quantity               |
-| lot_onhand_burn        | Computed                      | Current lot quantity in burn units (receipts - usage) |
-| first_transaction_date | Computed                      | When this lot first appeared             |
-| last_transaction_date  | Computed                      | Most recent transaction for this lot     |
-| item_name              | inventory_item.name           | Item name for display                    |
-| item_type              | inventory_item.type           | Item type for filtering                  |
+| org_id                 | invnt_onhand.org_id           | The organization                         |
+| invnt_item_id          | invnt_onhand.invnt_item_id    | The item                                 |
+| lot_number             | invnt_onhand                  | Lot code from vendor                     |
+| lot_expiry_date        | invnt_onhand                  | Expiry date for this lot                 |
+| onhand_uom             | invnt_onhand                  | Unit for the on-hand quantity            |
+| onhand_quantity        | invnt_onhand                  | Latest on-hand quantity for this lot     |
+| onhand_burn_quantity   | invnt_onhand                  | Burn units per onhand unit at time of record |
+| onhand_date            | invnt_onhand                  | Date of the on-hand snapshot             |
+| created_at             | invnt_onhand                  | When the record was created              |
+| created_by             | invnt_onhand                  | Who created the record                   |
+| updated_at             | invnt_onhand                  | When the record was last updated         |
+| updated_by             | invnt_onhand                  | Who last updated the record              |
 
 ---
 
 ## Planned Features
 
-### Estimated usage transaction on receipt
+### Estimated usage adjustment on receipt
 
-When an order receipt is logged, the system should automatically create a `usage` transaction before the `receipt` transaction to account for estimated consumption since the last transaction. The calculation:
+When an order receipt is logged, the system should automatically create an adjusted on-hand record before the receipt record to account for estimated consumption since the last on-hand snapshot. The calculation:
 
-1. Get the last transaction for the item (by `transaction_date DESC, created_at DESC`)
-2. Calculate weeks elapsed: `(receipt_date - last_transaction_date) / 7`
-3. Get `burn_per_week` from `inventory_item`
-4. Estimated burn since last transaction: `burn_per_week * weeks_elapsed`
-5. Convert to on-hand units: `estimated_burn / burn_per_onhand_unit`
-6. Create a `usage` transaction with `quantity_onhand = last_onhand - estimated_onhand_usage` and `reference_table = 'inventory_order_receipt'`
-7. Create the `receipt` transaction with `quantity_onhand = adjusted_onhand + received_quantity_in_onhand_units`
+1. Get the latest on-hand record for the item (by `onhand_date DESC, created_at DESC`)
+2. Calculate weeks elapsed: `(receipt_date - last_onhand_date) / 7`
+3. Get `burn_per_week` from `invnt_item`
+4. Estimated burn since last on-hand: `burn_per_week * weeks_elapsed`
+5. Convert to on-hand units: `estimated_burn / onhand_burn_quantity`
+6. Create an adjusted `invnt_onhand` record with `onhand_quantity = last_onhand - estimated_onhand_usage`
+7. Create the receipt `invnt_onhand` record with `onhand_quantity = adjusted_onhand + received_quantity_in_onhand_units`
 
-This keeps the estimated usage visible as an explicit transaction in the history rather than silently adjusting the on-hand during receipt. Can be implemented as a Supabase database function or in the application layer.
+This keeps the estimated usage visible as an explicit record in the history rather than silently adjusting the on-hand during receipt. Can be implemented as a Supabase database function or in the application layer.
