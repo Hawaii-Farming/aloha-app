@@ -5,12 +5,9 @@ CREATE TABLE IF NOT EXISTS hr_training (
 
     training_type   TEXT,
     training_date   DATE,
-    topics_covered  TEXT,
-    trainer_name    TEXT,
+    topics_covered  JSONB NOT NULL DEFAULT '[]',
+    trainer_names   JSONB NOT NULL DEFAULT '[]',
     materials_url   TEXT,
-
-    certification_issued        BOOLEAN NOT NULL DEFAULT false,
-    certification_valid_days    INTEGER,
 
     notes           TEXT,
     verified_by     TEXT REFERENCES hr_employee(id),
@@ -33,11 +30,9 @@ COMMENT ON COLUMN hr_training.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN hr_training.farm_id IS 'Optional farm scope; null if training applies across the org';
 COMMENT ON COLUMN hr_training.training_type IS 'Category of training conducted (e.g. GMP, Food Safety, Sanitation, Equipment Operation, GAPs, HACCP)';
 COMMENT ON COLUMN hr_training.training_date IS 'Date the training was conducted';
-COMMENT ON COLUMN hr_training.topics_covered IS 'Description of the topics covered during the training session';
-COMMENT ON COLUMN hr_training.trainer_name IS 'Name of the trainer; may be an external trainer or internal employee name';
+COMMENT ON COLUMN hr_training.topics_covered IS 'JSON array of topic strings covered during the training session';
+COMMENT ON COLUMN hr_training.trainer_names IS 'JSON array of trainer names; may include external trainers or internal employee names';
 COMMENT ON COLUMN hr_training.materials_url IS 'URL or path to the training materials or presentation used';
-COMMENT ON COLUMN hr_training.certification_issued IS 'Whether a certification was issued to attendees upon completion';
-COMMENT ON COLUMN hr_training.certification_valid_days IS 'Number of days the certification is valid from the date of issue; null if no expiry';
 COMMENT ON COLUMN hr_training.notes IS 'Free-text notes about the training session';
 COMMENT ON COLUMN hr_training.verified_by IS 'Employee who verified the training session record';
 COMMENT ON COLUMN hr_training.verified_at IS 'Timestamp when the training session was verified';
