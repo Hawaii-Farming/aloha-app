@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS hr_travel_request (
 
     -- Workflow
     status              TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'denied')),
-    requested_by        UUID NOT NULL REFERENCES auth.users(id),
+    requested_by        TEXT NOT NULL REFERENCES hr_employee(id),
     requested_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     denial_reason       TEXT,
     notes               TEXT,

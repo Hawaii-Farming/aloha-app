@@ -78,6 +78,11 @@ These tables are shared across all organizations.
 - **hr_time_off_request** — Employee time off requests with PTO/sick leave breakdown and approval workflow (pending → approved/denied)
 - **hr_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
 
+## Maintenance Module (2 tables) — [Docs](docs/schemas/maint.md)
+
+- **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, recurring frequency, and before/after photo arrays
+- **maint_request_part** — Inventory items consumed during a maintenance request with quantity used
+
 ## Planned Modules
 
 - [x] **Inventory** — Item catalog, categories, orders with partial receipt workflow, transactions, and computed views for dashboards
@@ -108,4 +113,5 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Core Schema](docs/schemas/core.md) — 11 foundation tables
 - [Inventory Schema](docs/schemas/inventory.md) — Items, orders, transactions, and views
 - [HR Schema](docs/schemas/hr.md) — Tasks, employees, and labor tracking
+- [Maintenance Schema](docs/schemas/maint.md) — Work orders and parts usage
 - [Future Improvements](docs/schemas/future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)

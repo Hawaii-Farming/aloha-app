@@ -154,6 +154,7 @@ Categories and subcategories: growing (greenhouse, nursery), packaging (packroom
 | notes          | TEXT         | nullable                         | General notes about the site or asset |
 | photos         | JSONB        | NOT NULL, default []             | JSON array of photo URLs       |
 | metadata       | JSONB        | NOT NULL, default {}             | Flexible JSON for display-only details (dimensions, capacity, environmental settings) |
+| is_food_contact_surface | BOOLEAN | NOT NULL, default false         | Whether this site or surface comes into contact with food; requires sanitization before reuse if true |
 | is_active      | BOOLEAN      | NOT NULL, default true           | Soft delete flag; false hides the site from active use |
 
 Unique constraint on `(org_id, farm_id, name)` — no duplicate site names within an org+farm combination.

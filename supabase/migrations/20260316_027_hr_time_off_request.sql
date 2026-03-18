@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS hr_time_off_request (
 
     -- Workflow
     status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'denied')),
-    requested_by    UUID NOT NULL REFERENCES auth.users(id),
+    requested_by    TEXT NOT NULL REFERENCES hr_employee(id),
     requested_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     reviewed_by     TEXT REFERENCES hr_employee(id),
     reviewed_at     TIMESTAMPTZ,

@@ -156,11 +156,11 @@ Tracks purchase order requests through a workflow from request to receipt. Each 
 | order_quantity       | NUMERIC      | NOT NULL                              | Quantity ordered in order units          |
 | burn_per_order_uom  | NUMERIC      | nullable                              | Snapshot of burn units per order unit at order time |
 | status               | TEXT         | NOT NULL, default requested, CHECK    | Workflow status: requested, approved, rejected, ordered, partial, received, cancelled |
-| requested_by         | UUID         | NOT NULL, FK → auth.users(id)         | User who submitted the order request     |
+| requested_by         | TEXT         | NOT NULL, FK → hr_employee(id)        | Employee who submitted the order request |
 | requested_at         | TIMESTAMPTZ  | NOT NULL, default now                 | Timestamp when the order was requested   |
-| reviewed_by          | UUID         | FK → auth.users(id), nullable         | User who approved or rejected the order  |
+| reviewed_by          | TEXT         | FK → hr_employee(id), nullable        | Employee who approved or rejected the order |
 | reviewed_at          | TIMESTAMPTZ  | nullable                              | Timestamp when the order was reviewed    |
-| order_placed_by      | UUID         | FK → auth.users(id), nullable         | User who placed the order with the vendor |
+| order_placed_by      | TEXT         | FK → hr_employee(id), nullable        | Employee who placed the order with the vendor |
 | order_placed_at      | TIMESTAMPTZ  | nullable                              | Timestamp when the order was placed with the vendor |
 | vendor_po_number     | TEXT  | nullable                              | PO number assigned by the vendor for this order |
 | expected_delivery_date | DATE       | nullable                              | Expected delivery date from the vendor   |

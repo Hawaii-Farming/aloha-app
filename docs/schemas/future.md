@@ -71,7 +71,7 @@ Migration: `supabase/migrations_future/20260316_003_hr_travel_request.sql`
 | travel_start_date | DATE         | nullable                          | First day of travel                      |
 | travel_return_date| DATE         | nullable                          | First day the employee returns           |
 | status            | TEXT         | NOT NULL, default pending, CHECK  | Approval status: pending, approved, denied |
-| requested_by      | UUID         | NOT NULL, FK → auth.users(id)     | Auth user who submitted the request      |
+| requested_by      | TEXT         | NOT NULL, FK → hr_employee(id)    | Employee who submitted the request       |
 | requested_at      | TIMESTAMPTZ  | NOT NULL, default now             | Timestamp when the request was submitted |
 | denial_reason     | TEXT         | nullable                          | Reason provided when the request is denied |
 | notes             | TEXT         | nullable                          | Additional notes about the request       |

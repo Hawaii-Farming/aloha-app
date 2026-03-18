@@ -20,11 +20,11 @@ CREATE TABLE IF NOT EXISTS invnt_po (
 
     -- Workflow
     status                 TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'approved', 'rejected', 'ordered', 'partial', 'received', 'cancelled')),
-    requested_by           UUID NOT NULL REFERENCES auth.users(id),
+    requested_by           TEXT NOT NULL REFERENCES hr_employee(id),
     requested_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
-    reviewed_by            UUID REFERENCES auth.users(id),
+    reviewed_by            TEXT REFERENCES hr_employee(id),
     reviewed_at            TIMESTAMPTZ,
-    order_placed_by        UUID REFERENCES auth.users(id),
+    order_placed_by        TEXT REFERENCES hr_employee(id),
     order_placed_at        TIMESTAMPTZ,
 
     -- Vendor & cost

@@ -187,7 +187,7 @@ Employee time off requests with PTO and sick leave breakdown and a simple approv
 | sick_leave_days | NUMERIC      | nullable                          | Number of days charged to sick leave balance |
 | request_reason  | TEXT         | nullable                          | Employee-provided reason for the time off |
 | status          | TEXT         | NOT NULL, default pending, CHECK  | Approval status: pending, approved, denied |
-| requested_by    | UUID         | NOT NULL, FK → auth.users(id)     | Auth user who submitted the request      |
+| requested_by    | TEXT         | NOT NULL, FK → hr_employee(id)    | Employee who submitted the request       |
 | requested_at    | TIMESTAMPTZ  | NOT NULL, default now             | Timestamp when the request was submitted |
 | reviewed_by     | TEXT         | FK → hr_employee(id), nullable    | Employee who approved or denied the request |
 | reviewed_at     | TIMESTAMPTZ  | nullable                          | Timestamp when the request was reviewed  |

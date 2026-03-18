@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS site (
     -- General site details
     metadata        JSONB NOT NULL DEFAULT '{}',
 
+    is_food_contact_surface BOOLEAN NOT NULL DEFAULT false,
     is_active       BOOLEAN NOT NULL DEFAULT true,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
@@ -55,6 +56,7 @@ COMMENT ON COLUMN site.manual_url IS 'URL or path to the equipment manual or sit
 COMMENT ON COLUMN site.notes IS 'General notes about the site or asset';
 COMMENT ON COLUMN site.photos IS 'JSON array of photo URLs';
 COMMENT ON COLUMN site.metadata IS 'Flexible JSON for display-only details (dimensions, capacity, environmental settings)';
+COMMENT ON COLUMN site.is_food_contact_surface IS 'Whether this site or surface comes into contact with food; requires sanitization before reuse if true';
 COMMENT ON COLUMN site.is_active IS 'Soft delete flag; false hides the site from active use';
 COMMENT ON COLUMN site.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN site.created_by IS 'Email of the user who created the record';
