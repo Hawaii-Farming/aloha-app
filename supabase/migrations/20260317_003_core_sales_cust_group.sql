@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS sales_cust_group (
     id         TEXT PRIMARY KEY,
     org_id     TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     name       TEXT NOT NULL,
+    is_active  BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by TEXT,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -13,6 +14,7 @@ COMMENT ON TABLE sales_cust_group IS 'Org-specific customer classifications used
 COMMENT ON COLUMN sales_cust_group.id IS 'Human-readable identifier derived from group name (lowercase trimmed)';
 COMMENT ON COLUMN sales_cust_group.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN sales_cust_group.name IS 'Display name of the customer group, unique within the org';
+COMMENT ON COLUMN sales_cust_group.is_active IS 'Soft delete flag; false hides the customer group from active use';
 COMMENT ON COLUMN sales_cust_group.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN sales_cust_group.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_cust_group.updated_at IS 'Timestamp when the record was last updated';

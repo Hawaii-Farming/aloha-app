@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS invnt_po_receipt (
     -- Delivery acceptance
     delivery_truck_clean   BOOLEAN,
     delivery_acceptable    BOOLEAN,
-    receipt_notes          TEXT,
+    notes                  TEXT,
     receipt_photos         JSONB NOT NULL DEFAULT '[]',
 
     is_active              BOOLEAN NOT NULL DEFAULT true,
@@ -39,7 +39,7 @@ COMMENT ON COLUMN invnt_po_receipt.lot_number IS 'Lot or batch number from the v
 COMMENT ON COLUMN invnt_po_receipt.lot_expiry_date IS 'Expiry date for this lot';
 COMMENT ON COLUMN invnt_po_receipt.delivery_truck_clean IS 'Whether the delivery truck was clean upon arrival';
 COMMENT ON COLUMN invnt_po_receipt.delivery_acceptable IS 'Whether the delivery was accepted in acceptable condition';
-COMMENT ON COLUMN invnt_po_receipt.receipt_notes IS 'Free-text notes about the receipt or delivery';
+COMMENT ON COLUMN invnt_po_receipt.notes IS 'Free-text notes about the receipt or delivery';
 COMMENT ON COLUMN invnt_po_receipt.receipt_photos IS 'JSON array of photo URLs documenting the delivery';
 COMMENT ON COLUMN invnt_po_receipt.is_active IS 'Soft delete flag; false hides the receipt from active use';
 COMMENT ON COLUMN invnt_po_receipt.created_at IS 'Timestamp when the record was created';

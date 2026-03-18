@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS fsafe_corrective_action (
     org_id              TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     farm_id             TEXT        REFERENCES farm(id),
     template_id         TEXT        REFERENCES fsafe_template(id),
-    response_id         UUID        NOT NULL REFERENCES fsafe_response(id),
+    response_id         UUID        REFERENCES fsafe_response(id),
+    emp_test_id         UUID        REFERENCES fsafe_emp_test(id),
     action_type_id      TEXT        REFERENCES fsafe_corrective_action_type(id),
 
     other_action        TEXT,
@@ -26,15 +27,17 @@ CREATE TABLE IF NOT EXISTS fsafe_corrective_action (
 
 CREATE INDEX idx_fsafe_corrective_action_org_id   ON fsafe_corrective_action (org_id);
 CREATE INDEX idx_fsafe_corrective_action_response ON fsafe_corrective_action (response_id);
+CREATE INDEX idx_fsafe_corrective_action_emp_test ON fsafe_corrective_action (emp_test_id);
 CREATE INDEX idx_fsafe_corrective_action_assigned ON fsafe_corrective_action (assigned_to);
 CREATE INDEX idx_fsafe_corrective_action_status   ON fsafe_corrective_action (org_id, status);
 
-COMMENT ON TABLE fsafe_corrective_action IS 'Corrective actions raised against a failing food safety checklist response. Tracks the action, assignment, and resolution status.';
+COMMENT ON TABLE fsafe_corrective_action IS 'Corrective actions raised against a failing food safety checklist response or EMP test result. Exactly one of response_id or emp_test_id will be set per row.';
 COMMENT ON COLUMN fsafe_corrective_action.id IS 'Unique identifier for the corrective action';
 COMMENT ON COLUMN fsafe_corrective_action.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN fsafe_corrective_action.farm_id IS 'Optional farm scope; null if the corrective action applies to all farms';
 COMMENT ON COLUMN fsafe_corrective_action.template_id IS 'Checklist template this corrective action belongs to; denormalized for easier filtering and reporting';
-COMMENT ON COLUMN fsafe_corrective_action.response_id IS 'Failing checklist response that triggered this corrective action';
+COMMENT ON COLUMN fsafe_corrective_action.response_id IS 'Failing checklist response that triggered this corrective action; null if triggered by an EMP test result';
+COMMENT ON COLUMN fsafe_corrective_action.emp_test_id IS 'Failing EMP test result that triggered this corrective action; null if triggered by a checklist response';
 COMMENT ON COLUMN fsafe_corrective_action.action_type_id IS 'Predefined corrective action type selected from the org lookup; null if a custom description is provided instead';
 COMMENT ON COLUMN fsafe_corrective_action.other_action IS 'Free-text description of the corrective action when no predefined action type is selected';
 COMMENT ON COLUMN fsafe_corrective_action.assigned_to IS 'Employee responsible for completing the corrective action';

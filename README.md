@@ -67,16 +67,18 @@ These tables are shared across all organizations.
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 - **invnt_lot_summary** (view) — Current on-hand quantity per lot with expiry dates
 
-## HR Module (8 tables, 1 view) — [Docs](docs/schemas/20260317_03_hr.md)
+## HR Module (10 tables, 1 view) — [Docs](docs/schemas/20260317_03_hr.md)
 
 - **hr_department** — Org-specific department lookup for classifying employees (e.g. GH, PH, Lettuce). Composite PK on (org_id, code).
 - **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). Composite PK on (org_id, code).
 - **hr_task** — Flat task catalog for labor tracking with name, description, and accounting link (TEXT PK)
 - **hr_employee** — Unified employee register and org membership; every system user has a row here with a role. Tracks employment details, compensation, and access level. Users are duplicated per org they belong to.
 - **hr_task_tracker** — Header record for a task event with task, farm, date, start/stop times, and verification status
-- **hr_task_tracker_site** — Sites where a task event was performed; supports tasks carried out across multiple sites
+- **hr_task_site** — Sites where a task event was performed; supports tasks carried out across multiple sites
 - **hr_task_roster** — Employees per task event with individual start/stop times (overridable from tracker) and units completed
 - **hr_time_off_request** — Employee time off requests with PTO/sick leave breakdown and approval workflow (pending → approved/denied)
+- **hr_training** — Staff training session records with type, date, topics, trainer, and certification details
+- **hr_training_attendee** — Per-employee attendance and certification records for each training session
 - **hr_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
 
 ## Maintenance Module (2 tables) — [Docs](docs/schemas/20260317_04_maint.md)
@@ -84,13 +86,15 @@ These tables are shared across all organizations.
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (5 tables) — [Docs](docs/schemas/20260317_05_fsafe.md)
+## Food Safety Module (7 tables) — [Docs](docs/schemas/20260317_05_fsafe.md)
 
 - **fsafe_template** — Master checklist template definition with name, template type, and optional farm scope
 - **fsafe_corrective_action_type** — Org-defined reusable corrective action options selectable from a dropdown
 - **fsafe_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
 - **fsafe_response** — Employee responses per question per task tracker session; `hr_task_tracker` acts as the checklist completion header
-- **fsafe_corrective_action** — Corrective actions raised against failing responses with assignment, due date, result tracking, and verification
+- **fsafe_corrective_action** — Corrective actions raised against failing checklist responses or EMP test failures with assignment, due date, result tracking, and verification
+- **fsafe_emp_test_name** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
+- **fsafe_emp_test** — Individual EMP test results per site with retest/vector chaining, certification, and corrective action linkage
 
 ## Planned Modules
 

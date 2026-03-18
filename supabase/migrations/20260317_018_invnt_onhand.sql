@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS invnt_onhand (
     lot_number             TEXT,
     lot_expiry_date        DATE,
 
-    additional_notes       TEXT,
+    notes                  TEXT,
 
     -- Status & audit
     is_active              BOOLEAN NOT NULL DEFAULT true,
@@ -36,7 +36,7 @@ COMMENT ON COLUMN invnt_onhand.onhand_quantity IS 'Quantity on hand in onhand un
 COMMENT ON COLUMN invnt_onhand.burn_per_onhand_uom IS 'Burn units per onhand unit at time of record';
 COMMENT ON COLUMN invnt_onhand.lot_number IS 'Lot or batch number for lot-tracked items';
 COMMENT ON COLUMN invnt_onhand.lot_expiry_date IS 'Expiry date for this lot';
-COMMENT ON COLUMN invnt_onhand.additional_notes IS 'Free-text notes about this on-hand record';
+COMMENT ON COLUMN invnt_onhand.notes IS 'Free-text notes about this on-hand record';
 COMMENT ON COLUMN invnt_onhand.is_active IS 'Soft delete flag; false hides the record from active use';
 COMMENT ON COLUMN invnt_onhand.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN invnt_onhand.created_by IS 'Email of the user who created the record';

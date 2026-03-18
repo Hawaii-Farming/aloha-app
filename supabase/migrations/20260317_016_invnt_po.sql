@@ -20,8 +20,6 @@ CREATE TABLE IF NOT EXISTS invnt_po (
 
     -- Workflow
     status                 TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'approved', 'rejected', 'ordered', 'partial', 'received', 'cancelled')),
-    requested_by           TEXT NOT NULL REFERENCES hr_employee(id),
-    requested_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
     reviewed_by            TEXT REFERENCES hr_employee(id),
     reviewed_at            TIMESTAMPTZ,
     order_placed_by        TEXT REFERENCES hr_employee(id),
@@ -36,12 +34,14 @@ CREATE TABLE IF NOT EXISTS invnt_po (
     tracking_number        TEXT,
 
     -- Notes & photos
-    order_notes            TEXT,
+    notes                  TEXT,
     rejected_reason        TEXT,
     request_photos         JSONB NOT NULL DEFAULT '[]',
 
     -- Status & audit
     is_active              BOOLEAN NOT NULL DEFAULT true,
+    requested_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    requested_by           TEXT NOT NULL REFERENCES hr_employee(id),
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by             TEXT
 );
@@ -64,8 +64,6 @@ COMMENT ON COLUMN invnt_po.order_uom IS 'Unit of measure for the order quantity 
 COMMENT ON COLUMN invnt_po.order_quantity IS 'Quantity ordered in order units';
 COMMENT ON COLUMN invnt_po.burn_per_order_uom IS 'Snapshot of burn units per order unit at order time';
 COMMENT ON COLUMN invnt_po.status IS 'Workflow status: requested, approved, rejected, ordered, partial, received, cancelled';
-COMMENT ON COLUMN invnt_po.requested_by IS 'User who submitted the order request';
-COMMENT ON COLUMN invnt_po.requested_at IS 'Timestamp when the order was requested';
 COMMENT ON COLUMN invnt_po.reviewed_by IS 'User who approved or rejected the order';
 COMMENT ON COLUMN invnt_po.reviewed_at IS 'Timestamp when the order was reviewed';
 COMMENT ON COLUMN invnt_po.order_placed_by IS 'User who placed the order with the vendor';
@@ -76,9 +74,11 @@ COMMENT ON COLUMN invnt_po.total_cost IS 'Total cost for the order';
 COMMENT ON COLUMN invnt_po.is_freight_included IS 'Whether total_cost includes freight charges';
 COMMENT ON COLUMN invnt_po.expected_delivery_date IS 'Expected delivery date from the vendor';
 COMMENT ON COLUMN invnt_po.tracking_number IS 'Shipping or freight tracking number';
-COMMENT ON COLUMN invnt_po.order_notes IS 'Free-text notes about the order';
+COMMENT ON COLUMN invnt_po.notes IS 'Free-text notes about the order';
 COMMENT ON COLUMN invnt_po.rejected_reason IS 'Reason for rejection when status is rejected';
 COMMENT ON COLUMN invnt_po.request_photos IS 'JSON array of photo URLs attached to the request';
 COMMENT ON COLUMN invnt_po.is_active IS 'Soft delete flag; false hides the order from active use';
+COMMENT ON COLUMN invnt_po.requested_at IS 'Timestamp when the order was requested';
+COMMENT ON COLUMN invnt_po.requested_by IS 'User who submitted the order request';
 COMMENT ON COLUMN invnt_po.updated_at IS 'Timestamp when the record was last updated';
 COMMENT ON COLUMN invnt_po.updated_by IS 'Email of the user who last updated the record';

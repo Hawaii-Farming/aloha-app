@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     start_date                   DATE,
     end_date                     DATE,
     is_verifier                  BOOLEAN NOT NULL DEFAULT false,
-    is_active                    BOOLEAN NOT NULL DEFAULT true,
     access_level                 TEXT NOT NULL CHECK (access_level IN ('owner', 'manager', 'team_lead', 'employee')),
     team_lead_id                 TEXT REFERENCES hr_employee(id),
     compensation_manager_id      TEXT REFERENCES hr_employee(id),
@@ -29,6 +28,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     email                        TEXT,
     company_email                TEXT,
     site_id_housing              TEXT REFERENCES site(id),
+    is_active                    BOOLEAN NOT NULL DEFAULT true,
     created_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                   TEXT,
     updated_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -60,7 +60,6 @@ COMMENT ON COLUMN hr_employee.work_authorization IS 'Visa/work authorization typ
 COMMENT ON COLUMN hr_employee.start_date IS 'Employment start date';
 COMMENT ON COLUMN hr_employee.end_date IS 'Employment end date; NULL if currently employed';
 COMMENT ON COLUMN hr_employee.is_verifier IS 'Whether this employee is authorized to verify records';
-COMMENT ON COLUMN hr_employee.is_active IS 'Soft delete flag; false disables the employee without removing the record';
 COMMENT ON COLUMN hr_employee.access_level IS 'System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection.';
 COMMENT ON COLUMN hr_employee.team_lead_id IS 'Self-referencing TEXT FK to direct team_lead; stores readable employee id (e.g. jane_doe)';
 COMMENT ON COLUMN hr_employee.compensation_manager_id IS 'Self-referencing TEXT FK to compensation manager; stores readable employee id';
@@ -73,6 +72,7 @@ COMMENT ON COLUMN hr_employee.phone IS 'Employee phone number';
 COMMENT ON COLUMN hr_employee.email IS 'Employee email address';
 COMMENT ON COLUMN hr_employee.company_email IS 'Company-issued email address';
 COMMENT ON COLUMN hr_employee.site_id_housing IS 'Reference to the site record used as the employee housing assignment';
+COMMENT ON COLUMN hr_employee.is_active IS 'Soft delete flag; false disables the employee without removing the record';
 COMMENT ON COLUMN hr_employee.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN hr_employee.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN hr_employee.updated_at IS 'Timestamp when the record was last updated';

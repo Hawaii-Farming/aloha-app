@@ -31,13 +31,14 @@ supabase/migrations/YYYYMMDD_NNN_module_tablename.sql
 ```
 Numbered sequentially by module in this order:
 
-| Range   | Module       |
-|---------|--------------|
-| 001–011 | Core         |
-| 012–020 | Inventory    |
-| 021–029 | HR           |
-| 030–031 | Maintenance  |
-| 032–036 | Food Safety  |
+| Range       | Module       |
+|-------------|--------------|
+| 001–011     | Core         |
+| 012–020     | Inventory    |
+| 021–029     | HR           |
+| 030–031     | Maintenance  |
+| 032–038     | Food Safety  |
+| 039–040     | HR (cont.)   |
 
 ### Schema doc files
 ```
@@ -62,14 +63,24 @@ docs/schemas/YYYYMMDD_NN_module.md
 
 ---
 
-## 5. Foreign Keys — Audit and Workflow Fields
+## 5. Foreign Keys — Workflow vs Audit Fields
 
-All workflow and audit FK fields that reference a person **must use**:
+These two types of person-reference fields are handled differently:
+
+### Workflow fields
+Fields that identify a specific employee involved in a business process (e.g. `requested_by`, `reviewed_by`, `assigned_to`, `fixer_id`, `sampled_by`, `reported_by`) **must use**:
 ```sql
 TEXT REFERENCES hr_employee(id)
 ```
 
-**Never use** `UUID REFERENCES auth.users(id)` for workflow fields.
+### Audit fields
+`created_by` and `updated_by` store the **email** of the Supabase Auth user who made the change. They are plain `TEXT` with no FK constraint — they are not joined to, just logged:
+```sql
+created_by  TEXT
+updated_by  TEXT
+```
+
+**Never use** `UUID REFERENCES auth.users(id)` for any of these fields.
 
 The **only** exception is `hr_employee.user_id UUID REFERENCES auth.users(id)` — this is the intentional link between an employee record and Supabase Auth. Do not change this.
 
@@ -85,7 +96,7 @@ updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 updated_by  TEXT
 ```
 
-For tables that represent a submitted request or event, use `requested_at`/`requested_by` **instead of** `created_at`/`created_by` — never both. Tables currently using this pattern: `invnt_po`, `hr_time_off_request`, `maint_request`, `fsafe_response`, `fsafe_corrective_action`.
+For tables that represent a submitted request or event, use `requested_at`/`requested_by` **instead of** `created_at`/`created_by` — never both. Tables currently using this pattern: `invnt_po`, `hr_time_off_request`, `maint_request`.
 
 ---
 
