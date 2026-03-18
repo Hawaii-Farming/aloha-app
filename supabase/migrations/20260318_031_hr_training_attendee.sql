@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS hr_training_attendee (
     training_id     UUID NOT NULL REFERENCES hr_training(id) ON DELETE CASCADE,
     employee_id     TEXT NOT NULL REFERENCES hr_employee(id),
 
-    attended_training           BOOLEAN NOT NULL DEFAULT false,
     signed_at                   TIMESTAMPTZ,
 
     certification_number        TEXT,
@@ -32,8 +31,7 @@ COMMENT ON TABLE hr_training_attendee IS 'Individual attendance and certificatio
 COMMENT ON COLUMN hr_training_attendee.id IS 'Unique identifier for the attendee record';
 COMMENT ON COLUMN hr_training_attendee.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN hr_training_attendee.training_id IS 'Training session this attendance record belongs to';
-COMMENT ON COLUMN hr_training_attendee.employee_id IS 'Employee who attended or was scheduled to attend the training';
-COMMENT ON COLUMN hr_training_attendee.attended_training IS 'Whether the employee attended the training session';
+COMMENT ON COLUMN hr_training_attendee.employee_id IS 'Employee who attended the training; row is created only when attendance is confirmed';
 COMMENT ON COLUMN hr_training_attendee.signed_at IS 'Timestamp when the employee signed the training attendance record';
 COMMENT ON COLUMN hr_training_attendee.certification_number IS 'Certification number issued to the employee upon completion';
 COMMENT ON COLUMN hr_training_attendee.certification_issued_on IS 'Date the certification was issued to the employee';
