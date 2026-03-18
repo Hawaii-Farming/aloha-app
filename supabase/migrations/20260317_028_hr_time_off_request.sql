@@ -41,7 +41,7 @@ COMMENT ON COLUMN hr_time_off_request.pto_days IS 'Number of days charged to PTO
 COMMENT ON COLUMN hr_time_off_request.sick_leave_days IS 'Number of days charged to sick leave balance';
 COMMENT ON COLUMN hr_time_off_request.request_reason IS 'Employee-provided reason for the time off';
 COMMENT ON COLUMN hr_time_off_request.status IS 'Approval status: pending, approved, denied';
-COMMENT ON COLUMN hr_time_off_request.requested_by IS 'Auth user who submitted the request';
+COMMENT ON COLUMN hr_time_off_request.requested_by IS 'Employee who submitted the request';
 COMMENT ON COLUMN hr_time_off_request.requested_at IS 'Timestamp when the request was submitted';
 COMMENT ON COLUMN hr_time_off_request.reviewed_by IS 'Employee who approved or denied the request';
 COMMENT ON COLUMN hr_time_off_request.reviewed_at IS 'Timestamp when the request was reviewed';

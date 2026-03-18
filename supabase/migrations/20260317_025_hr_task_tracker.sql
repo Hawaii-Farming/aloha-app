@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS hr_task_tracker (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     farm_id         TEXT REFERENCES farm(id),
-    site_id         TEXT REFERENCES site(id),
     task_id         TEXT NOT NULL REFERENCES hr_task(id),
 
     date            DATE NOT NULL,
@@ -10,6 +9,10 @@ CREATE TABLE IF NOT EXISTS hr_task_tracker (
     stop_time       TIMESTAMPTZ,
     status          TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'completed')),
     notes           TEXT,
+    fsafe_template_id TEXT,
+    photos          JSONB NOT NULL DEFAULT '[]',
+    verified_by     TEXT REFERENCES hr_employee(id),
+    verified_at     TIMESTAMPTZ,
 
     is_active       BOOLEAN NOT NULL DEFAULT true,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -27,13 +30,16 @@ COMMENT ON TABLE hr_task_tracker IS 'Header record for a task event. Captures th
 COMMENT ON COLUMN hr_task_tracker.id IS 'Unique identifier for the task event';
 COMMENT ON COLUMN hr_task_tracker.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN hr_task_tracker.farm_id IS 'Farm where the task was performed';
-COMMENT ON COLUMN hr_task_tracker.site_id IS 'Specific site where the task was performed';
 COMMENT ON COLUMN hr_task_tracker.task_id IS 'Task performed, references hr_task catalog';
 COMMENT ON COLUMN hr_task_tracker.date IS 'Date the task was performed';
 COMMENT ON COLUMN hr_task_tracker.start_time IS 'Time the task started; used as the default for roster entries';
 COMMENT ON COLUMN hr_task_tracker.stop_time IS 'Time the task ended; used as the default for roster entries';
 COMMENT ON COLUMN hr_task_tracker.status IS 'Workflow status: open, in_progress, completed';
 COMMENT ON COLUMN hr_task_tracker.notes IS 'Free-text notes about the task event';
+COMMENT ON COLUMN hr_task_tracker.fsafe_template_id IS 'Food safety checklist template used for this task event; null if not a food safety task';
+COMMENT ON COLUMN hr_task_tracker.photos IS 'JSON array of photo URLs taken during the task';
+COMMENT ON COLUMN hr_task_tracker.verified_by IS 'Employee who verified the task event record';
+COMMENT ON COLUMN hr_task_tracker.verified_at IS 'Timestamp when the task event was verified';
 COMMENT ON COLUMN hr_task_tracker.is_active IS 'Soft delete flag; false hides the record from active use';
 COMMENT ON COLUMN hr_task_tracker.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN hr_task_tracker.created_by IS 'Email of the user who created the record';
