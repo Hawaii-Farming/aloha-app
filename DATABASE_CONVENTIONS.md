@@ -35,10 +35,9 @@ Numbered sequentially by module in this order:
 |-------------|--------------|
 | 001–011     | Core         |
 | 012–020     | Inventory    |
-| 021–029     | HR           |
-| 030–031     | Maintenance  |
-| 032–038     | Food Safety  |
-| 039–040     | HR (cont.)   |
+| 021–031     | HR           |
+| 032–033     | Maintenance  |
+| 034–040     | Food Safety  |
 
 ### Schema doc files
 ```
@@ -47,12 +46,12 @@ docs/schemas/YYYYMMDD_NN_module.md
 
 | File | Module |
 |------|--------|
-| `20260317_01_core.md` | Core |
-| `20260317_02_invnt.md` | Inventory |
-| `20260317_03_hr.md` | HR |
-| `20260317_04_maint.md` | Maintenance |
-| `20260317_05_fsafe.md` | Food Safety |
-| `20260317_06_future.md` | Deferred / Future |
+| `20260318_01_core.md` | Core |
+| `20260318_02_invnt.md` | Inventory |
+| `20260318_03_hr.md` | HR |
+| `20260318_04_maint.md` | Maintenance |
+| `20260318_05_fsafe.md` | Food Safety |
+| `20260318_06_future.md` | Deferred / Future |
 
 ---
 

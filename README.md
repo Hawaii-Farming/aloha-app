@@ -32,7 +32,7 @@ aloha-app/
   src/                   # React application (coming soon)
 ```
 
-## Core Schema (11 tables) — [Docs](docs/schemas/20260317_01_core.md)
+## Core Schema (11 tables) — [Docs](docs/schemas/20260318_01_core.md)
 
 ### Global Reference Tables
 These tables are shared across all organizations.
@@ -55,7 +55,7 @@ These tables are shared across all organizations.
 - **sales_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping)
 - **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 
-## Inventory Module (7 tables, 2 views) — [Docs](docs/schemas/20260317_02_invnt.md)
+## Inventory Module (7 tables, 2 views) — [Docs](docs/schemas/20260318_02_invnt.md)
 
 - **invnt_vendor** — Org-level vendors for procurement with contact details and payment terms (TEXT PK)
 - **invnt_category** — Top-level categories for organizing inventory items (TEXT PK)
@@ -67,7 +67,7 @@ These tables are shared across all organizations.
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 - **invnt_lot_summary** (view) — Current on-hand quantity per lot with expiry dates
 
-## HR Module (10 tables, 1 view) — [Docs](docs/schemas/20260317_03_hr.md)
+## HR Module (10 tables, 1 view) — [Docs](docs/schemas/20260318_03_hr.md)
 
 - **hr_department** — Org-specific department lookup for classifying employees (e.g. GH, PH, Lettuce). Composite PK on (org_id, code).
 - **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). Composite PK on (org_id, code).
@@ -81,12 +81,12 @@ These tables are shared across all organizations.
 - **hr_training_attendee** — Per-employee attendance and certification records for each training session
 - **hr_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
 
-## Maintenance Module (2 tables) — [Docs](docs/schemas/20260317_04_maint.md)
+## Maintenance Module (2 tables) — [Docs](docs/schemas/20260318_04_maint.md)
 
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (7 tables) — [Docs](docs/schemas/20260317_05_fsafe.md)
+## Food Safety Module (7 tables) — [Docs](docs/schemas/20260318_05_fsafe.md)
 
 - **fsafe_template** — Master checklist template definition with name, template type, and optional farm scope
 - **fsafe_corrective_action_type** — Org-defined reusable corrective action options selectable from a dropdown
@@ -114,9 +114,9 @@ See [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) for the full set of schem
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [Core Schema](docs/schemas/20260317_01_core.md) — 11 foundation tables
-- [Inventory Schema](docs/schemas/20260317_02_invnt.md) — Items, orders, transactions, and views
-- [HR Schema](docs/schemas/20260317_03_hr.md) — Tasks, employees, and labor tracking
-- [Maintenance Schema](docs/schemas/20260317_04_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260317_05_fsafe.md) — Checklists, responses, and corrective actions
-- [Future Improvements](docs/schemas/20260317_06_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
+- [Core Schema](docs/schemas/20260318_01_core.md) — 11 foundation tables
+- [Inventory Schema](docs/schemas/20260318_02_invnt.md) — Items, orders, transactions, and views
+- [HR Schema](docs/schemas/20260318_03_hr.md) — Tasks, employees, and labor tracking
+- [Maintenance Schema](docs/schemas/20260318_04_maint.md) — Work orders and parts usage
+- [Food Safety Schema](docs/schemas/20260318_05_fsafe.md) — Checklists, responses, and corrective actions
+- [Future Improvements](docs/schemas/20260318_06_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
