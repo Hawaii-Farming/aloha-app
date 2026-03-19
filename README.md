@@ -86,7 +86,7 @@ These tables are shared across all organizations.
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (7 tables) — [Docs](docs/schemas/20260318_05_fsafe.md)
+## Food Safety Module (8 tables) — [Docs](docs/schemas/20260318_05_fsafe.md)
 
 - **fsafe_template** — Master checklist template definition with name, template type, and optional farm scope
 - **fsafe_corrective_action_type** — Org-defined reusable corrective action options selectable from a dropdown
@@ -95,6 +95,7 @@ These tables are shared across all organizations.
 - **fsafe_corrective_action** — Corrective actions raised against failing checklist responses or EMP test failures with assignment, due date, result tracking, and verification
 - **fsafe_emp_test_name** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_emp_test** — Individual EMP test results per site with retest/vector chaining, certification, and corrective action linkage
+- **fsafe_water_test** — Water test results per submission covering E.coli, Salmonella, Listeria, and Total Coliform with lab reference tracking
 
 ## Planned Modules
 

@@ -37,7 +37,7 @@ Numbered sequentially by module in this order:
 | 012–020     | Inventory    |
 | 021–031     | HR           |
 | 032–033     | Maintenance  |
-| 034–040     | Food Safety  |
+| 034–041     | Food Safety  |
 
 ### Schema doc files
 ```
