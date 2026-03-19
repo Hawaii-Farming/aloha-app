@@ -100,7 +100,7 @@ These tables are shared across all organizations.
 ## Planned Modules
 
 - [x] **Inventory** — Item catalog, categories, orders with partial receipt workflow, transactions, and computed views for dashboards
-- [~] **HR** — Employee records, task catalog, scheduling, and labor tracking (in progress); travel requests and disciplinary warnings deferred to future
+- [x] **HR** — Employee records, task catalog, task tracking, time off requests, training records, and weekly schedule view; travel requests and disciplinary warnings deferred to future
 - [x] **Food Safety** — Checklist templates, question banks, employee responses, and corrective action tracking
 - [ ] **Sales** — Customer orders, order lines with price snapshots, invoicing
 - [ ] **Pack** — Pack runs, label generation, lot tracking (FSMA traceability)
