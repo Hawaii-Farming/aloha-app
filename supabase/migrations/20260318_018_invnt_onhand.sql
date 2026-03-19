@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS invnt_onhand (
     onhand_date            DATE NOT NULL,
     onhand_uom             TEXT REFERENCES util_uom(code),
     onhand_quantity        NUMERIC NOT NULL,
-    burn_per_onhand_uom   NUMERIC,
+    burn_per_onhand   NUMERIC,
 
     -- Lot tracking
     lot_number             TEXT,
@@ -33,7 +33,7 @@ COMMENT ON COLUMN invnt_onhand.invnt_item_id IS 'Inventory item this record trac
 COMMENT ON COLUMN invnt_onhand.onhand_date IS 'Date of the on-hand snapshot';
 COMMENT ON COLUMN invnt_onhand.onhand_uom IS 'Unit of measure for the on-hand quantity';
 COMMENT ON COLUMN invnt_onhand.onhand_quantity IS 'Quantity on hand in onhand units';
-COMMENT ON COLUMN invnt_onhand.burn_per_onhand_uom IS 'Burn units per onhand unit at time of record';
+COMMENT ON COLUMN invnt_onhand.burn_per_onhand IS 'Burn units per onhand unit at time of record';
 COMMENT ON COLUMN invnt_onhand.lot_number IS 'Lot or batch number for lot-tracked items';
 COMMENT ON COLUMN invnt_onhand.lot_expiry_date IS 'Expiry date for this lot';
 COMMENT ON COLUMN invnt_onhand.notes IS 'Free-text notes about this on-hand record';

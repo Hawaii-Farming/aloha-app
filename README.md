@@ -64,7 +64,7 @@ These tables are shared across all organizations.
 - **invnt_subcategory** — Second-level categories under invnt_category (TEXT PK)
 - **invnt_item** — Items with unit conversions, burn rates, reorder settings, and proper columns for all details
 - **invnt_po** — Purchase order requests with workflow (requested → approved → ordered → received) and snapshot pricing
-- **invnt_po_receipt** — Individual deliveries against a purchase order with lot tracking and partial receipt support
+- **invnt_po_received** — Individual deliveries received against a purchase order with lot tracking and partial delivery support
 - **invnt_onhand** — On-hand inventory snapshots per item with lot tracking and burn unit conversion
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 - **invnt_lot_summary** (view) — Current on-hand quantity per lot with expiry dates

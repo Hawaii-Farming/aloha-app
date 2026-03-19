@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS invnt_po (
 
     -- Request classification
     request_type           TEXT NOT NULL DEFAULT 'inventory_item' CHECK (request_type IN ('non_inventory_item', 'inventory_item')),
-    urgency_level          TEXT,
+    urgency_level          TEXT CHECK (urgency_level IN ('today', '2_days', '7_days', 'not_urgent')),
 
     -- Item identification
     category_id            TEXT REFERENCES invnt_category(id),
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS invnt_po (
     burn_uom               TEXT REFERENCES util_uom(code),
     order_uom              TEXT REFERENCES util_uom(code),
     order_quantity         NUMERIC NOT NULL,
-    burn_per_order_uom    NUMERIC,
+    burn_per_order    NUMERIC,
 
     -- Workflow
     status                 TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'approved', 'rejected', 'ordered', 'partial', 'received', 'cancelled')),
@@ -55,14 +55,14 @@ COMMENT ON COLUMN invnt_po.id IS 'Unique identifier for the purchase order';
 COMMENT ON COLUMN invnt_po.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN invnt_po.farm_id IS 'Optional farm scope for the order';
 COMMENT ON COLUMN invnt_po.request_type IS 'Whether this is a non-inventory purchase or an inventory item purchase: non_inventory_item, inventory_item';
-COMMENT ON COLUMN invnt_po.urgency_level IS 'Number of days until the item is needed (e.g. 1, 2, 7)';
+COMMENT ON COLUMN invnt_po.urgency_level IS 'How urgently the item is needed: today, 2_days, 7_days, not_urgent';
 COMMENT ON COLUMN invnt_po.category_id IS 'Category for non_inventory_item requests (provides classification when there is no linked inventory item)';
 COMMENT ON COLUMN invnt_po.invnt_item_id IS 'Linked inventory item; NULL for non_inventory_item requests';
 COMMENT ON COLUMN invnt_po.item_name IS 'Snapshot of item name at order time; manually entered for non_inventory_item requests';
 COMMENT ON COLUMN invnt_po.burn_uom IS 'Unit of measure for burn quantity (snapshot from item at order time)';
 COMMENT ON COLUMN invnt_po.order_uom IS 'Unit of measure for the order quantity (snapshot from item at order time)';
 COMMENT ON COLUMN invnt_po.order_quantity IS 'Quantity ordered in order units';
-COMMENT ON COLUMN invnt_po.burn_per_order_uom IS 'Snapshot of burn units per order unit at order time';
+COMMENT ON COLUMN invnt_po.burn_per_order IS 'Snapshot of burn units per order unit at order time';
 COMMENT ON COLUMN invnt_po.status IS 'Workflow status: requested, approved, rejected, ordered, partial, received, cancelled';
 COMMENT ON COLUMN invnt_po.reviewed_by IS 'User who approved or rejected the order';
 COMMENT ON COLUMN invnt_po.reviewed_at IS 'Timestamp when the order was reviewed';

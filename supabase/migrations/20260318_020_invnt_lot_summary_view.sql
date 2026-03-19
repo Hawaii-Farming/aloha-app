@@ -6,7 +6,7 @@ SELECT DISTINCT ON (invnt_item_id, lot_number)
     lot_expiry_date,
     onhand_uom,
     onhand_quantity,
-    burn_per_onhand_uom,
+    burn_per_onhand,
     onhand_date,
     created_at,
     created_by,
