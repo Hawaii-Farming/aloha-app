@@ -99,9 +99,10 @@ These tables are shared across all organizations.
 
 ## Planned Modules
 
-- [x] **Inventory** — Item catalog, categories, orders with partial receipt workflow, transactions, and computed views for dashboards
-- [x] **HR** — Employee records, task catalog, task tracking, time off requests, training records, and weekly schedule view; travel requests and disciplinary warnings deferred to future
-- [x] **Food Safety** — Checklist templates, question banks, employee responses, and corrective action tracking
+- [x] **Inventory** — Vendor and item catalog with categories, purchase orders with partial receipt workflow, on-hand snapshots, and computed views for stock levels and burn rates
+- [x] **HR** — Employee records, department and work authorization lookups, task catalog, task tracking with multi-site and roster support, time off requests, staff training records, and weekly schedule view; travel requests and disciplinary warnings deferred to future
+- [x] **Maintenance** — Work orders with priority, status, fixer assignment, recurring frequency, and inventory items consumed
+- [x] **Food Safety** — Configurable checklist templates, question banks, employee responses, corrective action tracking, EMP test catalog and results with retest/vector chaining, and water quality test records
 - [ ] **Sales** — Customer orders, order lines with price snapshots, invoicing
 - [ ] **Pack** — Pack runs, label generation, lot tracking (FSMA traceability)
 - [ ] **Grow** — Seeding, grow batches, growth stage tracking, nutrient recipes, environmental monitoring
