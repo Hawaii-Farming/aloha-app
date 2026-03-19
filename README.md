@@ -27,8 +27,10 @@ Pricing is managed with three tiers of specificity — default prices by product
 aloha-app/
   supabase/
     migrations/          # Sequential SQL migration files (source of truth)
+    migrations_future/   # Designed but not yet deployed tables
   docs/
     schemas/             # Human-readable schema documentation per module
+    processes/           # Business process documentation with flow diagrams
   src/                   # React application (coming soon)
 ```
 
