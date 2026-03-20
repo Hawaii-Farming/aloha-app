@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS invnt_usage (
     burn_uom               TEXT REFERENCES util_uom(code),
     quantity_burn          NUMERIC NOT NULL,
 
-    is_active              BOOLEAN NOT NULL DEFAULT true,
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by             TEXT,
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -30,7 +30,7 @@ COMMENT ON COLUMN invnt_usage.reference_id IS 'Source record ID in the reference
 COMMENT ON COLUMN invnt_usage.usage_date IS 'Date the consumption occurred';
 COMMENT ON COLUMN invnt_usage.burn_uom IS 'Unit of measure for the burn quantity';
 COMMENT ON COLUMN invnt_usage.quantity_burn IS 'Quantity consumed in burn units';
-COMMENT ON COLUMN invnt_usage.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN invnt_usage.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN invnt_usage.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN invnt_usage.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN invnt_usage.updated_at IS 'Timestamp when the record was last updated';

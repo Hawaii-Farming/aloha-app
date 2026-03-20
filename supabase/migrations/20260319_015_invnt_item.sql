@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     photos                   JSONB NOT NULL DEFAULT '[]',
 
     -- Status & audit
-    is_active                BOOLEAN NOT NULL DEFAULT true,
+    is_deleted                BOOLEAN NOT NULL DEFAULT false,
     created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by               TEXT,
     updated_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -99,7 +99,7 @@ COMMENT ON COLUMN invnt_item.seed_is_pelleted IS 'Whether seed item is pelleted 
 COMMENT ON COLUMN invnt_item.maint_part_type IS 'Type classification for parts (e.g. electrical, mechanical, plumbing)';
 COMMENT ON COLUMN invnt_item.maint_part_number IS 'Manufacturer part number or catalog SKU';
 COMMENT ON COLUMN invnt_item.photos IS 'JSON array of photo URLs for the item';
-COMMENT ON COLUMN invnt_item.is_active IS 'Soft delete flag; false hides the item from active use';
+COMMENT ON COLUMN invnt_item.is_deleted IS 'Soft delete flag; false hides the item from active use';
 COMMENT ON COLUMN invnt_item.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN invnt_item.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN invnt_item.updated_at IS 'Timestamp when the record was last updated';

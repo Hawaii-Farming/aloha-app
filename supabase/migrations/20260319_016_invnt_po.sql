@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS invnt_po (
 
     -- Status & audit
     status                 TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'approved', 'rejected', 'ordered', 'partial', 'received', 'cancelled')),
-    is_active              BOOLEAN NOT NULL DEFAULT true,
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
     requested_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
     requested_by           TEXT NOT NULL REFERENCES hr_employee(id),
     reviewed_at            TIMESTAMPTZ,
@@ -71,7 +71,7 @@ COMMENT ON COLUMN invnt_po.notes IS 'Free-text notes about the order';
 COMMENT ON COLUMN invnt_po.rejected_reason IS 'Reason for rejection when status is rejected';
 COMMENT ON COLUMN invnt_po.request_photos IS 'JSON array of photo URLs attached to the request';
 COMMENT ON COLUMN invnt_po.status IS 'Workflow status: requested, approved, rejected, ordered, partial, received, cancelled';
-COMMENT ON COLUMN invnt_po.is_active IS 'Soft delete flag; false hides the order from active use';
+COMMENT ON COLUMN invnt_po.is_deleted IS 'Soft delete flag; false hides the order from active use';
 COMMENT ON COLUMN invnt_po.requested_at IS 'Timestamp when the order was requested';
 COMMENT ON COLUMN invnt_po.requested_by IS 'Employee who submitted the order request';
 COMMENT ON COLUMN invnt_po.reviewed_at IS 'Timestamp when the order was reviewed';

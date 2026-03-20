@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS fsafe_emp_test (
     required_retests        INTEGER NOT NULL DEFAULT 0,
     required_vector_tests   INTEGER NOT NULL DEFAULT 0,
 
-    is_active       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted       BOOLEAN NOT NULL DEFAULT false,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -41,7 +41,7 @@ COMMENT ON COLUMN fsafe_emp_test.numeric_minimum_value IS 'Minimum acceptable nu
 COMMENT ON COLUMN fsafe_emp_test.numeric_maximum_value IS 'Maximum acceptable numeric value; results above this are a fail';
 COMMENT ON COLUMN fsafe_emp_test.required_retests IS 'Number of retest records to auto-generate when any test of this type fails';
 COMMENT ON COLUMN fsafe_emp_test.required_vector_tests IS 'Number of vector test records to auto-generate when any test of this type fails';
-COMMENT ON COLUMN fsafe_emp_test.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN fsafe_emp_test.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN fsafe_emp_test.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN fsafe_emp_test.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN fsafe_emp_test.updated_at IS 'Timestamp when the record was last updated';

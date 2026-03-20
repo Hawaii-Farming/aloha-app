@@ -7,7 +7,7 @@ WITH latest_onhand AS (
         burn_per_onhand,
         onhand_date
     FROM invnt_onhand
-    WHERE is_active = true
+    WHERE is_deleted = false
     ORDER BY invnt_item_id, onhand_date DESC, created_at DESC
 ),
 open_orders AS (
@@ -21,10 +21,10 @@ open_orders AS (
             invnt_po_id,
             SUM(received_quantity * burn_per_received) AS received_quantity_in_burn
         FROM invnt_po_received
-        WHERE is_active = true
+        WHERE is_deleted = false
         GROUP BY invnt_po_id
     ) r ON r.invnt_po_id = po.id
-    WHERE po.is_active = true
+    WHERE po.is_deleted = false
       AND po.invnt_item_id IS NOT NULL
       AND po.status IN ('approved', 'ordered', 'partial')
     GROUP BY po.invnt_item_id
@@ -85,6 +85,6 @@ SELECT
 FROM invnt_item i
 LEFT JOIN latest_onhand lo ON lo.invnt_item_id = i.id
 LEFT JOIN open_orders oo ON oo.invnt_item_id = i.id
-WHERE i.is_active = true;
+WHERE i.is_deleted = false;
 
 COMMENT ON VIEW invnt_item_summary IS 'Dashboard view combining latest on-hand snapshot, open order totals with received deliveries, and computed forecasts (weeks-on-hand, next-order-date) per active inventory item';

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS invnt_vendor (
     phone          TEXT,
     address        TEXT,
     payment_terms  TEXT,
-    is_active      BOOLEAN NOT NULL DEFAULT true,
+    is_deleted      BOOLEAN NOT NULL DEFAULT false,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by     TEXT,
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -24,7 +24,7 @@ COMMENT ON COLUMN invnt_vendor.email IS 'Vendor email address';
 COMMENT ON COLUMN invnt_vendor.phone IS 'Vendor phone number';
 COMMENT ON COLUMN invnt_vendor.address IS 'Vendor physical address';
 COMMENT ON COLUMN invnt_vendor.payment_terms IS 'Payment terms (e.g. Net 30, COD, Prepaid)';
-COMMENT ON COLUMN invnt_vendor.is_active IS 'Soft delete flag; false hides the vendor from active use';
+COMMENT ON COLUMN invnt_vendor.is_deleted IS 'Soft delete flag; false hides the vendor from active use';
 COMMENT ON COLUMN invnt_vendor.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN invnt_vendor.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN invnt_vendor.updated_at IS 'Timestamp when the record was last updated';

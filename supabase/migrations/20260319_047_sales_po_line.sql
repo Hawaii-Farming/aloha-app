@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS sales_po_line (
     price_per_unit NUMERIC NOT NULL,
     notes               TEXT,
 
-    is_active           BOOLEAN NOT NULL DEFAULT true,
+    is_deleted           BOOLEAN NOT NULL DEFAULT false,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -33,7 +33,7 @@ COMMENT ON COLUMN sales_po_line.sale_uom IS 'Unit of measure for the quantity or
 COMMENT ON COLUMN sales_po_line.quantity_ordered IS 'Number of sale units ordered';
 COMMENT ON COLUMN sales_po_line.price_per_unit IS 'Snapshot price per unit at time of order';
 COMMENT ON COLUMN sales_po_line.notes IS 'Free-text notes about this order line';
-COMMENT ON COLUMN sales_po_line.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN sales_po_line.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN sales_po_line.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN sales_po_line.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_po_line.updated_at IS 'Timestamp when the record was last updated';

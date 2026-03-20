@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS fsafe_test_hold (
     status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed')),
     notes           TEXT,
 
-    is_active       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted       BOOLEAN NOT NULL DEFAULT false,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     sampled_on      DATE,
@@ -42,7 +42,7 @@ COMMENT ON COLUMN fsafe_test_hold.fsafe_lab_id IS 'Laboratory where the sample i
 COMMENT ON COLUMN fsafe_test_hold.lab_test_id IS 'External reference number assigned by the laboratory for tracking';
 COMMENT ON COLUMN fsafe_test_hold.status IS 'Workflow status: pending (awaiting sample), in_progress (at lab), completed (results received)';
 COMMENT ON COLUMN fsafe_test_hold.notes IS 'Free-text notes about this test-and-hold event';
-COMMENT ON COLUMN fsafe_test_hold.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN fsafe_test_hold.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN fsafe_test_hold.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN fsafe_test_hold.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN fsafe_test_hold.sampled_on IS 'Date when the sample was collected from the lot';

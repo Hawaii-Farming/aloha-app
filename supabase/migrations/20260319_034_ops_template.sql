@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS ops_template (
     numeric_minimum_rlu_value   NUMERIC,
     numeric_maximum_rlu_value   NUMERIC,
 
-    is_active                   BOOLEAN     NOT NULL DEFAULT true,
+    is_deleted                   BOOLEAN     NOT NULL DEFAULT false,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                  TEXT,
     updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -41,7 +41,7 @@ COMMENT ON COLUMN ops_template.display_order IS 'Sort position for ordering temp
 COMMENT ON COLUMN ops_template.atp_site_count IS 'Number of sites to randomly select for ATP testing; null means no ATP testing for this template';
 COMMENT ON COLUMN ops_template.numeric_minimum_rlu_value IS 'Minimum acceptable RLU value for ATP tests on this template; results below this are a fail';
 COMMENT ON COLUMN ops_template.numeric_maximum_rlu_value IS 'Maximum acceptable RLU value for ATP tests on this template; results above this are a fail';
-COMMENT ON COLUMN ops_template.is_active IS 'Soft delete flag; false hides the template from active use';
+COMMENT ON COLUMN ops_template.is_deleted IS 'Soft delete flag; false hides the template from active use';
 COMMENT ON COLUMN ops_template.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_template.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_template.updated_at IS 'Timestamp when the record was last updated';

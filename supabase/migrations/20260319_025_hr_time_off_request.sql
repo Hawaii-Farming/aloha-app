@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS hr_time_off_request (
     notes           TEXT,
     status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'denied')),
 
-    is_active       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted       BOOLEAN NOT NULL DEFAULT false,
     requested_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     requested_by    TEXT NOT NULL REFERENCES hr_employee(id),
     reviewed_at     TIMESTAMPTZ,
@@ -40,7 +40,7 @@ COMMENT ON COLUMN hr_time_off_request.request_reason IS 'Employee-provided reaso
 COMMENT ON COLUMN hr_time_off_request.denial_reason IS 'Reason provided when the request is denied';
 COMMENT ON COLUMN hr_time_off_request.notes IS 'Additional notes about the request';
 COMMENT ON COLUMN hr_time_off_request.status IS 'Approval status: pending, approved, denied';
-COMMENT ON COLUMN hr_time_off_request.is_active IS 'Soft delete flag; false hides the request from active use';
+COMMENT ON COLUMN hr_time_off_request.is_deleted IS 'Soft delete flag; false hides the request from active use';
 COMMENT ON COLUMN hr_time_off_request.requested_at IS 'Timestamp when the request was submitted';
 COMMENT ON COLUMN hr_time_off_request.requested_by IS 'Employee who submitted the request';
 COMMENT ON COLUMN hr_time_off_request.reviewed_at IS 'Timestamp when the request was reviewed';

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS ops_training_attendee (
 
     notes               TEXT,
 
-    is_active           BOOLEAN NOT NULL DEFAULT true,
+    is_deleted           BOOLEAN NOT NULL DEFAULT false,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -39,7 +39,7 @@ COMMENT ON COLUMN ops_training_attendee.certification_issued_on IS 'Date the cer
 COMMENT ON COLUMN ops_training_attendee.certification_expires_on IS 'Date the employee certification expires';
 COMMENT ON COLUMN ops_training_attendee.certificate_url IS 'URL or path to the issued certificate document';
 COMMENT ON COLUMN ops_training_attendee.notes IS 'Free-text notes about this attendee record';
-COMMENT ON COLUMN ops_training_attendee.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN ops_training_attendee.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN ops_training_attendee.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_training_attendee.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_training_attendee.updated_at IS 'Timestamp when the record was last updated';

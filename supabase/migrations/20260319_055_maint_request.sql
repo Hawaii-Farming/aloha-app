@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS maint_request (
     after_photos              JSONB       NOT NULL DEFAULT '[]',
 
     is_preventive_maintenance BOOLEAN     NOT NULL DEFAULT false,
-    is_active                 BOOLEAN     NOT NULL DEFAULT true,
+    is_deleted                 BOOLEAN     NOT NULL DEFAULT false,
 
     requested_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     requested_by              TEXT        NOT NULL REFERENCES hr_employee(id),
@@ -45,7 +45,7 @@ COMMENT ON COLUMN maint_request.fixer_description IS 'Comments or notes left by 
 COMMENT ON COLUMN maint_request.before_photos IS 'JSON array of photo URLs taken before the maintenance work';
 COMMENT ON COLUMN maint_request.after_photos IS 'JSON array of photo URLs taken after the maintenance work';
 COMMENT ON COLUMN maint_request.is_preventive_maintenance IS 'Whether this is a scheduled preventive maintenance task rather than a reactive repair';
-COMMENT ON COLUMN maint_request.is_active IS 'Soft delete flag; false hides the request from active use';
+COMMENT ON COLUMN maint_request.is_deleted IS 'Soft delete flag; false hides the request from active use';
 COMMENT ON COLUMN maint_request.requested_at IS 'Timestamp when the request was submitted';
 COMMENT ON COLUMN maint_request.requested_by IS 'Employee who submitted the maintenance request';
 COMMENT ON COLUMN maint_request.updated_at IS 'Timestamp when the record was last updated';

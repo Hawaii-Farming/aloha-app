@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_photo (
     photo_url                   TEXT NOT NULL,
     caption                     TEXT,
 
-    is_active                   BOOLEAN NOT NULL DEFAULT true,
+    is_deleted                   BOOLEAN NOT NULL DEFAULT false,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                  TEXT,
     updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -28,7 +28,7 @@ COMMENT ON COLUMN pack_shelf_life_photo.observation_date IS 'Date the photo was 
 COMMENT ON COLUMN pack_shelf_life_photo.shelf_life_day IS 'Number of days since the pack date (e.g. day 0, day 1, day 7)';
 COMMENT ON COLUMN pack_shelf_life_photo.photo_url IS 'URL or path to the photo';
 COMMENT ON COLUMN pack_shelf_life_photo.caption IS 'Optional caption describing what the photo shows';
-COMMENT ON COLUMN pack_shelf_life_photo.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN pack_shelf_life_photo.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN pack_shelf_life_photo.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN pack_shelf_life_photo.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN pack_shelf_life_photo.updated_at IS 'Timestamp when the record was last updated';

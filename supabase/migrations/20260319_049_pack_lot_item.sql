@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS pack_lot_item (
     uom                 TEXT NOT NULL REFERENCES util_uom(code),
     quantity_packed     NUMERIC NOT NULL,
 
-    is_active           BOOLEAN NOT NULL DEFAULT true,
+    is_deleted           BOOLEAN NOT NULL DEFAULT false,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -31,7 +31,7 @@ COMMENT ON COLUMN pack_lot_item.sales_product_id IS 'Product that was packed in 
 COMMENT ON COLUMN pack_lot_item.best_by_date IS 'Best-by date for this product, derived from the lot pack date plus the product shelf life';
 COMMENT ON COLUMN pack_lot_item.uom IS 'Unit of measure for quantity packed; defaults to the product sale unit (e.g. case)';
 COMMENT ON COLUMN pack_lot_item.quantity_packed IS 'Number of units packed for this product in this lot';
-COMMENT ON COLUMN pack_lot_item.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN pack_lot_item.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN pack_lot_item.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN pack_lot_item.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN pack_lot_item.updated_at IS 'Timestamp when the record was last updated';

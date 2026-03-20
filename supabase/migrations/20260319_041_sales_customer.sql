@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS sales_customer (
     email           TEXT,
     cc_emails       JSONB NOT NULL DEFAULT '[]',
     billing_address TEXT,
-    is_active       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted       BOOLEAN NOT NULL DEFAULT false,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -28,7 +28,7 @@ COMMENT ON COLUMN sales_customer.name IS 'Display name of the customer, unique w
 COMMENT ON COLUMN sales_customer.email IS 'Primary email address for the customer';
 COMMENT ON COLUMN sales_customer.cc_emails IS 'JSON array of additional email addresses to CC on communications';
 COMMENT ON COLUMN sales_customer.billing_address IS 'Billing address for invoicing';
-COMMENT ON COLUMN sales_customer.is_active IS 'Soft delete flag; false hides the customer from active use';
+COMMENT ON COLUMN sales_customer.is_deleted IS 'Soft delete flag; false hides the customer from active use';
 COMMENT ON COLUMN sales_customer.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN sales_customer.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_customer.updated_at IS 'Timestamp when the record was last updated';

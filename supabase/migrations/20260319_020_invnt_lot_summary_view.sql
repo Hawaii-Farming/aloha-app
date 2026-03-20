@@ -13,7 +13,7 @@ SELECT DISTINCT ON (invnt_item_id, lot_number)
     updated_at,
     updated_by
 FROM invnt_onhand
-WHERE is_active = true
+WHERE is_deleted = false
   AND lot_number IS NOT NULL
   AND onhand_quantity > 0
 ORDER BY invnt_item_id, lot_number, onhand_date DESC, created_at DESC;

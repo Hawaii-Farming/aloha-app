@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS ops_template_category (
     name        TEXT        NOT NULL,
     description TEXT,
 
-    is_active   BOOLEAN     NOT NULL DEFAULT true,
+    is_deleted   BOOLEAN     NOT NULL DEFAULT false,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by  TEXT,
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -21,7 +21,7 @@ COMMENT ON COLUMN ops_template_category.id IS 'Human-readable identifier derived
 COMMENT ON COLUMN ops_template_category.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN ops_template_category.name IS 'Category name, unique within the org (e.g. Pre-Op, Post-Op, House Inspection)';
 COMMENT ON COLUMN ops_template_category.description IS 'Optional description of what this category covers';
-COMMENT ON COLUMN ops_template_category.is_active IS 'Soft delete flag; false hides the category from active use';
+COMMENT ON COLUMN ops_template_category.is_deleted IS 'Soft delete flag; false hides the category from active use';
 COMMENT ON COLUMN ops_template_category.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_template_category.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_template_category.updated_at IS 'Timestamp when the record was last updated';

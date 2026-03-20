@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS ops_response (
     response_enum           TEXT,
     response_text           TEXT,
 
-    is_active               BOOLEAN     NOT NULL DEFAULT true,
+    is_deleted               BOOLEAN     NOT NULL DEFAULT false,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by              TEXT,
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -39,7 +39,7 @@ COMMENT ON COLUMN ops_response.response_boolean IS 'Boolean response value; used
 COMMENT ON COLUMN ops_response.response_numeric IS 'Numeric response value; used when question response_type is numeric';
 COMMENT ON COLUMN ops_response.response_enum IS 'Selected enum option; used when question response_type is enum';
 COMMENT ON COLUMN ops_response.response_text IS 'Free-text notes or observations for this response';
-COMMENT ON COLUMN ops_response.is_active IS 'Soft delete flag; false hides the response from active use';
+COMMENT ON COLUMN ops_response.is_deleted IS 'Soft delete flag; false hides the response from active use';
 COMMENT ON COLUMN ops_response.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_response.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_response.updated_at IS 'Timestamp when the record was last updated';

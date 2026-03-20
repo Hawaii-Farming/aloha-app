@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS ops_training (
 
     notes                   TEXT,
 
-    is_active               BOOLEAN NOT NULL DEFAULT true,
+    is_deleted               BOOLEAN NOT NULL DEFAULT false,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by              TEXT,
     verified_at             TIMESTAMPTZ,
@@ -35,7 +35,7 @@ COMMENT ON COLUMN ops_training.topics_covered IS 'JSON array of topic strings co
 COMMENT ON COLUMN ops_training.trainer_names IS 'JSON array of trainer names; may include external trainers or internal employee names';
 COMMENT ON COLUMN ops_training.materials_url IS 'URL or path to the training materials or presentation used';
 COMMENT ON COLUMN ops_training.notes IS 'Free-text notes about the training session';
-COMMENT ON COLUMN ops_training.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN ops_training.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN ops_training.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_training.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_training.verified_at IS 'Timestamp when the training session was verified';

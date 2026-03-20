@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS sales_product_price (
     price          NUMERIC NOT NULL,
     effective_from DATE NOT NULL,
     effective_to   DATE,
-    is_active      BOOLEAN NOT NULL DEFAULT true,
+    is_deleted      BOOLEAN NOT NULL DEFAULT false,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by     TEXT,
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -29,7 +29,7 @@ COMMENT ON COLUMN sales_product_price.sales_customer_group_id IS 'Customer group
 COMMENT ON COLUMN sales_product_price.price IS 'Price per sale unit';
 COMMENT ON COLUMN sales_product_price.effective_from IS 'Start date when this price becomes active';
 COMMENT ON COLUMN sales_product_price.effective_to IS 'End date when this price expires; NULL means no expiry';
-COMMENT ON COLUMN sales_product_price.is_active IS 'Soft delete flag; false hides the price from active use';
+COMMENT ON COLUMN sales_product_price.is_deleted IS 'Soft delete flag; false hides the price from active use';
 COMMENT ON COLUMN sales_product_price.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN sales_product_price.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_product_price.updated_at IS 'Timestamp when the record was last updated';

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS org (
     slug       TEXT NOT NULL,
     address    TEXT,
     currency   TEXT,
-    is_active  BOOLEAN NOT NULL DEFAULT true,
+    is_deleted  BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by TEXT,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -19,7 +19,7 @@ COMMENT ON COLUMN org.name IS 'Display name of the organization';
 COMMENT ON COLUMN org.slug IS 'Short initials derived from the organization name (e.g. HF for Hawaii Farming)';
 COMMENT ON COLUMN org.address IS 'Physical address of the organization';
 COMMENT ON COLUMN org.currency IS 'Default currency code for the organization (e.g. USD, KES)';
-COMMENT ON COLUMN org.is_active IS 'Soft delete flag; false hides the organization from active use';
+COMMENT ON COLUMN org.is_deleted IS 'Soft delete flag; false hides the organization from active use';
 COMMENT ON COLUMN org.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN org.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN org.updated_at IS 'Timestamp when the record was last updated';

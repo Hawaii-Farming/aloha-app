@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS ops_task_tracker (
     notes           TEXT,
     photos          JSONB NOT NULL DEFAULT '[]',
 
-    is_active       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted       BOOLEAN NOT NULL DEFAULT false,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     verified_at     TIMESTAMPTZ,
@@ -38,7 +38,7 @@ COMMENT ON COLUMN ops_task_tracker.stop_time IS 'Time the task ended; used as th
 COMMENT ON COLUMN ops_task_tracker.status IS 'Workflow status: open, in_progress, completed';
 COMMENT ON COLUMN ops_task_tracker.notes IS 'Free-text notes about the task event';
 COMMENT ON COLUMN ops_task_tracker.photos IS 'JSON array of photo URLs taken during the task';
-COMMENT ON COLUMN ops_task_tracker.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN ops_task_tracker.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN ops_task_tracker.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_task_tracker.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_task_tracker.verified_at IS 'Timestamp when the task event was verified';

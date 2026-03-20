@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS maint_request_invnt_item (
     uom                 TEXT REFERENCES util_uom(code),
     quantity_used       NUMERIC,
 
-    is_active           BOOLEAN     NOT NULL DEFAULT true,
+    is_deleted           BOOLEAN     NOT NULL DEFAULT false,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -27,7 +27,7 @@ COMMENT ON COLUMN maint_request_invnt_item.maint_request_id IS 'Maintenance requ
 COMMENT ON COLUMN maint_request_invnt_item.invnt_item_id IS 'Inventory item used during the maintenance';
 COMMENT ON COLUMN maint_request_invnt_item.uom IS 'Unit of measure for the quantity used';
 COMMENT ON COLUMN maint_request_invnt_item.quantity_used IS 'Quantity of the item consumed during the maintenance';
-COMMENT ON COLUMN maint_request_invnt_item.is_active IS 'Soft delete flag; false removes the entry without deleting the record';
+COMMENT ON COLUMN maint_request_invnt_item.is_deleted IS 'Soft delete flag; false removes the entry without deleting the record';
 COMMENT ON COLUMN maint_request_invnt_item.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN maint_request_invnt_item.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN maint_request_invnt_item.updated_at IS 'Timestamp when the record was last updated';

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS invnt_po_received (
     notes                  TEXT,
     received_photos        JSONB NOT NULL DEFAULT '[]',
 
-    is_active              BOOLEAN NOT NULL DEFAULT true,
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
     received_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     received_by            TEXT,
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -43,7 +43,7 @@ COMMENT ON COLUMN invnt_po_received.delivery_truck_clean IS 'Whether the deliver
 COMMENT ON COLUMN invnt_po_received.delivery_acceptable IS 'Whether the delivery was accepted in acceptable condition';
 COMMENT ON COLUMN invnt_po_received.notes IS 'Free-text notes about the delivery';
 COMMENT ON COLUMN invnt_po_received.received_photos IS 'JSON array of photo URLs documenting the delivery';
-COMMENT ON COLUMN invnt_po_received.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN invnt_po_received.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN invnt_po_received.received_at IS 'Timestamp when the delivery was recorded';
 COMMENT ON COLUMN invnt_po_received.received_by IS 'Email of the user who recorded the delivery';
 COMMENT ON COLUMN invnt_po_received.updated_at IS 'Timestamp when the record was last updated';

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS invnt_sales_product_item (
     sale_uom          TEXT REFERENCES util_uom(code),
     quantity_per_sale_uom NUMERIC,
 
-    is_active         BOOLEAN NOT NULL DEFAULT true,
+    is_deleted         BOOLEAN NOT NULL DEFAULT false,
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by        TEXT,
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -29,7 +29,7 @@ COMMENT ON COLUMN invnt_sales_product_item.invnt_item_id IS 'Inventory item cons
 COMMENT ON COLUMN invnt_sales_product_item.packaging_level IS 'Which packaging level consumes this item: pack or sale';
 COMMENT ON COLUMN invnt_sales_product_item.sale_uom IS 'Unit of measure for the sale quantity at this packaging level';
 COMMENT ON COLUMN invnt_sales_product_item.quantity_per_sale_uom IS 'Quantity of the inventory item consumed per unit at the specified packaging level';
-COMMENT ON COLUMN invnt_sales_product_item.is_active IS 'Soft delete flag; false hides the link from active use';
+COMMENT ON COLUMN invnt_sales_product_item.is_deleted IS 'Soft delete flag; false hides the link from active use';
 COMMENT ON COLUMN invnt_sales_product_item.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN invnt_sales_product_item.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN invnt_sales_product_item.updated_at IS 'Timestamp when the record was last updated';

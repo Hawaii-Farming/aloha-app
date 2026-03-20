@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS site (
 
     is_food_contact_surface BOOLEAN NOT NULL DEFAULT false,
     zone            TEXT CHECK (zone IN ('zone_1', 'zone_2', 'zone_3', 'zone_4')),
-    is_active       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted       BOOLEAN NOT NULL DEFAULT false,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -59,7 +59,7 @@ COMMENT ON COLUMN site.photos IS 'JSON array of photo URLs';
 COMMENT ON COLUMN site.metadata IS 'Flexible JSON for display-only details (dimensions, capacity, environmental settings)';
 COMMENT ON COLUMN site.is_food_contact_surface IS 'Whether this site or surface comes into contact with food; requires sanitization before reuse if true';
 COMMENT ON COLUMN site.zone IS 'EMP zone classification for this site as defined in food safety documentation: zone_1, zone_2, zone_3, zone_4; null if not applicable';
-COMMENT ON COLUMN site.is_active IS 'Soft delete flag; false hides the site from active use';
+COMMENT ON COLUMN site.is_deleted IS 'Soft delete flag; false hides the site from active use';
 COMMENT ON COLUMN site.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN site.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN site.updated_at IS 'Timestamp when the record was last updated';

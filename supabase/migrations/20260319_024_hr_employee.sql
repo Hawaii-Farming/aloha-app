@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     site_id_housing              TEXT REFERENCES site(id),
 
     is_verifier                  BOOLEAN NOT NULL DEFAULT false,
-    is_active                    BOOLEAN NOT NULL DEFAULT true,
+    is_deleted                    BOOLEAN NOT NULL DEFAULT false,
 
     -- =============================================
     -- AUDIT
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
 
 CREATE INDEX idx_hr_employee_org_id     ON hr_employee (org_id);
 CREATE INDEX idx_hr_employee_user_id    ON hr_employee (user_id);
-CREATE INDEX idx_hr_employee_active     ON hr_employee (org_id, is_active);
+CREATE INDEX idx_hr_employee_active     ON hr_employee (org_id, is_deleted);
 CREATE INDEX idx_hr_employee_team_lead  ON hr_employee (team_lead_id);
 CREATE INDEX idx_hr_employee_department ON hr_employee (hr_department_id);
 CREATE INDEX idx_hr_employee_title      ON hr_employee (hr_title_id);
@@ -99,7 +99,7 @@ COMMENT ON COLUMN hr_employee.compensation_manager_id IS 'Self-referencing TEXT 
 COMMENT ON COLUMN hr_employee.hr_work_authorization_id IS 'Visa/work authorization type; references hr_work_authorization (e.g. local, wfe, furte, h1b)';
 COMMENT ON COLUMN hr_employee.start_date IS 'Employment start date';
 COMMENT ON COLUMN hr_employee.end_date IS 'Employment end date; NULL if currently employed';
-COMMENT ON COLUMN hr_employee.is_active IS 'Soft delete flag; false disables the employee without removing the record';
+COMMENT ON COLUMN hr_employee.is_deleted IS 'Soft delete flag; false disables the employee without removing the record';
 COMMENT ON COLUMN hr_employee.is_verifier IS 'Whether this employee is authorized to verify records';
 COMMENT ON COLUMN hr_employee.payroll_id IS 'External payroll system identifier';
 COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type: hourly or salary';

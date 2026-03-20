@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS ops_task (
     farm_id     TEXT REFERENCES farm(id),
     name        TEXT NOT NULL,
     description TEXT,
-    is_active   BOOLEAN NOT NULL DEFAULT true,
+    is_deleted   BOOLEAN NOT NULL DEFAULT false,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by  TEXT,
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -21,7 +21,7 @@ COMMENT ON COLUMN ops_task.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN ops_task.farm_id IS 'Optional farm scope; NULL if task applies to all farms';
 COMMENT ON COLUMN ops_task.name IS 'Short name for the task, unique within the org (e.g. HARV, PICK)';
 COMMENT ON COLUMN ops_task.description IS 'Description of the task';
-COMMENT ON COLUMN ops_task.is_active IS 'Soft delete flag; false hides the task from active use';
+COMMENT ON COLUMN ops_task.is_deleted IS 'Soft delete flag; false hides the task from active use';
 COMMENT ON COLUMN ops_task.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_task.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_task.updated_at IS 'Timestamp when the record was last updated';

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS hr_travel_request (
     reviewed_by         TEXT REFERENCES hr_employee(id),
     reviewed_at         TIMESTAMPTZ,
 
-    is_active           BOOLEAN NOT NULL DEFAULT true,
+    is_deleted           BOOLEAN NOT NULL DEFAULT false,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by          TEXT
 );
@@ -47,6 +47,6 @@ COMMENT ON COLUMN hr_travel_request.requested_by IS 'Auth user who submitted the
 COMMENT ON COLUMN hr_travel_request.requested_at IS 'Timestamp when the request was submitted';
 COMMENT ON COLUMN hr_travel_request.reviewed_by IS 'Employee who approved or denied the request';
 COMMENT ON COLUMN hr_travel_request.reviewed_at IS 'Timestamp when the request was reviewed';
-COMMENT ON COLUMN hr_travel_request.is_active IS 'Soft delete flag; false hides the request from active use';
+COMMENT ON COLUMN hr_travel_request.is_deleted IS 'Soft delete flag; false hides the request from active use';
 COMMENT ON COLUMN hr_travel_request.updated_at IS 'Timestamp when the record was last updated';
 COMMENT ON COLUMN hr_travel_request.updated_by IS 'Email of the user who last updated the record';

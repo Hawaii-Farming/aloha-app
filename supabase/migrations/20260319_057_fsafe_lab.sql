@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS fsafe_lab (
     name            TEXT NOT NULL,
     description     TEXT,
 
-    is_active       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted       BOOLEAN NOT NULL DEFAULT false,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -21,7 +21,7 @@ COMMENT ON COLUMN fsafe_lab.id IS 'Human-readable unique identifier derived from
 COMMENT ON COLUMN fsafe_lab.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN fsafe_lab.name IS 'Display name of the laboratory';
 COMMENT ON COLUMN fsafe_lab.description IS 'Optional description of the laboratory and services offered';
-COMMENT ON COLUMN fsafe_lab.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN fsafe_lab.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN fsafe_lab.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN fsafe_lab.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN fsafe_lab.updated_at IS 'Timestamp when the record was last updated';

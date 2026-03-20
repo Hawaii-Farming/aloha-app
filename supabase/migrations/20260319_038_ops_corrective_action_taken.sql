@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
 
     result_description  TEXT,
 
-    is_active           BOOLEAN     NOT NULL DEFAULT true,
+    is_deleted           BOOLEAN     NOT NULL DEFAULT false,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     verified_at         TIMESTAMPTZ,
@@ -46,7 +46,7 @@ COMMENT ON COLUMN ops_corrective_action_taken.completed_on IS 'Date when the cor
 COMMENT ON COLUMN ops_corrective_action_taken.status IS 'Resolution status: open, completed';
 COMMENT ON COLUMN ops_corrective_action_taken.notes IS 'Additional notes about the corrective action or its resolution';
 COMMENT ON COLUMN ops_corrective_action_taken.result_description IS 'Description of the observed outcome after the corrective action was implemented';
-COMMENT ON COLUMN ops_corrective_action_taken.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN ops_corrective_action_taken.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN ops_corrective_action_taken.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_corrective_action_taken.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_corrective_action_taken.verified_at IS 'Timestamp when the corrective action was verified as effective';

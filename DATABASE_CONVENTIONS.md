@@ -21,6 +21,18 @@ Column descriptions in `.md` docs must **exactly match** the text in `COMMENT ON
 
 When you update a `COMMENT ON COLUMN`, update the `.md` description in the same change. When you update a `.md` description, update the `COMMENT ON COLUMN` in the same change.
 
+### Which columns get descriptions
+
+Only add `COMMENT ON COLUMN` and `.md` descriptions for **business-specific columns** — the fields unique to that table's purpose. Skip comments for:
+
+- **PK**: `id`
+- **Standard audit**: `org_id`, `farm_id`, `is_deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`
+- **Workflow fields**: `verified_at/by`, `reviewed_at/by`, `sampled_at/by`, `approved_at/by`, `ordered_at/by`, `uploaded_at/by`, `completed_at`, `completed_on`, `delivered_to_lab_on`, `test_started_on`, etc.
+- **Date/timestamp fields**: `start_time`, `stop_time`, `pack_date`, `harvest_date`, `best_by_date`, `order_date`, `invoice_date`, `observation_date`, etc.
+- **Common self-descriptive fields**: `name`, `description`, `notes`, `status`, `photos`, `display_order`, `caption`, etc.
+
+These fields are self-descriptive from their names and have consistent meaning across tables. Only add a comment when the field's purpose is **not obvious** from its name alone (e.g. `initial_retest_vector`, `atp_site_count`, `enum_pass_options`).
+
 ---
 
 ## 3. File Naming
@@ -132,7 +144,7 @@ org_id
 farm_id              (if applicable)
 site_id              (if applicable)
 ... business fields ...
-is_active
+is_deleted
 created_at / requested_at
 created_by / requested_by
 ... workflow fields (e.g. verified_at, verified_by) ...
@@ -148,7 +160,7 @@ Workflow fields are fields that capture a named person performing a step in the 
 
 No records are physically deleted. Every table has:
 ```sql
-is_active BOOLEAN NOT NULL DEFAULT true
+is_deleted BOOLEAN NOT NULL DEFAULT false
 ```
 
 ---

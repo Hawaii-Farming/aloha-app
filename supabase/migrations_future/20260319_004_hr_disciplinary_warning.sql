@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS hr_disciplinary_warning (
     reviewed_by                     TEXT REFERENCES hr_employee(id),
     reviewed_at                     TIMESTAMPTZ,
 
-    is_active                       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted                       BOOLEAN NOT NULL DEFAULT false,
     updated_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                      TEXT
 );
@@ -55,6 +55,6 @@ COMMENT ON COLUMN hr_disciplinary_warning.reported_by IS 'Employee (manager/HR) 
 COMMENT ON COLUMN hr_disciplinary_warning.reported_at IS 'Timestamp when the warning was filed';
 COMMENT ON COLUMN hr_disciplinary_warning.reviewed_by IS 'Employee who reviewed and finalized the warning';
 COMMENT ON COLUMN hr_disciplinary_warning.reviewed_at IS 'Timestamp when the warning was reviewed';
-COMMENT ON COLUMN hr_disciplinary_warning.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN hr_disciplinary_warning.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN hr_disciplinary_warning.updated_at IS 'Timestamp when the record was last updated';
 COMMENT ON COLUMN hr_disciplinary_warning.updated_by IS 'Email of the user who last updated the record';

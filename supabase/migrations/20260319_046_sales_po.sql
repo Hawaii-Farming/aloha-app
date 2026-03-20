@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS sales_po (
 
     status                          TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'approved', 'fulfilled')),
 
-    is_active                       BOOLEAN NOT NULL DEFAULT true,
+    is_deleted                       BOOLEAN NOT NULL DEFAULT false,
     created_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                      TEXT,
     approved_at                     TIMESTAMPTZ,
@@ -45,7 +45,7 @@ COMMENT ON COLUMN sales_po.invoice_date IS 'Date the invoice was issued; null un
 COMMENT ON COLUMN sales_po.recurring_frequency IS 'Standing order frequency: weekly, biweekly, or monthly; null for one-time orders';
 COMMENT ON COLUMN sales_po.notes IS 'Free-text notes about the order';
 COMMENT ON COLUMN sales_po.status IS 'Order status: draft (new), approved (ready to fulfill), fulfilled (shipped)';
-COMMENT ON COLUMN sales_po.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN sales_po.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN sales_po.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN sales_po.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_po.approved_at IS 'Timestamp when the order was approved';

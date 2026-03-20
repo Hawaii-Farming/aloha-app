@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS ops_task_schedule (
 
     units_completed         NUMERIC,
 
-    is_active               BOOLEAN NOT NULL DEFAULT true,
+    is_deleted               BOOLEAN NOT NULL DEFAULT false,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by              TEXT,
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -33,7 +33,7 @@ COMMENT ON COLUMN ops_task_schedule.hr_employee_id IS 'Employee scheduled for th
 COMMENT ON COLUMN ops_task_schedule.start_time IS 'Time this employee started; pre-filled from task tracker, overridable if they started late';
 COMMENT ON COLUMN ops_task_schedule.stop_time IS 'Time this employee stopped; pre-filled from task tracker, overridable if they left early';
 COMMENT ON COLUMN ops_task_schedule.units_completed IS 'Generic output quantity for this employee (e.g. lbs picked, trays seeded, rows cleaned)';
-COMMENT ON COLUMN ops_task_schedule.is_active IS 'Soft delete flag; false removes the employee from the schedule without deleting the record';
+COMMENT ON COLUMN ops_task_schedule.is_deleted IS 'Soft delete flag; false removes the employee from the schedule without deleting the record';
 COMMENT ON COLUMN ops_task_schedule.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN ops_task_schedule.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN ops_task_schedule.updated_at IS 'Timestamp when the record was last updated';

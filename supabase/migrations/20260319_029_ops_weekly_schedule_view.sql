@@ -14,8 +14,8 @@ WITH schedule_base AS (
         (tt.start_time::DATE - EXTRACT(DOW FROM tt.start_time)::INTEGER) AS week_start_date
     FROM ops_task_schedule s
     JOIN ops_task_tracker tt ON tt.id = s.ops_task_tracker_id
-    WHERE s.is_active  = true
-      AND tt.is_active = true
+    WHERE s.is_deleted  = false
+      AND tt.is_deleted = false
 )
 SELECT
     sb.week_start_date,
@@ -90,7 +90,7 @@ SELECT
 FROM schedule_base sb
 JOIN hr_employee e  ON e.id = sb.hr_employee_id
 JOIN ops_task    t  ON t.id = sb.ops_task_id
-WHERE e.is_active = true
+WHERE e.is_deleted = false
 GROUP BY
     sb.week_start_date,
     sb.org_id,

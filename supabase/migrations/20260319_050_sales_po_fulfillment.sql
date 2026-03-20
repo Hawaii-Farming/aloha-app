@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS sales_po_fulfillment (
     quantity_fulfilled  NUMERIC NOT NULL,
     notes               TEXT,
 
-    is_active           BOOLEAN NOT NULL DEFAULT true,
+    is_deleted           BOOLEAN NOT NULL DEFAULT false,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -29,7 +29,7 @@ COMMENT ON COLUMN sales_po_fulfillment.sales_po_line_id IS 'Order line being ful
 COMMENT ON COLUMN sales_po_fulfillment.pack_lot_id IS 'Pack lot the fulfilled product was drawn from; null if lot tracking is not applicable';
 COMMENT ON COLUMN sales_po_fulfillment.quantity_fulfilled IS 'Number of sale units fulfilled from this lot for this order line';
 COMMENT ON COLUMN sales_po_fulfillment.notes IS 'Free-text notes about this fulfillment';
-COMMENT ON COLUMN sales_po_fulfillment.is_active IS 'Soft delete flag; false hides the record from active use';
+COMMENT ON COLUMN sales_po_fulfillment.is_deleted IS 'Soft delete flag; true means the record has been removed';
 COMMENT ON COLUMN sales_po_fulfillment.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN sales_po_fulfillment.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN sales_po_fulfillment.updated_at IS 'Timestamp when the record was last updated';
