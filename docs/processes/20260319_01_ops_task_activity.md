@@ -6,21 +6,21 @@ This document describes the end-to-end process for creating a task activity, com
 
 ## Overview
 
-When a team performs an activity on the farm, they create a **task tracker** record that captures what was done, where, and when. If the activity requires a checklist (e.g. a food safety inspection), a checklist template is attached and employees fill in their responses as part of the same activity. Everything — the task details, the checklist answers, and any ATP surface test readings — is tied back to a single tracker record so the full picture of that activity can be retrieved at any time.
+When a team performs an activity on the farm, they fill out a single form that captures what was done, where, and when. If the activity requires a checklist (e.g. a food safety inspection), selecting a template immediately renders the checklist questions on the same form — the employee can begin answering questions before or after filling in other fields like start time. Everything — the task details, the checklist answers, and any ATP surface test readings — is saved together and tied back to a single tracker record so the full picture of that activity can be retrieved at any time.
 
 ---
 
 ## Quick Fill (No Pre-Created Activity)
 
-In some situations an employee may want to fill out a checklist template directly — without going through the full "start activity → fill checklist → submit" flow. For example, a supervisor completing a daily log at a tablet without first formally opening an activity.
+In some situations an employee may want to fill out a checklist template directly — without filling in all the activity fields first. For example, a supervisor completing a daily log at a tablet who just wants to pick a template and start answering questions.
 
-The preferred approach is to handle this at the application layer rather than by loosening the database schema. When a user submits a checklist this way, the frontend silently creates the `ops_task_tracker` record and immediately closes it in the same transaction as the responses:
+This is handled at the application layer rather than by loosening the database schema. When a user submits a checklist this way, the frontend silently creates the `ops_task_tracker` record and immediately closes it in the same transaction as the responses:
 
 - `start_time` and `stop_time` are both set to the submission timestamp (or the user is prompted for a single "completed at" time).
 - `status` is set to `completed`.
 - All `ops_response` rows are written as normal, linked to this auto-created tracker record.
 
-From the user's perspective: open template → fill answers → submit. No separate activity creation step, no stop time prompt. The database still holds a complete, closed tracker record for every set of responses — preserving full audit trail and corrective action traceability.
+From the user's perspective: open template → fill answers → submit. No separate activity fields to fill in. The database still holds a complete, closed tracker record for every set of responses — preserving full audit trail and corrective action traceability.
 
 > **Why not add a `date` field to `ops_response` instead?** A date alone does not capture the context the tracker provides — site, task type, assigned employees, start and stop time, and status. Making the tracker optional by bypassing it results in floating responses with no provenance, which breaks reporting and corrective action linkage. The quick fill approach keeps the schema clean and the process intact.
 
@@ -30,23 +30,24 @@ From the user's perspective: open template → fill answers → submit. No separ
 
 ```mermaid
 flowchart TD
-    A([User starts a new activity]) --> B[Fill in activity details:\nTask — e.g. Harvest\nSite — e.g. GH01\nStart time\nOptional: select checklist template]
-    B --> C[Save ops_task_tracker\nstatus = open]
+    A([User opens the activity form]) --> B[Select task — e.g. Harvest\nSelect site — e.g. GH01\nSelect farm]
 
-    C --> D{Checklist template\nattached?}
-    D -- No --> E[Activity saved\nno checklist to complete]
-    D -- Yes --> F[Load checklist questions\nfrom ops_question\nWHERE ops_template_id = selected template]
+    B --> C{Select checklist\ntemplate?}
+    C -- No --> D[Form shows activity\nfields only]
+    C -- Yes --> E[Checklist questions\nrender immediately on form]
 
-    F --> G{Template has\natp_site_count > 0?}
-    G -- No --> H[Standard checklist\nquestions only]
-    G -- Yes --> I[Randomly select N sites\nWHERE is_food_contact_surface = true\nN = ops_template.atp_site_count\nAdd RLU input fields to form]
+    E --> F{Template has\natp_site_count > 0?}
+    F -- No --> G[Standard checklist\nquestions only]
+    F -- Yes --> H[Randomly select N sites\nWHERE is_food_contact_surface = true\nN = ops_template.atp_site_count\nAdd RLU input fields to form]
 
-    H --> J[Employee fills in\nall checklist responses]
-    I --> J
+    G --> I[Employee fills in checklist\nand activity fields in any order\nStart time is required before save]
+    H --> I
+    D --> J[Employee fills in activity fields\nStart time is required before save]
 
-    J --> K[Employee enters stop time\nand submits the form]
+    I --> K[Employee enters stop time\nand submits the form]
+    J --> K
 
-    K --> L[UPDATE ops_task_tracker\nstop_time\nstatus = completed]
+    K --> L[INSERT ops_task_tracker\nstart_time, stop_time\nstatus = completed]
 
     L --> M[INSERT ops_response rows\nOne per checklist question\nsite_id = null]
 
@@ -67,9 +68,9 @@ flowchart TD
 
 ## Step-by-Step Description
 
-### 1. Start a New Activity
+### 1. Open the Activity Form
 
-The employee opens the activity form and fills in the required details before saving:
+The employee opens a new activity form and fills in the following fields. These can be completed in any order — the checklist (if selected) is visible on the same form from the start, not loaded after saving.
 
 | Field | Description |
 |-------|-------------|
@@ -77,15 +78,14 @@ The employee opens the activity form and fills in the required details before sa
 | Site | The site where the activity is taking place (e.g. GH01) |
 | Farm | The farm this activity belongs to |
 | Start time | When the activity began — required before the form can be saved |
+| Stop time | When the activity ended — required before the form can be submitted |
 | Checklist template | Optional — select a checklist from `ops_template` if this activity requires one |
-
-Once saved, an `ops_task_tracker` record is created with `status = open`.
 
 ---
 
-### 2. Complete the Checklist
+### 2. Complete the Checklist (Pre-Activity Check)
 
-If a checklist template was attached, the form displays all active questions from `ops_question` for that template, ordered by `display_order`. Each question has a defined response type:
+When a checklist template is selected, the checklist questions render immediately on the same form. The employee can begin answering questions at any point — even before filling in the start time — because the checklist serves as a pre-activity check. Questions are loaded from `ops_question` for the selected template, ordered by `display_order`. Each question has a defined response type:
 
 | Response Type | How the Employee Answers |
 |--------------|--------------------------|
@@ -113,13 +113,13 @@ Pass/fail for ATP readings is evaluated against:
 
 ### 4. Submit the Activity
 
-Before submitting, the employee enters the **stop time**. The form cannot be submitted without it.
+Before submitting, the employee must have filled in the **start time** and **stop time**. The form cannot be submitted without both.
 
-On submission the following is written to the database:
+On submission the following is written to the database in a single transaction:
 
 | What | Table | Key Fields |
 |------|-------|------------|
-| Activity closed | `ops_task_tracker` | `stop_time`, `status = completed` |
+| Activity created and closed | `ops_task_tracker` | `start_time`, `stop_time`, `status = completed` |
 | One row per checklist question answered | `ops_response` | `ops_task_tracker_id`, `ops_question_id`, response value, `site_id = null` |
 | One row per ATP site tested | `ops_response` | `ops_task_tracker_id`, `response_numeric`, `site_id`, `ops_question_id = null` |
 | One row per failing response or ATP reading | `ops_corrective_action_taken` | `ops_response_id` |

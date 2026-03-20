@@ -25,6 +25,9 @@ When you update a `COMMENT ON COLUMN`, update the `.md` description in the same 
 
 ## 3. File Naming
 
+### Date prefix rule
+The `YYYYMMDD` prefix on all migration files, schema docs, and process docs must be updated to **today's date** on every commit. This applies to files in `supabase/migrations/`, `supabase/migrations_future/`, `docs/schemas/`, and `docs/processes/`.
+
 ### Migration files
 ```
 supabase/migrations/YYYYMMDD_NNN_module_tablename.sql
@@ -35,8 +38,8 @@ Numbered sequentially by module in this order:
 |-------------|--------------|
 | 001–011     | Core         |
 | 012–020     | Inventory    |
-| 021–025     | HR           |
-| 026–038     | Ops          |
+| 021–025     | Human Resources |
+| 026–038     | Operations   |
 | 039–040     | Maintenance  |
 | 041–042     | Food Safety  |
 
@@ -47,13 +50,13 @@ docs/schemas/YYYYMMDD_NN_module.md
 
 | File | Module |
 |------|--------|
-| `20260318_01_core.md` | Core |
-| `20260318_02_invnt.md` | Inventory |
-| `20260318_03_hr.md` | HR |
-| `20260318_04_ops.md` | Ops |
-| `20260318_05_maint.md` | Maintenance |
-| `20260318_06_fsafe.md` | Food Safety |
-| `20260318_07_future.md` | Deferred / Future |
+| `20260319_01_core.md` | Core |
+| `20260319_02_invnt.md` | Inventory |
+| `20260319_03_hr.md` | Human Resources |
+| `20260319_04_ops.md` | Operations |
+| `20260319_05_maint.md` | Maintenance |
+| `20260319_06_fsafe.md` | Food Safety |
+| `20260319_07_future.md` | Deferred / Future |
 
 ---
 
@@ -170,7 +173,7 @@ This column is used for Row Level Security (RLS) filtering.
 | `core_`   | Core org structure |
 | `invnt_`  | Inventory |
 | `hr_`     | Human Resources |
-| `ops_`    | Ops |
+| `ops_`    | Operations |
 | `maint_`  | Maintenance |
 | `fsafe_`  | Food Safety (EMP testing only) |
 
