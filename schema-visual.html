@@ -1,4 +1,4 @@
-<!-- v: 03-20 12:55pm -->
+<!-- v: 03-20 01:29pm -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,7 +171,7 @@ body { background: #0a0a0f; color: #e0e0e0; font-family: -apple-system, BlinkMac
 <body>
 
 <div class="topbar">
-  <h1>Aloha Schema</h1><span style="font-size:11px;color:#e0e0e0" id="versionLabel">v: 03-20 12:55pm</span>
+  <h1>Aloha Schema</h1><span style="font-size:11px;color:#e0e0e0" id="versionLabel">v: 03-20 01:29pm</span>
   <div class="version-toggle">
     <button id="btnV1" onclick="setVersion('v1')">V1</button>
     <button id="btnV2" class="active" onclick="setVersion('v2')">V2</button>
@@ -1762,6 +1762,13 @@ async function loadSchemaFromMds() {
           }
         }
       }
+      // Add any new V1 tables that aren't in the saved V2
+      const renamedOldNames = new Set(Object.values(renames));
+      for (const [v1Name, v1Tbl] of Object.entries(schemaV1.tables)) {
+        if (!schemaV2.tables[v1Name] && !renamedOldNames.has(v1Name)) {
+          schemaV2.tables[v1Name] = JSON.parse(JSON.stringify(v1Tbl));
+        }
+      }
       if (saved.foreignKeys) schemaV2.foreignKeys = saved.foreignKeys;
       if (saved.renames) schemaV2.renames = saved.renames;
       if (saved.coreTables) schemaV2.coreTables = saved.coreTables;
@@ -1789,6 +1796,13 @@ async function loadSchemaFromMds() {
           for (const col of tbl.columns) {
             if (!col.description && v1ColMap[col.name]?.description) col.description = v1ColMap[col.name].description;
           }
+        }
+      }
+      // Add any new V1 tables that aren't in the git-loaded V2
+      const renamedOldNames2 = new Set(Object.values(renames));
+      for (const [v1Name, v1Tbl] of Object.entries(schemaV1.tables)) {
+        if (!schemaV2.tables[v1Name] && !renamedOldNames2.has(v1Name)) {
+          schemaV2.tables[v1Name] = JSON.parse(JSON.stringify(v1Tbl));
         }
       }
       status += ' + git edits';
