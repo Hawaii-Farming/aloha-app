@@ -20,11 +20,6 @@ CREATE INDEX idx_pack_packaging_type_org_id ON pack_packaging_type (org_id);
 CREATE UNIQUE INDEX uq_pack_packaging_type_org_level  ON pack_packaging_type (org_id, name) WHERE farm_id IS NULL;
 CREATE UNIQUE INDEX uq_pack_packaging_type_farm_level ON pack_packaging_type (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
 
--- Add FK from sales_product now that pack_packaging_type exists
-ALTER TABLE sales_product
-    ADD CONSTRAINT fk_sales_product_pack_packaging_type
-    FOREIGN KEY (pack_packaging_type_id) REFERENCES pack_packaging_type(id);
-
 COMMENT ON TABLE pack_packaging_type IS 'Org-defined packaging type lookup (e.g. clamshell, bag, sleeve, tray wrap). Referenced by both sales_product and pack_shelf_life_trial.';
 COMMENT ON COLUMN pack_packaging_type.id IS 'Human-readable identifier derived from name (trimmed lowercase)';
 COMMENT ON COLUMN pack_packaging_type.org_id IS 'Owning organization for RLS filtering';
@@ -37,5 +32,3 @@ COMMENT ON COLUMN pack_packaging_type.created_at IS 'Timestamp when the record w
 COMMENT ON COLUMN pack_packaging_type.created_by IS 'Email of the user who created the record';
 COMMENT ON COLUMN pack_packaging_type.updated_at IS 'Timestamp when the record was last updated';
 COMMENT ON COLUMN pack_packaging_type.updated_by IS 'Email of the user who last updated the record';
-
-COMMENT ON COLUMN sales_product.pack_packaging_type_id IS 'Packaging type for this product; FK to org-defined pack_packaging_type lookup; FK added via ALTER TABLE in pack_packaging_type migration';

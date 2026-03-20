@@ -2,9 +2,10 @@ CREATE TABLE IF NOT EXISTS sales_po (
     id                              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     farm_id                         TEXT NOT NULL REFERENCES farm(id),
-    sales_customer_id                   TEXT NOT NULL REFERENCES sales_customer(id),
-    sales_fob_id                    TEXT REFERENCES sales_fob(id),
+    sales_customer_id               TEXT NOT NULL REFERENCES sales_customer(id),
+    sales_customer_group_id         TEXT REFERENCES sales_customer_group(id),
     sales_donation_recipient_id     TEXT REFERENCES sales_donation_recipient(id),
+    sales_fob_id                    TEXT REFERENCES sales_fob(id),
 
     po_number           TEXT,
     order_date                      DATE NOT NULL,
@@ -35,8 +36,9 @@ COMMENT ON COLUMN sales_po.id IS 'Unique identifier for the order';
 COMMENT ON COLUMN sales_po.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN sales_po.farm_id IS 'Farm (crop line) this order belongs to';
 COMMENT ON COLUMN sales_po.sales_customer_id IS 'Customer placing the order';
-COMMENT ON COLUMN sales_po.sales_fob_id IS 'FOB delivery point for this order; null if using the customer default';
+COMMENT ON COLUMN sales_po.sales_customer_group_id IS 'Customer group for this order; null if using the customer default group';
 COMMENT ON COLUMN sales_po.sales_donation_recipient_id IS 'Donation recipient if this order is a donation; null for regular sales orders';
+COMMENT ON COLUMN sales_po.sales_fob_id IS 'FOB delivery point for this order; null if using the customer default';
 COMMENT ON COLUMN sales_po.po_number IS 'Customer purchase order number for reference and cross-system matching';
 COMMENT ON COLUMN sales_po.order_date IS 'Date the order was placed';
 COMMENT ON COLUMN sales_po.invoice_date IS 'Date the invoice was issued; null until invoiced';

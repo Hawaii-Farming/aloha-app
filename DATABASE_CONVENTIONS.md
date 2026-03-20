@@ -40,12 +40,15 @@ Numbered sequentially by module in this order:
 | 012–020     | Inventory    |
 | 021–025     | Human Resources |
 | 026–038     | Operations   |
-| 039–047     | Sales        |
-| 048–054     | Pack         |
+| 039         | Pack (packaging_type) |
+| 040–047     | Sales (fob → po_line) |
+| 048–049     | Pack (lot, lot_item)  |
+| 050         | Sales (po_fulfillment)|
+| 051–054     | Pack (shelf life)     |
 | 055–056     | Maintenance  |
 | 057–058     | Food Safety  |
 
-> Note: Core range has gaps at 003–005 and 010–011 after sales tables were moved to the Sales module.
+> Note: Core range has gaps at 003–005 and 010–011 after sales tables were moved to the Sales module. Pack and Sales migrations are interleaved (039–054) due to cross-module FK dependencies.
 
 ### Schema doc files
 ```
@@ -58,8 +61,8 @@ docs/schemas/YYYYMMDD_NN_module.md
 | `20260319_02_invnt.md` | Inventory |
 | `20260319_03_hr.md` | Human Resources |
 | `20260319_04_ops.md` | Operations |
-| `20260319_05_sales.md` | Sales |
-| `20260319_06_pack.md` | Pack |
+| `20260319_05_pack.md` | Pack |
+| `20260319_06_sales.md` | Sales |
 | `20260319_07_maint.md` | Maintenance |
 | `20260319_08_fsafe.md` | Food Safety |
 | `20260319_09_future.md` | Deferred / Future |
