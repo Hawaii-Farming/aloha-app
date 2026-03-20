@@ -35,9 +35,10 @@ Numbered sequentially by module in this order:
 |-------------|--------------|
 | 001–011     | Core         |
 | 012–020     | Inventory    |
-| 021–031     | HR           |
-| 032–033     | Maintenance  |
-| 034–041     | Food Safety  |
+| 021–025     | HR           |
+| 026–038     | Ops          |
+| 039–040     | Maintenance  |
+| 041–042     | Food Safety  |
 
 ### Schema doc files
 ```
@@ -49,16 +50,17 @@ docs/schemas/YYYYMMDD_NN_module.md
 | `20260318_01_core.md` | Core |
 | `20260318_02_invnt.md` | Inventory |
 | `20260318_03_hr.md` | HR |
-| `20260318_04_maint.md` | Maintenance |
-| `20260318_05_fsafe.md` | Food Safety |
-| `20260318_06_future.md` | Deferred / Future |
+| `20260318_04_ops.md` | Ops |
+| `20260318_05_maint.md` | Maintenance |
+| `20260318_06_fsafe.md` | Food Safety |
+| `20260318_07_future.md` | Deferred / Future |
 
 ---
 
 ## 4. Primary Keys
 
-- **TEXT PK** — lookup and reference tables where the ID is human-readable and derived from the name field (e.g. `org`, `farm`, `site`, `hr_employee`, `hr_task`, `invnt_vendor`, `invnt_category`, `fsafe_template`, etc.)
-- **UUID PK** (`gen_random_uuid()`) — transactional tables where records are created at runtime (e.g. `hr_task_tracker`, `invnt_po`, `fsafe_response`, `maint_request`, etc.)
+- **TEXT PK** — lookup and reference tables where the ID is human-readable and derived from the name field (e.g. `org`, `farm`, `site`, `hr_employee`, `ops_task`, `invnt_vendor`, `invnt_category`, `ops_template`, etc.)
+- **UUID PK** (`gen_random_uuid()`) — transactional tables where records are created at runtime (e.g. `ops_task_tracker`, `invnt_po`, `ops_response`, `maint_request`, etc.)
 
 ---
 
@@ -114,15 +116,18 @@ Columns must follow this order:
 ```
 id
 org_id
-farm_id         (if applicable)
-site_id         (if applicable)
+farm_id              (if applicable)
+site_id              (if applicable)
 ... business fields ...
 is_active
 created_at / requested_at
 created_by / requested_by
+... workflow fields (e.g. verified_at, verified_by) ...
 updated_at
 updated_by
 ```
+
+Workflow fields are fields that capture a named person performing a step in the record's lifecycle (e.g. `verified_by`, `approved_by`, `reviewed_by`), along with their companion timestamp. They sit between `created_by` and `updated_at` so that `updated_at`/`updated_by` always close the column list.
 
 ---
 
@@ -165,8 +170,9 @@ This column is used for Row Level Security (RLS) filtering.
 | `core_`   | Core org structure |
 | `invnt_`  | Inventory |
 | `hr_`     | Human Resources |
+| `ops_`    | Ops |
 | `maint_`  | Maintenance |
-| `fsafe_`  | Food Safety |
+| `fsafe_`  | Food Safety (EMP testing only) |
 
 ---
 
@@ -191,3 +197,34 @@ Tables that are designed but not yet ready for deployment go in:
 supabase/migrations_future/
 ```
 Document them in `docs/schemas/20260317_06_future.md`.
+
+---
+
+## 15. Foreign Key Column Naming
+
+FK columns must carry the prefix of the **referenced** module. Name the column `{referenced_table}_id`.
+
+| Referenced table                        | Column name                                |
+|-----------------------------------------|--------------------------------------------|
+| `hr_employee`                           | `hr_employee_id`                           |
+| `invnt_vendor`                          | `invnt_vendor_id`                          |
+| `invnt_category`                        | `invnt_category_id`                        |
+| `invnt_item`                            | `invnt_item_id`                            |
+| `ops_task`                              | `ops_task_id`                              |
+| `ops_task_tracker`                      | `ops_task_tracker_id`                      |
+| `ops_training`                          | `ops_training_id`                          |
+| `ops_training_type`                     | `ops_training_type_id`                     |
+| `ops_template_category`                 | `ops_template_category_id`                 |
+| `ops_template`                          | `ops_template_id`                          |
+| `ops_question`                          | `ops_question_id`                          |
+| `ops_response`                          | `ops_response_id`                          |
+| `ops_corrective_action_choice`          | `ops_corrective_action_choice_id`          |
+| `fsafe_emp_test`                        | `fsafe_emp_test_id`                        |
+| `fsafe_emp_result`                      | `fsafe_emp_result_id`                      |
+
+**Exceptions** — workflow fields that name the person performing a role keep their role-based name even though they reference `hr_employee(id)`:
+- `requested_by`, `reviewed_by`, `approved_by`, `verified_by`, `sampled_by`, `assigned_to`, `fixer_id`, `ordered_by`
+
+Self-referencing FK columns in the same table follow the same rule with an optional semantic prefix (e.g. `original_fsafe_emp_result_id` for the parent-test link in `fsafe_emp_result`).
+
+Also note: `ops_corrective_action_taken.fsafe_emp_result_id` is an intentional cross-module FK from the Ops module to Food Safety — the column retains the `fsafe_` prefix to reflect the referenced table.

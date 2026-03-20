@@ -34,9 +34,9 @@ SELECT
     i.org_id,
     i.farm_id,
     i.id AS invnt_item_id,
-    i.category_id,
-    i.subcategory_id,
-    i.vendor_id,
+    i.invnt_category_id,
+    i.invnt_subcategory_id,
+    i.invnt_vendor_id,
 
     -- Item UOMs & conversions
     i.burn_uom,
@@ -52,19 +52,19 @@ SELECT
 
     -- Reorder settings
     i.is_auto_reorder,
-    i.reorder_point_burn,
-    i.reorder_quantity_burn,
+    i.reorder_point_in_burn,
+    i.reorder_quantity_in_burn,
 
     -- Current on-hand (from latest invnt_onhand record)
     COALESCE(lo.onhand_quantity, 0) AS onhand_quantity,
-    COALESCE(lo.onhand_quantity * lo.burn_per_onhand, 0) AS onhand_burn,
+    COALESCE(lo.onhand_quantity * lo.burn_per_onhand, 0) AS onhand_quantity_in_burn,
     lo.onhand_date,
     CURRENT_DATE - lo.onhand_date AS days_since_onhand,
 
     -- Open orders (from invnt_po + invnt_po_received)
     COALESCE(oo.ordered_quantity_in_burn, 0) AS ordered_quantity_in_burn,
     COALESCE(oo.received_quantity_in_burn, 0) AS received_quantity_in_burn,
-    COALESCE(oo.ordered_quantity_in_burn, 0) - COALESCE(oo.received_quantity_in_burn, 0) AS remaining_burn,
+    COALESCE(oo.ordered_quantity_in_burn, 0) - COALESCE(oo.received_quantity_in_burn, 0) AS remaining_quantity_in_burn,
 
     -- Computed forecasts
     CASE

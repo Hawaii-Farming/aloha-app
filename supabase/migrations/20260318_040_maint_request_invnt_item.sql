@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS maint_request_invnt_item (
     org_id              TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     maint_request_id    UUID        NOT NULL REFERENCES maint_request(id) ON DELETE CASCADE,
     invnt_item_id       UUID        NOT NULL REFERENCES invnt_item(id),
+    uom                 TEXT REFERENCES util_uom(code),
     quantity_used       NUMERIC,
 
     is_active           BOOLEAN     NOT NULL DEFAULT true,
@@ -22,6 +23,7 @@ COMMENT ON COLUMN maint_request_invnt_item.id IS 'Unique identifier for the reco
 COMMENT ON COLUMN maint_request_invnt_item.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN maint_request_invnt_item.maint_request_id IS 'Maintenance request this inventory item usage belongs to';
 COMMENT ON COLUMN maint_request_invnt_item.invnt_item_id IS 'Inventory item used during the maintenance';
+COMMENT ON COLUMN maint_request_invnt_item.uom IS 'Unit of measure for the quantity used';
 COMMENT ON COLUMN maint_request_invnt_item.quantity_used IS 'Quantity of the item consumed during the maintenance';
 COMMENT ON COLUMN maint_request_invnt_item.is_active IS 'Soft delete flag; false removes the entry without deleting the record';
 COMMENT ON COLUMN maint_request_invnt_item.created_at IS 'Timestamp when the record was created';

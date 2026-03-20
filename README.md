@@ -57,11 +57,10 @@ These tables are shared across all organizations.
 - **sales_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping)
 - **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 
-## Inventory Module (7 tables, 2 views) — [Docs](docs/schemas/20260318_02_invnt.md)
+## Inventory Module (6 tables, 2 views) — [Docs](docs/schemas/20260318_02_invnt.md)
 
 - **invnt_vendor** — Org-level vendors for procurement with contact details and payment terms (TEXT PK)
-- **invnt_category** — Top-level categories for organizing inventory items (TEXT PK)
-- **invnt_subcategory** — Second-level categories under invnt_category (TEXT PK)
+- **invnt_category** — Two-level category hierarchy; rows with `parent_category_id` null are top-level categories, rows with `parent_category_id` set are subcategories (TEXT PK, self-referencing)
 - **invnt_item** — Items with unit conversions, burn rates, reorder settings, and proper columns for all details
 - **invnt_po** — Purchase order requests with workflow (requested → approved → ordered → received) and snapshot pricing
 - **invnt_po_received** — Individual deliveries received against a purchase order with lot tracking and partial delivery support
@@ -69,42 +68,47 @@ These tables are shared across all organizations.
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 - **invnt_lot_summary** (view) — Current on-hand quantity per lot with expiry dates
 
-## HR Module (10 tables, 1 view) — [Docs](docs/schemas/20260318_03_hr.md)
+## HR Module (5 tables) — [Docs](docs/schemas/20260318_03_hr.md)
 
-- **hr_department** — Org-specific department lookup for classifying employees (e.g. GH, PH, Lettuce). Composite PK on (org_id, code).
-- **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). Composite PK on (org_id, code).
-- **hr_task** — Flat task catalog for labor tracking with name, description, and accounting link (TEXT PK)
-- **hr_employee** — Unified employee register and org membership; every system user has a row here with a role. Tracks employment details, compensation, and access level. Users are duplicated per org they belong to.
-- **hr_task_tracker** — Header record for a task event with task, farm, date, start/stop times, and verification status
-- **hr_task_site** — Sites where a task event was performed; supports tasks carried out across multiple sites
-- **hr_task_roster** — Employees per task event with individual start/stop times (overridable from tracker) and units completed
+- **hr_department** — Org-specific department lookup for classifying employees (e.g. GH, PH, Lettuce). TEXT PK derived from name.
+- **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). TEXT PK derived from name.
+- **hr_title** — Org-specific job title lookup (e.g. Farm Manager, Supervisor, Grower). TEXT PK derived from name.
+- **hr_employee** — Unified employee register and org membership; every system user has a row here with a role. Tracks employment details, compensation, and access level. Department, work authorization, and title are FK references. Users are duplicated per org they belong to.
 - **hr_time_off_request** — Employee time off requests with PTO/sick leave breakdown and approval workflow (pending → approved/denied)
-- **hr_training** — Staff training session records with type, date, topics, trainer, and certification details
-- **hr_training_attendee** — Per-employee attendance and certification records for each training session
-- **hr_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
 
-## Maintenance Module (2 tables) — [Docs](docs/schemas/20260318_04_maint.md)
+## Ops Module (13 tables, 1 view) — [Docs](docs/schemas/20260318_04_ops.md)
+
+- **ops_task** — Flat task catalog for labor tracking with name and description (TEXT PK)
+- **ops_task_tracker** — Header record for a task event with task, farm, site, date, start/stop times, and verification status. Site is stored directly on the tracker.
+- **ops_task_schedule** — Employees per task event with individual start/stop times (overridable from tracker) and units completed
+- **ops_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
+- **ops_training_type** — Org-specific training type lookup (e.g. GMP, Food Safety, HACCP). TEXT PK derived from name.
+- **ops_training** — Staff training session records with type, date, topics, trainer names, and materials
+- **ops_training_attendee** — Per-employee attendance and certification records for each training session
+- **ops_template_category** — Org-defined categories for grouping checklist templates by module or purpose (TEXT PK)
+- **ops_template** — Master checklist template definition with name, category, and optional farm scope
+- **ops_corrective_action_choice** — Org-defined reusable corrective action options selectable from a dropdown
+- **ops_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
+- **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
+- **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
+
+## Maintenance Module (2 tables) — [Docs](docs/schemas/20260318_05_maint.md)
 
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (8 tables) — [Docs](docs/schemas/20260318_05_fsafe.md)
+## Food Safety Module (2 tables) — [Docs](docs/schemas/20260318_06_fsafe.md)
 
-- **fsafe_template** — Master checklist template definition with name, template type, and optional farm scope
-- **fsafe_corrective_action_type** — Org-defined reusable corrective action options selectable from a dropdown
-- **fsafe_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
-- **fsafe_response** — Employee responses per question per task tracker session; `hr_task_tracker` acts as the checklist completion header
-- **fsafe_corrective_action** — Corrective actions raised against failing checklist responses or EMP test failures with assignment, due date, result tracking, and verification
-- **fsafe_emp_test_name** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
-- **fsafe_emp_test** — Individual EMP test results per site with retest/vector chaining, certification, and corrective action linkage
-- **fsafe_water_test** — Water test results per submission covering E.coli, Salmonella, Listeria, and Total Coliform with lab reference tracking
+- **fsafe_emp_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
+- **fsafe_emp_result** — Individual EMP test results per site with retest/vector chaining and corrective action linkage; water tests recorded here using named definitions (e.g. water_listeria, water_ecoli, water_salmonella)
 
 ## Planned Modules
 
-- [x] **Inventory** — Vendor and item catalog with categories, purchase orders with partial receipt workflow, on-hand snapshots, and computed views for stock levels and burn rates
-- [x] **HR** — Employee records, department and work authorization lookups, task catalog, task tracking with multi-site and roster support, time off requests, staff training records, and weekly schedule view; travel requests and disciplinary warnings deferred to future
+- [x] **Inventory** — Vendor and item catalog with two-level category hierarchy, purchase orders with partial delivery workflow, on-hand snapshots, and computed views for stock levels and burn rates
+- [x] **HR** — Employee records, department, work authorization, and title lookups, and time off requests
+- [x] **Ops** — Task catalog, task tracking with site and schedule support, weekly schedule view, staff training records, food safety checklist templates, questions, responses, corrective action choices, and corrective actions taken
 - [x] **Maintenance** — Work orders with priority, status, fixer assignment, recurring frequency, and inventory items consumed
-- [x] **Food Safety** — Configurable checklist templates, question banks, employee responses, corrective action tracking, EMP test catalog and results with retest/vector chaining, and water quality test records
+- [x] **Food Safety** — EMP test definitions and results with retest/vector chaining and corrective action linkage; water tests use named EMP test definitions
 - [ ] **Sales** — Customer orders, order lines with price snapshots, invoicing
 - [ ] **Pack** — Pack runs, label generation, lot tracking (FSMA traceability)
 - [ ] **Grow** — Seeding, grow batches, growth stage tracking, nutrient recipes, environmental monitoring
@@ -120,7 +124,8 @@ Detailed table documentation with column definitions, constraints, and relations
 
 - [Core Schema](docs/schemas/20260318_01_core.md) — 11 foundation tables
 - [Inventory Schema](docs/schemas/20260318_02_invnt.md) — Items, orders, transactions, and views
-- [HR Schema](docs/schemas/20260318_03_hr.md) — Tasks, employees, and labor tracking
-- [Maintenance Schema](docs/schemas/20260318_04_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260318_05_fsafe.md) — Checklists, responses, and corrective actions
-- [Future Improvements](docs/schemas/20260318_06_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
+- [HR Schema](docs/schemas/20260318_03_hr.md) — Employee records and HR lookups
+- [Ops Schema](docs/schemas/20260318_04_ops.md) — Task tracking, training, and food safety checklists
+- [Maintenance Schema](docs/schemas/20260318_05_maint.md) — Work orders and parts usage
+- [Food Safety Schema](docs/schemas/20260318_06_fsafe.md) — EMP test definitions and results
+- [Future Improvements](docs/schemas/20260318_07_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
