@@ -92,12 +92,22 @@ These tables are shared across all organizations.
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Maintenance Module (2 tables) — [Docs](docs/schemas/20260319_05_maint.md)
+## Pack Module (7 tables) — [Docs](docs/schemas/20260319_05_pack.md)
+
+- **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
+- **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
+- **pack_packaging_type** — Org-defined packaging type lookup (e.g. clamshell, bag, sleeve, tray wrap); also referenced by sales_product (TEXT PK)
+- **pack_shelf_life_check** — Defines what gets checked during shelf life observations with response type and termination criteria (TEXT PK)
+- **pack_shelf_life_trial** — Shelf life trial header linking product, lot, packaging type, target vs actual shelf life, and trial status
+- **pack_shelf_life_observation** — Individual observation responses per check per date per trial with typed responses
+- **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
+
+## Maintenance Module (2 tables) — [Docs](docs/schemas/20260319_06_maint.md)
 
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (2 tables) — [Docs](docs/schemas/20260319_06_fsafe.md)
+## Food Safety Module (2 tables) — [Docs](docs/schemas/20260319_07_fsafe.md)
 
 - **fsafe_emp_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_emp_result** — Individual EMP test results per site with retest/vector chaining and corrective action linkage; water tests recorded here using named definitions (e.g. water_listeria, water_ecoli, water_salmonella)
@@ -107,10 +117,10 @@ These tables are shared across all organizations.
 - [x] **Inventory** — Vendor and item catalog with two-level category hierarchy, purchase orders with partial delivery workflow, on-hand snapshots, and computed views for stock levels and burn rates
 - [x] **Human Resources** — Employee records, department, work authorization, and title lookups, and time off requests
 - [x] **Operations** — Task catalog, task tracking with site and schedule support, weekly schedule view, staff training records, food safety checklist templates, questions, responses, corrective action choices, and corrective actions taken
+- [x] **Pack** — Production lot tracking with lot number generation, packaging type lookup, and shelf life trials with configurable checks and observation logging
 - [x] **Maintenance** — Work orders with priority, status, fixer assignment, recurring frequency, and inventory items consumed
 - [x] **Food Safety** — EMP test definitions and results with retest/vector chaining and corrective action linkage; water tests use named EMP test definitions
 - [ ] **Sales** — Customer orders, order lines with price snapshots, invoicing
-- [ ] **Pack** — Pack runs, label generation, lot tracking (FSMA traceability)
 - [ ] **Grow** — Seeding, grow batches, growth stage tracking, nutrient recipes, environmental monitoring
 - [ ] **Global** — Cross-module shared configuration, reporting, and analytics
 
@@ -126,6 +136,7 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Inventory Schema](docs/schemas/20260319_02_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260319_03_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260319_04_ops.md) — Task tracking, training, and food safety checklists
-- [Maintenance Schema](docs/schemas/20260319_05_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260319_06_fsafe.md) — EMP test definitions and results
-- [Future Improvements](docs/schemas/20260319_07_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
+- [Pack Schema](docs/schemas/20260319_05_pack.md) — Production lot tracking and shelf life trials
+- [Maintenance Schema](docs/schemas/20260319_06_maint.md) — Work orders and parts usage
+- [Food Safety Schema](docs/schemas/20260319_07_fsafe.md) — EMP test definitions and results
+- [Future Improvements](docs/schemas/20260319_08_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)

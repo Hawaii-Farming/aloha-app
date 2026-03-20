@@ -40,8 +40,9 @@ Numbered sequentially by module in this order:
 | 012–020     | Inventory    |
 | 021–025     | Human Resources |
 | 026–038     | Operations   |
-| 039–040     | Maintenance  |
-| 041–042     | Food Safety  |
+| 039–045     | Pack         |
+| 046–047     | Maintenance  |
+| 048–049     | Food Safety  |
 
 ### Schema doc files
 ```
@@ -54,9 +55,10 @@ docs/schemas/YYYYMMDD_NN_module.md
 | `20260319_02_invnt.md` | Inventory |
 | `20260319_03_hr.md` | Human Resources |
 | `20260319_04_ops.md` | Operations |
-| `20260319_05_maint.md` | Maintenance |
-| `20260319_06_fsafe.md` | Food Safety |
-| `20260319_07_future.md` | Deferred / Future |
+| `20260319_05_pack.md` | Pack |
+| `20260319_06_maint.md` | Maintenance |
+| `20260319_07_fsafe.md` | Food Safety |
+| `20260319_08_future.md` | Deferred / Future |
 
 ---
 
@@ -145,10 +147,14 @@ is_active BOOLEAN NOT NULL DEFAULT true
 
 ## 10. Photos and JSONB Arrays
 
-Photos are stored as JSONB arrays of URLs, not numbered columns:
+Photos are stored as JSONB arrays of URLs when they are simple attachments with no per-photo metadata:
 ```sql
 photos JSONB NOT NULL DEFAULT '[]'
 ```
+
+When photos require individual metadata (e.g. caption, observation date, shelf life day), use a separate table with one row per photo instead. This allows per-photo querying, filtering, RLS, and audit fields. Example: `pack_shelf_life_photo`.
+
+Never use numbered columns (`photo_01_url`, `photo_02_url`, etc.).
 
 Use JSONB for flexible arrays (photos, enum option lists). Use proper FK columns for anything that is joined, filtered, or used in calculations.
 
@@ -176,6 +182,7 @@ This column is used for Row Level Security (RLS) filtering.
 | `ops_`    | Operations |
 | `maint_`  | Maintenance |
 | `fsafe_`  | Food Safety (EMP testing only) |
+| `pack_`   | Pack |
 
 ---
 
@@ -224,6 +231,10 @@ FK columns must carry the prefix of the **referenced** module. Name the column `
 | `ops_corrective_action_choice`          | `ops_corrective_action_choice_id`          |
 | `fsafe_emp_test`                        | `fsafe_emp_test_id`                        |
 | `fsafe_emp_result`                      | `fsafe_emp_result_id`                      |
+| `pack_lot`                              | `pack_lot_id`                              |
+| `pack_packaging_type`                   | `pack_packaging_type_id`                   |
+| `pack_shelf_life_check`                 | `pack_shelf_life_check_id`                 |
+| `pack_shelf_life_trial`                 | `pack_shelf_life_trial_id`                 |
 
 **Exceptions** — workflow fields that name the person performing a role keep their role-based name even though they reference `hr_employee(id)`:
 - `requested_by`, `reviewed_by`, `approved_by`, `verified_by`, `sampled_by`, `assigned_to`, `fixer_id`, `ordered_by`

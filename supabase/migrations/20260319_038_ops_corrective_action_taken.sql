@@ -35,7 +35,7 @@ COMMENT ON TABLE ops_corrective_action_taken IS 'Corrective actions raised again
 COMMENT ON COLUMN ops_corrective_action_taken.id IS 'Unique identifier for the corrective action';
 COMMENT ON COLUMN ops_corrective_action_taken.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN ops_corrective_action_taken.farm_id IS 'Optional farm scope; null if the corrective action applies to all farms';
-COMMENT ON COLUMN ops_corrective_action_taken.ops_template_id IS 'Checklist template this corrective action belongs to; denormalized for easier filtering and reporting';
+COMMENT ON COLUMN ops_corrective_action_taken.ops_template_id IS 'Checklist template this corrective action belongs to; null when triggered by an EMP test result which has no associated template';
 COMMENT ON COLUMN ops_corrective_action_taken.ops_response_id IS 'Failing checklist response that triggered this corrective action; null if triggered by an EMP test result';
 COMMENT ON COLUMN ops_corrective_action_taken.fsafe_emp_result_id IS 'Failing EMP test result that triggered this corrective action; null if triggered by a checklist response; FK added via ALTER TABLE in fsafe_emp_result migration';
 COMMENT ON COLUMN ops_corrective_action_taken.ops_corrective_action_choice_id IS 'Predefined corrective action choice selected from the org lookup; null if a custom description is provided instead';

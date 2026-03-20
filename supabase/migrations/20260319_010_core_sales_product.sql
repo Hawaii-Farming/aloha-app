@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS sales_product (
 
     -- Display & status
     photos                     JSONB NOT NULL DEFAULT '[]',
-    display_order              INT,
+    display_order              INT         NOT NULL DEFAULT 0,
     is_active                  BOOLEAN NOT NULL DEFAULT true,
 
     -- Audit

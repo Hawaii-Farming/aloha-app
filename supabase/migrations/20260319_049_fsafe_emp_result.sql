@@ -46,7 +46,7 @@ COMMENT ON COLUMN fsafe_emp_result.farm_id IS 'Farm where the sample was collect
 COMMENT ON COLUMN fsafe_emp_result.site_id IS 'Site where the sample was collected; zone classification is stored on the site record';
 COMMENT ON COLUMN fsafe_emp_result.fsafe_emp_test_id IS 'EMP test definition used for this test event';
 COMMENT ON COLUMN fsafe_emp_result.test_method IS 'Test method used, selected from the test methods list on the EMP test definition (e.g. PCR, Culture)';
-COMMENT ON COLUMN fsafe_emp_result.initial_retest_vector IS 'Type of test: initial (first run), retest (triggered by initial fail), vector (triggered by retest fail)';
+COMMENT ON COLUMN fsafe_emp_result.initial_retest_vector IS 'Type of test: initial (first run), retest (triggered by any fail), vector (triggered by any fail)';
 COMMENT ON COLUMN fsafe_emp_result.status IS 'Workflow status: pending, in_progress, completed';
 COMMENT ON COLUMN fsafe_emp_result.result_enum IS 'Enum result value selected from test enum_options when result_type is enum';
 COMMENT ON COLUMN fsafe_emp_result.result_numeric IS 'Numeric result value when result_type is numeric; frontend converts detection limit strings (e.g. <1, >2419) to numeric values before submission';
