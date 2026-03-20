@@ -1,4 +1,4 @@
-<!-- v: 03-20 10:48am -->
+<!-- v: 03-20 12:55pm -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,7 +171,7 @@ body { background: #0a0a0f; color: #e0e0e0; font-family: -apple-system, BlinkMac
 <body>
 
 <div class="topbar">
-  <h1>Aloha Schema</h1><span style="font-size:11px;color:#e0e0e0" id="versionLabel">v: 03-20 10:48am</span>
+  <h1>Aloha Schema</h1><span style="font-size:11px;color:#e0e0e0" id="versionLabel">v: 03-20 12:55pm</span>
   <div class="version-toggle">
     <button id="btnV1" onclick="setVersion('v1')">V1</button>
     <button id="btnV2" class="active" onclick="setVersion('v2')">V2</button>
@@ -1774,6 +1774,27 @@ async function loadSchemaFromMds() {
     } catch(e) { console.error('localStorage load failed:', e); }
   }
 
+  // If no localStorage edits, try loading V2 from git (for GitHub Pages)
+  if (!savedData) {
+    const gitResult = await loadFromGit();
+    if (gitResult.ok) {
+      // Carry over descriptions from V1 for git-loaded data too
+      const renames = schemaV2.renames || {};
+      for (const [name, tbl] of Object.entries(schemaV2.tables)) {
+        const v1Name = renames[name] || name;
+        const v1Tbl = schemaV1.tables[v1Name];
+        if (!tbl.description && v1Tbl?.description) tbl.description = v1Tbl.description;
+        if (v1Tbl && tbl.columns) {
+          const v1ColMap = Object.fromEntries((v1Tbl.columns || []).map(c => [c.name, c]));
+          for (const col of tbl.columns) {
+            if (!col.description && v1ColMap[col.name]?.description) col.description = v1ColMap[col.name].description;
+          }
+        }
+      }
+      status += ' + git edits';
+    }
+  }
+
   if (!mdResult.ok) {
     status = `offline (embedded)`;
     statusColor = '#E0C45A';
@@ -2116,10 +2137,9 @@ async function saveToGit() {
 async function loadFromGit() {
   try {
     const token = getGhToken();
-    // Try fetching schema-v2.json from GitHub (private repo needs token)
     const headers = { 'Accept': 'application/vnd.github.v3.raw' };
     if (token) headers['Authorization'] = `token ${token}`;
-    const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/supabase/migrations/schema-v2.json?ref=main`, { headers });
+    const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/schema-v2.json?ref=main`, { headers });
     if (!jsonRes.ok) return { ok: false, error: `JSON HTTP ${jsonRes.status}` };
     const data = await jsonRes.json();
     if (data.tables) {
@@ -2128,6 +2148,8 @@ async function loadFromGit() {
       if (data.coreTables) schemaV2.coreTables = data.coreTables;
       if (data.corePositions) schemaV2.corePositions = data.corePositions;
       if (data.tableOrder) schemaV2.tableOrder = data.tableOrder;
+      if (data.comments) schemaV2.comments = data.comments;
+      if (data.renames) schemaV2.renames = data.renames;
     }
     return { ok: true };
   } catch(e) {
