@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS sales_product (
     name                       TEXT NOT NULL,
     segment                    TEXT CHECK (segment IN ('wholesale', 'retail', 'food_service')),
     description                TEXT,
-    packaging                  TEXT,
+    pack_packaging_type_id     TEXT,    -- FK added via ALTER TABLE in pack_packaging_type migration
 
     -- Packaging hierarchy: item -> pack -> sale -> shipping
     item_uom                   TEXT REFERENCES util_uom(code),
@@ -80,7 +80,7 @@ COMMENT ON COLUMN sales_product.code IS 'Short product code, unique within the f
 COMMENT ON COLUMN sales_product.name IS 'Full display name of the product, unique within the farm';
 COMMENT ON COLUMN sales_product.segment IS 'Market segment: wholesale, retail, or food_service';
 COMMENT ON COLUMN sales_product.description IS 'Product description for catalogs and labels';
-COMMENT ON COLUMN sales_product.packaging IS 'Packaging format (e.g. clamshell, bag, sleeve, tray wrap)';
+COMMENT ON COLUMN sales_product.pack_packaging_type_id IS 'Packaging type for this product; FK to org-defined pack_packaging_type lookup; FK added via ALTER TABLE in pack_packaging_type migration';
 COMMENT ON COLUMN sales_product.item_uom IS 'Unit of measure for the individual product item (e.g. each, head)';
 COMMENT ON COLUMN sales_product.pack_uom IS 'Unit of measure for the consumer pack level (e.g. bag, clamshell)';
 COMMENT ON COLUMN sales_product.item_per_pack_uom IS 'Number of items per pack';
