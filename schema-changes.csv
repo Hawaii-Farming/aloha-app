@@ -1,0 +1,55 @@
+table,type,detail,notes
+"invnt_item","removed","Column ""accounting_id"" removed","why do we have storage site and maint storage site?
+does it make sense to store variety and pelleted in here? Should there not be a separate seed detail table? Maybe not, but let's discuss. Is lot info just for seeds?
+we are storing vendor becasue we define the same product from diff vendors as diff items?"
+"invnt_item","added","Column ""qb_accountt_name"" added","why do we have storage site and maint storage site?
+does it make sense to store variety and pelleted in here? Should there not be a separate seed detail table? Maybe not, but let's discuss. Is lot info just for seeds?
+we are storing vendor becasue we define the same product from diff vendors as diff items?"
+"invnt_item","modified","Column order changed","why do we have storage site and maint storage site?
+does it make sense to store variety and pelleted in here? Should there not be a separate seed detail table? Maybe not, but let's discuss. Is lot info just for seeds?
+we are storing vendor becasue we define the same product from diff vendors as diff items?"
+"hr_employee","removed","Column ""payroll_admin"" removed","what is payroll_id, employee_id?
+pay_structure should be an enum or just hourly / salary
+I think is_verifier should be in fsafe? It should be assinged by the head of FS not HR, but maybe not worth a dedicated table
+access level be enum?"
+"hr_employee","removed","Column ""payslip_delivery_method"" removed","what is payroll_id, employee_id?
+pay_structure should be an enum or just hourly / salary
+I think is_verifier should be in fsafe? It should be assinged by the head of FS not HR, but maybe not worth a dedicated table
+access level be enum?"
+"hr_employee","added","Column ""payroll_processor"" added","what is payroll_id, employee_id?
+pay_structure should be an enum or just hourly / salary
+I think is_verifier should be in fsafe? It should be assinged by the head of FS not HR, but maybe not worth a dedicated table
+access level be enum?"
+"hr_employee","added","Column ""pay_delivery_method"" added","what is payroll_id, employee_id?
+pay_structure should be an enum or just hourly / salary
+I think is_verifier should be in fsafe? It should be assinged by the head of FS not HR, but maybe not worth a dedicated table
+access level be enum?"
+"fsafe_emp_test","removed","Column ""result_type"" removed","don't we want farm?
+there are plurals here
+why are test methods jsonbs? If we have jsons then I think we should define them here in the schema and maybe describe what they do? Are jsonbs editable by the users?
+what is result_typedon?
+are we sure we want to store min and maxes here? I coudl see ranges varying"
+"fsafe_emp_test","added","Column ""result_typedon"" added","don't we want farm?
+there are plurals here
+why are test methods jsonbs? If we have jsons then I think we should define them here in the schema and maybe describe what they do? Are jsonbs editable by the users?
+what is result_typedon?
+are we sure we want to store min and maxes here? I coudl see ranges varying"
+"fsafe_emp_result","modified","Column order changed","do we nee dorg and farm here if empt_test_id already has that info?]
+isn't test method defined in the test?"
+"invnt_qb_account","added","Table added",""
+"org_farm","added","Table added",""
+"invnt_category_subcategory","added","Table added",""
+"org_site","modified","Renamed from ""site""",""
+"farm","removed","Table removed",""
+"fsafe_lab","removed","Table removed",""
+"fsafe_test_hold","removed","Table removed",""
+"fsafe_test_hold_po","removed","Table removed",""
+"fsafe_test_hold_result","removed","Table removed",""
+"grow_variety","note","Has notes","what is diff between code and id here?"
+"grow_grade","note","Has notes","what is diff between id and code?"
+"invnt_vendor","note","Has notes","do we need / use payment terms?"
+"hr_department","note","Has notes","are id, name, and desc all diff?"
+"—","comment","","I beleive now your .md includes a generic command to build four CRUD columns. Should we add is_active to this command"
+"—","comment","","It's kind of interesting, and maybe not true, but are the three foundational tables: people who work at the farm, the physical areas of the farm, and inventory items that come into the farm. I wonder what doesn't at some point touch one of these tables?"
+"—","comment","","will we have a table that defines what tables / forms a user can edit - for example, maybe head of HR or owners can manager hr_department or hr_titles definitions"
+"—","comment","","I haven't reviewed fully, but are all nullable characteristsic correct?"
