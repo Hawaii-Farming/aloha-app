@@ -1683,9 +1683,7 @@ async function fetchMdFile(path, token) {
 }
 
 async function loadSchemaFromMds() {
-  let token = getGhToken();
-  if (!token) token = promptGhToken();
-  if (!token) return { ok: false, error: 'No token' };
+  const token = getGhToken(); // optional — works without token for public repos
 
   try {
     const allTables = {};
