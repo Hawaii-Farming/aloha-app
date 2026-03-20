@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS ops_training_attendee (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                      TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    farm_id                     TEXT REFERENCES farm(id),
     ops_training_id             UUID NOT NULL REFERENCES ops_training(id) ON DELETE CASCADE,
     hr_employee_id              TEXT NOT NULL REFERENCES hr_employee(id),
 
@@ -29,6 +30,7 @@ CREATE INDEX idx_ops_training_attendee_org      ON ops_training_attendee (org_id
 COMMENT ON TABLE ops_training_attendee IS 'Individual attendance and certification records for each employee per training session. One row per employee per training.';
 COMMENT ON COLUMN ops_training_attendee.id IS 'Unique identifier for the attendee record';
 COMMENT ON COLUMN ops_training_attendee.org_id IS 'Owning organization for RLS filtering';
+COMMENT ON COLUMN ops_training_attendee.farm_id IS 'Optional farm scope; inherited from parent ops_training';
 COMMENT ON COLUMN ops_training_attendee.ops_training_id IS 'Training session this attendance record belongs to';
 COMMENT ON COLUMN ops_training_attendee.hr_employee_id IS 'Employee who attended the training; row is created only when attendance is confirmed';
 COMMENT ON COLUMN ops_training_attendee.signed_at IS 'Timestamp when the employee signed the training attendance record';

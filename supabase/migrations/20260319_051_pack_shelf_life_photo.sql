@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS pack_shelf_life_photo (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                      TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    farm_id                     TEXT REFERENCES farm(id),
     pack_shelf_life_trial_id    UUID NOT NULL REFERENCES pack_shelf_life_trial(id) ON DELETE CASCADE,
 
     observation_date            DATE NOT NULL,
@@ -21,6 +22,7 @@ CREATE INDEX idx_pack_shelf_life_photo_trial  ON pack_shelf_life_photo (pack_she
 COMMENT ON TABLE pack_shelf_life_photo IS 'Photos taken during a shelf life trial observation. Multiple photos per observation date per trial.';
 COMMENT ON COLUMN pack_shelf_life_photo.id IS 'Unique identifier for the photo';
 COMMENT ON COLUMN pack_shelf_life_photo.org_id IS 'Owning organization for RLS filtering';
+COMMENT ON COLUMN pack_shelf_life_photo.farm_id IS 'Optional farm scope; inherited from parent pack_shelf_life_trial';
 COMMENT ON COLUMN pack_shelf_life_photo.pack_shelf_life_trial_id IS 'Trial this photo belongs to';
 COMMENT ON COLUMN pack_shelf_life_photo.observation_date IS 'Date the photo was taken';
 COMMENT ON COLUMN pack_shelf_life_photo.shelf_life_day IS 'Number of days since the pack date (e.g. day 0, day 1, day 7)';

@@ -34,7 +34,7 @@ aloha-app/
   src/                   # React application (coming soon)
 ```
 
-## Core Schema (11 tables) — [Docs](docs/schemas/20260319_01_core.md)
+## Core Schema (9 tables) — [Docs](docs/schemas/20260319_01_core.md)
 
 ### Global Reference Tables
 These tables are shared across all organizations.
@@ -52,10 +52,6 @@ These tables are shared across all organizations.
 - **site** — Unified site register for all locations and assets (growing, packaging, storage, maintenance) with category/subcategory-driven fields
 - **grow_variety** — Crop varieties with short codes (e.g. "K" for Keiki)
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A)
-
-### Products and Pricing
-- **sales_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping)
-- **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 
 ## Inventory Module (6 tables, 2 views) — [Docs](docs/schemas/20260319_02_invnt.md)
 
@@ -92,7 +88,16 @@ These tables are shared across all organizations.
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Pack Module (7 tables) — [Docs](docs/schemas/20260319_05_pack.md)
+## Sales Module (6 tables) — [Docs](docs/schemas/20260319_05_sales.md)
+
+- **sales_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping)
+- **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
+- **sales_donation_recipient** — Org-defined lookup of places product can be donated to (e.g. food banks, shelters, community programs) (TEXT PK)
+- **sales_po** — Customer order header with customer, FOB, dates, approval workflow, accounting upload tracking, and optional recurring frequency for standing orders
+- **sales_po_line** — Individual products within an order with snapshot pricing at time of order
+- **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, supporting partial fulfillment across multiple lots
+
+## Pack Module (7 tables) — [Docs](docs/schemas/20260319_06_pack.md)
 
 - **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
 - **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
@@ -101,13 +106,6 @@ These tables are shared across all organizations.
 - **pack_shelf_life_trial** — Shelf life trial header linking product, lot, packaging type, target vs actual shelf life, and trial status
 - **pack_shelf_life_observation** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
-
-## Sales Module (4 tables) — [Docs](docs/schemas/20260319_06_sales.md)
-
-- **sales_donation_recipient** — Org-defined lookup of places product can be donated to (e.g. food banks, shelters, community programs) (TEXT PK)
-- **sales_order** — Customer order header with customer, FOB, dates, approval workflow, accounting upload tracking, and optional recurring frequency for standing orders
-- **sales_order_line** — Individual products within an order with snapshot pricing at time of order
-- **sales_order_fulfillment** — Fulfillment records linking order lines to pack lots, supporting partial fulfillment across multiple lots
 
 ## Maintenance Module (2 tables) — [Docs](docs/schemas/20260319_07_maint.md)
 
@@ -124,8 +122,8 @@ These tables are shared across all organizations.
 - [x] **Inventory** — Vendor and item catalog with two-level category hierarchy, purchase orders with partial delivery workflow, on-hand snapshots, and computed views for stock levels and burn rates
 - [x] **Human Resources** — Employee records, department, work authorization, and title lookups, and time off requests
 - [x] **Operations** — Task catalog, task tracking with site and schedule support, weekly schedule view, staff training records, food safety checklist templates, questions, responses, corrective action choices, and corrective actions taken
+- [x] **Sales** — Product catalog, tiered pricing, customer orders with approval workflow, donation tracking, standing order recurrence, and fulfillment against pack lots
 - [x] **Pack** — Production lot tracking with lot number generation, packaging type lookup, and shelf life trials with configurable checks and observation logging
-- [x] **Sales** — Customer orders with approval workflow, snapshot pricing, donation tracking, standing order recurrence, and fulfillment against pack lots
 - [x] **Maintenance** — Work orders with priority, status, fixer assignment, recurring frequency, and inventory items consumed
 - [x] **Food Safety** — EMP test definitions and results with retest/vector chaining and corrective action linkage; water tests use named EMP test definitions
 - [ ] **Grow** — Seeding, grow batches, growth stage tracking, nutrient recipes, environmental monitoring
@@ -139,12 +137,12 @@ See [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) for the full set of schem
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [Core Schema](docs/schemas/20260319_01_core.md) — 11 foundation tables
+- [Core Schema](docs/schemas/20260319_01_core.md) — 9 foundation tables
 - [Inventory Schema](docs/schemas/20260319_02_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260319_03_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260319_04_ops.md) — Task tracking, training, and food safety checklists
-- [Pack Schema](docs/schemas/20260319_05_pack.md) — Production lot tracking and shelf life trials
-- [Sales Schema](docs/schemas/20260319_06_sales.md) — Customer orders, fulfillment, and donations
+- [Sales Schema](docs/schemas/20260319_05_sales.md) — Product catalog, pricing, orders, fulfillment, and donations
+- [Pack Schema](docs/schemas/20260319_06_pack.md) — Production lot tracking and shelf life trials
 - [Maintenance Schema](docs/schemas/20260319_07_maint.md) — Work orders and parts usage
 - [Food Safety Schema](docs/schemas/20260319_08_fsafe.md) — EMP test definitions and results
 - [Future Improvements](docs/schemas/20260319_09_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)

@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS ops_task_schedule (
     id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                  TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    farm_id                 TEXT REFERENCES farm(id),
     ops_task_tracker_id     UUID NOT NULL REFERENCES ops_task_tracker(id) ON DELETE CASCADE,
     hr_employee_id          TEXT NOT NULL REFERENCES hr_employee(id),
 
@@ -26,6 +27,7 @@ CREATE INDEX idx_ops_task_schedule_org_id   ON ops_task_schedule (org_id);
 COMMENT ON TABLE ops_task_schedule IS 'Lists the employees scheduled for a task event. Each row links an employee to a task tracker record with their individual start/stop times and units completed.';
 COMMENT ON COLUMN ops_task_schedule.id IS 'Unique identifier for the schedule entry';
 COMMENT ON COLUMN ops_task_schedule.org_id IS 'Owning organization for RLS filtering';
+COMMENT ON COLUMN ops_task_schedule.farm_id IS 'Optional farm scope; inherited from parent ops_task_tracker';
 COMMENT ON COLUMN ops_task_schedule.ops_task_tracker_id IS 'Parent task event this schedule entry belongs to';
 COMMENT ON COLUMN ops_task_schedule.hr_employee_id IS 'Employee scheduled for the task';
 COMMENT ON COLUMN ops_task_schedule.start_time IS 'Time this employee started; pre-filled from task tracker, overridable if they started late';

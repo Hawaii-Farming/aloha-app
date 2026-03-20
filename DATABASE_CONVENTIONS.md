@@ -36,14 +36,16 @@ Numbered sequentially by module in this order:
 
 | Range       | Module       |
 |-------------|--------------|
-| 001–011     | Core         |
+| 001–009     | Core         |
 | 012–020     | Inventory    |
 | 021–025     | Human Resources |
 | 026–038     | Operations   |
-| 039–045     | Pack         |
-| 046–049     | Sales        |
-| 050–051     | Maintenance  |
-| 052–053     | Food Safety  |
+| 039–044     | Sales        |
+| 045–051     | Pack         |
+| 052–053     | Maintenance  |
+| 054–055     | Food Safety  |
+
+> Note: Core range has a gap at 010–011 after `sales_product` and `sales_product_price` were moved to the Sales module.
 
 ### Schema doc files
 ```
@@ -56,8 +58,8 @@ docs/schemas/YYYYMMDD_NN_module.md
 | `20260319_02_invnt.md` | Inventory |
 | `20260319_03_hr.md` | Human Resources |
 | `20260319_04_ops.md` | Operations |
-| `20260319_05_pack.md` | Pack |
-| `20260319_06_sales.md` | Sales |
+| `20260319_05_sales.md` | Sales |
+| `20260319_06_pack.md` | Pack |
 | `20260319_07_maint.md` | Maintenance |
 | `20260319_08_fsafe.md` | Food Safety |
 | `20260319_09_future.md` | Deferred / Future |
@@ -171,6 +173,10 @@ org_id TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE
 
 This column is used for Row Level Security (RLS) filtering.
 
+### farm_id inheritance
+
+If a parent/header table has `farm_id`, all its child tables must also include `farm_id` with the same nullability. The child's `farm_id` is inherited from the parent at insert time. This ensures every table in a parent-child hierarchy can be independently filtered by farm without joining back to the parent.
+
 ---
 
 ## 12. Module Table Prefixes
@@ -234,8 +240,8 @@ FK columns must carry the prefix of the **referenced** module. Name the column `
 | `fsafe_emp_test`                        | `fsafe_emp_test_id`                        |
 | `fsafe_emp_result`                      | `fsafe_emp_result_id`                      |
 | `sales_donation_recipient`              | `sales_donation_recipient_id`              |
-| `sales_order`                           | `sales_order_id`                           |
-| `sales_order_line`                      | `sales_order_line_id`                      |
+| `sales_po`                              | `sales_po_id`                              |
+| `sales_po_line`                         | `sales_po_line_id`                         |
 | `pack_lot`                              | `pack_lot_id`                              |
 | `pack_packaging_type`                   | `pack_packaging_type_id`                   |
 | `pack_shelf_life_check`                 | `pack_shelf_life_check_id`                 |

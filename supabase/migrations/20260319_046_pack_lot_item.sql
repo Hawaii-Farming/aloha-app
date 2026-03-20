@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS pack_lot_item (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id              TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    farm_id             TEXT NOT NULL REFERENCES farm(id),
     pack_lot_id         UUID NOT NULL REFERENCES pack_lot(id) ON DELETE CASCADE,
     sales_product_id    TEXT NOT NULL REFERENCES sales_product(id),
 
@@ -24,6 +25,7 @@ CREATE INDEX idx_pack_lot_item_product  ON pack_lot_item (sales_product_id);
 COMMENT ON TABLE pack_lot_item IS 'Individual products packed within a lot. One row per product per lot.';
 COMMENT ON COLUMN pack_lot_item.id IS 'Unique identifier for the pack lot item';
 COMMENT ON COLUMN pack_lot_item.org_id IS 'Owning organization for RLS filtering';
+COMMENT ON COLUMN pack_lot_item.farm_id IS 'Farm (crop line) this pack lot item belongs to; inherited from parent pack_lot';
 COMMENT ON COLUMN pack_lot_item.pack_lot_id IS 'Parent lot this item belongs to';
 COMMENT ON COLUMN pack_lot_item.sales_product_id IS 'Product that was packed in this lot';
 COMMENT ON COLUMN pack_lot_item.best_by_date IS 'Best-by date for this product, derived from the lot pack date plus the product shelf life';
