@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS sales_fob (
     CONSTRAINT uq_sales_fob UNIQUE (org_id, name)
 );
 
-COMMENT ON TABLE sales_fob IS 'Org-specific FOB (Free On Board) delivery points that determine pricing and shipping responsibility (e.g. Farm Pick-up, Local Delivery)';
+COMMENT ON TABLE sales_fob IS 'Org-specific FOB (Freight On Board) delivery points that determine pricing and shipping responsibility (e.g. Farm Pick-up, Local Delivery)';
 COMMENT ON COLUMN sales_fob.id IS 'Human-readable identifier derived from FOB name (lowercase trimmed)';
 COMMENT ON COLUMN sales_fob.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN sales_fob.name IS 'Display name of the FOB point, unique within the org';

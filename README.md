@@ -97,7 +97,7 @@ These tables are shared across all organizations.
 
 ## Sales Module (9 tables) — [Docs](docs/schemas/20260319_06_sales.md)
 
-- **sales_fob** — Org-specific FOB (Free On Board) delivery points (TEXT PK)
+- **sales_fob** — Org-specific FOB (Freight On Board) delivery points (TEXT PK)
 - **sales_customer_group** — Org-specific customer classifications for reporting and group pricing (TEXT PK)
 - **sales_customer** — Org customers with group, FOB preference, billing, and external accounting link (TEXT PK)
 - **sales_donation_recipient** — Org-defined lookup of places product can be donated to (e.g. food banks, shelters, community programs) (TEXT PK)
@@ -112,10 +112,14 @@ These tables are shared across all organizations.
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (2 tables) — [Docs](docs/schemas/20260319_08_fsafe.md)
+## Food Safety Module (6 tables) — [Docs](docs/schemas/20260319_08_fsafe.md)
 
 - **fsafe_emp_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_emp_result** — Individual EMP test results per site with retest/vector chaining and corrective action linkage; water tests recorded here using named definitions (e.g. water_listeria, water_ecoli, water_salmonella)
+- **fsafe_lab** — Catalog of laboratories used for food safety test submissions (TEXT PK)
+- **fsafe_test_hold** — Test-and-hold header; one record per pack lot tested, tracks sample collection, lab submission, and test timeline
+- **fsafe_test_hold_po** — Links test-and-hold records to sales POs on hold pending results
+- **fsafe_test_hold_result** — Individual test results per test type per test-and-hold event
 
 ## Planned Modules
 
@@ -125,7 +129,7 @@ These tables are shared across all organizations.
 - [x] **Pack** — Production lot tracking with lot number generation, packaging type lookup, and shelf life trials with configurable checks and observation logging
 - [x] **Sales** — Product catalog, tiered pricing, customer orders with approval workflow, donation tracking, standing order recurrence, and fulfillment against pack lots
 - [x] **Maintenance** — Work orders with priority, status, fixer assignment, recurring frequency, and inventory items consumed
-- [x] **Food Safety** — EMP test definitions and results with retest/vector chaining and corrective action linkage; water tests use named EMP test definitions
+- [x] **Food Safety** — EMP test definitions and results with retest/vector chaining, laboratory management, and test-and-hold testing for pack lots with per-test-type results
 - [ ] **Grow** — Seeding, grow batches, growth stage tracking, nutrient recipes, environmental monitoring
 - [ ] **Global** — Cross-module shared configuration, reporting, and analytics
 
@@ -144,5 +148,5 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Pack Schema](docs/schemas/20260319_05_pack.md) — Production lot tracking and shelf life trials
 - [Sales Schema](docs/schemas/20260319_06_sales.md) — Product catalog, pricing, orders, fulfillment, and donations
 - [Maintenance Schema](docs/schemas/20260319_07_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260319_08_fsafe.md) — EMP test definitions and results
+- [Food Safety Schema](docs/schemas/20260319_08_fsafe.md) — EMP testing, lab management, and test-and-hold
 - [Future Improvements](docs/schemas/20260319_09_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)

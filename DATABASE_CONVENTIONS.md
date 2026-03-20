@@ -47,7 +47,7 @@ Numbered sequentially by module in this order:
 | 050         | Sales (po_fulfillment)|
 | 051–054     | Pack (shelf life)     |
 | 055–056     | Maintenance  |
-| 057–058     | Food Safety  |
+| 057–062     | Food Safety  |
 
 > Note: Core range has gaps at 003–005 and 010–011 after sales tables were moved to the Sales module. Pack and Sales migrations are interleaved (039–054) due to cross-module FK dependencies.
 
