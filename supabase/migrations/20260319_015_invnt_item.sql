@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     -- Item details
     invnt_vendor_id          TEXT REFERENCES invnt_vendor(id),
     manufacturer             TEXT,
-    seed_variety_id          TEXT REFERENCES grow_variety(id),
+    grow_variety_id          TEXT REFERENCES grow_variety(id),
     seed_is_pelleted         BOOLEAN NOT NULL DEFAULT false,
     maint_part_type          TEXT,
     maint_part_number        TEXT,
@@ -91,10 +91,10 @@ COMMENT ON COLUMN invnt_item.reorder_quantity_in_burn IS 'Quantity in burn units
 COMMENT ON COLUMN invnt_item.requires_lot_tracking IS 'Whether deliveries and transactions must include a lot number';
 COMMENT ON COLUMN invnt_item.requires_expiry_date IS 'Whether deliveries must include an expiry date';
 COMMENT ON COLUMN invnt_item.site_id_storage IS 'Storage site where this item is kept';
-COMMENT ON COLUMN invnt_item.maint_site_id_equipment IS 'Equipment site this part belongs to; references site';
+COMMENT ON COLUMN invnt_item.maint_site_id_equipment IS 'Equipment site this part belongs to';
 COMMENT ON COLUMN invnt_item.invnt_vendor_id IS 'Primary vendor for procurement';
 COMMENT ON COLUMN invnt_item.manufacturer IS 'Manufacturer or brand name';
-COMMENT ON COLUMN invnt_item.seed_variety_id IS 'Linked crop variety for seed items';
+COMMENT ON COLUMN invnt_item.grow_variety_id IS 'Linked crop variety for seed items';
 COMMENT ON COLUMN invnt_item.seed_is_pelleted IS 'Whether seed item is pelleted for easier planting';
 COMMENT ON COLUMN invnt_item.maint_part_type IS 'Type classification for parts (e.g. electrical, mechanical, plumbing)';
 COMMENT ON COLUMN invnt_item.maint_part_number IS 'Manufacturer part number or catalog SKU';

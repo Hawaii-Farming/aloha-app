@@ -40,8 +40,6 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     hr_work_authorization_id     TEXT REFERENCES hr_work_authorization(id),
     start_date                   DATE,
     end_date                     DATE,
-    is_verifier                  BOOLEAN NOT NULL DEFAULT false,
-    is_active                    BOOLEAN NOT NULL DEFAULT true,
 
     -- =============================================
     -- PAYROLL & COMPENSATION
@@ -57,6 +55,9 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     -- HOUSING
     -- =============================================
     site_id_housing              TEXT REFERENCES site(id),
+
+    is_verifier                  BOOLEAN NOT NULL DEFAULT false,
+    is_active                    BOOLEAN NOT NULL DEFAULT true,
 
     -- =============================================
     -- AUDIT

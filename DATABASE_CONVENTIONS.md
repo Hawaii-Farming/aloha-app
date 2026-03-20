@@ -110,7 +110,7 @@ updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 updated_by  TEXT
 ```
 
-For tables that represent a submitted request or event, use `requested_at`/`requested_by` **instead of** `created_at`/`created_by` — never both. Tables currently using this pattern: `invnt_po`, `invnt_po_received`, `hr_time_off_request`, `maint_request`.
+For tables that represent a submitted request or event, use a semantic name **instead of** `created_at`/`created_by` — never both. The name should reflect the action (e.g. `requested_at`/`requested_by`, `received_at`/`received_by`). Tables currently using this pattern: `invnt_po` (`requested_at/by`), `invnt_po_received` (`received_at/by`), `hr_time_off_request` (`requested_at/by`), `maint_request` (`requested_at/by`).
 
 ---
 
@@ -187,9 +187,8 @@ If a parent/header table has `farm_id`, all its child tables must also include `
 
 | Prefix    | Module       |
 |-----------|--------------|
-| (none)    | Core globals (`util_uom`) |
-| `grow_`   | Core crop data (varieties, grades) |
-| `core_`   | Core org structure |
+| (none)    | Core (`util_uom`, `org`, `farm`, `site`) |
+| `grow_`   | Core crop data (`grow_variety`, `grow_grade`) |
 | `sales_`  | Sales |
 | `invnt_`  | Inventory |
 | `hr_`     | Human Resources |
@@ -206,7 +205,7 @@ Each `.md` doc must include:
 
 1. A module title and one-paragraph description
 2. An audit field note at the top
-3. A Mermaid ERD — relationships only, no entity attribute blocks. Use unquoted, lowercase labels with underscores for multi-word phrases (e.g. `table1 ||--o{ table2 : has`, `table1 ||--o{ table2 : packed_in`)
+3. A Mermaid ERD — relationships only, no entity attribute blocks. Use unquoted, lowercase labels with underscores for multi-word phrases (e.g. `table1 ||--o{ table2 : has`, `table1 ||--o{ table2 : packed_in`). If the ERD references `farm`, it must also include `org ||--o{ farm : operates` to show the ownership hierarchy
 4. A section per table with:
    - One-paragraph description
    - A column table: `| Column | Type | Constraints | Description |`
