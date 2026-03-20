@@ -205,7 +205,7 @@ Each `.md` doc must include:
 
 1. A module title and one-paragraph description
 2. An audit field note at the top
-3. A Mermaid ERD — relationships only, no entity attribute blocks. Use unquoted, lowercase labels with underscores for multi-word phrases (e.g. `table1 ||--o{ table2 : has`, `table1 ||--o{ table2 : packed_in`). If the ERD references `farm`, it must also include `org ||--o{ farm : operates` to show the ownership hierarchy
+3. A Mermaid ERD — relationships only, no entity attribute blocks. Use unquoted, lowercase labels with underscores for multi-word phrases (e.g. `table1 ||--o{ table2 : has`, `table1 ||--o{ table2 : packed_in`). Every table with `farm_id` must have a `farm ||--o{ table : scoped` relationship in the ERD, and if `farm` appears, `org ||--o{ farm : operates` must also be present
 4. A section per table with:
    - One-paragraph description
    - A column table: `| Column | Type | Constraints | Description |`
