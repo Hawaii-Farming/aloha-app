@@ -34,18 +34,15 @@ aloha-app/
   src/                   # React application (coming soon)
 ```
 
-## Core Schema (9 tables) — [Docs](docs/schemas/20260319_01_core.md)
+## Core Schema (6 tables) — [Docs](docs/schemas/20260319_01_core.md)
 
 ### Global Reference Tables
 These tables are shared across all organizations.
 
 - **util_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
 
-### Organization and Customers
+### Organization
 - **org** — Root entity for multi-org support with currency setting
-- **sales_cust_group** — Org-specific customer classifications for reporting and group pricing
-- **sales_fob** — Org-specific FOB (Free On Board) delivery points
-- **sales_cust** — Org customers with group, FOB preference, billing, and external accounting link
 
 ### Farm Structure
 - **farm** — Crop/product lines within an org with weighing and growing UOM defaults
@@ -88,11 +85,14 @@ These tables are shared across all organizations.
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Sales Module (6 tables) — [Docs](docs/schemas/20260319_05_sales.md)
+## Sales Module (9 tables) — [Docs](docs/schemas/20260319_05_sales.md)
 
-- **sales_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping)
-- **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
+- **sales_fob** — Org-specific FOB (Free On Board) delivery points (TEXT PK)
+- **sales_customer_group** — Org-specific customer classifications for reporting and group pricing (TEXT PK)
+- **sales_customer** — Org customers with group, FOB preference, billing, and external accounting link (TEXT PK)
 - **sales_donation_recipient** — Org-defined lookup of places product can be donated to (e.g. food banks, shelters, community programs) (TEXT PK)
+- **sales_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping) (TEXT PK)
+- **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 - **sales_po** — Customer order header with customer, FOB, dates, approval workflow, accounting upload tracking, and optional recurring frequency for standing orders
 - **sales_po_line** — Individual products within an order with snapshot pricing at time of order
 - **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, supporting partial fulfillment across multiple lots
@@ -137,7 +137,7 @@ See [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) for the full set of schem
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [Core Schema](docs/schemas/20260319_01_core.md) — 9 foundation tables
+- [Core Schema](docs/schemas/20260319_01_core.md) — 6 foundation tables
 - [Inventory Schema](docs/schemas/20260319_02_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260319_03_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260319_04_ops.md) — Task tracking, training, and food safety checklists

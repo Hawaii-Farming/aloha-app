@@ -36,16 +36,16 @@ Numbered sequentially by module in this order:
 
 | Range       | Module       |
 |-------------|--------------|
-| 001–009     | Core         |
+| 001–002, 006–009 | Core    |
 | 012–020     | Inventory    |
 | 021–025     | Human Resources |
 | 026–038     | Operations   |
-| 039–044     | Sales        |
-| 045–051     | Pack         |
-| 052–053     | Maintenance  |
-| 054–055     | Food Safety  |
+| 039–047     | Sales        |
+| 048–054     | Pack         |
+| 055–056     | Maintenance  |
+| 057–058     | Food Safety  |
 
-> Note: Core range has a gap at 010–011 after `sales_product` and `sales_product_price` were moved to the Sales module.
+> Note: Core range has gaps at 003–005 and 010–011 after sales tables were moved to the Sales module.
 
 ### Schema doc files
 ```
@@ -239,7 +239,11 @@ FK columns must carry the prefix of the **referenced** module. Name the column `
 | `ops_corrective_action_choice`          | `ops_corrective_action_choice_id`          |
 | `fsafe_emp_test`                        | `fsafe_emp_test_id`                        |
 | `fsafe_emp_result`                      | `fsafe_emp_result_id`                      |
+| `sales_fob`                             | `sales_fob_id`                             |
+| `sales_customer_group`                  | `sales_customer_group_id`                  |
+| `sales_customer`                        | `sales_customer_id`                        |
 | `sales_donation_recipient`              | `sales_donation_recipient_id`              |
+| `sales_product`                         | `sales_product_id`                         |
 | `sales_po`                              | `sales_po_id`                              |
 | `sales_po_line`                         | `sales_po_line_id`                         |
 | `pack_lot`                              | `pack_lot_id`                              |

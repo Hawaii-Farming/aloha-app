@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS sales_po (
     id                              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     farm_id                         TEXT NOT NULL REFERENCES farm(id),
-    sales_cust_id                   TEXT NOT NULL REFERENCES sales_cust(id),
+    sales_customer_id                   TEXT NOT NULL REFERENCES sales_customer(id),
     sales_fob_id                    TEXT REFERENCES sales_fob(id),
     sales_donation_recipient_id     TEXT REFERENCES sales_donation_recipient(id),
 
@@ -27,14 +27,14 @@ CREATE TABLE IF NOT EXISTS sales_po (
 
 CREATE INDEX idx_sales_po_org_id   ON sales_po (org_id);
 CREATE INDEX idx_sales_po_farm     ON sales_po (farm_id);
-CREATE INDEX idx_sales_po_customer ON sales_po (sales_cust_id);
+CREATE INDEX idx_sales_po_customer ON sales_po (sales_customer_id);
 CREATE INDEX idx_sales_po_status   ON sales_po (org_id, status);
 
 COMMENT ON TABLE sales_po IS 'Customer order header. One row per order. Tracks customer, FOB, dates, approval workflow, and optional recurring frequency for standing orders.';
 COMMENT ON COLUMN sales_po.id IS 'Unique identifier for the order';
 COMMENT ON COLUMN sales_po.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN sales_po.farm_id IS 'Farm (crop line) this order belongs to';
-COMMENT ON COLUMN sales_po.sales_cust_id IS 'Customer placing the order';
+COMMENT ON COLUMN sales_po.sales_customer_id IS 'Customer placing the order';
 COMMENT ON COLUMN sales_po.sales_fob_id IS 'FOB delivery point for this order; null if using the customer default';
 COMMENT ON COLUMN sales_po.sales_donation_recipient_id IS 'Donation recipient if this order is a donation; null for regular sales orders';
 COMMENT ON COLUMN sales_po.po_number IS 'Customer purchase order number for reference and cross-system matching';
