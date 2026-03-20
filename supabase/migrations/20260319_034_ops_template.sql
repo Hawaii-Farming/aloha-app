@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS ops_template (
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                  TEXT,
     updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by                  TEXT,
-
+    updated_by                  TEXT
 );
 
 CREATE INDEX idx_ops_template_org_id ON ops_template (org_id);

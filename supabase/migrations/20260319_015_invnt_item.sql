@@ -90,7 +90,7 @@ COMMENT ON COLUMN invnt_item.reorder_point_in_burn IS 'Stock level in burn units
 COMMENT ON COLUMN invnt_item.reorder_quantity_in_burn IS 'Quantity in burn units to reorder when reorder point is reached';
 COMMENT ON COLUMN invnt_item.requires_lot_tracking IS 'Whether deliveries and transactions must include a lot number';
 COMMENT ON COLUMN invnt_item.requires_expiry_date IS 'Whether deliveries must include an expiry date';
-COMMENT ON COLUMN invnt_item.site_id_storage IS 'Storage site where this item is kept; references site';
+COMMENT ON COLUMN invnt_item.site_id_storage IS 'Storage site where this item is kept';
 COMMENT ON COLUMN invnt_item.maint_site_id_equipment IS 'Equipment site this part belongs to; references site';
 COMMENT ON COLUMN invnt_item.invnt_vendor_id IS 'Primary vendor for procurement';
 COMMENT ON COLUMN invnt_item.manufacturer IS 'Manufacturer or brand name';

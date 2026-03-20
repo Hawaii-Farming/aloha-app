@@ -31,7 +31,7 @@ COMMENT ON COLUMN sales_po_line.sales_po_id IS 'Parent order this line belongs t
 COMMENT ON COLUMN sales_po_line.sales_product_id IS 'Product being ordered';
 COMMENT ON COLUMN sales_po_line.sale_uom IS 'Unit of measure for the quantity ordered (e.g. case, box)';
 COMMENT ON COLUMN sales_po_line.quantity_ordered IS 'Number of sale units ordered';
-COMMENT ON COLUMN sales_po_line.price_per_unit IS 'Snapshot price per sale unit at time of order';
+COMMENT ON COLUMN sales_po_line.price_per_unit IS 'Snapshot price per unit at time of order';
 COMMENT ON COLUMN sales_po_line.notes IS 'Free-text notes about this order line';
 COMMENT ON COLUMN sales_po_line.is_active IS 'Soft delete flag; false hides the record from active use';
 COMMENT ON COLUMN sales_po_line.created_at IS 'Timestamp when the record was created';

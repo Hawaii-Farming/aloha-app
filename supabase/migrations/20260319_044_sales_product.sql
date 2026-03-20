@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS sales_product (
     id                         TEXT PRIMARY KEY,
     org_id                     TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
     farm_id                    TEXT NOT NULL REFERENCES farm(id) ON DELETE CASCADE,
-    grade_id                   TEXT REFERENCES grow_grade(id),
+    grow_grade_id                   TEXT REFERENCES grow_grade(id),
     code                       TEXT NOT NULL,
     name                       TEXT NOT NULL,
     segment                    TEXT CHECK (segment IN ('wholesale', 'retail', 'food_service')),
@@ -75,7 +75,7 @@ COMMENT ON TABLE sales_product IS 'Sellable products with full packaging hierarc
 COMMENT ON COLUMN sales_product.id IS 'Human-readable identifier derived from product name (lowercase trimmed)';
 COMMENT ON COLUMN sales_product.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN sales_product.farm_id IS 'Farm (crop line) this product belongs to';
-COMMENT ON COLUMN sales_product.grade_id IS 'Harvest quality grade for this product';
+COMMENT ON COLUMN sales_product.grow_grade_id IS 'Harvest quality grade for this product';
 COMMENT ON COLUMN sales_product.code IS 'Short product code, unique within the farm';
 COMMENT ON COLUMN sales_product.name IS 'Full display name of the product, unique within the farm';
 COMMENT ON COLUMN sales_product.segment IS 'Market segment: wholesale, retail, or food_service';

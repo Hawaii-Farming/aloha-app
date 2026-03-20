@@ -53,7 +53,7 @@ These tables are shared across all organizations.
 ## Inventory Module (6 tables, 2 views) — [Docs](docs/schemas/20260319_02_invnt.md)
 
 - **invnt_vendor** — Org-level vendors for procurement with contact details and payment terms (TEXT PK)
-- **invnt_category** — Two-level category hierarchy; rows with `parent_category_id` null are top-level categories, rows with `parent_category_id` set are subcategories (TEXT PK, self-referencing)
+- **invnt_category** — Two-level category hierarchy; rows with `sub_category_name` null are top-level categories, rows with `sub_category_name` set are subcategories (TEXT PK)
 - **invnt_item** — Items with unit conversions, burn rates, reorder settings, and proper columns for all details
 - **invnt_po** — Purchase order requests with workflow (requested → approved → ordered → received) and snapshot pricing
 - **invnt_po_received** — Individual deliveries received against a purchase order with lot tracking and partial delivery support
@@ -69,7 +69,7 @@ These tables are shared across all organizations.
 - **hr_employee** — Unified employee register and org membership; every system user has a row here with a role. Tracks employment details, compensation, and access level. Department, work authorization, and title are FK references. Users are duplicated per org they belong to.
 - **hr_time_off_request** — Employee time off requests with PTO/sick leave breakdown and approval workflow (pending → approved/denied)
 
-## Operations Module (13 tables, 1 view) — [Docs](docs/schemas/20260319_04_ops.md)
+## Operations Module (12 tables, 1 view) — [Docs](docs/schemas/20260319_04_ops.md)
 
 - **ops_task** — Flat task catalog for labor tracking with name and description (TEXT PK)
 - **ops_task_tracker** — Header record for a task event with task, farm, site, date, start/stop times, and verification status. Site is stored directly on the tracker.

@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS invnt_po_received (
     id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                 TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    farm_id                TEXT REFERENCES farm(id),
     invnt_po_id            UUID NOT NULL REFERENCES invnt_po(id) ON DELETE CASCADE,
     received_date          DATE NOT NULL,
     received_uom           TEXT REFERENCES util_uom(code),
@@ -30,6 +31,7 @@ CREATE INDEX idx_invnt_po_received_org ON invnt_po_received (org_id);
 COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a purchase order; supports partial receipts with lot tracking';
 COMMENT ON COLUMN invnt_po_received.id IS 'Unique identifier for the received delivery record';
 COMMENT ON COLUMN invnt_po_received.org_id IS 'Owning organization for RLS filtering';
+COMMENT ON COLUMN invnt_po_received.farm_id IS 'Optional farm scope; inherited from parent invnt_po';
 COMMENT ON COLUMN invnt_po_received.invnt_po_id IS 'Parent purchase order this delivery belongs to';
 COMMENT ON COLUMN invnt_po_received.received_date IS 'Actual date the delivery arrived';
 COMMENT ON COLUMN invnt_po_received.received_uom IS 'Unit of measure for the received quantity';

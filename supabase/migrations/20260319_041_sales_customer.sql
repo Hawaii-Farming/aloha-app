@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS sales_customer (
     id              TEXT PRIMARY KEY,
     org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
-    sales_customeromer_group_id   TEXT REFERENCES sales_customeromer_group(id),
+    sales_customer_group_id   TEXT REFERENCES sales_customer_group(id),
     sales_fob_id          TEXT REFERENCES sales_fob(id),
     accounting_id     TEXT,
     name            TEXT NOT NULL,
@@ -21,7 +21,7 @@ CREATE INDEX idx_sales_customer_org_id ON sales_customer (org_id);
 COMMENT ON TABLE sales_customer IS 'Org customers with group classification, FOB preference, billing details, and external accounting link';
 COMMENT ON COLUMN sales_customer.id IS 'Human-readable identifier derived from customer name (lowercase trimmed)';
 COMMENT ON COLUMN sales_customer.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN sales_customer.sales_customeromer_group_id IS 'Customer group for reporting and group-level pricing';
+COMMENT ON COLUMN sales_customer.sales_customer_group_id IS 'Customer group for reporting and group-level pricing';
 COMMENT ON COLUMN sales_customer.sales_fob_id IS 'Default FOB delivery point for this customer';
 COMMENT ON COLUMN sales_customer.accounting_id IS 'External accounting system identifier for integration';
 COMMENT ON COLUMN sales_customer.name IS 'Display name of the customer, unique within the org';

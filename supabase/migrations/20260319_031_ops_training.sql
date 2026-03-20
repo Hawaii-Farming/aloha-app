@@ -29,7 +29,7 @@ COMMENT ON TABLE ops_training IS 'Staff training session records. Each row is on
 COMMENT ON COLUMN ops_training.id IS 'Unique identifier for the training session';
 COMMENT ON COLUMN ops_training.org_id IS 'Owning organization for RLS filtering';
 COMMENT ON COLUMN ops_training.farm_id IS 'Optional farm scope; null if training applies across the org';
-COMMENT ON COLUMN ops_training.ops_training_type_id IS 'Training type from the org lookup; references ops_training_type (e.g. gmp, food_safety, haccp)';
+COMMENT ON COLUMN ops_training.ops_training_type_id IS 'Training type from the org lookup; references ops_training_type';
 COMMENT ON COLUMN ops_training.training_date IS 'Date the training was conducted';
 COMMENT ON COLUMN ops_training.topics_covered IS 'JSON array of topic strings covered during the training session';
 COMMENT ON COLUMN ops_training.trainer_names IS 'JSON array of trainer names; may include external trainers or internal employee names';

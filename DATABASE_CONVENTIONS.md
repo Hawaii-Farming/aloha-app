@@ -40,8 +40,9 @@ Numbered sequentially by module in this order:
 | 012–020     | Inventory    |
 | 021–025     | Human Resources |
 | 026–038     | Operations   |
-| 039         | Pack (packaging_type) |
-| 040–047     | Sales (fob → po_line) |
+| 039–042     | Sales (fob → donation_recipient) |
+| 043         | Pack (packaging_type) |
+| 044–047     | Sales (product → po_line) |
 | 048–049     | Pack (lot, lot_item)  |
 | 050         | Sales (po_fulfillment)|
 | 051–054     | Pack (shelf life)     |
@@ -109,7 +110,7 @@ updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 updated_by  TEXT
 ```
 
-For tables that represent a submitted request or event, use `requested_at`/`requested_by` **instead of** `created_at`/`created_by` — never both. Tables currently using this pattern: `invnt_po`, `hr_time_off_request`, `maint_request`.
+For tables that represent a submitted request or event, use `requested_at`/`requested_by` **instead of** `created_at`/`created_by` — never both. Tables currently using this pattern: `invnt_po`, `invnt_po_received`, `hr_time_off_request`, `maint_request`.
 
 ---
 
@@ -187,7 +188,9 @@ If a parent/header table has `farm_id`, all its child tables must also include `
 | Prefix    | Module       |
 |-----------|--------------|
 | (none)    | Core globals (`util_uom`) |
+| `grow_`   | Core crop data (varieties, grades) |
 | `core_`   | Core org structure |
+| `sales_`  | Sales |
 | `invnt_`  | Inventory |
 | `hr_`     | Human Resources |
 | `ops_`    | Operations |
@@ -217,7 +220,7 @@ Tables that are designed but not yet ready for deployment go in:
 ```
 supabase/migrations_future/
 ```
-Document them in `docs/schemas/20260317_06_future.md`.
+Document them in `docs/schemas/20260319_09_future.md`.
 
 ---
 
@@ -257,6 +260,8 @@ FK columns must carry the prefix of the **referenced** module. Name the column `
 **Exceptions** — workflow fields that name the person performing a role keep their role-based name even though they reference `hr_employee(id)`:
 - `requested_by`, `reviewed_by`, `approved_by`, `verified_by`, `sampled_by`, `assigned_to`, `fixer_id`, `ordered_by`, `uploaded_by`
 
-Self-referencing FK columns in the same table follow the same rule with an optional semantic prefix (e.g. `original_fsafe_emp_result_id` for the parent-test link in `fsafe_emp_result`).
+Self-referencing FK columns in the same table follow the same rule with an optional semantic prefix (e.g. `original_fsafe_emp_result_id` for the parent-test link in `fsafe_emp_result`, `team_lead_id` and `compensation_manager_id` in `hr_employee`).
+
+**Multiple FKs to the same table** — when a table has more than one FK to the same referenced table, use a semantic suffix to distinguish them (e.g. `site_id_storage` and `maint_site_id_equipment` in `invnt_item`, `site_id_housing` in `hr_employee`).
 
 Also note: `ops_corrective_action_taken.fsafe_emp_result_id` is an intentional cross-module FK from the Ops module to Food Safety — the column retains the `fsafe_` prefix to reflect the referenced table.
