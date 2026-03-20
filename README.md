@@ -102,12 +102,19 @@ These tables are shared across all organizations.
 - **pack_shelf_life_observation** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
 
-## Maintenance Module (2 tables) — [Docs](docs/schemas/20260319_06_maint.md)
+## Sales Module (4 tables) — [Docs](docs/schemas/20260319_06_sales.md)
+
+- **sales_donation_recipient** — Org-defined lookup of places product can be donated to (e.g. food banks, shelters, community programs) (TEXT PK)
+- **sales_order** — Customer order header with customer, FOB, dates, approval workflow, accounting upload tracking, and optional recurring frequency for standing orders
+- **sales_order_line** — Individual products within an order with snapshot pricing at time of order
+- **sales_order_fulfillment** — Fulfillment records linking order lines to pack lots, supporting partial fulfillment across multiple lots
+
+## Maintenance Module (2 tables) — [Docs](docs/schemas/20260319_07_maint.md)
 
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (2 tables) — [Docs](docs/schemas/20260319_07_fsafe.md)
+## Food Safety Module (2 tables) — [Docs](docs/schemas/20260319_08_fsafe.md)
 
 - **fsafe_emp_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_emp_result** — Individual EMP test results per site with retest/vector chaining and corrective action linkage; water tests recorded here using named definitions (e.g. water_listeria, water_ecoli, water_salmonella)
@@ -118,9 +125,9 @@ These tables are shared across all organizations.
 - [x] **Human Resources** — Employee records, department, work authorization, and title lookups, and time off requests
 - [x] **Operations** — Task catalog, task tracking with site and schedule support, weekly schedule view, staff training records, food safety checklist templates, questions, responses, corrective action choices, and corrective actions taken
 - [x] **Pack** — Production lot tracking with lot number generation, packaging type lookup, and shelf life trials with configurable checks and observation logging
+- [x] **Sales** — Customer orders with approval workflow, snapshot pricing, donation tracking, standing order recurrence, and fulfillment against pack lots
 - [x] **Maintenance** — Work orders with priority, status, fixer assignment, recurring frequency, and inventory items consumed
 - [x] **Food Safety** — EMP test definitions and results with retest/vector chaining and corrective action linkage; water tests use named EMP test definitions
-- [ ] **Sales** — Customer orders, order lines with price snapshots, invoicing
 - [ ] **Grow** — Seeding, grow batches, growth stage tracking, nutrient recipes, environmental monitoring
 - [ ] **Global** — Cross-module shared configuration, reporting, and analytics
 
@@ -137,6 +144,7 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Human Resources Schema](docs/schemas/20260319_03_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260319_04_ops.md) — Task tracking, training, and food safety checklists
 - [Pack Schema](docs/schemas/20260319_05_pack.md) — Production lot tracking and shelf life trials
-- [Maintenance Schema](docs/schemas/20260319_06_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260319_07_fsafe.md) — EMP test definitions and results
-- [Future Improvements](docs/schemas/20260319_08_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
+- [Sales Schema](docs/schemas/20260319_06_sales.md) — Customer orders, fulfillment, and donations
+- [Maintenance Schema](docs/schemas/20260319_07_maint.md) — Work orders and parts usage
+- [Food Safety Schema](docs/schemas/20260319_08_fsafe.md) — EMP test definitions and results
+- [Future Improvements](docs/schemas/20260319_09_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)

@@ -41,8 +41,9 @@ Numbered sequentially by module in this order:
 | 021–025     | Human Resources |
 | 026–038     | Operations   |
 | 039–045     | Pack         |
-| 046–047     | Maintenance  |
-| 048–049     | Food Safety  |
+| 046–049     | Sales        |
+| 050–051     | Maintenance  |
+| 052–053     | Food Safety  |
 
 ### Schema doc files
 ```
@@ -56,9 +57,10 @@ docs/schemas/YYYYMMDD_NN_module.md
 | `20260319_03_hr.md` | Human Resources |
 | `20260319_04_ops.md` | Operations |
 | `20260319_05_pack.md` | Pack |
-| `20260319_06_maint.md` | Maintenance |
-| `20260319_07_fsafe.md` | Food Safety |
-| `20260319_08_future.md` | Deferred / Future |
+| `20260319_06_sales.md` | Sales |
+| `20260319_07_maint.md` | Maintenance |
+| `20260319_08_fsafe.md` | Food Safety |
+| `20260319_09_future.md` | Deferred / Future |
 
 ---
 
@@ -231,13 +233,16 @@ FK columns must carry the prefix of the **referenced** module. Name the column `
 | `ops_corrective_action_choice`          | `ops_corrective_action_choice_id`          |
 | `fsafe_emp_test`                        | `fsafe_emp_test_id`                        |
 | `fsafe_emp_result`                      | `fsafe_emp_result_id`                      |
+| `sales_donation_recipient`              | `sales_donation_recipient_id`              |
+| `sales_order`                           | `sales_order_id`                           |
+| `sales_order_line`                      | `sales_order_line_id`                      |
 | `pack_lot`                              | `pack_lot_id`                              |
 | `pack_packaging_type`                   | `pack_packaging_type_id`                   |
 | `pack_shelf_life_check`                 | `pack_shelf_life_check_id`                 |
 | `pack_shelf_life_trial`                 | `pack_shelf_life_trial_id`                 |
 
 **Exceptions** — workflow fields that name the person performing a role keep their role-based name even though they reference `hr_employee(id)`:
-- `requested_by`, `reviewed_by`, `approved_by`, `verified_by`, `sampled_by`, `assigned_to`, `fixer_id`, `ordered_by`
+- `requested_by`, `reviewed_by`, `approved_by`, `verified_by`, `sampled_by`, `assigned_to`, `fixer_id`, `ordered_by`, `uploaded_by`
 
 Self-referencing FK columns in the same table follow the same rule with an optional semantic prefix (e.g. `original_fsafe_emp_result_id` for the parent-test link in `fsafe_emp_result`).
 
