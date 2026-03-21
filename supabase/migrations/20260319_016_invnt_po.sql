@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS invnt_po (
     id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                 TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                 TEXT NOT NULL REFERENCES org(id),
     farm_id                TEXT REFERENCES farm(id),
 
     -- Request classification
@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS invnt_po (
     -- Status & audit
     status                 TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'approved', 'rejected', 'ordered', 'partial', 'received', 'cancelled')),
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by             TEXT,
     requested_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
     requested_by           TEXT NOT NULL REFERENCES hr_employee(id),
     reviewed_at            TIMESTAMPTZ,

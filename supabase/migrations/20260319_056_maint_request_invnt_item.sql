@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS maint_request_invnt_item (
     id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id              TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id              TEXT        NOT NULL REFERENCES org(id),
     farm_id             TEXT        REFERENCES farm(id),
-    maint_request_id    UUID        NOT NULL REFERENCES maint_request(id) ON DELETE CASCADE,
+    maint_request_id    UUID        NOT NULL REFERENCES maint_request(id),
     invnt_item_id       UUID        NOT NULL REFERENCES invnt_item(id),
     uom                 TEXT REFERENCES util_uom(code),
     quantity_used       NUMERIC,

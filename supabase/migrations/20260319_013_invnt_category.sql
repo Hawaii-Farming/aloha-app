@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS invnt_category (
     id                  TEXT PRIMARY KEY,
-    org_id              TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id              TEXT NOT NULL REFERENCES org(id),
     category_name       TEXT NOT NULL,
     sub_category_name   TEXT,
     is_deleted           BOOLEAN NOT NULL DEFAULT false,

@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS fsafe_test_hold_po (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id              TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id              TEXT NOT NULL REFERENCES org(id),
     farm_id             TEXT NOT NULL REFERENCES farm(id),
-    fsafe_test_hold_id  UUID NOT NULL REFERENCES fsafe_test_hold(id) ON DELETE CASCADE,
+    fsafe_test_hold_id  UUID NOT NULL REFERENCES fsafe_test_hold(id),
     sales_po_id         UUID NOT NULL REFERENCES sales_po(id),
 
     is_deleted           BOOLEAN NOT NULL DEFAULT false,

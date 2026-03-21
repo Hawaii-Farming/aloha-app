@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS sales_po_line (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id              TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id              TEXT NOT NULL REFERENCES org(id),
     farm_id             TEXT NOT NULL REFERENCES farm(id),
-    sales_po_id         UUID NOT NULL REFERENCES sales_po(id) ON DELETE CASCADE,
+    sales_po_id         UUID NOT NULL REFERENCES sales_po(id),
     sales_product_id    TEXT NOT NULL REFERENCES sales_product(id),
 
     sale_uom            TEXT NOT NULL REFERENCES util_uom(code),

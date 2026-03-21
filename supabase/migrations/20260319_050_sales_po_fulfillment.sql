@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS sales_po_fulfillment (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id              TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id              TEXT NOT NULL REFERENCES org(id),
     farm_id             TEXT NOT NULL REFERENCES farm(id),
     sales_po_id         UUID NOT NULL REFERENCES sales_po(id),
-    sales_po_line_id    UUID NOT NULL REFERENCES sales_po_line(id) ON DELETE CASCADE,
+    sales_po_line_id    UUID NOT NULL REFERENCES sales_po_line(id),
     pack_lot_id         UUID REFERENCES pack_lot(id),
 
     quantity_fulfilled  NUMERIC NOT NULL,

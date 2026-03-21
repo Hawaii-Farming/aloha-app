@@ -3,7 +3,7 @@
 -- TEXT PK derived from name (trimmed lowercase), unique within the org.
 CREATE TABLE IF NOT EXISTS hr_work_authorization (
     id          TEXT        PRIMARY KEY,
-    org_id      TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id      TEXT        NOT NULL REFERENCES org(id),
     name        TEXT NOT NULL,
     description TEXT,
     is_deleted   BOOLEAN     NOT NULL DEFAULT false,

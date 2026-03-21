@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS ops_template_category (
     id          TEXT        PRIMARY KEY,
-    org_id      TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id      TEXT        NOT NULL REFERENCES org(id),
 
     name        TEXT        NOT NULL,
     description TEXT,

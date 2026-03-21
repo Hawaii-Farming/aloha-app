@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS hr_disciplinary_warning (
     id                              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                          TEXT NOT NULL REFERENCES org(id),
     employee_id                     TEXT NOT NULL REFERENCES hr_employee(id),
 
     -- Warning details
@@ -19,14 +19,15 @@ CREATE TABLE IF NOT EXISTS hr_disciplinary_warning (
     acknowledged_at                 TIMESTAMPTZ,
     employee_signature_url          TEXT,
 
-    -- Workflow
     status                          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed')),
-    reported_by                     TEXT REFERENCES hr_employee(id),
-    reported_at                     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    reviewed_by                     TEXT REFERENCES hr_employee(id),
-    reviewed_at                     TIMESTAMPTZ,
 
     is_deleted                       BOOLEAN NOT NULL DEFAULT false,
+    created_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by                      TEXT,
+    reported_at                     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    reported_by                     TEXT REFERENCES hr_employee(id),
+    reviewed_at                     TIMESTAMPTZ,
+    reviewed_by                     TEXT REFERENCES hr_employee(id),
     updated_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                      TEXT
 );

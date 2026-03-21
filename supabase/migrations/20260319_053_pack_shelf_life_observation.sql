@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS pack_shelf_life_observation (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                      TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                      TEXT NOT NULL REFERENCES org(id),
     farm_id                     TEXT REFERENCES farm(id),
-    pack_shelf_life_trial_id    UUID NOT NULL REFERENCES pack_shelf_life_trial(id) ON DELETE CASCADE,
+    pack_shelf_life_trial_id    UUID NOT NULL REFERENCES pack_shelf_life_trial(id),
     pack_shelf_life_check_id    TEXT NOT NULL REFERENCES pack_shelf_life_check(id),
 
     observation_date            DATE NOT NULL,

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     id                                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                              TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                              TEXT        NOT NULL REFERENCES org(id),
     farm_id                             TEXT        REFERENCES farm(id),
     ops_template_id                     TEXT        REFERENCES ops_template(id),
     ops_response_id                     UUID        REFERENCES ops_response(id),

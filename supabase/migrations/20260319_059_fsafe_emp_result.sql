@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS fsafe_emp_result (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT REFERENCES farm(id),
     site_id         TEXT NOT NULL REFERENCES site(id),
     -- Test configuration

@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS invnt_po_received (
     id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                 TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                 TEXT NOT NULL REFERENCES org(id),
     farm_id                TEXT REFERENCES farm(id),
-    invnt_po_id            UUID NOT NULL REFERENCES invnt_po(id) ON DELETE CASCADE,
+    invnt_po_id            UUID NOT NULL REFERENCES invnt_po(id),
     received_date          DATE NOT NULL,
     received_uom           TEXT REFERENCES util_uom(code),
     received_quantity      NUMERIC NOT NULL,
@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS invnt_po_received (
     received_photos        JSONB NOT NULL DEFAULT '[]',
 
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by             TEXT,
     received_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     received_by            TEXT,
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),

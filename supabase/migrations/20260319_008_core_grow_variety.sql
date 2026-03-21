@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS grow_variety (
     id         TEXT PRIMARY KEY,
-    org_id     TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
-    farm_id    TEXT NOT NULL REFERENCES farm(id) ON DELETE CASCADE,
+    org_id     TEXT NOT NULL REFERENCES org(id),
+    farm_id    TEXT NOT NULL REFERENCES farm(id),
     code       TEXT NOT NULL,
     name       TEXT NOT NULL,
     description TEXT,

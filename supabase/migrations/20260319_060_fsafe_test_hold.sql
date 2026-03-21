@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS fsafe_test_hold (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT NOT NULL REFERENCES farm(id),
     pack_lot_id     UUID NOT NULL REFERENCES pack_lot(id),
     sales_customer_id       TEXT REFERENCES sales_customer(id),

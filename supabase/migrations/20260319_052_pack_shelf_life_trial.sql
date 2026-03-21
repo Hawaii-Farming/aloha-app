@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS pack_shelf_life_trial (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                      TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                      TEXT NOT NULL REFERENCES org(id),
     farm_id                     TEXT REFERENCES farm(id),
     pack_lot_id                 UUID REFERENCES pack_lot(id),
     sales_product_id            TEXT NOT NULL REFERENCES sales_product(id),

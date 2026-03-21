@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS ops_template (
     id                          TEXT        PRIMARY KEY,
-    org_id                      TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                      TEXT        NOT NULL REFERENCES org(id),
     farm_id                     TEXT        REFERENCES farm(id),
 
     name                        TEXT        NOT NULL,

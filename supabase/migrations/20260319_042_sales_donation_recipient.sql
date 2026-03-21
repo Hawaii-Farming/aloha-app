@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS sales_donation_recipient (
     id              TEXT PRIMARY KEY,
-    org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id          TEXT NOT NULL REFERENCES org(id),
 
     name            TEXT NOT NULL,
     description     TEXT,

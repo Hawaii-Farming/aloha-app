@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS invnt_sales_product_item (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id            TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id            TEXT NOT NULL REFERENCES org(id),
     farm_id           TEXT REFERENCES farm(id),
-    product_id        TEXT NOT NULL REFERENCES sales_product(id) ON DELETE CASCADE,
-    invnt_item_id     UUID NOT NULL REFERENCES invnt_item(id) ON DELETE CASCADE,
+    product_id        TEXT NOT NULL REFERENCES sales_product(id),
+    invnt_item_id     UUID NOT NULL REFERENCES invnt_item(id),
     packaging_level   TEXT NOT NULL CHECK (packaging_level IN ('pack', 'sale')),
     sale_uom          TEXT REFERENCES util_uom(code),
     quantity_per_sale_uom NUMERIC,

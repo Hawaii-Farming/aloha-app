@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS pack_lot (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT NOT NULL REFERENCES farm(id),
 
     lot_number      TEXT NOT NULL,

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS maint_request (
     id                        UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                    TEXT        NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                    TEXT        NOT NULL REFERENCES org(id),
     farm_id                   TEXT        REFERENCES farm(id),
     site_id                   TEXT        NOT NULL REFERENCES site(id),
 
@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS maint_request (
     is_preventive_maintenance BOOLEAN     NOT NULL DEFAULT false,
     is_deleted                 BOOLEAN     NOT NULL DEFAULT false,
 
+    created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by                TEXT,
     requested_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     requested_by              TEXT        NOT NULL REFERENCES hr_employee(id),
     updated_at                TIMESTAMPTZ NOT NULL DEFAULT now(),

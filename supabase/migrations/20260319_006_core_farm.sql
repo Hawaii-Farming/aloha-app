@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS farm (
     id               TEXT PRIMARY KEY,
-    org_id           TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id           TEXT NOT NULL REFERENCES org(id),
     name             TEXT NOT NULL,
     weighing_uom  TEXT REFERENCES util_uom(code),
     growing_uom   TEXT REFERENCES util_uom(code),

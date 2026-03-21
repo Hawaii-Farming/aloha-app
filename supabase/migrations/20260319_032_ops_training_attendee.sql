@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS ops_training_attendee (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                      TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                      TEXT NOT NULL REFERENCES org(id),
     farm_id                     TEXT REFERENCES farm(id),
-    ops_training_id             UUID NOT NULL REFERENCES ops_training(id) ON DELETE CASCADE,
+    ops_training_id             UUID NOT NULL REFERENCES ops_training(id),
     hr_employee_id              TEXT NOT NULL REFERENCES hr_employee(id),
 
     signed_at                   TIMESTAMPTZ,

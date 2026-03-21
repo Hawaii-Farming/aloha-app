@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS fsafe_test_hold_result (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id              TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id              TEXT NOT NULL REFERENCES org(id),
     farm_id             TEXT NOT NULL REFERENCES farm(id),
-    fsafe_test_hold_id  UUID NOT NULL REFERENCES fsafe_test_hold(id) ON DELETE CASCADE,
+    fsafe_test_hold_id  UUID NOT NULL REFERENCES fsafe_test_hold(id),
     fsafe_emp_test_id  TEXT NOT NULL REFERENCES fsafe_emp_test(id),
 
     response_enum       TEXT,

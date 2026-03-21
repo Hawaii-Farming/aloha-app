@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS invnt_item (
     id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id                   TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id                   TEXT NOT NULL REFERENCES org(id),
     farm_id                  TEXT REFERENCES farm(id),
     invnt_category_id        TEXT REFERENCES invnt_category(id),
     invnt_subcategory_id     TEXT REFERENCES invnt_category(id),

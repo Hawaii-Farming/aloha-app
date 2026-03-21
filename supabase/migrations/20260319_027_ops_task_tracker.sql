@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS ops_task_tracker (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT REFERENCES farm(id),
     site_id         TEXT REFERENCES site(id),
     ops_task_id     TEXT NOT NULL REFERENCES ops_task(id),

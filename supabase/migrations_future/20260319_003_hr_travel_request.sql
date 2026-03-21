@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS hr_travel_request (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id              TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id              TEXT NOT NULL REFERENCES org(id),
     employee_id         TEXT NOT NULL REFERENCES hr_employee(id),
 
     -- Travel details
@@ -11,16 +11,17 @@ CREATE TABLE IF NOT EXISTS hr_travel_request (
     travel_start_date   DATE,
     travel_return_date  DATE,
 
-    -- Workflow
-    status              TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'denied')),
-    requested_by        TEXT NOT NULL REFERENCES hr_employee(id),
-    requested_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     denial_reason       TEXT,
     notes               TEXT,
-    reviewed_by         TEXT REFERENCES hr_employee(id),
-    reviewed_at         TIMESTAMPTZ,
+    status              TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'denied')),
 
     is_deleted           BOOLEAN NOT NULL DEFAULT false,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by          TEXT,
+    requested_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    requested_by        TEXT NOT NULL REFERENCES hr_employee(id),
+    reviewed_at         TIMESTAMPTZ,
+    reviewed_by         TEXT REFERENCES hr_employee(id),
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by          TEXT
 );

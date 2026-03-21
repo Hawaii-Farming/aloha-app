@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS fsafe_emp_test (
     id              TEXT PRIMARY KEY,
-    org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id          TEXT NOT NULL REFERENCES org(id),
 
     test_name       TEXT NOT NULL,
     test_methods    JSONB NOT NULL DEFAULT '[]',

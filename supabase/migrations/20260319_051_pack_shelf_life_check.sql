@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS pack_shelf_life_check (
     id              TEXT PRIMARY KEY,
-    org_id          TEXT NOT NULL REFERENCES org(id) ON DELETE CASCADE,
+    org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT REFERENCES farm(id),
 
     name            TEXT NOT NULL,
