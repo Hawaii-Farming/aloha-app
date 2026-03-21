@@ -1,4 +1,4 @@
-<!-- v: 03-20 01:34pm -->
+<!-- v: 03-20 02:19pm -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,7 +171,7 @@ body { background: #0a0a0f; color: #e0e0e0; font-family: -apple-system, BlinkMac
 <body>
 
 <div class="topbar">
-  <h1>Aloha Schema</h1><span style="font-size:11px;color:#e0e0e0" id="versionLabel">v: 03-20 01:34pm</span>
+  <h1>Aloha Schema</h1><span style="font-size:11px;color:#e0e0e0" id="versionLabel">v: 03-20 02:19pm</span>
   <div class="version-toggle">
     <button id="btnV1" onclick="setVersion('v1')">V1</button>
     <button id="btnV2" class="active" onclick="setVersion('v2')">V2</button>
@@ -187,7 +187,7 @@ body { background: #0a0a0f; color: #e0e0e0; font-family: -apple-system, BlinkMac
     <span><span class="num" id="statViews">0</span> views</span>
     <span><span class="num" id="statCols">0</span> columns</span>
     <span><span class="num" id="statFKs">0</span> FKs</span>
-    <span style="font-size:10px;color:#999;font-style:italic">ID, audit, is_active hidden</span>
+    <span style="font-size:10px;color:#999;font-style:italic">ID, audit, soft-delete hidden</span>
     <span id="persistStatus" class="persist-indicator"></span>
   </div>
 </div>
@@ -1884,8 +1884,9 @@ function computeDiff(v1, v2) {
       if (v1Name !== v2Name) {
         diffs.push({ type: 'modified', table: v2Name, detail: `Renamed from "${v1Name}"` });
       }
-      const c1 = v1.tables[v1Name].columns;
-      const c2 = v2.tables[v2Name].columns;
+      const hiddenCols = new Set(['created_at','updated_at','created_by','updated_by','is_active','is_deleted','is_deleted']);
+      const c1 = v1.tables[v1Name].columns.filter(c => !hiddenCols.has(c.name));
+      const c2 = v2.tables[v2Name].columns.filter(c => !hiddenCols.has(c.name));
       const c1Map = Object.fromEntries(c1.map(c => [c.name, c]));
       const c2Map = Object.fromEntries(c2.map(c => [c.name, c]));
       const allCols = new Set([...Object.keys(c1Map), ...Object.keys(c2Map)]);
@@ -2267,7 +2268,7 @@ function render() {
         const isFk = fkCols[t] && fkCols[t].has(col.name);
         const isKey = isPk || isFk;
         const colDiffClass = mc.status ? ` ${mc.status}` : '';
-        const isAudit = ['created_at','updated_at','created_by','updated_by','is_active'].includes(col.name);
+        const isAudit = ['created_at','updated_at','created_by','updated_by','is_active','is_deleted'].includes(col.name);
         const keyClass = isPk ? ' pk-row' : (isAudit ? ' crud-row' : (isKey ? '' : ' non-key'));
         const nameClass = isPk ? 'col-name pk' : (isFk ? 'col-name fk' : 'col-name');
         html += `<div class="col-row${colDiffClass}${keyClass}">`;
@@ -2302,7 +2303,7 @@ function render() {
           const isPk = col.name === 'id';
           const isFk = fkCols[t] && fkCols[t].has(col.name);
           const nameClass = isPk ? 'col-name pk' : (isFk ? 'col-name fk' : 'col-name');
-          const isAudit = ['created_at','updated_at','created_by','updated_by','is_active'].includes(col.name);
+          const isAudit = ['created_at','updated_at','created_by','updated_by','is_active','is_deleted'].includes(col.name);
           html += `<div class="col-row added${isPk ? ' pk-row' : (isAudit ? ' crud-row' : (isFk ? '' : ' non-key'))}">`;
           if (isFk) html += `<span class="col-fk-icon">&#128279;</span>`;
           const colDescTip2 = (col.description || col.name).replace(/"/g, '&quot;');
@@ -2409,7 +2410,7 @@ function openEditTable(tableName) {
   if (!tbl) return;
   window._editingTable = tableName;
 
-  const auditCols = ['created_at','updated_at','created_by','updated_by','is_active'];
+  const auditCols = ['created_at','updated_at','created_by','updated_by','is_active','is_deleted'];
   const editableCols = tbl.columns.filter(c => !auditCols.includes(c.name));
   const colsHtml = editableCols.map((c, i) => colRowHtml(c, i, tableName)).join('');
 
@@ -2581,7 +2582,7 @@ function saveEditTable(origName) {
   if (!newName || !cols.length) return;
 
   const tbl = schemaV2.tables[origName];
-  const auditCols = tbl.columns.filter(c => ['created_at','updated_at','created_by','updated_by','is_active'].includes(c.name));
+  const auditCols = tbl.columns.filter(c => ['created_at','updated_at','created_by','updated_by','is_active','is_deleted'].includes(c.name));
   tbl.columns = [...cols, ...auditCols];
   tbl.description = (document.getElementById('editTableDesc')?.value || '').trim();
   tbl.notes = (document.getElementById('editTableNotes')?.value || '').trim();
@@ -2878,7 +2879,7 @@ function renderCoreFlow() {
     }
   }
 
-  const auditNames = ['created_at','updated_at','created_by','updated_by','is_active'];
+  const auditNames = ['created_at','updated_at','created_by','updated_by','is_active','is_deleted'];
   let html = '';
   for (const t of coreSet) {
     const tbl = schema.tables[t];
