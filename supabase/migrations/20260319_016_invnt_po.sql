@@ -33,27 +33,25 @@ CREATE TABLE IF NOT EXISTS invnt_po (
 
     -- Status & audit
     status                 TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested', 'approved', 'rejected', 'ordered', 'partial', 'received', 'cancelled')),
-    is_deleted              BOOLEAN NOT NULL DEFAULT false,
-    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by             TEXT,
     requested_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
     requested_by           TEXT NOT NULL REFERENCES hr_employee(id),
     reviewed_at            TIMESTAMPTZ,
     reviewed_by            TEXT REFERENCES hr_employee(id),
     ordered_at             TIMESTAMPTZ,
     ordered_by             TEXT REFERENCES hr_employee(id),
+    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by             TEXT,
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by             TEXT
+    updated_by             TEXT,
+    is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
+
+COMMENT ON TABLE invnt_po IS 'Tracks purchase order requests through a workflow from request to receipt. Each order snapshots the item name, units, and cost at order time so the record stays accurate even if the item changes later.';
 
 CREATE INDEX idx_invnt_po_org_id ON invnt_po (org_id);
 CREATE INDEX idx_invnt_po_status ON invnt_po (org_id, status);
 CREATE INDEX idx_invnt_po_item   ON invnt_po (invnt_item_id);
 
-COMMENT ON TABLE invnt_po IS 'Purchase order requests with approval workflow (requested > approved > ordered > partial > received) and snapshot pricing at order time';
-COMMENT ON COLUMN invnt_po.id IS 'Unique identifier for the purchase order';
-COMMENT ON COLUMN invnt_po.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN invnt_po.farm_id IS 'Optional farm scope for the order';
 COMMENT ON COLUMN invnt_po.request_type IS 'Whether this is a non-inventory purchase or an inventory item purchase: non_inventory_item, inventory_item';
 COMMENT ON COLUMN invnt_po.urgency_level IS 'How urgently the item is needed: today, 2_days, 7_days, not_urgent';
 COMMENT ON COLUMN invnt_po.invnt_category_id IS 'Category for non_inventory_item requests; references invnt_category rows where sub_category_name IS NULL';
@@ -68,17 +66,4 @@ COMMENT ON COLUMN invnt_po.invnt_vendor_id IS 'Vendor the order is placed with';
 COMMENT ON COLUMN invnt_po.total_cost IS 'Total cost for the order';
 COMMENT ON COLUMN invnt_po.is_freight_included IS 'Whether total_cost includes freight charges';
 COMMENT ON COLUMN invnt_po.expected_delivery_date IS 'Expected delivery date from the vendor';
-COMMENT ON COLUMN invnt_po.tracking_number IS 'Shipping or freight tracking number';
-COMMENT ON COLUMN invnt_po.notes IS 'Free-text notes about the order';
-COMMENT ON COLUMN invnt_po.rejected_reason IS 'Reason for rejection when status is rejected';
-COMMENT ON COLUMN invnt_po.request_photos IS 'JSON array of photo URLs attached to the request';
 COMMENT ON COLUMN invnt_po.status IS 'Workflow status: requested, approved, rejected, ordered, partial, received, cancelled';
-COMMENT ON COLUMN invnt_po.is_deleted IS 'Soft delete flag; false hides the order from active use';
-COMMENT ON COLUMN invnt_po.requested_at IS 'Timestamp when the order was requested';
-COMMENT ON COLUMN invnt_po.requested_by IS 'Employee who submitted the order request';
-COMMENT ON COLUMN invnt_po.reviewed_at IS 'Timestamp when the order was reviewed';
-COMMENT ON COLUMN invnt_po.reviewed_by IS 'Employee who approved or rejected the order';
-COMMENT ON COLUMN invnt_po.ordered_at IS 'Timestamp when the order was placed with the vendor';
-COMMENT ON COLUMN invnt_po.ordered_by IS 'Employee who placed the order with the vendor';
-COMMENT ON COLUMN invnt_po.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN invnt_po.updated_by IS 'Email of the user who last updated the record';

@@ -48,8 +48,8 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     pay_structure                TEXT CHECK (pay_structure IN ('hourly', 'salary')),
     overtime_threshold           NUMERIC,
     wc                           TEXT,
-    payroll_admin                TEXT,
-    payslip_delivery_method      TEXT,
+    payroll_processor                TEXT,
+    pay_delivery_method      TEXT,
 
     -- =============================================
     -- HOUSING
@@ -57,7 +57,6 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     site_id_housing              TEXT REFERENCES site(id),
 
     is_verifier                  BOOLEAN NOT NULL DEFAULT false,
-    is_deleted                    BOOLEAN NOT NULL DEFAULT false,
 
     -- =============================================
     -- AUDIT
@@ -66,9 +65,12 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     created_by                   TEXT,
     updated_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                   TEXT,
+    is_deleted                    BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT uq_hr_employee_name UNIQUE (org_id, first_name, last_name)
 );
+
+COMMENT ON TABLE hr_employee IS 'Unified employee register and org membership table. Every employee gets a row here with a required access_level that defines their role (owner, manager, team_lead, employee). Employees without app access have a null user_id. A user can belong to multiple orgs by having one row per org. Tracks employment details, management hierarchy, and compensation.';
 
 CREATE INDEX idx_hr_employee_org_id     ON hr_employee (org_id);
 CREATE INDEX idx_hr_employee_user_id    ON hr_employee (user_id);
@@ -77,19 +79,7 @@ CREATE INDEX idx_hr_employee_team_lead  ON hr_employee (team_lead_id);
 CREATE INDEX idx_hr_employee_department ON hr_employee (hr_department_id);
 CREATE INDEX idx_hr_employee_title      ON hr_employee (hr_title_id);
 
-COMMENT ON TABLE hr_employee IS 'Unified employee register and org membership. Every user with org access has a row here. Tracks employment details, management hierarchy, compensation, and access level. A user can have rows in multiple orgs.';
-COMMENT ON COLUMN hr_employee.id IS 'Human-readable identifier derived from employee name (e.g. john_smith)';
-COMMENT ON COLUMN hr_employee.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN hr_employee.first_name IS 'Employee first name';
-COMMENT ON COLUMN hr_employee.last_name IS 'Employee last name';
-COMMENT ON COLUMN hr_employee.preferred_name IS 'Preferred or nickname used in day-to-day communication';
-COMMENT ON COLUMN hr_employee.gender IS 'Employee gender';
-COMMENT ON COLUMN hr_employee.date_of_birth IS 'Employee date of birth';
 COMMENT ON COLUMN hr_employee.is_minority IS 'Whether the employee is classified as a minority for compliance reporting';
-COMMENT ON COLUMN hr_employee.profile_photo_url IS 'URL to employee profile photo';
-COMMENT ON COLUMN hr_employee.phone IS 'Employee phone number';
-COMMENT ON COLUMN hr_employee.email IS 'Employee email address';
-COMMENT ON COLUMN hr_employee.company_email IS 'Company-issued email address';
 COMMENT ON COLUMN hr_employee.user_id IS 'Link to Supabase auth user; nullable for employees without system access';
 COMMENT ON COLUMN hr_employee.hr_department_id IS 'Department the employee belongs to; references hr_department';
 COMMENT ON COLUMN hr_employee.hr_title_id IS 'Job title from the org title lookup; references hr_title';
@@ -97,18 +87,11 @@ COMMENT ON COLUMN hr_employee.access_level IS 'System access level: owner, manag
 COMMENT ON COLUMN hr_employee.team_lead_id IS 'Self-referencing TEXT FK to direct team_lead; stores readable employee id (e.g. jane_doe)';
 COMMENT ON COLUMN hr_employee.compensation_manager_id IS 'Self-referencing TEXT FK to compensation manager; stores readable employee id';
 COMMENT ON COLUMN hr_employee.hr_work_authorization_id IS 'Visa/work authorization type; references hr_work_authorization (e.g. local, wfe, furte, h1b)';
-COMMENT ON COLUMN hr_employee.start_date IS 'Employment start date';
-COMMENT ON COLUMN hr_employee.end_date IS 'Employment end date; NULL if currently employed';
-COMMENT ON COLUMN hr_employee.is_deleted IS 'Soft delete flag; false disables the employee without removing the record';
 COMMENT ON COLUMN hr_employee.is_verifier IS 'Whether this employee is authorized to verify records';
 COMMENT ON COLUMN hr_employee.payroll_id IS 'External payroll system identifier';
 COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type: hourly or salary';
 COMMENT ON COLUMN hr_employee.overtime_threshold IS 'Hours threshold before overtime kicks in';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';
-COMMENT ON COLUMN hr_employee.payroll_admin IS 'Payroll administrator responsible for employee compensation (e.g. HRB, HF)';
-COMMENT ON COLUMN hr_employee.payslip_delivery_method IS 'How pay stubs are delivered (e.g. email, print, portal)';
+COMMENT ON COLUMN hr_employee.payroll_processor IS 'Payroll administrator responsible for employee compensation (e.g. HRB, HF)';
+COMMENT ON COLUMN hr_employee.pay_delivery_method IS 'How pay stubs are delivered (e.g. email, print, portal)';
 COMMENT ON COLUMN hr_employee.site_id_housing IS 'Reference to the site record used as the employee housing assignment';
-COMMENT ON COLUMN hr_employee.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN hr_employee.created_by IS 'Email of the user who created the record';
-COMMENT ON COLUMN hr_employee.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN hr_employee.updated_by IS 'Email of the user who last updated the record';

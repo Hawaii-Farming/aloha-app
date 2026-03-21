@@ -9,29 +9,22 @@ CREATE TABLE IF NOT EXISTS invnt_usage (
     burn_uom               TEXT REFERENCES util_uom(code),
     quantity_burn          NUMERIC NOT NULL,
 
-    is_deleted              BOOLEAN NOT NULL DEFAULT false,
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by             TEXT,
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by             TEXT
+    updated_by             TEXT,
+    is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
+
+COMMENT ON TABLE invnt_usage IS 'Tracks inventory consumption linked back to the source module that triggered it. The reference_table and reference_id columns provide a generic FK to any table so usage can be traced to its origin.';
 
 CREATE INDEX idx_invnt_usage_org_id ON invnt_usage (org_id);
 CREATE INDEX idx_invnt_usage_item ON invnt_usage (invnt_item_id, usage_date);
 CREATE INDEX idx_invnt_usage_ref ON invnt_usage (reference_table, reference_id);
 
-COMMENT ON TABLE invnt_usage IS 'Tracks inventory consumption linked back to the source module via reference_table and reference_id';
-COMMENT ON COLUMN invnt_usage.id IS 'Unique identifier for the usage record';
-COMMENT ON COLUMN invnt_usage.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN invnt_usage.farm_id IS 'Optional farm scope';
 COMMENT ON COLUMN invnt_usage.invnt_item_id IS 'Inventory item that was consumed';
 COMMENT ON COLUMN invnt_usage.reference_table IS 'Source table that triggered the usage (e.g. grow_fertigation_schedule, harvest_batch)';
 COMMENT ON COLUMN invnt_usage.reference_id IS 'Source record ID in the reference_table';
 COMMENT ON COLUMN invnt_usage.usage_date IS 'Date the consumption occurred';
 COMMENT ON COLUMN invnt_usage.burn_uom IS 'Unit of measure for the burn quantity';
 COMMENT ON COLUMN invnt_usage.quantity_burn IS 'Quantity consumed in burn units';
-COMMENT ON COLUMN invnt_usage.is_deleted IS 'Soft delete flag; true means the record has been removed';
-COMMENT ON COLUMN invnt_usage.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN invnt_usage.created_by IS 'Email of the user who created the record';
-COMMENT ON COLUMN invnt_usage.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN invnt_usage.updated_by IS 'Email of the user who last updated the record';

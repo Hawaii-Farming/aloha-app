@@ -14,33 +14,23 @@ CREATE TABLE IF NOT EXISTS ops_training_attendee (
 
     notes               TEXT,
 
-    is_deleted           BOOLEAN NOT NULL DEFAULT false,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by          TEXT,
+    is_deleted           BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT uq_ops_training_attendee UNIQUE (ops_training_id, hr_employee_id)
 );
+
+COMMENT ON TABLE ops_training_attendee IS 'Individual attendance and certification records for each employee per training session. One row per employee per training.';
 
 CREATE INDEX idx_ops_training_attendee_training ON ops_training_attendee (ops_training_id);
 CREATE INDEX idx_ops_training_attendee_employee ON ops_training_attendee (hr_employee_id);
 CREATE INDEX idx_ops_training_attendee_org      ON ops_training_attendee (org_id);
 
-COMMENT ON TABLE ops_training_attendee IS 'Individual attendance and certification records for each employee per training session. One row per employee per training.';
-COMMENT ON COLUMN ops_training_attendee.id IS 'Unique identifier for the attendee record';
-COMMENT ON COLUMN ops_training_attendee.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN ops_training_attendee.farm_id IS 'Optional farm scope; inherited from parent ops_training';
 COMMENT ON COLUMN ops_training_attendee.ops_training_id IS 'Training session this attendance record belongs to';
 COMMENT ON COLUMN ops_training_attendee.hr_employee_id IS 'Employee who attended the training; row is created only when attendance is confirmed';
-COMMENT ON COLUMN ops_training_attendee.signed_at IS 'Timestamp when the employee signed the training attendance record';
 COMMENT ON COLUMN ops_training_attendee.certification_number IS 'Certification number issued to the employee upon completion';
 COMMENT ON COLUMN ops_training_attendee.certification_issued_on IS 'Date the certification was issued to the employee';
 COMMENT ON COLUMN ops_training_attendee.certification_expires_on IS 'Date the employee certification expires';
-COMMENT ON COLUMN ops_training_attendee.certificate_url IS 'URL or path to the issued certificate document';
-COMMENT ON COLUMN ops_training_attendee.notes IS 'Free-text notes about this attendee record';
-COMMENT ON COLUMN ops_training_attendee.is_deleted IS 'Soft delete flag; true means the record has been removed';
-COMMENT ON COLUMN ops_training_attendee.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN ops_training_attendee.created_by IS 'Email of the user who created the record';
-COMMENT ON COLUMN ops_training_attendee.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN ops_training_attendee.updated_by IS 'Email of the user who last updated the record';

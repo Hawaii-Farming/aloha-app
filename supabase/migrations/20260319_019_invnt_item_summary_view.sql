@@ -86,5 +86,3 @@ FROM invnt_item i
 LEFT JOIN latest_onhand lo ON lo.invnt_item_id = i.id
 LEFT JOIN open_orders oo ON oo.invnt_item_id = i.id
 WHERE i.is_deleted = false;
-
-COMMENT ON VIEW invnt_item_summary IS 'Dashboard view combining latest on-hand snapshot, open order totals with received deliveries, and computed forecasts (weeks-on-hand, next-order-date) per active inventory item';

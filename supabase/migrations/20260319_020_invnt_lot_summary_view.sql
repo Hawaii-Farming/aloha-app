@@ -17,5 +17,3 @@ WHERE is_deleted = false
   AND lot_number IS NOT NULL
   AND onhand_quantity > 0
 ORDER BY invnt_item_id, lot_number, onhand_date DESC, created_at DESC;
-
-COMMENT ON VIEW invnt_lot_summary IS 'Latest on-hand snapshot per item and lot number combination; only includes lots with positive stock';

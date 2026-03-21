@@ -34,7 +34,7 @@ aloha-app/
   src/                   # React application (coming soon)
 ```
 
-## Core Schema (6 tables) — [Docs](docs/schemas/20260319_01_core.md)
+## Org Module (6 tables) — [Docs](docs/schemas/20260319_01_org.md)
 
 ### Global Reference Tables
 These tables are shared across all organizations.
@@ -114,7 +114,7 @@ These tables are shared across all organizations.
 
 ## Food Safety Module (6 tables) — [Docs](docs/schemas/20260319_08_fsafe.md)
 
-- **fsafe_emp_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
+- **fsafe_lab_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_emp_result** — Individual EMP test results per site with retest/vector chaining and corrective action linkage; water tests recorded here using named definitions (e.g. water_listeria, water_ecoli, water_salmonella)
 - **fsafe_lab** — Catalog of laboratories used for food safety test submissions (TEXT PK)
 - **fsafe_test_hold** — Test-and-hold header; one record per pack lot tested, tracks sample collection, lab submission, and test timeline
@@ -141,7 +141,7 @@ See [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) for the full set of schem
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [Core Schema](docs/schemas/20260319_01_core.md) — 6 foundation tables
+- [Org Schema](docs/schemas/20260319_01_org.md) — 6 foundation tables
 - [Inventory Schema](docs/schemas/20260319_02_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260319_03_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260319_04_ops.md) — Task tracking, training, and food safety checklists

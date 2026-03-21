@@ -10,8 +10,8 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| (none)    | Core (`util_uom`, `org`, `farm`, `site`) | 001–009 | 01 |
-| `grow_`   | Core crop data (`grow_variety`, `grow_grade`) | (within Core) | 01 |
+| (none)    | Org (`util_uom`, `org`, `farm`, `site`) | 001–009 | 01 |
+| `grow_`   | Org crop data (`grow_variety`, `grow_grade`) | (within Org) | 01 |
 | `invnt_`  | Inventory       | 012–020 | 02 |
 | `hr_`     | Human Resources | 021–025 | 03 |
 | `ops_`    | Operations      | 026–038 | 04 |
@@ -23,8 +23,6 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 
 Sales & Pack migration ranges are interleaved (039–054) due to cross-module FK dependencies.
 
-Tables designed but not yet ready for deployment go in `supabase/migrations_future/` and are documented in the `_09_future.md` schema doc.
-
 ---
 
 ## 2. Standard Fields
@@ -32,16 +30,15 @@ Tables designed but not yet ready for deployment go in `supabase/migrations_futu
 Every table includes these fields. They are omitted from `.md` column tables for brevity and do not receive `COMMENT ON COLUMN` descriptions.
 
 ```sql
-is_deleted  BOOLEAN     NOT NULL DEFAULT false
 created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 created_by  TEXT
 updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 updated_by  TEXT
+is_deleted  BOOLEAN     NOT NULL DEFAULT false
 ```
 
 - `is_deleted` — soft delete flag. No records are physically deleted. Queries filter on `WHERE is_deleted = false`.
 - `created_by` / `updated_by` — Supabase Auth email (TEXT, no FK). These are audit fields, not workflow fields.
-- `updated_at` / `updated_by` always close the column list.
 - `ON DELETE CASCADE` is never used. All FK constraints use the default `RESTRICT` behavior.
 
 ### Workflow fields
@@ -57,7 +54,7 @@ Workflow field rules:
 - Timestamp always precedes person: `verified_at` before `verified_by`
 - Ordered by lifecycle stage: `requested_at/by` → `reviewed_at/by` → `approved_at/by` → `ordered_at/by` → `verified_at/by`
 - Use `_at` (TIMESTAMPTZ) when exact time matters; use `_on` (DATE) when only the date matters (e.g. `sampled_on`, `delivered_to_lab_on`)
-- Workflow fields sit between `created_by` and `updated_at` in column order
+- Workflow fields sit between business fields and CRUD fields in column order
 - They are additional — they do not replace `created_at`/`created_by`
 
 The **only** `auth.users` FK in the project is `hr_employee.user_id UUID REFERENCES auth.users(id)`.
@@ -72,13 +69,15 @@ org_id
 farm_id              (if applicable)
 site_id              (if applicable)
 ... business fields ...
-is_deleted
+... workflow fields (e.g. requested_at, requested_by, verified_at, verified_by) ...
 created_at
 created_by
-... workflow fields (e.g. requested_at, requested_by, verified_at, verified_by) ...
 updated_at
 updated_by
+is_deleted
 ```
+
+CRUD fields always close the column list in this exact order. Workflow fields sit between business fields and CRUD fields.
 
 ---
 
@@ -178,14 +177,14 @@ Column descriptions in `.md` docs must **exactly match** the text in `COMMENT ON
 
 ### Which columns get descriptions
 
-Only add `COMMENT ON COLUMN` and `.md` descriptions for **business-specific columns**. Skip descriptions for standard fields (Section 2), workflow fields (Section 2), and any column whose purpose is obvious from its name alone:
+Add `COMMENT ON COLUMN` and `.md` descriptions for **all non-PK, non-audit fields whose purpose is not obvious from the column name alone**. The fields that do NOT get comments are:
 
-- `id`, `org_id`, `farm_id`, `is_deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`
-- `verified_at/by`, `reviewed_at/by`, `sampled_at/by`, `approved_at/by`, `ordered_at/by`, `uploaded_at/by`, `completed_at`, `completed_on`, etc.
-- `start_time`, `stop_time`, `pack_date`, `harvest_date`, `best_by_date`, `order_date`, `invoice_date`, etc.
-- `name`, `description`, `notes`, `status`, `photos`, `display_order`, `caption`, etc.
+- **PK**: `id`
+- **CRUD audit**: `created_at`, `created_by`, `updated_at`, `updated_by`, `is_deleted`
+- **Scoping**: `org_id`, `farm_id`
+- **Self-descriptive columns**: fields where the name alone makes the purpose clear (e.g. `email`, `phone`, `address`, `name`, `description`, `notes`, `photos`, `caption`)
 
-Only add a description when the field's purpose is **not obvious** from its name alone (e.g. `initial_retest_vector`, `atp_site_count`, `enum_pass_options`).
+Everything else — business fields, workflow fields, FK references, status, dates, configuration fields, etc. — gets a comment. When in doubt, add the comment.
 
 ### Schema doc format
 

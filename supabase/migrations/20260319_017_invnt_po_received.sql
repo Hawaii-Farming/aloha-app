@@ -18,35 +18,23 @@ CREATE TABLE IF NOT EXISTS invnt_po_received (
     notes                  TEXT,
     received_photos        JSONB NOT NULL DEFAULT '[]',
 
-    is_deleted              BOOLEAN NOT NULL DEFAULT false,
-    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by             TEXT,
     received_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
     received_by            TEXT,
+    created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by             TEXT,
     updated_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by             TEXT
+    updated_by             TEXT,
+    is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
+
+COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a purchase order. One order can have multiple received records to handle partial deliveries. Each record captures its own lot number, expiry date, quantity, and acceptance details.';
 
 CREATE INDEX idx_invnt_po_received_po  ON invnt_po_received (invnt_po_id);
 CREATE INDEX idx_invnt_po_received_org ON invnt_po_received (org_id);
 
-COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a purchase order; supports partial receipts with lot tracking';
-COMMENT ON COLUMN invnt_po_received.id IS 'Unique identifier for the received delivery record';
-COMMENT ON COLUMN invnt_po_received.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN invnt_po_received.farm_id IS 'Optional farm scope; inherited from parent invnt_po';
 COMMENT ON COLUMN invnt_po_received.invnt_po_id IS 'Parent purchase order this delivery belongs to';
-COMMENT ON COLUMN invnt_po_received.received_date IS 'Actual date the delivery arrived';
 COMMENT ON COLUMN invnt_po_received.received_uom IS 'Unit of measure for the received quantity';
 COMMENT ON COLUMN invnt_po_received.received_quantity IS 'Quantity received in the received unit';
 COMMENT ON COLUMN invnt_po_received.burn_per_received IS 'Conversion factor: burn units per received unit at time of delivery';
-COMMENT ON COLUMN invnt_po_received.lot_number IS 'Lot or batch number from the vendor';
-COMMENT ON COLUMN invnt_po_received.lot_expiry_date IS 'Expiry date for this lot';
 COMMENT ON COLUMN invnt_po_received.delivery_truck_clean IS 'Whether the delivery truck was clean upon arrival';
 COMMENT ON COLUMN invnt_po_received.delivery_acceptable IS 'Whether the delivery was accepted in acceptable condition';
-COMMENT ON COLUMN invnt_po_received.notes IS 'Free-text notes about the delivery';
-COMMENT ON COLUMN invnt_po_received.received_photos IS 'JSON array of photo URLs documenting the delivery';
-COMMENT ON COLUMN invnt_po_received.is_deleted IS 'Soft delete flag; true means the record has been removed';
-COMMENT ON COLUMN invnt_po_received.received_at IS 'Timestamp when the delivery was recorded';
-COMMENT ON COLUMN invnt_po_received.received_by IS 'Email of the user who recorded the delivery';
-COMMENT ON COLUMN invnt_po_received.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN invnt_po_received.updated_by IS 'Email of the user who last updated the record';

@@ -106,10 +106,3 @@ ORDER BY
     sb.week_start_date,
     e.last_name,
     e.first_name;
-
-COMMENT ON VIEW ops_weekly_schedule IS
-    'Pivoted weekly schedule view. One row per employee per task per week. '
-    'Day columns show formatted start-stop times. '
-    'total_hours sums completed schedule entries. '
-    'ot_threshold_weekly is the bi-weekly overtime_threshold halved. '
-    'is_over_ot_threshold flags employees whose total_hours exceed their weekly threshold.';

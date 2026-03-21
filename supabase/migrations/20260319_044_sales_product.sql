@@ -57,29 +57,25 @@ CREATE TABLE IF NOT EXISTS sales_product (
     -- Display & status
     photos                     JSONB NOT NULL DEFAULT '[]',
     display_order              INT         NOT NULL DEFAULT 0,
-    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
 
     -- Audit
     created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                 TEXT,
     updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                 TEXT,
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT uq_sales_product_code UNIQUE (farm_id, code),
     CONSTRAINT uq_sales_product_name UNIQUE (farm_id, name)
 );
 
+COMMENT ON TABLE sales_product IS 'The sellable products from each farm. Combines a grade with a full packaging hierarchy (item, pack, sale, shipping) that drives inventory calculations.';
+
 CREATE INDEX idx_sales_product_farm_id ON sales_product (farm_id);
 
-COMMENT ON TABLE sales_product IS 'Sellable products with full packaging hierarchy (item -> pack -> sale -> shipping), unit conversions, weights, storage requirements, and product identification';
-COMMENT ON COLUMN sales_product.id IS 'Human-readable identifier derived from product name (lowercase trimmed)';
-COMMENT ON COLUMN sales_product.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN sales_product.farm_id IS 'Farm (crop line) this product belongs to';
 COMMENT ON COLUMN sales_product.grow_grade_id IS 'Harvest quality grade for this product';
 COMMENT ON COLUMN sales_product.code IS 'Short product code, unique within the farm';
-COMMENT ON COLUMN sales_product.name IS 'Full display name of the product, unique within the farm';
 COMMENT ON COLUMN sales_product.segment IS 'Market segment: wholesale, retail, or food_service';
-COMMENT ON COLUMN sales_product.description IS 'Product description for catalogs and labels';
 COMMENT ON COLUMN sales_product.pack_packaging_type_id IS 'Packaging type for this product; FK to org-defined pack_packaging_type lookup';
 COMMENT ON COLUMN sales_product.item_uom IS 'Unit of measure for the individual product item (e.g. each, head)';
 COMMENT ON COLUMN sales_product.pack_uom IS 'Unit of measure for the consumer pack level (e.g. bag, clamshell)';
@@ -109,10 +105,4 @@ COMMENT ON COLUMN sales_product.is_hazardous IS 'Whether this product is classif
 COMMENT ON COLUMN sales_product.is_fsma_traceable IS 'Whether this product is on the FDA FSMA 204 Food Traceability List';
 COMMENT ON COLUMN sales_product.gtin IS 'Global Trade Item Number (up to 14 digits)';
 COMMENT ON COLUMN sales_product.upc IS 'Universal Product Code (up to 12 digits)';
-COMMENT ON COLUMN sales_product.photos IS 'JSON array of photo URLs for the product';
 COMMENT ON COLUMN sales_product.display_order IS 'Sort order for UI display within the farm';
-COMMENT ON COLUMN sales_product.is_deleted IS 'Soft delete flag; false hides the product from active use';
-COMMENT ON COLUMN sales_product.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN sales_product.created_by IS 'Email of the user who created the record';
-COMMENT ON COLUMN sales_product.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN sales_product.updated_by IS 'Email of the user who last updated the record';

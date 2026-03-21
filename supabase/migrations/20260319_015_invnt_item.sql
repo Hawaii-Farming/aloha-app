@@ -49,14 +49,16 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     photos                   JSONB NOT NULL DEFAULT '[]',
 
     -- Status & audit
-    is_deleted                BOOLEAN NOT NULL DEFAULT false,
     created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by               TEXT,
     updated_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by               TEXT,
+    is_deleted                BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT uq_invnt_item UNIQUE (org_id, name)
 );
+
+COMMENT ON TABLE invnt_item IS 'The main inventory record. Items belong to an organization and optionally to a specific farm. Classification is handled by the category/subcategory structure. All item details are proper columns grouped by logical sections. Seed-specific fields are prefixed seed_; maintenance part fields are prefixed maint_.';
 
 CREATE INDEX idx_invnt_item_org_id ON invnt_item (org_id);
 CREATE INDEX idx_invnt_item_vendor      ON invnt_item (invnt_vendor_id);
@@ -65,15 +67,9 @@ CREATE INDEX idx_invnt_item_subcategory ON invnt_item (invnt_subcategory_id);
 CREATE INDEX idx_invnt_item_site_storage ON invnt_item (site_id_storage);
 CREATE INDEX idx_invnt_item_maint_site_equipment ON invnt_item (maint_site_id_equipment);
 
-COMMENT ON TABLE invnt_item IS 'Inventory items with three-unit system (burn, onhand, order), burn rates, reorder settings, and item details';
-COMMENT ON COLUMN invnt_item.id IS 'Unique identifier for the inventory item';
-COMMENT ON COLUMN invnt_item.org_id IS 'Owning organization for RLS filtering';
-COMMENT ON COLUMN invnt_item.farm_id IS 'Optional farm scope; NULL if item is shared across farms';
 COMMENT ON COLUMN invnt_item.invnt_category_id IS 'Top-level category for item classification; references invnt_category rows where sub_category_name IS NULL';
 COMMENT ON COLUMN invnt_item.invnt_subcategory_id IS 'Subcategory for finer item classification; references invnt_category rows where sub_category_name IS NOT NULL';
-COMMENT ON COLUMN invnt_item.name IS 'Display name of the item, unique within the org';
 COMMENT ON COLUMN invnt_item.accounting_id IS 'Identifier used to link this item to the accounting system';
-COMMENT ON COLUMN invnt_item.description IS 'Detailed description of the item';
 COMMENT ON COLUMN invnt_item.burn_uom IS 'Smallest consumption unit used for burn rate tracking (e.g. ml, g, seed)';
 COMMENT ON COLUMN invnt_item.onhand_uom IS 'Unit used for physical stock counts (e.g. bottle, bag, box)';
 COMMENT ON COLUMN invnt_item.order_uom IS 'Unit used when placing orders with vendors (e.g. case, pallet)';
@@ -93,14 +89,7 @@ COMMENT ON COLUMN invnt_item.requires_expiry_date IS 'Whether deliveries must in
 COMMENT ON COLUMN invnt_item.site_id_storage IS 'Storage site where this item is kept';
 COMMENT ON COLUMN invnt_item.maint_site_id_equipment IS 'Equipment site this part belongs to';
 COMMENT ON COLUMN invnt_item.invnt_vendor_id IS 'Primary vendor for procurement';
-COMMENT ON COLUMN invnt_item.manufacturer IS 'Manufacturer or brand name';
 COMMENT ON COLUMN invnt_item.grow_variety_id IS 'Linked crop variety for seed items';
 COMMENT ON COLUMN invnt_item.seed_is_pelleted IS 'Whether seed item is pelleted for easier planting';
 COMMENT ON COLUMN invnt_item.maint_part_type IS 'Type classification for parts (e.g. electrical, mechanical, plumbing)';
 COMMENT ON COLUMN invnt_item.maint_part_number IS 'Manufacturer part number or catalog SKU';
-COMMENT ON COLUMN invnt_item.photos IS 'JSON array of photo URLs for the item';
-COMMENT ON COLUMN invnt_item.is_deleted IS 'Soft delete flag; false hides the item from active use';
-COMMENT ON COLUMN invnt_item.created_at IS 'Timestamp when the record was created';
-COMMENT ON COLUMN invnt_item.created_by IS 'Email of the user who created the record';
-COMMENT ON COLUMN invnt_item.updated_at IS 'Timestamp when the record was last updated';
-COMMENT ON COLUMN invnt_item.updated_by IS 'Email of the user who last updated the record';
