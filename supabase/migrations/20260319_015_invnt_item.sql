@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS invnt_item (
     id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                   TEXT NOT NULL REFERENCES org(id),
-    farm_id                  TEXT REFERENCES farm(id),
+    farm_id                  TEXT REFERENCES org_farm(id),
     invnt_category_id        TEXT REFERENCES invnt_category(id),
     invnt_subcategory_id     TEXT REFERENCES invnt_category(id),
     name                     TEXT NOT NULL,
@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     description              TEXT,
 
     -- Three-unit system
-    burn_uom                 TEXT REFERENCES util_uom(code),
-    onhand_uom               TEXT REFERENCES util_uom(code),
-    order_uom                TEXT REFERENCES util_uom(code),
+    burn_uom                 TEXT REFERENCES org_uom(code),
+    onhand_uom               TEXT REFERENCES org_uom(code),
+    order_uom                TEXT REFERENCES org_uom(code),
     burn_per_onhand     NUMERIC,
     burn_per_order      NUMERIC,
 
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     requires_expiry_date     BOOLEAN NOT NULL DEFAULT false,
 
     -- Site references
-    site_id_storage      TEXT REFERENCES site(id),
-    maint_site_id_equipment  TEXT REFERENCES site(id),
+    site_id_storage      TEXT REFERENCES org_site(id),
+    site_id_equipment  TEXT REFERENCES org_site(id),
 
     -- Item details
     invnt_vendor_id          TEXT REFERENCES invnt_vendor(id),
@@ -67,7 +67,7 @@ CREATE INDEX idx_invnt_item_vendor      ON invnt_item (invnt_vendor_id);
 CREATE INDEX idx_invnt_item_category    ON invnt_item (invnt_category_id);
 CREATE INDEX idx_invnt_item_subcategory ON invnt_item (invnt_subcategory_id);
 CREATE INDEX idx_invnt_item_site_storage ON invnt_item (site_id_storage);
-CREATE INDEX idx_invnt_item_maint_site_equipment ON invnt_item (maint_site_id_equipment);
+CREATE INDEX idx_invnt_item_site_equipment ON invnt_item (site_id_equipment);
 
 COMMENT ON COLUMN invnt_item.invnt_category_id IS 'References invnt_category rows where sub_category_name IS NULL';
 COMMENT ON COLUMN invnt_item.invnt_subcategory_id IS 'References invnt_category rows where sub_category_name IS NOT NULL';

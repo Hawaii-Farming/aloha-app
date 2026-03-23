@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS fsafe_emp_result (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          TEXT NOT NULL REFERENCES org(id),
-    farm_id         TEXT REFERENCES farm(id),
-    site_id         TEXT NOT NULL REFERENCES site(id),
+    farm_id         TEXT REFERENCES org_farm(id),
+    site_id         TEXT NOT NULL REFERENCES org_site(id),
     -- Test configuration
     fsafe_lab_id    TEXT REFERENCES fsafe_lab(id),
     fsafe_lab_test_id   TEXT NOT NULL REFERENCES fsafe_lab_test(id),
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS fsafe_emp_result (
     fail_code       TEXT,
 
     -- Retest / vector test linkage
-    original_fsafe_emp_result_id UUID REFERENCES fsafe_emp_result(id),
+    fsafe_emp_result_id_original UUID REFERENCES fsafe_emp_result(id),
 
     notes           TEXT,
 
@@ -34,13 +34,13 @@ CREATE TABLE IF NOT EXISTS fsafe_emp_result (
     is_deleted       BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE fsafe_emp_result IS 'EMP test results. One row per test event. Retests and vector tests link back to the original failing test via original_fsafe_emp_result_id, forming a clear chain of why each test was created.';
+COMMENT ON TABLE fsafe_emp_result IS 'EMP test results. One row per test event. Retests and vector tests link back to the original failing test via fsafe_emp_result_id_original, forming a clear chain of why each test was created.';
 
 CREATE INDEX idx_fsafe_emp_result_org      ON fsafe_emp_result (org_id);
 CREATE INDEX idx_fsafe_emp_result_lab      ON fsafe_emp_result (fsafe_lab_id);
 CREATE INDEX idx_fsafe_emp_result_site     ON fsafe_emp_result (site_id);
 CREATE INDEX idx_fsafe_emp_result_test     ON fsafe_emp_result (fsafe_lab_test_id);
-CREATE INDEX idx_fsafe_emp_result_original ON fsafe_emp_result (original_fsafe_emp_result_id);
+CREATE INDEX idx_fsafe_emp_result_original ON fsafe_emp_result (fsafe_emp_result_id_original);
 CREATE INDEX idx_fsafe_emp_result_status   ON fsafe_emp_result (org_id, status);
 
 COMMENT ON COLUMN fsafe_emp_result.site_id IS 'Zone classification is stored on the site record';
@@ -52,7 +52,7 @@ COMMENT ON COLUMN fsafe_emp_result.result_enum IS 'Selected from test enum_optio
 COMMENT ON COLUMN fsafe_emp_result.result_numeric IS 'Frontend converts detection limit strings (e.g. <1, >2419) to numeric values before submission';
 COMMENT ON COLUMN fsafe_emp_result.results_pass IS 'Whether the result meets the pass criteria defined on the EMP test definition';
 COMMENT ON COLUMN fsafe_emp_result.fail_code IS 'Human-readable failure code (e.g. LM-001)';
-COMMENT ON COLUMN fsafe_emp_result.original_fsafe_emp_result_id IS 'Initial test that triggered this retest or vector test; null for initial tests';
+COMMENT ON COLUMN fsafe_emp_result.fsafe_emp_result_id_original IS 'Initial test that triggered this retest or vector test; null for initial tests';
 
 -- Add FK from ops_corrective_action_taken now that fsafe_emp_result exists
 ALTER TABLE ops_corrective_action_taken

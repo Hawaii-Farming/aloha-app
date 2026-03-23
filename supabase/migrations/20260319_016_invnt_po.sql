@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS invnt_po (
     id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                 TEXT NOT NULL REFERENCES org(id),
-    farm_id                TEXT REFERENCES farm(id),
+    farm_id                TEXT REFERENCES org_farm(id),
 
     -- Request classification
     request_type           TEXT NOT NULL DEFAULT 'inventory_item' CHECK (request_type IN ('non_inventory_item', 'inventory_item')),
@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS invnt_po (
     item_name              TEXT NOT NULL,
 
     -- Order quantities & units (snapshots from item at order time)
-    burn_uom               TEXT REFERENCES util_uom(code),
-    order_uom              TEXT REFERENCES util_uom(code),
+    burn_uom               TEXT REFERENCES org_uom(code),
+    order_uom              TEXT REFERENCES org_uom(code),
     order_quantity         NUMERIC NOT NULL,
     burn_per_order         NUMERIC,
 

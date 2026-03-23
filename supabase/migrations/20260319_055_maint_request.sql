@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS maint_request (
     id                        UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                    TEXT        NOT NULL REFERENCES org(id),
-    farm_id                   TEXT        REFERENCES farm(id),
-    site_id                   TEXT        NOT NULL REFERENCES site(id),
+    farm_id                   TEXT        REFERENCES org_farm(id),
+    site_id                   TEXT        NOT NULL REFERENCES org_site(id),
 
     status                    TEXT        NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'pending', 'priority', 'done')),
     request_description       TEXT,

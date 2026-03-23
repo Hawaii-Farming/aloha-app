@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS invnt_sales_product_item (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id            TEXT NOT NULL REFERENCES org(id),
-    farm_id           TEXT REFERENCES farm(id),
+    farm_id           TEXT REFERENCES org_farm(id),
     product_id        TEXT NOT NULL REFERENCES sales_product(id),
     invnt_item_id     UUID NOT NULL REFERENCES invnt_item(id),
     packaging_level   TEXT NOT NULL CHECK (packaging_level IN ('pack', 'sale')),
-    sale_uom          TEXT REFERENCES util_uom(code),
+    sale_uom          TEXT REFERENCES org_uom(code),
     quantity_per_sale_uom NUMERIC,
 
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),

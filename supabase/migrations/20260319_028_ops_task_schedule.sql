@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS ops_task_schedule (
     id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                  TEXT NOT NULL REFERENCES org(id),
-    farm_id                 TEXT REFERENCES farm(id),
+    farm_id                 TEXT REFERENCES org_farm(id),
     ops_task_tracker_id     UUID NOT NULL REFERENCES ops_task_tracker(id),
     hr_employee_id          TEXT NOT NULL REFERENCES hr_employee(id),
 

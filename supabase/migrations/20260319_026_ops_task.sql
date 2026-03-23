@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS ops_task (
     id          TEXT PRIMARY KEY,
     org_id      TEXT NOT NULL REFERENCES org(id),
-    farm_id     TEXT REFERENCES farm(id),
+    farm_id     TEXT REFERENCES org_farm(id),
     name        TEXT NOT NULL,
     description TEXT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),

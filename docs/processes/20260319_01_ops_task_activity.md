@@ -148,7 +148,7 @@ SELECT tt.start_time, tt.stop_time, tt.status,
        t.name AS task, s.name AS site
 FROM ops_task_tracker tt
 JOIN ops_task t ON t.id = tt.ops_task_id
-JOIN site s     ON s.id = tt.site_id
+JOIN org_site s     ON s.id = tt.site_id
 WHERE tt.id = '[ops_task_tracker_id]';
 
 -- Checklist responses
@@ -163,7 +163,7 @@ ORDER BY q.display_order;
 -- ATP results
 SELECT s.name AS site_name, s.zone, r.response_numeric
 FROM ops_response r
-JOIN site s ON s.id = r.site_id
+JOIN org_site s ON s.id = r.site_id
 WHERE r.ops_task_tracker_id = '[ops_task_tracker_id]'
   AND r.site_id IS NOT NULL;
 ```
@@ -182,4 +182,4 @@ WHERE r.ops_task_tracker_id = '[ops_task_tracker_id]'
 | `ops_response` | All responses for an activity — both checklist answers and ATP readings |
 | `ops_corrective_action_choice` | Predefined corrective action options selectable from a dropdown |
 | `ops_corrective_action_taken` | Corrective actions raised against any failing response |
-| `site` | Provides site name, zone, and food contact surface flag for ATP site selection |
+| `org_site` | Provides site name, zone, and food contact surface flag for ATP site selection |

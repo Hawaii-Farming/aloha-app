@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS pack_lot_item (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id              TEXT NOT NULL REFERENCES org(id),
-    farm_id             TEXT NOT NULL REFERENCES farm(id),
+    farm_id             TEXT NOT NULL REFERENCES org_farm(id),
     pack_lot_id         UUID NOT NULL REFERENCES pack_lot(id),
     sales_product_id    TEXT NOT NULL REFERENCES sales_product(id),
 
     best_by_date        DATE NOT NULL,
-    uom                 TEXT NOT NULL REFERENCES util_uom(code),
+    uom                 TEXT NOT NULL REFERENCES org_uom(code),
     quantity_packed     NUMERIC NOT NULL,
 
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),

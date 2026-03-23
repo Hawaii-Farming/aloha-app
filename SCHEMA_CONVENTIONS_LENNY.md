@@ -8,8 +8,8 @@ These rules apply to every schema change in this project. All contributors must 
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| `org_`    | Org (`org`, `org_uom`, `org_farm`, `org_site`) | 001–009 | 01 |
-| `grow_`   | Grow (`grow_variety`, `grow_grade`) | TBD | 01 |
+| `org_`    | Core (`org`, `org_uom`, `org_farm`, `org_site`) | 001–009 | 01 |
+| `grow_`   | Grow            | TBD     | 01 |
 | `invnt_`  | Inventory       | 012–020 | 02 |
 | `hr_`     | Human Resources | 021–025 | 03 |
 | `ops_`    | Operations      | 026–038 | 04 |
@@ -55,7 +55,7 @@ RLS policies use:
 
 ### 3.1 Primary keys
 
-- **TEXT** — lookup and reference tables where the ID is human-readable and derived from the name column (e.g. `org`, `org_farm`, `org_site`, `hr_employee`, `ops_task`)
+- **TEXT** — lookup and reference tables where the ID is human-readable and derived from the name column (e.g. `org`, `org_farm`, `site`, `hr_employee`, `ops_task`)
 - **UUID** (`gen_random_uuid()`) — transactional tables where records are created at runtime (e.g. `ops_task_tracker`, `invnt_po`, `maint_request`)
 
 ### 3.2 FK naming
@@ -70,7 +70,6 @@ sales_customer_id → sales_customer(id)
 
 Exceptions:
 
-- **Scoping columns** — `farm_id` and `site_id` keep their short names even though the tables are `org_farm` and `org_site`
 - **Workflow columns** — role-based names referencing `hr_employee(id)` (see 3.8)
 - **Self-referencing FKs** — use a semantic suffix so the domain prefix is preserved (e.g. `fsafe_emp_result_id_original` in `fsafe_emp_result`, not `original_fsafe_emp_result_id`)
 - **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` and `site_id_equipment` in `invnt_item`, `site_id_housing` in `hr_employee`)
@@ -199,7 +198,7 @@ Each `.md` doc must include:
 
 1. A module title and one-paragraph description
 2. A standard audit column note at the top referencing 3.9
-3. A Mermaid ERD — relationships only, no entity attribute blocks. Unquoted, lowercase labels with underscores. Every referenced core entity must appear with its full ownership chain (if `org_farm` appears, include `org ||--o{ org_farm : operates`; if `org_site` appears, include `org_farm ||--o{ org_site : contains`)
+3. A Mermaid ERD — relationships only, no entity attribute blocks. Unquoted, lowercase labels with underscores. Every referenced core entity must appear with its full ownership chain (if `farm` appears, include `org ||--o{ farm : operates`; if `site` appears, include `farm ||--o{ site : contains`)
 4. A table overview section
 5. A section per table with:
    - One-paragraph description

@@ -39,14 +39,14 @@ aloha-app/
 ### Global Reference Tables
 These tables are shared across all organizations.
 
-- **util_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
+- **org_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
 
 ### Organization
 - **org** — Root entity for multi-org support with currency setting
 
 ### Farm Structure
-- **farm** — Crop/product lines within an org with weighing and growing UOM defaults
-- **site** — Unified site register for all locations and assets (growing, packaging, storage, maintenance) with category/subcategory-driven fields
+- **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
+- **org_site** — Unified site register for all locations and assets (growing, packaging, storage, maintenance) with category/subcategory-driven fields
 - **grow_variety** — Crop varieties with short codes (e.g. "K" for Keiki)
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A)
 

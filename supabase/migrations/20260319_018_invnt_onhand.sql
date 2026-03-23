@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS invnt_onhand (
     id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                 TEXT NOT NULL REFERENCES org(id),
-    farm_id                TEXT REFERENCES farm(id),
+    farm_id                TEXT REFERENCES org_farm(id),
     invnt_item_id          UUID NOT NULL REFERENCES invnt_item(id),
     onhand_date            DATE NOT NULL,
-    onhand_uom             TEXT REFERENCES util_uom(code),
+    onhand_uom             TEXT REFERENCES org_uom(code),
     onhand_quantity        NUMERIC NOT NULL,
     burn_per_onhand   NUMERIC,
 

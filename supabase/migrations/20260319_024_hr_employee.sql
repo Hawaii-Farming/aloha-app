@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     -- =============================================
     -- HOUSING
     -- =============================================
-    site_id_housing              TEXT REFERENCES site(id),
+    site_id_housing              TEXT REFERENCES org_site(id),
 
     is_verifier                  BOOLEAN NOT NULL DEFAULT false,
 

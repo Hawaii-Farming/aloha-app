@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS invnt_usage (
     id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                 TEXT NOT NULL REFERENCES org(id),
-    farm_id                TEXT REFERENCES farm(id),
+    farm_id                TEXT REFERENCES org_farm(id),
     invnt_item_id          UUID NOT NULL REFERENCES invnt_item(id),
     reference_table        TEXT,
     reference_id           UUID,
     usage_date             DATE NOT NULL,
-    burn_uom               TEXT REFERENCES util_uom(code),
+    burn_uom               TEXT REFERENCES org_uom(code),
     quantity_burn          NUMERIC NOT NULL,
 
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),

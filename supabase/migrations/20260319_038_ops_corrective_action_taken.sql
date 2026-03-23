@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     id                                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                              TEXT        NOT NULL REFERENCES org(id),
-    farm_id                             TEXT        REFERENCES farm(id),
+    farm_id                             TEXT        REFERENCES org_farm(id),
     ops_template_id                     TEXT        REFERENCES ops_template(id),
     ops_response_id                     UUID        REFERENCES ops_response(id),
     fsafe_emp_result_id                 UUID,       -- FK to fsafe_emp_result(id) added via ALTER TABLE in fsafe_emp_result migration

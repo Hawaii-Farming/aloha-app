@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS ops_response (
     id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                  TEXT        NOT NULL REFERENCES org(id),
-    farm_id                 TEXT        REFERENCES farm(id),
+    farm_id                 TEXT        REFERENCES org_farm(id),
     ops_task_tracker_id     UUID        NOT NULL REFERENCES ops_task_tracker(id),
     ops_template_id         TEXT        NOT NULL REFERENCES ops_template(id),
     ops_question_id         UUID        REFERENCES ops_question(id),
-    site_id                 TEXT        REFERENCES site(id),
+    site_id                 TEXT        REFERENCES org_site(id),
 
     response_boolean        BOOLEAN,
     response_numeric        NUMERIC,

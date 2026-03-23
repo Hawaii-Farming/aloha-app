@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS grow_grade (
     id         TEXT PRIMARY KEY,
     org_id     TEXT NOT NULL REFERENCES org(id),
-    farm_id    TEXT NOT NULL REFERENCES farm(id),
+    farm_id    TEXT NOT NULL REFERENCES org_farm(id),
     code       TEXT NOT NULL,
     name       TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
