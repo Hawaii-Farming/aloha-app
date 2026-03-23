@@ -22,9 +22,5 @@ CREATE INDEX idx_invnt_usage_org_id ON invnt_usage (org_id);
 CREATE INDEX idx_invnt_usage_item ON invnt_usage (invnt_item_id, usage_date);
 CREATE INDEX idx_invnt_usage_ref ON invnt_usage (reference_table, reference_id);
 
-COMMENT ON COLUMN invnt_usage.invnt_item_id IS 'Inventory item that was consumed';
 COMMENT ON COLUMN invnt_usage.reference_table IS 'Source table that triggered the usage (e.g. grow_fertigation_schedule, harvest_batch)';
 COMMENT ON COLUMN invnt_usage.reference_id IS 'Source record ID in the reference_table';
-COMMENT ON COLUMN invnt_usage.usage_date IS 'Date the consumption occurred';
-COMMENT ON COLUMN invnt_usage.burn_uom IS 'Unit of measure for the burn quantity';
-COMMENT ON COLUMN invnt_usage.quantity_burn IS 'Quantity consumed in burn units';

@@ -21,5 +21,3 @@ COMMENT ON TABLE sales_customer IS 'Stores an organization''s customers with the
 CREATE INDEX idx_sales_customer_org_id ON sales_customer (org_id);
 
 COMMENT ON COLUMN sales_customer.sales_customer_group_id IS 'Customer group for reporting and group-level pricing';
-COMMENT ON COLUMN sales_customer.sales_fob_id IS 'Default FOB delivery point for this customer';
-COMMENT ON COLUMN sales_customer.accounting_id IS 'External accounting system identifier for integration';

@@ -21,7 +21,3 @@ COMMENT ON TABLE maint_request_invnt_item IS 'Inventory items consumed during a 
 CREATE INDEX idx_maint_request_invnt_item_request ON maint_request_invnt_item (maint_request_id);
 CREATE INDEX idx_maint_request_invnt_item_item    ON maint_request_invnt_item (invnt_item_id);
 
-COMMENT ON COLUMN maint_request_invnt_item.maint_request_id IS 'Maintenance request this inventory item usage belongs to';
-COMMENT ON COLUMN maint_request_invnt_item.invnt_item_id IS 'Inventory item used during the maintenance';
-COMMENT ON COLUMN maint_request_invnt_item.uom IS 'Unit of measure for the quantity used';
-COMMENT ON COLUMN maint_request_invnt_item.quantity_used IS 'Quantity of the item consumed during the maintenance';

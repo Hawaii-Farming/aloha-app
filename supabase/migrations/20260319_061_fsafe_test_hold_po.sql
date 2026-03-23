@@ -20,5 +20,3 @@ CREATE INDEX idx_fsafe_test_hold_po_org       ON fsafe_test_hold_po (org_id);
 CREATE INDEX idx_fsafe_test_hold_po_test_hold ON fsafe_test_hold_po (fsafe_test_hold_id);
 CREATE INDEX idx_fsafe_test_hold_po_sales_po  ON fsafe_test_hold_po (sales_po_id);
 
-COMMENT ON COLUMN fsafe_test_hold_po.fsafe_test_hold_id IS 'Parent test-and-hold record';
-COMMENT ON COLUMN fsafe_test_hold_po.sales_po_id IS 'Sales purchase order that is on hold pending test results';

@@ -18,5 +18,4 @@ CREATE INDEX idx_invnt_category_org_id ON invnt_category (org_id);
 CREATE UNIQUE INDEX uq_invnt_category_top_level  ON invnt_category (org_id, category_name) WHERE sub_category_name IS NULL;
 CREATE UNIQUE INDEX uq_invnt_category_sub_level   ON invnt_category (org_id, category_name, sub_category_name) WHERE sub_category_name IS NOT NULL;
 
-COMMENT ON COLUMN invnt_category.category_name IS 'Top-level category name (e.g. Fertilizers, Seeds, Packaging Materials)';
-COMMENT ON COLUMN invnt_category.sub_category_name IS 'Subcategory name under the parent category; NULL when this row represents a top-level category';
+COMMENT ON COLUMN invnt_category.sub_category_name IS 'NULL when this row represents a top-level category';

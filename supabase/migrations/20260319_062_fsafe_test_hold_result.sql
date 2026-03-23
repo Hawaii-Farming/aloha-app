@@ -25,8 +25,7 @@ CREATE INDEX idx_fsafe_test_hold_result_org       ON fsafe_test_hold_result (org
 CREATE INDEX idx_fsafe_test_hold_result_test_hold ON fsafe_test_hold_result (fsafe_test_hold_id);
 CREATE INDEX idx_fsafe_test_hold_result_emp_test ON fsafe_test_hold_result (fsafe_lab_test_id);
 
-COMMENT ON COLUMN fsafe_test_hold_result.fsafe_test_hold_id IS 'Parent test-and-hold record this result belongs to';
-COMMENT ON COLUMN fsafe_test_hold_result.fsafe_lab_test_id IS 'Test type definition that defines how this result is recorded and evaluated';
-COMMENT ON COLUMN fsafe_test_hold_result.response_enum IS 'Enum result value when test type response_type is enum (e.g. Positive, Negative)';
-COMMENT ON COLUMN fsafe_test_hold_result.response_numeric IS 'Numeric result value when test type response_type is numeric (e.g. CFU/g count)';
-COMMENT ON COLUMN fsafe_test_hold_result.result_pass IS 'Whether this result meets the pass criteria; null until result is entered';
+COMMENT ON COLUMN fsafe_test_hold_result.fsafe_lab_test_id IS 'Defines how this result is recorded and evaluated';
+COMMENT ON COLUMN fsafe_test_hold_result.response_enum IS 'Used when test result_type is enum (e.g. Positive, Negative)';
+COMMENT ON COLUMN fsafe_test_hold_result.response_numeric IS 'Used when test result_type is numeric (e.g. CFU/g count)';
+COMMENT ON COLUMN fsafe_test_hold_result.result_pass IS 'Null until result is entered';

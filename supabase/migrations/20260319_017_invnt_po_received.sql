@@ -32,9 +32,4 @@ COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a 
 CREATE INDEX idx_invnt_po_received_po  ON invnt_po_received (invnt_po_id);
 CREATE INDEX idx_invnt_po_received_org ON invnt_po_received (org_id);
 
-COMMENT ON COLUMN invnt_po_received.invnt_po_id IS 'Parent purchase order this delivery belongs to';
-COMMENT ON COLUMN invnt_po_received.received_uom IS 'Unit of measure for the received quantity';
-COMMENT ON COLUMN invnt_po_received.received_quantity IS 'Quantity received in the received unit';
 COMMENT ON COLUMN invnt_po_received.burn_per_received IS 'Conversion factor: burn units per received unit at time of delivery';
-COMMENT ON COLUMN invnt_po_received.delivery_truck_clean IS 'Whether the delivery truck was clean upon arrival';
-COMMENT ON COLUMN invnt_po_received.delivery_acceptable IS 'Whether the delivery was accepted in acceptable condition';

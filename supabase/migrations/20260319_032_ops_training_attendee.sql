@@ -29,8 +29,4 @@ CREATE INDEX idx_ops_training_attendee_training ON ops_training_attendee (ops_tr
 CREATE INDEX idx_ops_training_attendee_employee ON ops_training_attendee (hr_employee_id);
 CREATE INDEX idx_ops_training_attendee_org      ON ops_training_attendee (org_id);
 
-COMMENT ON COLUMN ops_training_attendee.ops_training_id IS 'Training session this attendance record belongs to';
-COMMENT ON COLUMN ops_training_attendee.hr_employee_id IS 'Employee who attended the training; row is created only when attendance is confirmed';
-COMMENT ON COLUMN ops_training_attendee.certification_number IS 'Certification number issued to the employee upon completion';
-COMMENT ON COLUMN ops_training_attendee.certification_issued_on IS 'Date the certification was issued to the employee';
-COMMENT ON COLUMN ops_training_attendee.certification_expires_on IS 'Date the employee certification expires';
+COMMENT ON COLUMN ops_training_attendee.hr_employee_id IS 'Row is created only when attendance is confirmed';

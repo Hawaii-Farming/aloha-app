@@ -26,6 +26,4 @@ CREATE INDEX idx_ops_task_schedule_tracker  ON ops_task_schedule (ops_task_track
 CREATE INDEX idx_ops_task_schedule_employee ON ops_task_schedule (hr_employee_id);
 CREATE INDEX idx_ops_task_schedule_org_id   ON ops_task_schedule (org_id);
 
-COMMENT ON COLUMN ops_task_schedule.ops_task_tracker_id IS 'Parent task event this schedule entry belongs to';
-COMMENT ON COLUMN ops_task_schedule.hr_employee_id IS 'Employee scheduled for the task';
 COMMENT ON COLUMN ops_task_schedule.units_completed IS 'Generic output quantity for this employee (e.g. lbs picked, trays seeded, rows cleaned)';

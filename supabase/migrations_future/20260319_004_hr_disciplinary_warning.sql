@@ -39,10 +39,6 @@ CREATE INDEX idx_hr_disciplinary_warning_employee ON hr_disciplinary_warning (em
 CREATE INDEX idx_hr_disciplinary_warning_status ON hr_disciplinary_warning (org_id, status);
 CREATE INDEX idx_hr_disciplinary_warning_date ON hr_disciplinary_warning (employee_id, warning_date);
 
-COMMENT ON COLUMN hr_disciplinary_warning.employee_id IS 'Employee receiving the warning';
 COMMENT ON COLUMN hr_disciplinary_warning.warning_type IS 'Severity level: verbal_warning, written_warning, final_warning, suspension, termination';
 COMMENT ON COLUMN hr_disciplinary_warning.offense_type IS 'Category of offense (e.g. Attendance, Performance, Conduct, Safety, Policy Violation)';
-COMMENT ON COLUMN hr_disciplinary_warning.plan_for_improvement IS 'Agreed steps or plan for the employee to improve';
-COMMENT ON COLUMN hr_disciplinary_warning.further_infraction_consequences IS 'Stated consequences if further infractions occur';
-COMMENT ON COLUMN hr_disciplinary_warning.is_acknowledged IS 'Whether the employee has acknowledged receipt of the warning';
 COMMENT ON COLUMN hr_disciplinary_warning.status IS 'Review status: pending, reviewed';

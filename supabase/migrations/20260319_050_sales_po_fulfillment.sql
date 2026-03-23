@@ -22,7 +22,4 @@ CREATE INDEX idx_sales_po_fulfillment_org_id     ON sales_po_fulfillment (org_id
 CREATE INDEX idx_sales_po_fulfillment_order_line ON sales_po_fulfillment (sales_po_line_id);
 CREATE INDEX idx_sales_po_fulfillment_lot        ON sales_po_fulfillment (pack_lot_id);
 
-COMMENT ON COLUMN sales_po_fulfillment.sales_po_id IS 'Parent order this fulfillment belongs to; inherited from parent sales_po_line';
-COMMENT ON COLUMN sales_po_fulfillment.sales_po_line_id IS 'Order line being fulfilled';
-COMMENT ON COLUMN sales_po_fulfillment.pack_lot_id IS 'Pack lot the fulfilled product was drawn from; null if lot tracking is not applicable';
-COMMENT ON COLUMN sales_po_fulfillment.quantity_fulfilled IS 'Number of sale units fulfilled from this lot for this order line';
+COMMENT ON COLUMN sales_po_fulfillment.pack_lot_id IS 'Null if lot tracking is not applicable';

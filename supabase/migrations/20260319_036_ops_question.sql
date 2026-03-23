@@ -35,11 +35,8 @@ COMMENT ON TABLE ops_question IS 'Questions within a checklist template. Ordered
 CREATE INDEX idx_ops_question_org_id   ON ops_question (org_id);
 CREATE INDEX idx_ops_question_template ON ops_question (ops_template_id, display_order);
 
-COMMENT ON COLUMN ops_question.ops_template_id IS 'Checklist template this question belongs to';
 COMMENT ON COLUMN ops_question.display_order IS 'Display order of this question within the template';
-COMMENT ON COLUMN ops_question.question_text IS 'The question or checklist item text shown to the employee';
 COMMENT ON COLUMN ops_question.response_type IS 'Expected response format: boolean, numeric, or enum';
-COMMENT ON COLUMN ops_question.is_required IS 'Whether this question must be answered before the checklist can be submitted';
 COMMENT ON COLUMN ops_question.boolean_pass_value IS 'The boolean value that constitutes a pass; used when response_type is boolean (e.g. true for Yes/Pass, false for No/Pass)';
 COMMENT ON COLUMN ops_question.numeric_minimum_value IS 'Minimum acceptable numeric value; a response below this triggers a corrective action warning';
 COMMENT ON COLUMN ops_question.numeric_maximum_value IS 'Maximum acceptable numeric value; a response above this triggers a corrective action warning';

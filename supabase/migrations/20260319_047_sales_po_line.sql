@@ -25,8 +25,4 @@ CREATE INDEX idx_sales_po_line_org_id  ON sales_po_line (org_id);
 CREATE INDEX idx_sales_po_line_order   ON sales_po_line (sales_po_id);
 CREATE INDEX idx_sales_po_line_product ON sales_po_line (sales_product_id);
 
-COMMENT ON COLUMN sales_po_line.sales_po_id IS 'Parent order this line belongs to';
-COMMENT ON COLUMN sales_po_line.sales_product_id IS 'Product being ordered';
-COMMENT ON COLUMN sales_po_line.sale_uom IS 'Unit of measure for the quantity ordered (e.g. case, box)';
-COMMENT ON COLUMN sales_po_line.quantity_ordered IS 'Number of sale units ordered';
 COMMENT ON COLUMN sales_po_line.price_per_unit IS 'Snapshot price per unit at time of order';

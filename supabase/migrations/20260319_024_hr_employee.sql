@@ -81,17 +81,10 @@ CREATE INDEX idx_hr_employee_title      ON hr_employee (hr_title_id);
 
 COMMENT ON COLUMN hr_employee.is_minority IS 'Whether the employee is classified as a minority for compliance reporting';
 COMMENT ON COLUMN hr_employee.user_id IS 'Link to Supabase auth user; nullable for employees without system access';
-COMMENT ON COLUMN hr_employee.hr_department_id IS 'Department the employee belongs to; references hr_department';
-COMMENT ON COLUMN hr_employee.hr_title_id IS 'Job title from the org title lookup; references hr_title';
 COMMENT ON COLUMN hr_employee.access_level IS 'System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection.';
-COMMENT ON COLUMN hr_employee.team_lead_id IS 'Self-referencing TEXT FK to direct team_lead; stores readable employee id (e.g. jane_doe)';
-COMMENT ON COLUMN hr_employee.compensation_manager_id IS 'Self-referencing TEXT FK to compensation manager; stores readable employee id';
 COMMENT ON COLUMN hr_employee.hr_work_authorization_id IS 'Visa/work authorization type; references hr_work_authorization (e.g. local, wfe, furte, h1b)';
 COMMENT ON COLUMN hr_employee.is_verifier IS 'Whether this employee is authorized to verify records';
-COMMENT ON COLUMN hr_employee.payroll_id IS 'External payroll system identifier';
 COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type: hourly or salary';
-COMMENT ON COLUMN hr_employee.overtime_threshold IS 'Hours threshold before overtime kicks in';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';
 COMMENT ON COLUMN hr_employee.payroll_processor IS 'Payroll administrator responsible for employee compensation (e.g. HRB, HF)';
 COMMENT ON COLUMN hr_employee.pay_delivery_method IS 'How pay stubs are delivered (e.g. email, print, portal)';
-COMMENT ON COLUMN hr_employee.site_id_housing IS 'Reference to the site record used as the employee housing assignment';

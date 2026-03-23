@@ -21,10 +21,6 @@ CREATE INDEX idx_sales_product_price_lookup ON sales_product_price (sales_produc
 
 CREATE INDEX idx_sales_product_price_org ON sales_product_price (org_id);
 
-COMMENT ON COLUMN sales_product_price.sales_product_id IS 'Product this price applies to';
-COMMENT ON COLUMN sales_product_price.sales_fob_id IS 'FOB delivery point this price applies to';
-COMMENT ON COLUMN sales_product_price.sales_customer_group_id IS 'Customer group for group-level pricing; NULL for customer-specific or default pricing';
-COMMENT ON COLUMN sales_product_price.sales_customer_id IS 'Specific customer for customer-level pricing; NULL for group or default pricing';
-COMMENT ON COLUMN sales_product_price.price IS 'Price per sale unit';
-COMMENT ON COLUMN sales_product_price.effective_from IS 'Start date when this price becomes active';
-COMMENT ON COLUMN sales_product_price.effective_to IS 'End date when this price expires; NULL means no expiry';
+COMMENT ON COLUMN sales_product_price.sales_customer_group_id IS 'NULL for customer-specific or default pricing';
+COMMENT ON COLUMN sales_product_price.sales_customer_id IS 'NULL for group or default pricing';
+COMMENT ON COLUMN sales_product_price.effective_to IS 'NULL means no expiry';

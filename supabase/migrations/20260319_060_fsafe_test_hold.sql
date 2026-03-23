@@ -33,9 +33,8 @@ CREATE INDEX idx_fsafe_test_hold_lot      ON fsafe_test_hold (pack_lot_id);
 CREATE INDEX idx_fsafe_test_hold_customer ON fsafe_test_hold (sales_customer_id);
 CREATE INDEX idx_fsafe_test_hold_status   ON fsafe_test_hold (org_id, status);
 
-COMMENT ON COLUMN fsafe_test_hold.pack_lot_id IS 'Pack lot being tested; one record per lot per lab — submit a separate entry for the same lot if sent to a different lab';
-COMMENT ON COLUMN fsafe_test_hold.sales_customer_id IS 'Customer requesting the test-and-hold; null if group-level or internal testing';
-COMMENT ON COLUMN fsafe_test_hold.sales_customer_group_id IS 'Customer group requesting the test-and-hold; null if customer-specific or internal testing';
-COMMENT ON COLUMN fsafe_test_hold.fsafe_lab_id IS 'Laboratory where the sample is submitted for testing';
+COMMENT ON COLUMN fsafe_test_hold.pack_lot_id IS 'One record per lot per lab — submit a separate entry for the same lot if sent to a different lab';
+COMMENT ON COLUMN fsafe_test_hold.sales_customer_id IS 'Null if group-level or internal testing';
+COMMENT ON COLUMN fsafe_test_hold.sales_customer_group_id IS 'Null if customer-specific or internal testing';
 COMMENT ON COLUMN fsafe_test_hold.lab_test_id IS 'External reference number assigned by the laboratory for tracking';
 COMMENT ON COLUMN fsafe_test_hold.status IS 'Workflow status: pending (awaiting sample), in_progress (at lab), completed (results received)';

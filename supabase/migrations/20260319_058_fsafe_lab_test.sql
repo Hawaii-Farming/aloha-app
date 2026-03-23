@@ -31,9 +31,7 @@ COMMENT ON TABLE fsafe_lab_test IS 'Catalog of EMP test definitions and their re
 
 CREATE INDEX idx_fsafe_lab_test_org ON fsafe_lab_test (org_id);
 
-COMMENT ON COLUMN fsafe_lab_test.test_name IS 'Name of the test or pathogen being tested for (e.g. Listeria, Salmonella)';
 COMMENT ON COLUMN fsafe_lab_test.test_methods IS 'JSON array of available test methods users can select when recording a result (e.g. ["PCR", "Culture", "ELISA"])';
-COMMENT ON COLUMN fsafe_lab_test.test_description IS 'Optional description of the test and its purpose';
 COMMENT ON COLUMN fsafe_lab_test.result_type IS 'How results are recorded and evaluated: enum (select from list) or numeric (measured value)';
 COMMENT ON COLUMN fsafe_lab_test.enum_options IS 'JSON array of all selectable result options when result_type is enum (e.g. ["Detected", "Not Detected"])';
 COMMENT ON COLUMN fsafe_lab_test.enum_pass_options IS 'JSON array of enum values that constitute a passing result (e.g. ["Not Detected"])';

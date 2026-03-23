@@ -57,13 +57,8 @@ COMMENT ON COLUMN invnt_po.urgency_level IS 'How urgently the item is needed: to
 COMMENT ON COLUMN invnt_po.invnt_category_id IS 'Category for non_inventory_item requests; references invnt_category rows where sub_category_name IS NULL';
 COMMENT ON COLUMN invnt_po.invnt_item_id IS 'Linked inventory item; NULL for non_inventory_item requests';
 COMMENT ON COLUMN invnt_po.item_name IS 'Snapshot of item name at order time; manually entered for non_inventory_item requests';
-COMMENT ON COLUMN invnt_po.burn_uom IS 'Unit of measure for burn quantity (snapshot from item at order time)';
-COMMENT ON COLUMN invnt_po.order_uom IS 'Unit of measure for the order quantity (snapshot from item at order time)';
-COMMENT ON COLUMN invnt_po.order_quantity IS 'Quantity ordered in order units';
+COMMENT ON COLUMN invnt_po.burn_uom IS 'Snapshot from item at order time';
+COMMENT ON COLUMN invnt_po.order_uom IS 'Snapshot from item at order time';
 COMMENT ON COLUMN invnt_po.burn_per_order IS 'Snapshot of burn units per order unit at order time';
-COMMENT ON COLUMN invnt_po.vendor_po_number IS 'PO number assigned by the vendor for this order';
-COMMENT ON COLUMN invnt_po.invnt_vendor_id IS 'Vendor the order is placed with';
-COMMENT ON COLUMN invnt_po.total_cost IS 'Total cost for the order';
 COMMENT ON COLUMN invnt_po.is_freight_included IS 'Whether total_cost includes freight charges';
-COMMENT ON COLUMN invnt_po.expected_delivery_date IS 'Expected delivery date from the vendor';
 COMMENT ON COLUMN invnt_po.status IS 'Workflow status: requested, approved, rejected, ordered, partial, received, cancelled';

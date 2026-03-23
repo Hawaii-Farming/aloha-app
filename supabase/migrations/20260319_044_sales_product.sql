@@ -73,36 +73,10 @@ COMMENT ON TABLE sales_product IS 'The sellable products from each farm. Combine
 
 CREATE INDEX idx_sales_product_farm_id ON sales_product (farm_id);
 
-COMMENT ON COLUMN sales_product.grow_grade_id IS 'Harvest quality grade for this product';
-COMMENT ON COLUMN sales_product.code IS 'Short product code, unique within the farm';
 COMMENT ON COLUMN sales_product.segment IS 'Market segment: wholesale, retail, or food_service';
-COMMENT ON COLUMN sales_product.pack_packaging_type_id IS 'Packaging type for this product; FK to org-defined pack_packaging_type lookup';
-COMMENT ON COLUMN sales_product.item_uom IS 'Unit of measure for the individual product item (e.g. each, head)';
-COMMENT ON COLUMN sales_product.pack_uom IS 'Unit of measure for the consumer pack level (e.g. bag, clamshell)';
-COMMENT ON COLUMN sales_product.item_per_pack_uom IS 'Number of items per pack';
-COMMENT ON COLUMN sales_product.sale_uom IS 'Unit of measure for the sale level (e.g. case, box)';
-COMMENT ON COLUMN sales_product.pack_per_sale_uom IS 'Number of packs per sale unit';
-COMMENT ON COLUMN sales_product.shipping_uom IS 'Unit of measure for the shipping level (e.g. pallet)';
-COMMENT ON COLUMN sales_product.max_sale_per_shipping_uom IS 'Maximum number of sale units the shipping unit can physically hold beyond the standard TI x HI configuration';
-COMMENT ON COLUMN sales_product.pack_net_weight IS 'Net weight of one pack in weight_uom';
-COMMENT ON COLUMN sales_product.sale_net_weight IS 'Net weight of one sale unit in weight_uom';
-COMMENT ON COLUMN sales_product.shipping_net_weight IS 'Net weight of one full shipping unit in weight_uom';
-COMMENT ON COLUMN sales_product.weight_uom IS 'Unit of measure for all net weight values on this product (e.g. lb, kg)';
-COMMENT ON COLUMN sales_product.sale_uom_length IS 'Length of the sale unit in dimension_uom';
-COMMENT ON COLUMN sales_product.sale_uom_width IS 'Width of the sale unit in dimension_uom';
-COMMENT ON COLUMN sales_product.sale_uom_height IS 'Height of the sale unit in dimension_uom';
-COMMENT ON COLUMN sales_product.dimension_uom IS 'Unit of measure for all dimension values on this product (e.g. in, cm)';
-COMMENT ON COLUMN sales_product.manufacture_storage_method IS 'How the product should be stored (e.g. refrigerated, frozen, ambient)';
-COMMENT ON COLUMN sales_product.minimum_storage_temperature IS 'Minimum storage temperature in temperature_uom';
-COMMENT ON COLUMN sales_product.maximum_storage_temperature IS 'Maximum storage temperature in temperature_uom';
-COMMENT ON COLUMN sales_product.temperature_uom IS 'Unit of measure for storage temperature values (e.g. F, C)';
-COMMENT ON COLUMN sales_product.shelf_life_days IS 'Product shelf life in days from date of manufacture';
+COMMENT ON COLUMN sales_product.max_sale_per_shipping_uom IS 'Maximum sale units the shipping unit can hold beyond the standard TI x HI configuration';
 COMMENT ON COLUMN sales_product.shipping_ti IS 'TI — number of sale units per layer on the shipping unit';
 COMMENT ON COLUMN sales_product.shipping_hi IS 'HI — number of layers stacked on the shipping unit';
-COMMENT ON COLUMN sales_product.shipping_requirements IS 'Special shipping instructions (e.g. temperature range, handling notes)';
 COMMENT ON COLUMN sales_product.is_catch_weight IS 'Whether this product is sold by actual weight rather than fixed weight';
-COMMENT ON COLUMN sales_product.is_hazardous IS 'Whether this product is classified as hazardous material';
 COMMENT ON COLUMN sales_product.is_fsma_traceable IS 'Whether this product is on the FDA FSMA 204 Food Traceability List';
-COMMENT ON COLUMN sales_product.gtin IS 'Global Trade Item Number (up to 14 digits)';
-COMMENT ON COLUMN sales_product.upc IS 'Universal Product Code (up to 12 digits)';
 COMMENT ON COLUMN sales_product.display_order IS 'Sort order for UI display within the farm';

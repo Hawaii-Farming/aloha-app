@@ -30,10 +30,7 @@ CREATE INDEX idx_pack_shelf_life_observation_org_id ON pack_shelf_life_observati
 CREATE INDEX idx_pack_shelf_life_observation_trial  ON pack_shelf_life_observation (pack_shelf_life_trial_id);
 CREATE INDEX idx_pack_shelf_life_observation_check  ON pack_shelf_life_observation (pack_shelf_life_check_id);
 
-COMMENT ON COLUMN pack_shelf_life_observation.pack_shelf_life_trial_id IS 'Trial this observation belongs to';
-COMMENT ON COLUMN pack_shelf_life_observation.pack_shelf_life_check_id IS 'Check being recorded in this observation';
-COMMENT ON COLUMN pack_shelf_life_observation.shelf_life_day IS 'Number of days since the pack date (e.g. day 0, day 1, day 7)';
-COMMENT ON COLUMN pack_shelf_life_observation.response_boolean IS 'Boolean response value; used when check response_type is boolean';
-COMMENT ON COLUMN pack_shelf_life_observation.response_numeric IS 'Numeric response value; used when check response_type is numeric';
-COMMENT ON COLUMN pack_shelf_life_observation.response_enum IS 'Selected enum option; used when check response_type is enum';
-COMMENT ON COLUMN pack_shelf_life_observation.response_text IS 'Free-text response; used when check response_type is text';
+COMMENT ON COLUMN pack_shelf_life_observation.response_boolean IS 'Used when check response_type is boolean';
+COMMENT ON COLUMN pack_shelf_life_observation.response_numeric IS 'Used when check response_type is numeric';
+COMMENT ON COLUMN pack_shelf_life_observation.response_enum IS 'Used when check response_type is enum';
+COMMENT ON COLUMN pack_shelf_life_observation.response_text IS 'Used when check response_type is text';

@@ -32,7 +32,6 @@ ALTER TABLE ops_task_tracker
     ADD CONSTRAINT fk_ops_task_tracker_ops_template
     FOREIGN KEY (ops_template_id) REFERENCES ops_template(id);
 
-COMMENT ON COLUMN ops_template.ops_template_category_id IS 'Category grouping this template by module or purpose; FK to org-defined ops_template_category lookup';
 COMMENT ON COLUMN ops_template.display_order IS 'Sort position for ordering templates in the UI';
 COMMENT ON COLUMN ops_template.atp_site_count IS 'Number of sites to randomly select for ATP testing; null means no ATP testing for this template';
 COMMENT ON COLUMN ops_template.numeric_minimum_rlu_value IS 'Minimum acceptable RLU value for ATP tests on this template; results below this are a fail';

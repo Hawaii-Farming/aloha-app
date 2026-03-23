@@ -33,7 +33,5 @@ CREATE INDEX idx_hr_travel_request_employee ON hr_travel_request (employee_id);
 CREATE INDEX idx_hr_travel_request_status ON hr_travel_request (org_id, status);
 CREATE INDEX idx_hr_travel_request_dates ON hr_travel_request (employee_id, travel_start_date);
 
-COMMENT ON COLUMN hr_travel_request.employee_id IS 'Employee submitting the travel request';
-COMMENT ON COLUMN hr_travel_request.travel_start_date IS 'First day of travel';
-COMMENT ON COLUMN hr_travel_request.travel_return_date IS 'First day the employee returns';
+COMMENT ON COLUMN hr_travel_request.travel_return_date IS 'First day the employee returns (not last day of travel)';
 COMMENT ON COLUMN hr_travel_request.status IS 'Approval status: pending, approved, denied';

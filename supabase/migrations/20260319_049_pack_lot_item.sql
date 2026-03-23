@@ -24,7 +24,4 @@ CREATE INDEX idx_pack_lot_item_org_id   ON pack_lot_item (org_id);
 CREATE INDEX idx_pack_lot_item_lot      ON pack_lot_item (pack_lot_id);
 CREATE INDEX idx_pack_lot_item_product  ON pack_lot_item (sales_product_id);
 
-COMMENT ON COLUMN pack_lot_item.pack_lot_id IS 'Parent lot this item belongs to';
-COMMENT ON COLUMN pack_lot_item.sales_product_id IS 'Product that was packed in this lot';
-COMMENT ON COLUMN pack_lot_item.uom IS 'Unit of measure for quantity packed; defaults to the product sale unit (e.g. case)';
-COMMENT ON COLUMN pack_lot_item.quantity_packed IS 'Number of units packed for this product in this lot';
+COMMENT ON COLUMN pack_lot_item.uom IS 'Defaults to the product sale unit (e.g. case)';

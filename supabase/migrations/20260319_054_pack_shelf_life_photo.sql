@@ -21,5 +21,3 @@ COMMENT ON TABLE pack_shelf_life_photo IS 'Photos taken during a shelf life tria
 CREATE INDEX idx_pack_shelf_life_photo_org_id ON pack_shelf_life_photo (org_id);
 CREATE INDEX idx_pack_shelf_life_photo_trial  ON pack_shelf_life_photo (pack_shelf_life_trial_id);
 
-COMMENT ON COLUMN pack_shelf_life_photo.pack_shelf_life_trial_id IS 'Trial this photo belongs to';
-COMMENT ON COLUMN pack_shelf_life_photo.shelf_life_day IS 'Number of days since the pack date (e.g. day 0, day 1, day 7)';
