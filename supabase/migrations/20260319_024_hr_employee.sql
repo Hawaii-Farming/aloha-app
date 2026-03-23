@@ -56,8 +56,6 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     -- =============================================
     site_id_housing              TEXT REFERENCES org_site(id),
 
-    is_verifier                  BOOLEAN NOT NULL DEFAULT false,
-
     -- =============================================
     -- AUDIT
     -- =============================================
@@ -83,7 +81,6 @@ COMMENT ON COLUMN hr_employee.is_minority IS 'Whether the employee is classified
 COMMENT ON COLUMN hr_employee.user_id IS 'Link to Supabase auth user; nullable for employees without system access';
 COMMENT ON COLUMN hr_employee.system_access_level_id IS 'System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection.';
 COMMENT ON COLUMN hr_employee.hr_work_authorization_id IS 'Visa/work authorization type; references hr_work_authorization (e.g. local, wfe, furte, h1b)';
-COMMENT ON COLUMN hr_employee.is_verifier IS 'Whether this employee is authorized to verify records';
 COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type: hourly or salary';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';
 COMMENT ON COLUMN hr_employee.payroll_processor IS 'Payroll administrator responsible for employee compensation (e.g. HRB, HF)';

@@ -9,16 +9,16 @@ These rules apply to every schema change in this project. All contributors must 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
 | `system_` | System (`org_uom`, `system_access_level`, `system_module`, `system_sub_module`) | 001–004 | 01 |
-| `org_`    | Org (`org`, `org_module`, `org_sub_module`, `org_farm`, `org_site`, `org_equipment`) | 005–010 | 01 |
-| `grow_`   | Grow (`grow_variety`, `grow_grade`) | 011–012 | 01 |
-| `invnt_`  | Inventory       | 013–020 | 02 |
-| `hr_`     | Human Resources | 021–026 | 03 |
-| `ops_`    | Operations      | 027–039 | 04 |
-| `pack_`   | Pack            | 040–055 | 05 |
-| `sales_`  | Sales           | 040–055 | 06 |
-| `maint_`  | Maintenance     | 056–057 | 07 |
-| `fsafe_`  | Food Safety     | 058–063 | 08 |
-| (deferred)| Future          | —       | 09 |
+| `org_`    | Org (`org`, `org_module`, `org_sub_module`, `org_farm`, `org_site`, `org_equipment`) | 005–010 | 02 |
+| `grow_`   | Grow (`grow_variety`, `grow_grade`) | 011–012 | 02 |
+| `invnt_`  | Inventory       | 013–020 | 03 |
+| `hr_`     | Human Resources | 021–026 | 04 |
+| `ops_`    | Operations      | 027–039 | 05 |
+| `pack_`   | Pack            | 040–055 | 06 |
+| `sales_`  | Sales           | 040–055 | 07 |
+| `maint_`  | Maintenance     | 056–057 | 08 |
+| `fsafe_`  | Food Safety     | 058–063 | 09 |
+| (deferred)| Future          | —       | 10 |
 
 Sales & Pack migration ranges are interleaved (040–055) due to cross-module FK dependencies.
 
