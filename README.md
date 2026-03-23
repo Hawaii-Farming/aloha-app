@@ -40,6 +40,7 @@ aloha-app/
 These tables are shared across all organizations.
 
 - **org_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
+- **org_module** — System-level module definitions for access control (Inventory, HR, Operations, etc.)
 
 ### Organization
 - **org** — Root entity for multi-org support with currency setting
@@ -47,6 +48,7 @@ These tables are shared across all organizations.
 ### Farm Structure
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
 - **org_site** — Unified site register for all locations and assets (growing, packaging, storage, maintenance) with category/subcategory-driven fields
+- **org_equipment** — Equipment register for physical assets; farm-level or shared, with current/previous employee assignment
 - **grow_variety** — Crop varieties with short codes (e.g. "K" for Keiki)
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A)
 
@@ -67,6 +69,7 @@ These tables are shared across all organizations.
 - **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). TEXT PK derived from name.
 - **hr_title** — Org-specific job title lookup (e.g. Farm Manager, Supervisor, Grower). TEXT PK derived from name.
 - **hr_employee** — Unified employee register and org membership; every system user has a row here with a role. Tracks employment details, compensation, and access level. Department, work authorization, and title are FK references. Users are duplicated per org they belong to.
+- **hr_module_access** — Controls which application modules each employee can access; one row per employee per module with is_enabled toggle
 - **hr_time_off_request** — Employee time off requests with PTO/sick leave breakdown and approval workflow (pending → approved/denied)
 
 ## Operations Module (12 tables, 1 view) — [Docs](docs/schemas/20260319_04_ops.md)

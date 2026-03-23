@@ -8,18 +8,19 @@ These rules apply to every schema change in this project. All contributors must 
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| `org_`    | Org (`org`, `org_uom`, `org_farm`, `org_site`) | 001–009 | 01 |
-| `grow_`   | Grow (`grow_variety`, `grow_grade`) | TBD | 01 |
-| `invnt_`  | Inventory       | 012–020 | 02 |
-| `hr_`     | Human Resources | 021–025 | 03 |
-| `ops_`    | Operations      | 026–038 | 04 |
-| `pack_`   | Pack            | 039–054 | 05 |
-| `sales_`  | Sales           | 039–054 | 06 |
-| `maint_`  | Maintenance     | 055–056 | 07 |
-| `fsafe_`  | Food Safety     | 057–062 | 08 |
+| `system_` | System (`org_uom`, `system_access_level`, `system_module`, `system_sub_module`) | 001–004 | 01 |
+| `org_`    | Org (`org`, `org_module`, `org_sub_module`, `org_farm`, `org_site`, `org_equipment`) | 005–010 | 01 |
+| `grow_`   | Grow (`grow_variety`, `grow_grade`) | 011–012 | 01 |
+| `invnt_`  | Inventory       | 013–020 | 02 |
+| `hr_`     | Human Resources | 021–026 | 03 |
+| `ops_`    | Operations      | 027–039 | 04 |
+| `pack_`   | Pack            | 040–055 | 05 |
+| `sales_`  | Sales           | 040–055 | 06 |
+| `maint_`  | Maintenance     | 056–057 | 07 |
+| `fsafe_`  | Food Safety     | 058–063 | 08 |
 | (deferred)| Future          | —       | 09 |
 
-Sales & Pack migration ranges are interleaved (039–054) due to cross-module FK dependencies.
+Sales & Pack migration ranges are interleaved (040–055) due to cross-module FK dependencies.
 
 Tables designed but not yet ready for deployment go in `supabase/migrations_future/` and are documented in the `_09_future.md` schema doc.
 
@@ -70,10 +71,10 @@ sales_customer_id → sales_customer(id)
 
 Exceptions:
 
-- **Scoping columns** — `farm_id` and `site_id` keep their short names even though the tables are `org_farm` and `org_site`
+- **Scoping columns** — `farm_id`, `site_id`, and `equipment_id` keep their short names even though the tables are `org_farm`, `org_site`, and `org_equipment`
 - **Workflow columns** — role-based names referencing `hr_employee(id)` (see 3.8)
 - **Self-referencing FKs** — use a semantic suffix so the domain prefix is preserved (e.g. `fsafe_emp_result_id_original` in `fsafe_emp_result`, not `original_fsafe_emp_result_id`)
-- **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` and `site_id_equipment` in `invnt_item`, `site_id_housing` in `hr_employee`)
+- **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` in `invnt_item`, `site_id_housing` in `hr_employee`)
 
 ### 3.3 No CASCADE
 
