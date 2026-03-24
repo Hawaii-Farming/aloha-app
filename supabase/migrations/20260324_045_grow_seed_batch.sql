@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS grow_seed_batch (
     site_id             TEXT REFERENCES org_site(id),
     ops_task_tracker_id UUID REFERENCES ops_task_tracker(id),
     batch_code          TEXT NOT NULL,
+    grow_cycle_pattern_id TEXT REFERENCES grow_cycle_pattern(id),
     grow_trial_type_id  TEXT REFERENCES grow_trial_type(id),
     grow_seed_mix_id    TEXT REFERENCES grow_seed_mix(id),
     invnt_item_id       TEXT REFERENCES invnt_item(id),

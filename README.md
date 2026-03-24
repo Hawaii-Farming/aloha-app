@@ -87,10 +87,11 @@ aloha-app/
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (26 tables) — [Docs](docs/schemas/20260324_06_grow.md)
+## Grow Module (27 tables) — [Docs](docs/schemas/20260324_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
+- **grow_cycle_pattern** — Growing cycle patterns per farm (e.g. 14-Day Lettuce, 42-Day Cucumber) for auto-calculating transplant/harvest dates (TEXT PK).
 - **grow_trial_type** — Lookup defining types of seeding trials (e.g. new lot, new variety). Farm-scoped (TEXT PK).
 - **grow_seed_mix** — Named seed blend recipes with items and percentages defined in child table. Farm-scoped (TEXT PK).
 - **grow_seed_mix_item** — Individual seed items within a mix recipe with proportion percentage.
