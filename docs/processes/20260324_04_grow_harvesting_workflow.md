@@ -2,15 +2,7 @@
 
 This document describes the harvesting activity flow using `ops_task_tracker` as the activity header and `grow_harvesting` as the domain-specific record.
 
----
-
-## Required Pre-Seeded Task
-
-The following task must be seeded in `ops_task` during org provisioning:
-
-| id | name |
-|---|---|
-| harvesting | Harvesting |
+> **Prerequisite:** The "Harvesting" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260324_01_org_provisioning.md) for setup steps.
 
 ---
 
@@ -31,7 +23,7 @@ The following task must be seeded in `ops_task` during org provisioning:
 
 1. Create an `ops_task_tracker` activity with task = "Harvesting"
 2. Create a `grow_harvesting` record linked to the activity via `ops_task_tracker_id`
-3. Select the seeding batch being harvested (`grow_seeding_id`) — this provides full seed-to-harvest traceability
+3. Select the seeding batch being harvested (`grow_seeding_id`) — only batches with status `transplanted` or `harvesting` are available. This provides full seed-to-harvest traceability
 4. Optionally assign a harvest grade (`grow_grade_id`)
 5. Enter the harvest date
 6. Add weigh-in records in `grow_harvesting_weight`:

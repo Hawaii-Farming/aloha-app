@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS grow_fertigation_tank (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id              TEXT NOT NULL REFERENCES org(id),
+    farm_id             TEXT NOT NULL REFERENCES org_farm(id),
+    ops_task_tracker_id UUID NOT NULL REFERENCES ops_task_tracker(id),
+    equipment_id        TEXT NOT NULL REFERENCES org_equipment(id),
+    volume_uom          TEXT NOT NULL REFERENCES sys_uom(code),
+    volume_applied      NUMERIC NOT NULL,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by          TEXT,
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by          TEXT,
+    is_deleted          BOOLEAN NOT NULL DEFAULT false,
+    CONSTRAINT uq_grow_fertigation_tank UNIQUE (ops_task_tracker_id, equipment_id)
+);
+
+COMMENT ON TABLE grow_fertigation_tank IS 'Tanks used during a fertigation event with the volume applied per tank.';
+
+COMMENT ON COLUMN grow_fertigation_tank.volume_uom IS 'Unit for volume applied (e.g. gallons, liters)';
+
+CREATE INDEX idx_grow_fertigation_tank_tracker ON grow_fertigation_tank (ops_task_tracker_id);

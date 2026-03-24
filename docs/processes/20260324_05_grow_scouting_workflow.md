@@ -2,15 +2,7 @@
 
 This document describes the scouting activity flow using `ops_task_tracker` directly as the header — no separate scouting header table is needed since all header data (site, date, notes) is already on the tracker.
 
----
-
-## Required Pre-Seeded Task
-
-The following task must be seeded in `ops_task` during org provisioning:
-
-| id | name |
-|---|---|
-| scouting | Scouting |
+> **Prerequisite:** The "Scouting" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260324_01_org_provisioning.md) for setup steps.
 
 ---
 
@@ -31,7 +23,7 @@ The following task must be seeded in `ops_task` during org provisioning:
 ## Flow
 
 1. Create an `ops_task_tracker` activity with task = "Scouting" (captures farm, site, date, start/stop time)
-2. Link the seeding batches being inspected via `grow_scouting_seeding` (one row per batch)
+2. Link the seeding batches being inspected via `grow_scouting_seeding` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
 3. For each pest or disease found, create a `grow_scouting_observation` record:
    - Set `observation_type` to `pest` or `disease`
    - Select the pest (`grow_pest_id`) or disease (`grow_disease_id`) from the lookup — enforced by CHECK constraint

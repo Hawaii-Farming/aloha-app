@@ -86,7 +86,7 @@ aloha-app/
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (18 tables) — [Docs](docs/schemas/20260324_06_grow.md)
+## Grow Module (23 tables) — [Docs](docs/schemas/20260324_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
@@ -103,10 +103,15 @@ aloha-app/
 - **grow_scouting_observation** — Individual pest or disease finding with side, severity, and infection stage.
 - **grow_scouting_observation_row** — Rows affected by a specific observation; one row per growing row.
 - **grow_scouting_photo** — Photos taken during scouting with optional caption; one row per photo.
-- **grow_input_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
+- **grow_spraying_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
 - **grow_spraying_seeding** — Join table linking spraying activities (ops_task_tracker) to seeding batches.
 - **grow_spraying_input** — Individual chemical/fertilizer applied per spraying activity with quantity and compliance link.
 - **grow_spraying_equipment** — Equipment used per spraying activity with water UOM and quantity per piece.
+- **grow_fertigation_recipe** — Reusable fertigation recipe with flush water config and top-up hours (TEXT PK).
+- **grow_fertigation_recipe_item** — Fertilizer items in a recipe with quantities; invnt_item_id nullable for one-off products.
+- **grow_fertigation_recipe_site** — Sites that receive a recipe (configuration for pre-filling).
+- **grow_fertigation_seeding** — Snapshot of seedings fertigated per event with recipe link.
+- **grow_fertigation_tank** — Tanks used per fertigation event with volume applied.
 
 ## Pack Module (7 tables) — [Docs](docs/schemas/20260324_07_pack.md)
 

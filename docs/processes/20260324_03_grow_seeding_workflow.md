@@ -2,15 +2,7 @@
 
 This document describes the seeding activity flow using `ops_task_tracker` as the activity header and `grow_seeding` as the domain-specific record.
 
----
-
-## Required Pre-Seeded Task
-
-The following task must be seeded in `ops_task` during org provisioning:
-
-| id | name |
-|---|---|
-| seeding | Seeding |
+> **Prerequisite:** The "Seeding" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260324_01_org_provisioning.md) for setup steps.
 
 ---
 
