@@ -23,6 +23,7 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 ## Flow
 
 1. Create an `ops_task_tracker` activity with task = "Scouting" (captures farm, site, date, start/stop time)
+   - If templates are linked to the "Scouting" task via `ops_task_template`, they are presented for completion
 2. Link the seeding batches being inspected via `grow_scouting_seeding` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
 3. For each pest or disease found, create a `grow_scouting_observation` record:
    - Set `observation_type` to `pest` or `disease`

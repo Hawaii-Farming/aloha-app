@@ -21,6 +21,7 @@ This document describes the seeding activity flow using `ops_task_tracker` as th
 ## Flow
 
 1. Create an `ops_task_tracker` activity with task = "Seeding"
+   - If templates are linked to the "Seeding" task via `ops_task_template`, they are presented for completion
 2. Create a `grow_seeding` record linked to the activity via `ops_task_tracker_id`
 3. Select either a single seed item (`invnt_item_id`) or a seed mix (`grow_seed_mix_id`) — never both (enforced by CHECK constraint)
 4. Enter batch code (system-generated, editable), seeding UOM, number of units, seeds per unit, number of rows

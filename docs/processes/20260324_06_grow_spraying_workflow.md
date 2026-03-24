@@ -25,7 +25,7 @@ This document describes the spraying activity flow using `ops_task_tracker` dire
 ## Flow
 
 1. Create an `ops_task_tracker` activity with task = "Spraying" (captures farm, site, date, start/stop time)
-2. Attach a pre-spray checklist template (`ops_template`) to the tracker — fill out the safety checklist via `ops_response`
+2. If templates are linked to the "Spraying" task via `ops_task_template`, the app presents them for completion (e.g. pre-spray safety checklist) — responses are recorded via `ops_response`
 3. Link the seeding batches being treated via `grow_spraying_seeding` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
 4. For each chemical or fertilizer applied, create a `grow_spraying_input` record:
    - Select from the active compliance records (`grow_spraying_compliance_id`) — only compliant products are available (filtered by `effective_date <= today` and `expiration_date IS NULL OR >= today`)

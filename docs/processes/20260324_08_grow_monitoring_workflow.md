@@ -79,6 +79,7 @@ The app evaluates the formula after the input readings are entered and stores th
 ## Flow
 
 1. Create an `ops_task_tracker` activity with task = "Monitoring"
+   - If templates are linked to the "Monitoring" task via `ops_task_template`, they are presented for completion
 2. Select the site — the app loads monitoring points matching `farm_id` + `site.category`
 3. Select the monitoring station from `org_site.monitoring_stations` dropdown
 4. For each monitoring point, enter the reading based on its `response_type`:

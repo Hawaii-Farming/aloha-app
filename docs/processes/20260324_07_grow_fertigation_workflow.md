@@ -56,6 +56,7 @@ Each activity records its own seedings snapshot, tank volumes, and timing indepe
 ## Flow
 
 1. Create an `ops_task_tracker` activity with task = "Fertigation"
+   - If templates are linked to the "Fertigation" task via `ops_task_template`, they are presented for completion
 2. Select the recipe (`grow_fertigation_recipe`)
 3. App pre-fills sites from `grow_fertigation_recipe_site`
 4. App looks up active seedings in those sites (`grow_seeding.status IN ('transplanted', 'harvesting')`)
