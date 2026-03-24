@@ -6,9 +6,10 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_reading (
     ops_task_tracker_id         UUID NOT NULL REFERENCES ops_task_tracker(id),
     grow_monitoring_point_id    TEXT NOT NULL REFERENCES grow_monitoring_point(id),
     monitoring_station          TEXT,
-    value                       NUMERIC,
+    reading                     NUMERIC,
     is_out_of_range             BOOLEAN NOT NULL DEFAULT false,
     is_injection                BOOLEAN NOT NULL DEFAULT false,
+    corrective_action           TEXT,
     notes                       TEXT,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                  TEXT,
@@ -21,9 +22,9 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_reading (
 COMMENT ON TABLE grow_monitoring_reading IS 'Individual measurement recorded during a monitoring event. One row per point per station. Calculated points store the computed result for historical record.';
 
 COMMENT ON COLUMN grow_monitoring_reading.monitoring_station IS 'Selected from org_site.monitoring_stations JSONB dropdown';
-COMMENT ON COLUMN grow_monitoring_reading.value IS 'Numeric reading; for direct points entered manually, for calculated points computed from formula';
-COMMENT ON COLUMN grow_monitoring_reading.is_out_of_range IS 'Auto-set by comparing value against grow_monitoring_point.minimum_value and maximum_value';
+COMMENT ON COLUMN grow_monitoring_reading.is_out_of_range IS 'Auto-set by comparing reading against grow_monitoring_point.minimum_value and maximum_value';
 COMMENT ON COLUMN grow_monitoring_reading.is_injection IS 'Whether injection was used during this reading; primarily for greenhouse drip measurements';
+COMMENT ON COLUMN grow_monitoring_reading.corrective_action IS 'Selected from grow_monitoring_point.corrective_actions when reading is out of range';
 
 CREATE INDEX idx_grow_monitoring_reading_tracker ON grow_monitoring_reading (ops_task_tracker_id);
 CREATE INDEX idx_grow_monitoring_reading_site ON grow_monitoring_reading (site_id);
