@@ -70,7 +70,7 @@ aloha-app/
 - **hr_module_access** — Controls which application modules each employee can access; one row per employee per module with is_enabled toggle
 - **hr_time_off_request** — Employee time off requests with PTO/sick leave breakdown and approval workflow (pending → approved/denied)
 
-## Operations Module (12 tables, 1 view) — [Docs](docs/schemas/20260324_05_ops.md)
+## Operations Module (13 tables, 1 view) — [Docs](docs/schemas/20260324_05_ops.md)
 
 - **ops_task** — Flat task catalog for labor tracking with name and description (TEXT PK)
 - **ops_task_tracker** — Header record for a task event with task, farm, site, date, start/stop times, and verification status. Site is stored directly on the tracker.
@@ -81,6 +81,7 @@ aloha-app/
 - **ops_training_attendee** — Per-employee attendance and certification records for each training session
 - **ops_template_category** — Org-defined categories for grouping checklist templates by module or purpose (TEXT PK)
 - **ops_template** — Master checklist template definition with name, category, and optional farm scope
+- **ops_task_template** — Many-to-many link between tasks and templates; app loads linked templates when creating an activity
 - **ops_corrective_action_choice** — Org-defined reusable corrective action options selectable from a dropdown
 - **ops_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header

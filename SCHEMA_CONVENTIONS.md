@@ -12,10 +12,10 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 |-----------|-----------------|-----------------|-------|
 | `sys_`    | System          | 001–004 | 01 |
 | `org_`    | Org             | 005–010 | 02 |
-| `grow_`   | Grow            | 011–012, 040–066 | 06 |
+| `grow_`   | Grow            | 011–012, 041–066 | 06 |
 | `invnt_`  | Inventory       | 013–020 | 03 |
 | `hr_`     | Human Resources | 021–026 | 04 |
-| `ops_`    | Operations      | 027–039 | 05 |
+| `ops_`    | Operations      | 027–040 | 05 |
 | `pack_`   | Pack            | 067–082 | 07 |
 | `sales_`  | Sales           | 067–082 | 08 |
 | `maint_`  | Maintenance     | 083–084 | 09 |

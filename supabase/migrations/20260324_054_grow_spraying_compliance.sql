@@ -5,23 +5,23 @@ CREATE TABLE IF NOT EXISTS grow_spraying_compliance (
     invnt_item_id               TEXT NOT NULL REFERENCES invnt_item(id),
 
     -- Regulatory Information
-    epa_registration            TEXT,
-    phi_days                    INTEGER,
-    rei_hours                   INTEGER,
+    epa_registration            TEXT NOT NULL,
+    phi_days                    INTEGER NOT NULL,
+    rei_hours                   INTEGER NOT NULL,
 
     -- Application & Usage
-    application_method          TEXT,
+    application_method          TEXT NOT NULL,
     target_pest_disease         JSONB NOT NULL DEFAULT '[]',
-    application_uom             TEXT REFERENCES sys_uom(code),
-    maximum_quantity_per_acre   NUMERIC,
-    burn_uom                    TEXT REFERENCES sys_uom(code),
-    application_per_burn_unit   NUMERIC,
+    application_uom             TEXT NOT NULL REFERENCES sys_uom(code),
+    maximum_quantity_per_acre   NUMERIC NOT NULL,
+    burn_uom                    TEXT NOT NULL REFERENCES sys_uom(code),
+    application_per_burn_unit   NUMERIC NOT NULL,
 
     -- Label & Compliance
-    label_date                  DATE,
-    effective_date              DATE,
+    label_date                  DATE NOT NULL,
+    effective_date              DATE NOT NULL,
     expiration_date             DATE,
-    external_label_url          TEXT,
+    external_label_url          TEXT NOT NULL,
 
     -- CRUD
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),

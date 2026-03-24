@@ -4,8 +4,6 @@ CREATE TABLE IF NOT EXISTS ops_task_tracker (
     farm_id         TEXT REFERENCES org_farm(id),
     site_id         TEXT REFERENCES org_site(id),
     ops_task_id     TEXT NOT NULL REFERENCES ops_task(id),
-    ops_template_id TEXT,
-
     start_time      TIMESTAMPTZ NOT NULL,
     stop_time       TIMESTAMPTZ,
     status          TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'completed')),
@@ -28,6 +26,5 @@ CREATE INDEX idx_ops_task_tracker_task   ON ops_task_tracker (ops_task_id);
 CREATE INDEX idx_ops_task_tracker_status ON ops_task_tracker (org_id, status);
 CREATE INDEX idx_ops_task_tracker_site   ON ops_task_tracker (site_id);
 
-COMMENT ON COLUMN ops_task_tracker.ops_template_id IS 'Checklist template used for this task event; null if not a food safety task; FK added via ALTER TABLE in ops_template migration';
 COMMENT ON COLUMN ops_task_tracker.status IS 'Workflow status: open, in_progress, completed';
 

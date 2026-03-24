@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_point (
     maximum_value   NUMERIC,
     display_order   INTEGER NOT NULL DEFAULT 0,
 
-    -- Calculation
+    -- Response & Calculation
+    response_type       TEXT NOT NULL DEFAULT 'numeric' CHECK (response_type IN ('numeric', 'boolean', 'text')),
     point_type          TEXT NOT NULL DEFAULT 'direct' CHECK (point_type IN ('direct', 'calculated')),
     formula             TEXT,
     input_point_ids     JSONB,
@@ -31,6 +32,7 @@ COMMENT ON TABLE grow_monitoring_point IS 'Defines what to measure per farm and 
 COMMENT ON COLUMN grow_monitoring_point.site_category IS 'Matches org_site.category to scope which points apply (e.g. greenhouse, nursery, pond)';
 COMMENT ON COLUMN grow_monitoring_point.minimum_value IS 'Below this value the reading is flagged as out of range';
 COMMENT ON COLUMN grow_monitoring_point.maximum_value IS 'Above this value the reading is flagged as out of range';
+COMMENT ON COLUMN grow_monitoring_point.response_type IS 'How the reading is captured: numeric (number input), boolean (yes/no toggle), text (free text)';
 COMMENT ON COLUMN grow_monitoring_point.point_type IS 'direct = manually entered; calculated = derived from formula';
 COMMENT ON COLUMN grow_monitoring_point.formula IS 'Expression string for calculated points (e.g. (drain_ml / (drip_ml * dripper) * 100)); null for direct points';
 COMMENT ON COLUMN grow_monitoring_point.input_point_ids IS 'JSON array of grow_monitoring_point IDs that feed into this calculation; null for direct points';

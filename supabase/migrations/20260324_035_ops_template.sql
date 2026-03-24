@@ -27,11 +27,6 @@ CREATE INDEX idx_ops_template_org_id ON ops_template (org_id);
 CREATE UNIQUE INDEX uq_ops_template_org_level  ON ops_template (org_id, name) WHERE farm_id IS NULL;
 CREATE UNIQUE INDEX uq_ops_template_farm_level ON ops_template (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
 
--- Add FK from ops_task_tracker now that ops_template exists
-ALTER TABLE ops_task_tracker
-    ADD CONSTRAINT fk_ops_task_tracker_ops_template
-    FOREIGN KEY (ops_template_id) REFERENCES ops_template(id);
-
 COMMENT ON COLUMN ops_template.display_order IS 'Sort position for ordering templates in the UI';
 COMMENT ON COLUMN ops_template.atp_site_count IS 'Number of sites to randomly select for ATP testing; null means no ATP testing for this template';
 COMMENT ON COLUMN ops_template.numeric_minimum_rlu_value IS 'Minimum acceptable RLU value for ATP tests on this template; results below this are a fail';

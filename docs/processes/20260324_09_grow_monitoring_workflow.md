@@ -81,11 +81,12 @@ The app evaluates the formula after the input readings are entered and stores th
 1. Create an `ops_task_tracker` activity with task = "Monitoring"
 2. Select the site — the app loads monitoring points matching `farm_id` + `site.category`
 3. Select the monitoring station from `org_site.monitoring_stations` dropdown
-4. For each monitoring point, enter the reading:
-   - **Direct points**: user enters the value manually
+4. For each monitoring point, enter the reading based on its `response_type`:
+   - **Numeric**: user enters a number (e.g. EC, pH, mL, temperature)
+   - **Boolean**: user toggles yes/no (e.g. Is Injection)
+   - **Text**: user enters free text (e.g. Substrate type)
    - **Calculated points**: app computes the value from the formula once all input readings are entered
-5. The app auto-flags `is_out_of_range = true` for any reading outside the point's `minimum_value` / `maximum_value`
-6. For greenhouse drip readings, user can toggle `is_injection` if injection was active
+5. The app auto-flags `is_out_of_range = true` for any numeric reading outside the point's `minimum_value` / `maximum_value`
 7. App snapshots active seedings in the site via `grow_monitoring_seeding` (`status IN ('transplanted', 'harvesting')`)
 8. Upload photos via `grow_monitoring_photo` (one row per photo with optional caption)
 9. Complete the activity
