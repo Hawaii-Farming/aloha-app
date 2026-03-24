@@ -86,7 +86,7 @@ aloha-app/
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (9 tables) — [Docs](docs/schemas/20260323_06_grow.md)
+## Grow Module (15 tables) — [Docs](docs/schemas/20260323_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
@@ -97,6 +97,12 @@ aloha-app/
 - **grow_harvest_container** — Container definitions with tare weight, optionally specific to variety and grade for auto-calculation
 - **grow_harvesting** — Harvest header linked to seeding batch for full traceability with grade assignment.
 - **grow_harvesting_weight** — Individual weigh-ins per container type with quantity; tare auto-calculated from container definition.
+- **grow_pest** — Standardized pest names for scouting observations. Farm-scoped (TEXT PK).
+- **grow_disease** — Standardized disease names for scouting observations. Farm-scoped (TEXT PK).
+- **grow_scouting** — Scouting event header for site inspections; covers one or more seeding batches.
+- **grow_scouting_seeding** — Join table linking scouting events to seeding batches.
+- **grow_scouting_observation** — Individual pest or disease finding with severity and infection stage.
+- **grow_input_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
 
 ## Pack Module (7 tables) — [Docs](docs/schemas/20260323_07_pack.md)
 
