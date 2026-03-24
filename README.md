@@ -87,7 +87,7 @@ aloha-app/
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (27 tables) — [Docs](docs/schemas/20260324_06_grow.md)
+## Grow Module (26 tables) — [Docs](docs/schemas/20260324_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
@@ -96,8 +96,7 @@ aloha-app/
 - **grow_seed_mix_item** — Individual seed items within a mix recipe with proportion percentage.
 - **grow_seed_batch** — Seeding batch linked to ops activity; either single variety or mix, with traceability code and lifecycle status.
 - **grow_harvest_container** — Container definitions with tare weight, optionally specific to variety and grade for auto-calculation
-- **grow_harvest** — Harvest header linked to seeding batch for full traceability with grade assignment.
-- **grow_harvest_weight** — Individual weigh-ins per container type with quantity; tare auto-calculated from container definition.
+- **grow_harvest_weight** — Individual weigh-ins per container type; links directly to seeding batch for traceability with grade assignment. Tare auto-calculated.
 - **grow_pest** — Standardized pest names for scouting observations. Farm-scoped (TEXT PK).
 - **grow_disease** — Standardized disease names for scouting observations. Farm-scoped (TEXT PK).
 - **grow_scout_seeding** — Join table linking scouting activities (ops_task_tracker) to seeding batches.
