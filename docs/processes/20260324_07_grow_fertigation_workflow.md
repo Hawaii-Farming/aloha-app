@@ -14,7 +14,7 @@ This document describes the fertigation activity flow using `ops_task_tracker` d
 | `grow_fertigation_recipe` | Reusable recipe — can be a fertilizer mix, flush water, or top-up water |
 | `grow_fertigation_recipe_item` | Items in the recipe with quantities |
 | `grow_fertigation_recipe_site` | Sites that receive this recipe (configuration) |
-| `grow_fertigation_seeding` | Snapshot — which seedings were fertigated on this event + recipe link |
+| `grow_fertigation_seed_batch` | Snapshot — which seedings were fertigated on this event + recipe link |
 | `grow_fertigation_tank` | Tanks used with volume applied per tank |
 
 ---
@@ -60,7 +60,7 @@ Each activity records its own seedings snapshot, tank volumes, and timing indepe
 2. Select the recipe (`grow_fertigation_recipe`)
 3. App pre-fills sites from `grow_fertigation_recipe_site`
 4. App looks up active seedings in those sites (`grow_seed_batch.status IN ('transplanted', 'harvesting')`)
-5. User confirms — seedings are recorded in `grow_fertigation_seeding` as a point-in-time snapshot
+5. User confirms — seedings are recorded in `grow_fertigation_seed_batch` as a point-in-time snapshot
 6. For each tank used, create a `grow_fertigation_tank` record:
    - Select the equipment (`equipment_id`)
    - Enter volume UOM and quantity applied
@@ -70,7 +70,7 @@ Each activity records its own seedings snapshot, tank volumes, and timing indepe
 
 ## Design Decision: Recipe ID on Seeding Table
 
-The `grow_fertigation_recipe_id` is stored on `grow_fertigation_seeding` rather than on a separate header table or on `ops_task_tracker`. This decision was made for three reasons:
+The `grow_fertigation_recipe_id` is stored on `grow_fertigation_seed_batch` rather than on a separate header table or on `ops_task_tracker`. This decision was made for three reasons:
 
 1. **`ops_task_tracker` stays module-agnostic** — adding grow-specific FKs to a shared ops table would bloat it as every module adds their own fields
 2. **No header table needed** — the only header-level business field is the recipe link. Creating a table with just `ops_task_tracker_id` + `grow_fertigation_recipe_id` adds complexity for one column
@@ -79,7 +79,7 @@ The `grow_fertigation_recipe_id` is stored on `grow_fertigation_seeding` rather 
 To query which recipe was used for a fertigation event:
 ```sql
 SELECT DISTINCT grow_fertigation_recipe_id
-FROM grow_fertigation_seeding
+FROM grow_fertigation_seed_batch
 WHERE ops_task_tracker_id = ?
 ```
 
@@ -100,7 +100,7 @@ flowchart TD
     A[Create ops_task_tracker\nTask = Fertigation] --> B[Select grow_fertigation_recipe]
     B --> C[App pre-fills sites from\ngrow_fertigation_recipe_site]
     C --> D[App looks up active seedings\nin those sites]
-    D --> E[User confirms seedings\n→ grow_fertigation_seeding snapshot]
+    D --> E[User confirms seedings\n→ grow_fertigation_seed_batch snapshot]
     E --> F[Add tank: grow_fertigation_tank]
     F --> F1[Select equipment + volume UOM + quantity]
     F1 --> F2{More tanks?}

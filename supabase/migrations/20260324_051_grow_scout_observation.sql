@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS grow_scout_observation (
     observation_type        TEXT NOT NULL CHECK (observation_type IN ('pest', 'disease')),
     grow_pest_id            TEXT REFERENCES grow_pest(id),
     grow_disease_id         TEXT REFERENCES grow_disease(id),
-    side                    TEXT,
     severity_level          TEXT NOT NULL CHECK (severity_level IN ('low', 'moderate', 'high', 'severe')),
     disease_infection_stage TEXT CHECK (disease_infection_stage IN ('early', 'mid', 'late', 'advanced')),
     notes                   TEXT,

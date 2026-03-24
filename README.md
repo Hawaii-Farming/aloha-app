@@ -99,22 +99,22 @@ aloha-app/
 - **grow_harvest_weight** — Individual weigh-ins per container type; links directly to seeding batch for traceability with grade assignment. Tare auto-calculated.
 - **grow_pest** — Standardized pest names for scouting observations. Farm-scoped (TEXT PK).
 - **grow_disease** — Standardized disease names for scouting observations. Farm-scoped (TEXT PK).
-- **grow_scout_seeding** — Join table linking scouting activities (ops_task_tracker) to seeding batches.
+- **grow_scout_seed_batch** — Join table linking scouting activities (ops_task_tracker) to seeding batches.
 - **grow_scout_observation** — Individual pest or disease finding with side, severity, and infection stage.
 - **grow_scout_observation_row** — Rows affected by a specific observation; one row per growing row.
 - **grow_scout_photo** — Photos taken during scouting with optional caption; one row per photo.
 - **grow_spray_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
-- **grow_spray_seeding** — Join table linking spraying activities (ops_task_tracker) to seeding batches.
+- **grow_spray_seed_batch** — Join table linking spraying activities (ops_task_tracker) to seeding batches.
 - **grow_spray_input** — Individual chemical/fertilizer applied per spraying activity with quantity and compliance link.
 - **grow_spray_equipment** — Equipment used per spraying activity with water UOM and quantity per piece.
 - **grow_fertigation_recipe** — Reusable fertigation recipe with flush water config and top-up hours (TEXT PK).
 - **grow_fertigation_recipe_item** — Fertilizer items in a recipe with quantities; invnt_item_id nullable for one-off products.
 - **grow_fertigation_recipe_site** — Sites that receive a recipe (configuration for pre-filling).
-- **grow_fertigation_seeding** — Snapshot of seedings fertigated per event with recipe link.
+- **grow_fertigation_seed_batch** — Snapshot of seedings fertigated per event with recipe link.
 - **grow_fertigation_tank** — Tanks used per fertigation event with volume applied.
 - **grow_monitoring_point** — Defines what to measure per farm and site category with UOM, thresholds, and optional formula for calculated points.
 - **grow_monitoring_reading** — Individual measurement per monitoring event per point per station.
-- **grow_monitoring_seeding** — Snapshot of seedings present during a monitoring event.
+- **grow_monitoring_seed_batch** — Snapshot of seedings present during a monitoring event.
 - **grow_monitoring_photo** — Photos taken during monitoring with optional caption.
 
 ## Pack Module (7 tables) — [Docs](docs/schemas/20260324_07_pack.md)
