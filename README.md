@@ -86,10 +86,14 @@ aloha-app/
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (2 tables) — [Docs](docs/schemas/20260323_06_grow.md)
+## Grow Module (6 tables) — [Docs](docs/schemas/20260323_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
+- **grow_trial_type** — Lookup defining types of seeding trials (e.g. new lot, new variety). Farm-scoped (TEXT PK).
+- **grow_seed_mix** — Named seed blend recipes with items and percentages defined in child table. Farm-scoped (TEXT PK).
+- **grow_seed_mix_item** — Individual seed items within a mix recipe with proportion percentage.
+- **grow_seeding_batch** — Seeding batch linked to ops activity; either single variety or mix, with traceability code and lifecycle status.
 
 ## Pack Module (7 tables) — [Docs](docs/schemas/20260323_07_pack.md)
 
@@ -134,9 +138,9 @@ aloha-app/
 - **Human Resources** — Payroll processing integration
 - **Pack** — Pack line productivity tracking and reporting
 
-## Database Conventions
+## Schema Conventions
 
-See [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) for the full set of schema design rules followed across this project.
+See [SCHEMA_CONVENTIONS.md](SCHEMA_CONVENTIONS.md) for the full set of schema design rules followed across this project.
 
 ## Schema Documentation
 

@@ -1,4 +1,4 @@
-# Aloha App — Schema Conventions
+# Schema Conventions
 
 These rules apply to every schema change in this project. All contributors must follow them.
 
@@ -15,11 +15,11 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 | `invnt_`  | Inventory       | 013–020 | 03 |
 | `hr_`     | Human Resources | 021–026 | 04 |
 | `ops_`    | Operations      | 027–039 | 05 |
-| `grow_`   | Grow            | 040–041 | 06 |
-| `pack_`   | Pack            | 042–057 | 07 |
-| `sales_`  | Sales           | 042–057 | 08 |
-| `maint_`  | Maintenance     | 058–059 | 09 |
-| `fsafe_`  | Food Safety     | 060–065 | 10 |
+| `grow_`   | Grow            | 040–045 | 06 |
+| `pack_`   | Pack            | 046–061 | 07 |
+| `sales_`  | Sales           | 046–061 | 08 |
+| `maint_`  | Maintenance     | 062–063 | 09 |
+| `fsafe_`  | Food Safety     | 064–069 | 10 |
 | (deferred)| Future          | —       | 11 |
 
 Sales & Pack migration ranges are interleaved (042–057) due to cross-module FK dependencies.
