@@ -1,6 +1,6 @@
 # Grow Module — Activity Workflows
 
-This document describes how the three main grow activities (seeding, harvesting, and scouting) flow through the system using the shared `ops_task_tracker` as the activity header.
+This document describes how the four main grow activities (seeding, harvesting, scouting, and spraying) flow through the system using the shared `ops_task_tracker` as the activity header.
 
 ---
 
@@ -13,6 +13,19 @@ All grow activities follow the same pattern:
 3. Complete the activity (stop time, status)
 
 The `ops_task_tracker` captures the common activity metadata (who, when, where). The grow tables capture the domain-specific details.
+
+### Required Pre-Seeded Tasks
+
+The following tasks must be seeded in `ops_task` during org provisioning for the grow workflows to function:
+
+| id | name |
+|---|---|
+| seeding | Seeding |
+| harvesting | Harvesting |
+| scouting | Scouting |
+| spraying | Spraying |
+
+Without these tasks, users cannot create the corresponding activities.
 
 ---
 
@@ -48,7 +61,7 @@ The `ops_task_tracker` captures the common activity metadata (who, when, where).
    - Enter number of containers and gross weight
    - Tare weight is calculated on the fly from `grow_harvest_container.tare_weight × number_of_containers`
    - Net weight = gross weight minus calculated tare
-7. Multiple weigh-ins per harvest are supported (e.g. 3 small totes + 2 large baskets)
+7. Multiple weigh-ins per harvest are supported (e.g. 20 totes + 2 pallets)
 
 **Note:** Harvest totals (total gross, total net, total containers) are derived by summing across `grow_harvesting_weight` rows. No totals are stored on the header.
 
@@ -74,17 +87,38 @@ The `ops_task_tracker` captures the common activity metadata (who, when, where).
 
 ---
 
-## 5. Why Scouting Has No Header
+## 5. Spraying
+
+**Tables:** `grow_spraying_seeding`, `grow_spraying_input`, `grow_spraying_equipment`
+
+**Flow:**
+1. Create an ops_task_tracker activity with task = "Spraying" (captures farm, site, date, start/stop time)
+2. Attach a pre-spray checklist template (`ops_template`) to the tracker — fill out the safety checklist via `ops_response`
+3. Link the seeding batches being treated via `grow_spraying_seeding` (one row per batch)
+4. For each chemical or fertilizer applied, create a `grow_spraying_input` record:
+   - Select the inventory item (`invnt_item_id`)
+   - Optionally link to the active compliance record (`grow_input_compliance_id`) for PHI/REI lookup
+   - Enter the target pest/disease, application UOM, and quantity applied
+5. For each piece of equipment used, create a `grow_spraying_equipment` record:
+   - Select the equipment (`equipment_id`)
+   - Enter water UOM and quantity
+
+**Note:** There is no separate spraying header table — same reasoning as scouting. The `ops_task_tracker` captures all header-level data. PHI/REI safety intervals are derived on the fly by taking the maximum across all `grow_spraying_input` rows via their linked `grow_input_compliance` records.
+
+---
+
+## 6. Why Some Activities Have Headers and Others Don't
 
 | Activity | Header table | Reason |
 |----------|-------------|--------|
 | Seeding | `grow_seeding` | Carries batch code, seed item/mix, UOM, units, dates, status — none of these exist on ops_task_tracker |
 | Harvesting | `grow_harvesting` | Carries seeding link, grade, harvest date — traceability and grading are harvest-specific |
-| Scouting | None (uses `ops_task_tracker` directly) | All header data (site, date, notes) is already on ops_task_tracker — a separate header would just duplicate it |
+| Scouting | None (uses `ops_task_tracker` directly) | All header data (site, date, notes) is already on ops_task_tracker |
+| Spraying | None (uses `ops_task_tracker` directly) | All header data (site, date, notes, start/stop) is already on ops_task_tracker; pre-spray checklist uses ops_template |
 
 ---
 
-## 6. Flow Diagram
+## 7. Flow Diagram
 
 ```mermaid
 flowchart TD
@@ -106,4 +140,12 @@ flowchart TD
     F --> F1[Select pest or disease + severity + side]
     F1 --> F2[Log affected rows via grow_scouting_observation_row]
     F2 --> F3[Upload photos via grow_scouting_photo]
+
+    B -->|Spraying| G[Fill pre-spray checklist via ops_template]
+    G --> G1[Link seeding batches via grow_spraying_seeding]
+    G1 --> G2[Add inputs via grow_spraying_input]
+    G2 --> G3[Select chemical + compliance + quantity]
+    G3 --> G4[Add equipment via grow_spraying_equipment]
+    G4 --> G5[Select equipment + water UOM + quantity]
+    G5 --> G6[PHI/REI derived from inputs on the fly]
 ```

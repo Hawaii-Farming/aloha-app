@@ -86,7 +86,7 @@ aloha-app/
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (16 tables) — [Docs](docs/schemas/20260324_06_grow.md)
+## Grow Module (18 tables) — [Docs](docs/schemas/20260324_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
@@ -104,6 +104,9 @@ aloha-app/
 - **grow_scouting_observation_row** — Rows affected by a specific observation; one row per growing row.
 - **grow_scouting_photo** — Photos taken during scouting with optional caption; one row per photo.
 - **grow_input_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
+- **grow_spraying_seeding** — Join table linking spraying activities (ops_task_tracker) to seeding batches.
+- **grow_spraying_input** — Individual chemical/fertilizer applied per spraying activity with quantity and compliance link.
+- **grow_spraying_equipment** — Equipment used per spraying activity with water UOM and quantity per piece.
 
 ## Pack Module (7 tables) — [Docs](docs/schemas/20260324_07_pack.md)
 

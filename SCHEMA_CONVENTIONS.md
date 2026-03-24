@@ -12,14 +12,14 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 |-----------|-----------------|-----------------|-------|
 | `sys_`    | System          | 001–004 | 01 |
 | `org_`    | Org             | 005–010 | 02 |
-| `grow_`   | Grow            | 011–012, 040–054 | 06 |
+| `grow_`   | Grow            | 011–012, 040–057 | 06 |
 | `invnt_`  | Inventory       | 013–020 | 03 |
 | `hr_`     | Human Resources | 021–026 | 04 |
 | `ops_`    | Operations      | 027–039 | 05 |
-| `pack_`   | Pack            | 054–069 | 07 |
-| `sales_`  | Sales           | 054–069 | 08 |
-| `maint_`  | Maintenance     | 070–071 | 09 |
-| `fsafe_`  | Food Safety     | 072–077 | 10 |
+| `pack_`   | Pack            | 058–073 | 07 |
+| `sales_`  | Sales           | 058–073 | 08 |
+| `maint_`  | Maintenance     | 074–075 | 09 |
+| `fsafe_`  | Food Safety     | 076–080 | 10 |
 | (deferred)| Future          | —       | 11 |
 
 Sales & Pack migration ranges are interleaved (042–057) due to cross-module FK dependencies.
