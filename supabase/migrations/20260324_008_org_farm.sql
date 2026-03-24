@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS org_farm (
     name             TEXT NOT NULL,
     weighing_uom  TEXT REFERENCES sys_uom(code),
     growing_uom   TEXT REFERENCES sys_uom(code),
+    volume_uom    TEXT REFERENCES sys_uom(code),
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by       TEXT,
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -16,3 +17,4 @@ COMMENT ON TABLE org_farm IS 'Represents a crop or product line within an organi
 
 COMMENT ON COLUMN org_farm.weighing_uom IS 'Default unit of measure for weighing operations on this farm (e.g. lb, kg)';
 COMMENT ON COLUMN org_farm.growing_uom IS 'Default unit of measure for growing/harvest tracking on this farm';
+COMMENT ON COLUMN org_farm.volume_uom IS 'Default unit of measure for water and liquid volumes on this farm (e.g. gallons, liters)';

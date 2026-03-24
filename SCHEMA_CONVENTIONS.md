@@ -22,7 +22,7 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 | `fsafe_`  | Food Safety     | 085–089 | 10 |
 | (deferred)| Future          | —       | 11 |
 
-Sales & Pack migration ranges are interleaved (042–057) due to cross-module FK dependencies.
+Sales & Pack migration ranges are interleaved (067–082) due to cross-module FK dependencies.
 
 Tables designed but not yet ready for deployment go in `supabase/migrations_future/` and are documented in the `_11_future.md` schema doc.
 
@@ -126,9 +126,9 @@ Exceptions:
 
 - **Scoping columns** — `farm_id`, `site_id`, and `equipment_id` keep their short names even though the tables are `org_farm`, `org_site`, and `org_equipment`
 - **Workflow fields** — role-based names referencing `hr_employee(id)` (see Section 2)
-- **Self-referencing FKs** — use a semantic suffix so the domain prefix is preserved (e.g. `fsafe_emp_result_id_original` in `fsafe_emp_result`, not `original_fsafe_emp_result_id`)
+- **Self-referencing FKs** — use a semantic suffix so the domain prefix is preserved (e.g. `fsafe_result_id_original` in `fsafe_result`, not `original_fsafe_result_id`)
 - **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` in `invnt_item`, `site_id_housing` in `hr_employee`)
-- **Cross-module FKs** — retain the referenced table's prefix (e.g. `ops_corrective_action_taken.fsafe_emp_result_id`)
+- **Cross-module FKs** — retain the referenced table's prefix (e.g. `ops_corrective_action_taken.fsafe_result_id`)
 
 ---
 

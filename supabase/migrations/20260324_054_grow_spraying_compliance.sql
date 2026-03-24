@@ -28,8 +28,7 @@ CREATE TABLE IF NOT EXISTS grow_spraying_compliance (
     created_by                  TEXT,
     updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                  TEXT,
-    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
-
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false
 );
 
 COMMENT ON TABLE grow_spraying_compliance IS 'Chemical label registry storing regulatory information per product. One row per chemical/fertilizer item with REI, PHI, label rates, and application restrictions.';

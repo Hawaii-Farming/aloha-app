@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS hr_travel_request (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id              TEXT NOT NULL REFERENCES org(id),
-    employee_id         TEXT NOT NULL REFERENCES hr_employee(id),
+    hr_employee_id         TEXT NOT NULL REFERENCES hr_employee(id),
 
     -- Travel details
     request_type        TEXT,
@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS hr_travel_request (
 COMMENT ON TABLE hr_travel_request IS 'Employee travel requests with a simple approval workflow. Captures trip details, purpose, and dates alongside a pending, approved, or denied status flow.';
 
 CREATE INDEX idx_hr_travel_request_org_id ON hr_travel_request (org_id);
-CREATE INDEX idx_hr_travel_request_employee ON hr_travel_request (employee_id);
+CREATE INDEX idx_hr_travel_request_employee ON hr_travel_request (hr_employee_id);
 CREATE INDEX idx_hr_travel_request_status ON hr_travel_request (org_id, status);
-CREATE INDEX idx_hr_travel_request_dates ON hr_travel_request (employee_id, travel_start_date);
+CREATE INDEX idx_hr_travel_request_dates ON hr_travel_request (hr_employee_id, travel_start_date);
 
 COMMENT ON COLUMN hr_travel_request.travel_return_date IS 'First day the employee returns (not last day of travel)';
 COMMENT ON COLUMN hr_travel_request.status IS 'Approval status: pending, approved, denied';
