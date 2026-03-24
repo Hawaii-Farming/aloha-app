@@ -6,29 +6,94 @@ These rules apply to every schema change in this project. All contributors must 
 
 ## 1. Modules
 
+One table defines all modules, their prefixes, file numbering, and doc numbering:
+
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| `sys_`    | System (`sys_uom`, `sys_access_level`, `sys_module`, `sys_sub_module`) | 001–004 | 01 |
-| `org_`    | Org (`org`, `org_module`, `org_sub_module`, `org_farm`, `org_site`, `org_equipment`) | 005–010 | 02 |
-| `grow_`   | Grow (`grow_variety`, `grow_grade`) | 011–012 | 02 |
-| `invnt_`  | Inventory       | 013–020 | 03 |
-| `hr_`     | Human Resources | 021–026 | 04 |
-| `ops_`    | Operations      | 027–039 | 05 |
-| `pack_`   | Pack            | 040–055 | 06 |
-| `sales_`  | Sales           | 040–055 | 07 |
-| `maint_`  | Maintenance     | 056–057 | 08 |
-| `fsafe_`  | Food Safety     | 058–063 | 09 |
-| (deferred)| Future          | —       | 10 |
+| (none)    | Org (`util_uom`, `org`, `farm`, `site`) | 001–009 | 01 |
+| `grow_`   | Org crop data (`grow_variety`, `grow_grade`) | (within Org) | 01 |
+| `invnt_`  | Inventory       | 012–020 | 02 |
+| `hr_`     | Human Resources | 021–025 | 03 |
+| `ops_`    | Operations      | 026–038 | 04 |
+| `pack_`   | Pack            | 039–054 | 05 |
+| `sales_`  | Sales           | 039–054 | 06 |
+| `maint_`  | Maintenance     | 055–056 | 07 |
+| `fsafe_`  | Food Safety     | 057–062 | 08 |
+| (deferred)| Future          | —       | 09 |
 
-Sales & Pack migration ranges are interleaved (040–055) due to cross-module FK dependencies.
-
-Tables designed but not yet ready for deployment go in `supabase/migrations_future/` and are documented in the `_09_future.md` schema doc.
+Sales & Pack migration ranges are interleaved (039–054) due to cross-module FK dependencies.
 
 ---
 
-## 2. Org Scoping & RLS
+## 2. Standard Fields
 
-### 2.1 org_id
+Every table includes these fields. They are omitted from `.md` column tables for brevity and do not receive `COMMENT ON COLUMN` descriptions.
+
+```sql
+created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+created_by  TEXT
+updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+updated_by  TEXT
+is_deleted  BOOLEAN     NOT NULL DEFAULT false
+```
+
+- `is_deleted` — soft delete flag. No records are physically deleted. Queries filter on `WHERE is_deleted = false`.
+- `created_by` / `updated_by` — Supabase Auth email (TEXT, no FK). These are audit fields, not workflow fields.
+- `ON DELETE CASCADE` is never used. All FK constraints use the default `RESTRICT` behavior.
+
+### Workflow fields
+
+Workflow fields capture a named person performing a step in a record's lifecycle. They are distinct from audit fields:
+
+| Type | Column examples | Datatype | FK? | Purpose |
+|------|-----------------|----------|-----|---------|
+| Workflow | `verified_by`, `reviewed_by`, `requested_by`, `sampled_by`, `ordered_by`, `approved_by`, `uploaded_by`, `assigned_to`, `fixer_id`, `reported_by` | TEXT | FK → `hr_employee(id)` | Identifies a specific employee in a business process |
+| Audit | `created_by`, `updated_by` | TEXT | No FK | Logs the Supabase Auth email of who made the change |
+
+Workflow field rules:
+- Timestamp always precedes person: `verified_at` before `verified_by`
+- Ordered by lifecycle stage: `requested_at/by` → `reviewed_at/by` → `approved_at/by` → `ordered_at/by` → `verified_at/by`
+- Use `_at` (TIMESTAMPTZ) when exact time matters; use `_on` (DATE) when only the date matters (e.g. `sampled_on`, `delivered_to_lab_on`)
+- Workflow fields sit between business fields and CRUD fields in column order
+- They are additional — they do not replace `created_at`/`created_by`
+
+The **only** `auth.users` FK in the project is `hr_employee.user_id UUID REFERENCES auth.users(id)`.
+
+---
+
+## 3. Column Ordering
+
+```
+id
+org_id
+farm_id              (if applicable)
+site_id              (if applicable)
+... business fields ...
+... workflow fields (e.g. requested_at, requested_by, verified_at, verified_by) ...
+created_at
+created_by
+updated_at
+updated_by
+is_deleted
+```
+
+CRUD fields always close the column list in this exact order. Workflow fields sit between business fields and CRUD fields.
+
+---
+
+## 4. Table Design
+
+### Primary keys
+
+- **TEXT PK** — lookup and reference tables where the ID is human-readable and derived from the name field (e.g. `org`, `farm`, `site`, `hr_employee`, `ops_task`)
+- **UUID PK** (`gen_random_uuid()`) — transactional tables where records are created at runtime (e.g. `ops_task_tracker`, `invnt_po`, `maint_request`)
+
+### Data types
+
+- All text fields use **`TEXT`** — no `VARCHAR(n)`. Frontend handles length validation.
+- Status and type fields use **`TEXT` with a `CHECK` constraint** — never PostgreSQL `ENUM` types. CHECK constraints can be added or removed in a single transactional migration; ENUM types cannot.
+
+### Multi-tenancy
 
 Every org-scoped table must have:
 
@@ -36,30 +101,15 @@ Every org-scoped table must have:
 org_id TEXT NOT NULL REFERENCES org(id)
 ```
 
-### 2.2 farm_id inheritance
+This column is used for Row Level Security (RLS) filtering.
 
-For convenience, when a parent table has `farm_id`, all its child tables also include `farm_id` with the same nullability. This avoids joining back to the parent when filtering by farm.
-
-### 2.3 Row Level Security
-
-RLS policies use:
-- **`org_id`** — isolates data by organization. A helper function maps `auth.uid()` → `hr_employee` → `org_id` to determine which org the current user belongs to.
-- **`is_deleted`** — filters out soft-deleted rows so they are invisible to all queries.
-
-### 2.4 Auth
-
-`hr_employee.user_id UUID REFERENCES auth.users(id)` connects a Supabase login to an employee record, which determines org membership and access level. No other table references `auth.users` directly — all user identity flows through `hr_employee`.
+**farm_id inheritance** — if a parent/header table has `farm_id`, all its child tables must also include `farm_id` with the same nullability. The child's `farm_id` is inherited from the parent at insert time. This ensures every table in a parent-child hierarchy can be independently filtered by farm without joining back to the parent.
 
 ---
 
-## 3. Table & Column Design
+## 5. Foreign Keys
 
-### 3.1 Primary keys
-
-- **TEXT** — lookup and reference tables where the ID is human-readable and derived from the name column (e.g. `org`, `org_farm`, `org_site`, `hr_employee`, `ops_task`)
-- **UUID** (`gen_random_uuid()`) — transactional tables where records are created at runtime (e.g. `ops_task_tracker`, `invnt_po`, `maint_request`)
-
-### 3.2 FK naming
+### Naming
 
 FK columns are named `{referenced_table}_id`:
 
@@ -71,43 +121,14 @@ sales_customer_id → sales_customer(id)
 
 Exceptions:
 
-- **Scoping columns** — `farm_id`, `site_id`, and `equipment_id` keep their short names even though the tables are `org_farm`, `org_site`, and `org_equipment`
-- **Workflow columns** — role-based names referencing `hr_employee(id)` (see 3.8)
-- **Self-referencing FKs** — use a semantic suffix so the domain prefix is preserved (e.g. `fsafe_emp_result_id_original` in `fsafe_emp_result`, not `original_fsafe_emp_result_id`)
-- **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` in `invnt_item`, `site_id_housing` in `hr_employee`)
+- **Workflow fields** — role-based names referencing `hr_employee(id)` (see Section 2)
+- **Self-referencing FKs** — use a semantic prefix (e.g. `original_fsafe_emp_result_id` in `fsafe_emp_result`)
+- **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` and `maint_site_id_equipment` in `invnt_item`, `site_id_housing` in `hr_employee`)
+- **Cross-module FKs** — retain the referenced table's prefix (e.g. `ops_corrective_action_taken.fsafe_emp_result_id`)
 
-### 3.3 No CASCADE
+---
 
-`ON DELETE CASCADE` is never used. All FK constraints use the default `RESTRICT` behavior. Since no records are physically deleted (soft delete via `is_deleted`), cascade is unnecessary and dangerous.
-
-### 3.4 TEXT
-
-All text columns use `TEXT`, no `VARCHAR(n)`. Frontend handles length validation.
-
-### 3.5 CHECK constraints
-
-Use `TEXT` with a `CHECK` constraint whenever a column has a fixed, developer-defined set of allowed values. Never use PostgreSQL `ENUM` types — CHECK constraints can be added or removed in a single transactional migration; ENUM types cannot.
-
-Common use cases:
-
-- **Status/workflow** — `status CHECK (status IN ('draft', 'approved', 'fulfilled'))` — tracks where a record is in its lifecycle
-- **Type/classification** — `request_type CHECK (request_type IN ('inventory_item', 'non_inventory_item'))` — determines which columns or behavior apply to a record
-- **Categorical** — `zone CHECK (zone IN ('zone_1', 'zone_2', 'zone_3', 'zone_4'))` — fixed classification that rarely changes
-- **Configuration** — `pay_structure CHECK (pay_structure IN ('hourly', 'salary'))`, `recurring_frequency CHECK (recurring_frequency IN ('daily', 'weekly', 'monthly', 'quarterly'))` — system behavior driven by the value
-
-CHECK vs JSONB: use CHECK when the allowed values are defined by developers and change via migration. Use JSONB arrays (e.g. `enum_options`) when allowed values are user-configurable at runtime.
-
-### 3.6 JSONB
-
-Use JSONB for flexible arrays where individual items don't need to be queried, filtered, or joined:
-
-- **Simple lists** — `photos` (URLs), `cc_emails` (addresses), `topics_covered` (strings), `trainer_names` (strings)
-- **Option sets** — `enum_options`, `enum_pass_options`, `test_methods` (arrays of allowed values for UI dropdowns and validation)
-- **Flexible metadata** — `metadata` (display-only key/value data that varies per record)
-
-Use proper FK columns for anything that is joined, filtered, or used in calculations. If individual items need their own metadata (e.g. photos with captions), use a separate table instead (e.g. `pack_shelf_life_photo`).
-
-### 3.7 Photos
+## 6. Photos & JSONB
 
 Photos are stored as JSONB arrays of URLs when they are simple attachments with no per-photo metadata:
 
@@ -119,58 +140,20 @@ When photos require individual metadata (e.g. caption, observation date), use a 
 
 Never use numbered columns (`photo_01_url`, `photo_02_url`, etc.).
 
-### 3.8 Workflow columns
-
-Workflow columns capture a named person performing a specific step in a record's lifecycle. They reference `hr_employee(id)` because they identify which employee performed a business action.
-
-| Column examples | Datatype | FK? |
-|-----------------|----------|-----|
-| `verified_by`, `reviewed_by`, `requested_by`, `approved_by`, `assigned_to` | TEXT | FK → `hr_employee(id)` |
-
-Rules:
-- **`_at` vs `_on`** — use `_at` (TIMESTAMPTZ) when exact time matters; use `_on` (DATE) when only the date matters (e.g. `sampled_on`, `delivered_to_lab_on`)
-- **Timestamp before person** — `verified_at` before `verified_by`
-
-### 3.9 Audit columns
-
-Every table includes these columns. They are omitted from `.md` column tables for brevity and do not receive `COMMENT ON COLUMN` descriptions.
-
-```sql
-created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-created_by  TEXT
-updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-updated_by  TEXT
-is_deleted  BOOLEAN     NOT NULL DEFAULT false
-```
-
-- **`created_by` / `updated_by`** — auto-set from the Supabase Auth session email via a database trigger. TEXT with no FK because no lookup is needed at write time.
-- **`is_deleted`** — soft delete flag. No records are physically deleted.
-
-### 3.10 Column ordering
-
-1. **id, org_id, farm_id**
-2. **Narrowing FKs** — filter columns before the selection they narrow (e.g. `invnt_category_id` before `invnt_item_id`)
-3. **Business columns** — group related columns together (e.g. `gender`, `date_of_birth` together; `overtime_threshold`, `wc` together)
-4. **Workflow columns**
-5. **Audit columns**
-
-### 3.11 Column descriptions
-
-Only add a `COMMENT ON COLUMN` and `.md` description when the column's purpose is not obvious from its name alone.
+Use JSONB for flexible arrays (photos, enum option lists). Use proper FK columns for anything that is joined, filtered, or used in calculations.
 
 ---
 
-## 4. Schema Change Process
+## 7. Schema Change Process
 
-### 4.1 Change order
+Every schema change requires four steps in this order:
 
-1. **Ensure access** to this conventions doc, schema module `.md` files, and a Supabase connection
-2. **Update conventions** — if the change introduces a new pattern or modifies an existing rule
-3. **Update the module `.md`** — the `.md` is the source of truth for table design
-4. **Update the SQL migration** — built from the `.md`
-5. **Update `README.md`**
+1. **Update the SQL migration file** — the `.sql` file is the source of truth
+2. **Update the module `.md` doc** — column descriptions must exactly match `COMMENT ON COLUMN` in the SQL
+3. **Update `README.md`** — if tables are added, removed, or renamed
+4. **Renumber migration files** — keep sequential order by module (see Section 1)
 
-### 4.2 File naming
+### File naming
 
 **Migration files:**
 ```
@@ -182,25 +165,34 @@ supabase/migrations/YYYYMMDD_NNN_module_tablename.sql
 docs/schemas/YYYYMMDD_NN_module.md
 ```
 
-### 4.3 Date prefix rule
-
-The `YYYYMMDD` prefix on all migration files, schema docs, and process docs must be updated to **today's date** on every commit.
+**Date prefix rule** — the `YYYYMMDD` prefix on all migration files, schema docs, and process docs must be updated to **today's date** on every commit.
 
 ---
 
-## 5. Documentation
+## 8. Documentation
 
-### 5.1 SQL ↔ MD sync rule
+### SQL ↔ MD sync rule
 
 Column descriptions in `.md` docs must **exactly match** the text in `COMMENT ON COLUMN` in the corresponding `.sql` file — word for word. When you update one, update the other in the same change.
 
-### 5.2 Schema doc format
+### Which columns get descriptions
+
+Add `COMMENT ON COLUMN` and `.md` descriptions for **all non-PK, non-audit fields whose purpose is not obvious from the column name alone**. The fields that do NOT get comments are:
+
+- **PK**: `id`
+- **CRUD audit**: `created_at`, `created_by`, `updated_at`, `updated_by`, `is_deleted`
+- **Scoping**: `org_id`, `farm_id`
+- **Self-descriptive columns**: fields where the name alone makes the purpose clear (e.g. `email`, `phone`, `address`, `name`, `description`, `notes`, `photos`, `caption`)
+
+Everything else — business fields, workflow fields, FK references, status, dates, configuration fields, etc. — gets a comment. When in doubt, add the comment.
+
+### Schema doc format
 
 Each `.md` doc must include:
 
 1. A module title and one-paragraph description
-2. A standard audit column note at the top referencing 3.9
-3. A Mermaid ERD — relationships only, no entity attribute blocks. Unquoted, lowercase labels with underscores. Every referenced core entity must appear with its full ownership chain (if `org_farm` appears, include `org ||--o{ org_farm : operates`; if `org_site` appears, include `org_farm ||--o{ org_site : contains`)
+2. A standard audit field note at the top referencing the fields in Section 2
+3. A Mermaid ERD — relationships only, no entity attribute blocks. Unquoted, lowercase labels with underscores. Every referenced core entity must appear with its full ownership chain (if `farm` appears, include `org ||--o{ farm : operates`; if `site` appears, include `farm ||--o{ site : contains`)
 4. A table overview section
 5. A section per table with:
    - One-paragraph description
