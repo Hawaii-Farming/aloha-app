@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS grow_spraying_equipment (
+CREATE TABLE IF NOT EXISTS grow_spray_equipment (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id              TEXT NOT NULL REFERENCES org(id),
     farm_id             TEXT NOT NULL REFERENCES org_farm(id),
@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS grow_spraying_equipment (
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by          TEXT,
     is_deleted          BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT uq_grow_spraying_equipment UNIQUE (ops_task_tracker_id, equipment_id)
+    CONSTRAINT uq_grow_spray_equipment UNIQUE (ops_task_tracker_id, equipment_id)
 );
 
-COMMENT ON TABLE grow_spraying_equipment IS 'Equipment used during a spraying event with the water quantity per piece of equipment.';
+COMMENT ON TABLE grow_spray_equipment IS 'Equipment used during a spraying event with the water quantity per piece of equipment.';
 
-COMMENT ON COLUMN grow_spraying_equipment.water_uom IS 'Unit for water quantity (e.g. gallons, liters)';
+COMMENT ON COLUMN grow_spray_equipment.water_uom IS 'Unit for water quantity (e.g. gallons, liters)';
 
-CREATE INDEX idx_grow_spraying_equipment_spraying ON grow_spraying_equipment (ops_task_tracker_id);
-CREATE INDEX idx_grow_spraying_equipment_equip ON grow_spraying_equipment (equipment_id);
+CREATE INDEX idx_grow_spray_equipment_spraying ON grow_spray_equipment (ops_task_tracker_id);
+CREATE INDEX idx_grow_spray_equipment_equip ON grow_spray_equipment (equipment_id);

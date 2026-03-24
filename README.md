@@ -94,20 +94,20 @@ aloha-app/
 - **grow_trial_type** — Lookup defining types of seeding trials (e.g. new lot, new variety). Farm-scoped (TEXT PK).
 - **grow_seed_mix** — Named seed blend recipes with items and percentages defined in child table. Farm-scoped (TEXT PK).
 - **grow_seed_mix_item** — Individual seed items within a mix recipe with proportion percentage.
-- **grow_seeding** — Seeding batch linked to ops activity; either single variety or mix, with traceability code and lifecycle status.
+- **grow_seed_batch** — Seeding batch linked to ops activity; either single variety or mix, with traceability code and lifecycle status.
 - **grow_harvest_container** — Container definitions with tare weight, optionally specific to variety and grade for auto-calculation
-- **grow_harvesting** — Harvest header linked to seeding batch for full traceability with grade assignment.
-- **grow_harvesting_weight** — Individual weigh-ins per container type with quantity; tare auto-calculated from container definition.
+- **grow_harvest** — Harvest header linked to seeding batch for full traceability with grade assignment.
+- **grow_harvest_weight** — Individual weigh-ins per container type with quantity; tare auto-calculated from container definition.
 - **grow_pest** — Standardized pest names for scouting observations. Farm-scoped (TEXT PK).
 - **grow_disease** — Standardized disease names for scouting observations. Farm-scoped (TEXT PK).
-- **grow_scouting_seeding** — Join table linking scouting activities (ops_task_tracker) to seeding batches.
-- **grow_scouting_observation** — Individual pest or disease finding with side, severity, and infection stage.
-- **grow_scouting_observation_row** — Rows affected by a specific observation; one row per growing row.
-- **grow_scouting_photo** — Photos taken during scouting with optional caption; one row per photo.
-- **grow_spraying_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
-- **grow_spraying_seeding** — Join table linking spraying activities (ops_task_tracker) to seeding batches.
-- **grow_spraying_input** — Individual chemical/fertilizer applied per spraying activity with quantity and compliance link.
-- **grow_spraying_equipment** — Equipment used per spraying activity with water UOM and quantity per piece.
+- **grow_scout_seeding** — Join table linking scouting activities (ops_task_tracker) to seeding batches.
+- **grow_scout_observation** — Individual pest or disease finding with side, severity, and infection stage.
+- **grow_scout_observation_row** — Rows affected by a specific observation; one row per growing row.
+- **grow_scout_photo** — Photos taken during scouting with optional caption; one row per photo.
+- **grow_spray_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
+- **grow_spray_seeding** — Join table linking spraying activities (ops_task_tracker) to seeding batches.
+- **grow_spray_input** — Individual chemical/fertilizer applied per spraying activity with quantity and compliance link.
+- **grow_spray_equipment** — Equipment used per spraying activity with water UOM and quantity per piece.
 - **grow_fertigation_recipe** — Reusable fertigation recipe with flush water config and top-up hours (TEXT PK).
 - **grow_fertigation_recipe_item** — Fertilizer items in a recipe with quantities; invnt_item_id nullable for one-off products.
 - **grow_fertigation_recipe_site** — Sites that receive a recipe (configuration for pre-filling).

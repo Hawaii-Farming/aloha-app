@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS grow_scouting_photo (
+CREATE TABLE IF NOT EXISTS grow_scout_photo (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id              TEXT NOT NULL REFERENCES org(id),
     farm_id             TEXT NOT NULL REFERENCES org_farm(id),
@@ -12,6 +12,6 @@ CREATE TABLE IF NOT EXISTS grow_scouting_photo (
     is_deleted          BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE grow_scouting_photo IS 'Photos taken during a scouting event. One row per photo with optional caption.';
+COMMENT ON TABLE grow_scout_photo IS 'Photos taken during a scouting event. One row per photo with optional caption.';
 
-CREATE INDEX idx_grow_scouting_photo_scouting ON grow_scouting_photo (ops_task_tracker_id);
+CREATE INDEX idx_grow_scout_photo_scouting ON grow_scout_photo (ops_task_tracker_id);

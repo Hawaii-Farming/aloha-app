@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS grow_scouting_observation (
+CREATE TABLE IF NOT EXISTS grow_scout_observation (
     id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                  TEXT NOT NULL REFERENCES org(id),
     farm_id                 TEXT NOT NULL REFERENCES org_farm(id),
@@ -15,16 +15,16 @@ CREATE TABLE IF NOT EXISTS grow_scouting_observation (
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by              TEXT,
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT chk_grow_scouting_observation_type CHECK (
+    CONSTRAINT chk_grow_scout_observation_type CHECK (
         (observation_type = 'pest' AND grow_pest_id IS NOT NULL AND grow_disease_id IS NULL)
         OR (observation_type = 'disease' AND grow_disease_id IS NOT NULL AND grow_pest_id IS NULL)
     )
 );
 
-COMMENT ON TABLE grow_scouting_observation IS 'Individual pest or disease finding within a scouting event. Either a pest or disease, enforced by CHECK constraint.';
+COMMENT ON TABLE grow_scout_observation IS 'Individual pest or disease finding within a scouting event. Either a pest or disease, enforced by CHECK constraint.';
 
-COMMENT ON COLUMN grow_scouting_observation.observation_type IS 'Type of finding: pest or disease';
-COMMENT ON COLUMN grow_scouting_observation.severity_level IS 'Severity: low, moderate, high, severe';
-COMMENT ON COLUMN grow_scouting_observation.disease_infection_stage IS 'Stage of infection for disease observations: early, mid, late, advanced; null for pest observations';
+COMMENT ON COLUMN grow_scout_observation.observation_type IS 'Type of finding: pest or disease';
+COMMENT ON COLUMN grow_scout_observation.severity_level IS 'Severity: low, moderate, high, severe';
+COMMENT ON COLUMN grow_scout_observation.disease_infection_stage IS 'Stage of infection for disease observations: early, mid, late, advanced; null for pest observations';
 
-CREATE INDEX idx_grow_scouting_observation_scouting ON grow_scouting_observation (ops_task_tracker_id);
+CREATE INDEX idx_grow_scout_observation_scouting ON grow_scout_observation (ops_task_tracker_id);
