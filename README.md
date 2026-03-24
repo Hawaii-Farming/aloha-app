@@ -34,7 +34,7 @@ aloha-app/
   src/                   # React application (coming soon)
 ```
 
-## System Module (4 tables) — [Docs](docs/schemas/20260319_01_system.md)
+## System Module (4 tables) — [Docs](docs/schemas/20260319_01_sys.md)
 
 - **sys_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
 - **sys_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
@@ -49,8 +49,6 @@ aloha-app/
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
 - **org_site** — Unified site register for all locations and assets (growing, packaging, storage, maintenance) with category/subcategory-driven fields
 - **org_equipment** — Equipment register for physical assets; farm-level or shared, with current/previous employee assignment
-- **grow_variety** — Crop varieties with short codes (e.g. "K" for Keiki)
-- **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A)
 
 ## Inventory Module (6 tables, 2 views) — [Docs](docs/schemas/20260319_03_invnt.md)
 
@@ -88,7 +86,12 @@ aloha-app/
 - **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Pack Module (7 tables) — [Docs](docs/schemas/20260319_06_pack.md)
+## Grow Module (2 tables) — [Docs](docs/schemas/20260319_06_grow.md)
+
+- **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
+- **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
+
+## Pack Module (7 tables) — [Docs](docs/schemas/20260319_07_pack.md)
 
 - **pack_packaging_type** — Org-defined packaging type lookup (e.g. clamshell, bag, sleeve, tray wrap); also referenced by sales_product (TEXT PK)
 - **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
@@ -98,7 +101,7 @@ aloha-app/
 - **pack_shelf_life_observation** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
 
-## Sales Module (9 tables) — [Docs](docs/schemas/20260319_07_sales.md)
+## Sales Module (9 tables) — [Docs](docs/schemas/20260319_08_sales.md)
 
 - **sales_fob** — Org-specific FOB (Freight On Board) delivery points (TEXT PK)
 - **sales_customer_group** — Org-specific customer classifications for reporting and group pricing (TEXT PK)
@@ -110,12 +113,12 @@ aloha-app/
 - **sales_po_line** — Individual products within an order with snapshot pricing at time of order
 - **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, supporting partial fulfillment across multiple lots
 
-## Maintenance Module (2 tables) — [Docs](docs/schemas/20260319_08_maint.md)
+## Maintenance Module (2 tables) — [Docs](docs/schemas/20260319_09_maint.md)
 
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (6 tables) — [Docs](docs/schemas/20260319_09_fsafe.md)
+## Food Safety Module (6 tables) — [Docs](docs/schemas/20260319_10_fsafe.md)
 
 - **fsafe_lab_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_emp_result** — Individual EMP test results per site with retest/vector chaining and corrective action linkage; water tests recorded here using named definitions (e.g. water_listeria, water_ecoli, water_salmonella)
@@ -144,13 +147,14 @@ See [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) for the full set of schem
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [System Schema](docs/schemas/20260319_01_system.md) — 4 system-level tables
+- [System Schema](docs/schemas/20260319_01_sys.md) — 4 system-level tables
 - [Org Schema](docs/schemas/20260319_02_org.md) — 8 organization structure tables
 - [Inventory Schema](docs/schemas/20260319_03_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260319_04_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260319_05_ops.md) — Task tracking, training, and food safety checklists
-- [Pack Schema](docs/schemas/20260319_06_pack.md) — Production lot tracking and shelf life trials
-- [Sales Schema](docs/schemas/20260319_07_sales.md) — Product catalog, pricing, orders, fulfillment, and donations
-- [Maintenance Schema](docs/schemas/20260319_08_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260319_09_fsafe.md) — EMP testing, lab management, and test-and-hold
-- [Future Improvements](docs/schemas/20260319_10_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
+- [Grow Schema](docs/schemas/20260319_06_grow.md) — Crop varieties and harvest grades
+- [Pack Schema](docs/schemas/20260319_07_pack.md) — Production lot tracking and shelf life trials
+- [Sales Schema](docs/schemas/20260319_08_sales.md) — Product catalog, pricing, orders, fulfillment, and donations
+- [Maintenance Schema](docs/schemas/20260319_09_maint.md) — Work orders and parts usage
+- [Food Safety Schema](docs/schemas/20260319_10_fsafe.md) — EMP testing, lab management, and test-and-hold
+- [Future Improvements](docs/schemas/20260319_11_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)

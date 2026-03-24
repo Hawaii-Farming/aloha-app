@@ -170,12 +170,12 @@ At any point during their session, the user can switch to a different organizati
 
 | Layer | Who controls it | What it does |
 |-------|----------------|--------------|
-| System modules & sub-modules | System admin (developer) | Defines what exists in the application |
-| Org module/sub-module toggles | Organization admin | Controls what is available to the entire organization |
-| Employee module access | Organization admin | Controls which modules each employee can see |
-| Record-level permissions | Organization admin | Controls what actions (view, edit, delete, verify) each employee can perform per module |
-| Access level on sub-modules | Organization admin (inherited from system) | Controls which sub-modules are visible based on the employee's role |
-| Employee access level | Organization admin | Assigned per employee; determines sub-module visibility |
+| System modules & sub-modules | Developer | Defines what exists in the application |
+| Org module/sub-module toggles | Admin | Controls what is available to the entire organization |
+| Employee module access | Admin | Controls which modules each employee can see |
+| Record-level permissions | Admin | Controls what actions (view, edit, delete, verify) each employee can perform per module |
+| Access level on sub-modules | Admin (inherited from system) | Controls which sub-modules are visible based on the employee's role |
+| Employee access level | Admin | Assigned per employee; determines sub-module visibility |
 
 ---
 

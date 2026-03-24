@@ -10,18 +10,21 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| (none)    | Org (`util_uom`, `org`, `farm`, `site`) | 001–009 | 01 |
-| `grow_`   | Org crop data (`grow_variety`, `grow_grade`) | (within Org) | 01 |
-| `invnt_`  | Inventory       | 012–020 | 02 |
-| `hr_`     | Human Resources | 021–025 | 03 |
-| `ops_`    | Operations      | 026–038 | 04 |
-| `pack_`   | Pack            | 039–054 | 05 |
-| `sales_`  | Sales           | 039–054 | 06 |
-| `maint_`  | Maintenance     | 055–056 | 07 |
-| `fsafe_`  | Food Safety     | 057–062 | 08 |
-| (deferred)| Future          | —       | 09 |
+| `sys_`    | System          | 001–004 | 01 |
+| `org_`    | Org             | 005–010 | 02 |
+| `invnt_`  | Inventory       | 013–020 | 03 |
+| `hr_`     | Human Resources | 021–026 | 04 |
+| `ops_`    | Operations      | 027–039 | 05 |
+| `grow_`   | Grow            | 040–041 | 06 |
+| `pack_`   | Pack            | 042–057 | 07 |
+| `sales_`  | Sales           | 042–057 | 08 |
+| `maint_`  | Maintenance     | 058–059 | 09 |
+| `fsafe_`  | Food Safety     | 060–065 | 10 |
+| (deferred)| Future          | —       | 11 |
 
-Sales & Pack migration ranges are interleaved (039–054) due to cross-module FK dependencies.
+Sales & Pack migration ranges are interleaved (042–057) due to cross-module FK dependencies.
+
+Tables designed but not yet ready for deployment go in `supabase/migrations_future/` and are documented in the `_11_future.md` schema doc.
 
 ---
 
@@ -85,7 +88,7 @@ CRUD fields always close the column list in this exact order. Workflow fields si
 
 ### Primary keys
 
-- **TEXT PK** — lookup and reference tables where the ID is human-readable and derived from the name field (e.g. `org`, `farm`, `site`, `hr_employee`, `ops_task`)
+- **TEXT PK** — lookup and reference tables where the ID is human-readable and derived from the name field (e.g. `org`, `org_farm`, `org_site`, `hr_employee`, `ops_task`)
 - **UUID PK** (`gen_random_uuid()`) — transactional tables where records are created at runtime (e.g. `ops_task_tracker`, `invnt_po`, `maint_request`)
 
 ### Data types
@@ -121,9 +124,10 @@ sales_customer_id → sales_customer(id)
 
 Exceptions:
 
+- **Scoping columns** — `farm_id`, `site_id`, and `equipment_id` keep their short names even though the tables are `org_farm`, `org_site`, and `org_equipment`
 - **Workflow fields** — role-based names referencing `hr_employee(id)` (see Section 2)
-- **Self-referencing FKs** — use a semantic prefix (e.g. `original_fsafe_emp_result_id` in `fsafe_emp_result`)
-- **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` and `maint_site_id_equipment` in `invnt_item`, `site_id_housing` in `hr_employee`)
+- **Self-referencing FKs** — use a semantic suffix so the domain prefix is preserved (e.g. `fsafe_emp_result_id_original` in `fsafe_emp_result`, not `original_fsafe_emp_result_id`)
+- **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_storage` in `invnt_item`, `site_id_housing` in `hr_employee`)
 - **Cross-module FKs** — retain the referenced table's prefix (e.g. `ops_corrective_action_taken.fsafe_emp_result_id`)
 
 ---
@@ -146,12 +150,13 @@ Use JSONB for flexible arrays (photos, enum option lists). Use proper FK columns
 
 ## 7. Schema Change Process
 
-Every schema change requires four steps in this order:
+Every schema change requires these steps in this order:
 
-1. **Update the SQL migration file** — the `.sql` file is the source of truth
-2. **Update the module `.md` doc** — column descriptions must exactly match `COMMENT ON COLUMN` in the SQL
-3. **Update `README.md`** — if tables are added, removed, or renamed
-4. **Renumber migration files** — keep sequential order by module (see Section 1)
+1. **Ensure access** to this conventions doc, schema module `.md` files, and a Supabase connection
+2. **Update conventions** — if the change introduces a new pattern or modifies an existing rule
+3. **Update the module `.md`** — the `.md` is the source of truth for table design
+4. **Update the SQL migration** — built from the `.md`
+5. **Update `README.md`**
 
 ### File naming
 
@@ -192,7 +197,7 @@ Each `.md` doc must include:
 
 1. A module title and one-paragraph description
 2. A standard audit field note at the top referencing the fields in Section 2
-3. A Mermaid ERD — relationships only, no entity attribute blocks. Unquoted, lowercase labels with underscores. Every referenced core entity must appear with its full ownership chain (if `farm` appears, include `org ||--o{ farm : operates`; if `site` appears, include `farm ||--o{ site : contains`)
+3. A Mermaid ERD — relationships only, no entity attribute blocks. Unquoted, lowercase labels with underscores. Every referenced core entity must appear with its full ownership chain (if `org_farm` appears, include `org ||--o{ org_farm : operates`; if `org_site` appears, include `org_farm ||--o{ org_site : contains`)
 4. A table overview section
 5. A section per table with:
    - One-paragraph description
