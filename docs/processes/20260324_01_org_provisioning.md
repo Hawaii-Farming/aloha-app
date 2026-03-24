@@ -65,6 +65,7 @@ Default tasks:
 | scouting | Scouting | Required by grow_scouting_workflow |
 | spraying | Spraying | Required by grow_spraying_workflow |
 | fertigation | Fertigation | Required by grow_fertigation_workflow |
+| monitoring | Monitoring | Required by grow_monitoring_workflow |
 
 ---
 

@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS org_site (
     notes           TEXT,
     photos          JSONB NOT NULL DEFAULT '[]',
 
+    -- Monitoring
+    monitoring_stations JSONB NOT NULL DEFAULT '[]',
+
     -- General site details
     metadata        JSONB NOT NULL DEFAULT '{}',
 

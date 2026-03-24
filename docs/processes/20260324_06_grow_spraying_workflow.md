@@ -28,9 +28,10 @@ This document describes the spraying activity flow using `ops_task_tracker` dire
 2. Attach a pre-spray checklist template (`ops_template`) to the tracker — fill out the safety checklist via `ops_response`
 3. Link the seeding batches being treated via `grow_spraying_seeding` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
 4. For each chemical or fertilizer applied, create a `grow_spraying_input` record:
-   - Select the inventory item (`invnt_item_id`)
-   - Optionally link to the active compliance record (`grow_spraying_compliance_id`) for PHI/REI lookup
+   - Select from the active compliance records (`grow_spraying_compliance_id`) — only compliant products are available (filtered by `effective_date <= today` and `expiration_date IS NULL OR >= today`)
+   - The inventory item is derived from the compliance record (no separate item selection)
    - Enter the target pest/disease, application UOM, and quantity applied
+   - The app enforces that `quantity_applied` does not exceed the compliance record's `maximum_quantity_per_acre`
 5. For each piece of equipment used, create a `grow_spraying_equipment` record:
    - Select the equipment (`equipment_id`)
    - Enter water UOM and quantity
