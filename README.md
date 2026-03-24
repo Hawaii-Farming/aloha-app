@@ -131,14 +131,13 @@ aloha-app/
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (6 tables) — [Docs](docs/schemas/20260323_10_fsafe.md)
+## Food Safety Module (5 tables) — [Docs](docs/schemas/20260323_10_fsafe.md)
 
 - **fsafe_lab_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
-- **fsafe_emp_result** — Individual EMP test results per site with retest/vector chaining and corrective action linkage; water tests recorded here using named definitions (e.g. water_listeria, water_ecoli, water_salmonella)
+- **fsafe_result** — Unified food safety test results for both EMP and test-and-hold testing; one row per test event with retest/vector chaining, corrective action linkage, and optional test-and-hold parent reference
 - **fsafe_lab** — Catalog of laboratories used for food safety test submissions (TEXT PK)
 - **fsafe_test_hold** — Test-and-hold header; one record per pack lot tested, tracks sample collection, lab submission, and test timeline
 - **fsafe_test_hold_po** — Links test-and-hold records to sales POs on hold pending results
-- **fsafe_test_hold_result** — Individual test results per test type per test-and-hold event
 
 ## Planned Modules
 

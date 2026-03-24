@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     farm_id                             TEXT        REFERENCES org_farm(id),
     ops_template_id                     TEXT        REFERENCES ops_template(id),
     ops_response_id                     UUID        REFERENCES ops_response(id),
-    fsafe_emp_result_id                 UUID,       -- FK to fsafe_emp_result(id) added via ALTER TABLE in fsafe_emp_result migration
+    fsafe_result_id                 UUID,       -- FK to fsafe_result(id) added via ALTER TABLE in fsafe_result migration
     ops_corrective_action_choice_id     TEXT        REFERENCES ops_corrective_action_choice(id),
 
     other_action        TEXT,
@@ -29,13 +29,13 @@ COMMENT ON TABLE ops_corrective_action_taken IS 'Corrective actions raised again
 
 CREATE INDEX idx_ops_corrective_action_taken_org_id   ON ops_corrective_action_taken (org_id);
 CREATE INDEX idx_ops_corrective_action_taken_response ON ops_corrective_action_taken (ops_response_id);
-CREATE INDEX idx_ops_corrective_action_taken_result   ON ops_corrective_action_taken (fsafe_emp_result_id);
+CREATE INDEX idx_ops_corrective_action_taken_result   ON ops_corrective_action_taken (fsafe_result_id);
 CREATE INDEX idx_ops_corrective_action_taken_assigned ON ops_corrective_action_taken (assigned_to);
 CREATE INDEX idx_ops_corrective_action_taken_status   ON ops_corrective_action_taken (org_id, status);
 
 COMMENT ON COLUMN ops_corrective_action_taken.ops_template_id IS 'Null when triggered by an EMP test result which has no associated template';
 COMMENT ON COLUMN ops_corrective_action_taken.ops_response_id IS 'Null if triggered by an EMP test result';
-COMMENT ON COLUMN ops_corrective_action_taken.fsafe_emp_result_id IS 'Null if triggered by a checklist response; FK added via ALTER TABLE in fsafe_emp_result migration';
+COMMENT ON COLUMN ops_corrective_action_taken.fsafe_result_id IS 'Null if triggered by a checklist response; FK added via ALTER TABLE in fsafe_result migration';
 COMMENT ON COLUMN ops_corrective_action_taken.ops_corrective_action_choice_id IS 'Null if a custom description is provided instead';
 COMMENT ON COLUMN ops_corrective_action_taken.other_action IS 'Used when no predefined choice is selected';
 COMMENT ON COLUMN ops_corrective_action_taken.status IS 'Resolution status: open, completed';

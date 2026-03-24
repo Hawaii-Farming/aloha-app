@@ -11,13 +11,7 @@ CREATE TABLE IF NOT EXISTS fsafe_test_hold (
     status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed')),
     notes           TEXT,
 
-    sampled_on      DATE,
-    sampled_by      TEXT REFERENCES hr_employee(id),
     delivered_to_lab_on DATE,
-    test_started_on     DATE,
-    completed_on        DATE,
-    verified_at     TIMESTAMPTZ,
-    verified_by     TEXT REFERENCES hr_employee(id),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
