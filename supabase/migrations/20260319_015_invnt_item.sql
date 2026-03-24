@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     description              TEXT,
 
     -- Three-unit system
-    burn_uom                 TEXT REFERENCES org_uom(code),
-    onhand_uom               TEXT REFERENCES org_uom(code),
-    order_uom                TEXT REFERENCES org_uom(code),
+    burn_uom                 TEXT REFERENCES sys_uom(code),
+    onhand_uom               TEXT REFERENCES sys_uom(code),
+    order_uom                TEXT REFERENCES sys_uom(code),
     burn_per_onhand     NUMERIC,
     burn_per_order      NUMERIC,
 

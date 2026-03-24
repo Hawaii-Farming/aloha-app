@@ -36,10 +36,10 @@ aloha-app/
 
 ## System Module (4 tables) — [Docs](docs/schemas/20260319_01_system.md)
 
-- **org_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
-- **system_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
-- **system_module** — Master list of application modules for access control
-- **system_sub_module** — Master list of sub-modules within each module with minimum access level requirements
+- **sys_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
+- **sys_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
+- **sys_module** — Master list of application modules for access control
+- **sys_sub_module** — Master list of sub-modules within each module with minimum access level requirements
 
 ## Organization Module (8 tables) — [Docs](docs/schemas/20260319_02_org.md)
 
@@ -144,7 +144,7 @@ See [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) for the full set of schem
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [System Schema](docs/schemas/20260319_01_system.md) — 4 system-level lookup tables
+- [System Schema](docs/schemas/20260319_01_system.md) — 4 system-level tables
 - [Org Schema](docs/schemas/20260319_02_org.md) — 8 organization structure tables
 - [Inventory Schema](docs/schemas/20260319_03_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260319_04_hr.md) — Employee records and Human Resources lookups

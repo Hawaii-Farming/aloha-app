@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS pack_lot_item (
     sales_product_id    TEXT NOT NULL REFERENCES sales_product(id),
 
     best_by_date        DATE NOT NULL,
-    uom                 TEXT NOT NULL REFERENCES org_uom(code),
+    uom                 TEXT NOT NULL REFERENCES sys_uom(code),
     quantity_packed     NUMERIC NOT NULL,
 
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),

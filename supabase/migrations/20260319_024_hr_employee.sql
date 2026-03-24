@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     -- =============================================
     hr_department_id             TEXT REFERENCES hr_department(id),
     hr_title_id                  TEXT REFERENCES hr_title(id),
-    system_access_level_id       TEXT NOT NULL REFERENCES system_access_level(id),
+    sys_access_level_id       TEXT NOT NULL REFERENCES sys_access_level(id),
     team_lead_id                 TEXT REFERENCES hr_employee(id),
     compensation_manager_id      TEXT REFERENCES hr_employee(id),
 
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     CONSTRAINT uq_hr_employee_name UNIQUE (org_id, first_name, last_name)
 );
 
-COMMENT ON TABLE hr_employee IS 'Unified employee register and org membership table. Every employee gets a row here with a required system_access_level_id that defines their role (owner, manager, team_lead, employee). Employees without app access have a null user_id. A user can belong to multiple orgs by having one row per org. Tracks employment details, management hierarchy, and compensation.';
+COMMENT ON TABLE hr_employee IS 'Unified employee register and org membership table. Every employee gets a row here with a required sys_access_level_id that defines their role (owner, manager, team_lead, employee). Employees without app access have a null user_id. A user can belong to multiple orgs by having one row per org. Tracks employment details, management hierarchy, and compensation.';
 
 CREATE INDEX idx_hr_employee_org_id     ON hr_employee (org_id);
 CREATE INDEX idx_hr_employee_user_id    ON hr_employee (user_id);
@@ -79,7 +79,7 @@ CREATE INDEX idx_hr_employee_title      ON hr_employee (hr_title_id);
 
 COMMENT ON COLUMN hr_employee.is_minority IS 'Whether the employee is classified as a minority for compliance reporting';
 COMMENT ON COLUMN hr_employee.user_id IS 'Link to Supabase auth user; nullable for employees without system access';
-COMMENT ON COLUMN hr_employee.system_access_level_id IS 'System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection.';
+COMMENT ON COLUMN hr_employee.sys_access_level_id IS 'System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection.';
 COMMENT ON COLUMN hr_employee.hr_work_authorization_id IS 'Visa/work authorization type; references hr_work_authorization (e.g. local, wfe, furte, h1b)';
 COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type: hourly or salary';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';

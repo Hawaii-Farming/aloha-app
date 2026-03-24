@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS invnt_po (
     item_name              TEXT NOT NULL,
 
     -- Order quantities & units (snapshots from item at order time)
-    burn_uom               TEXT REFERENCES org_uom(code),
-    order_uom              TEXT REFERENCES org_uom(code),
+    burn_uom               TEXT REFERENCES sys_uom(code),
+    order_uom              TEXT REFERENCES sys_uom(code),
     order_quantity         NUMERIC NOT NULL,
     burn_per_order         NUMERIC,
 

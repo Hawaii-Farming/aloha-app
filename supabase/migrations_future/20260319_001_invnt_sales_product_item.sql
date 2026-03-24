@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS invnt_sales_product_item (
     product_id        TEXT NOT NULL REFERENCES sales_product(id),
     invnt_item_id     UUID NOT NULL REFERENCES invnt_item(id),
     packaging_level   TEXT NOT NULL CHECK (packaging_level IN ('pack', 'sale')),
-    sale_uom          TEXT REFERENCES org_uom(code),
+    sale_uom          TEXT REFERENCES sys_uom(code),
     quantity_per_sale_uom NUMERIC,
 
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),

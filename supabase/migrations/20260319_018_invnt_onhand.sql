@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS invnt_onhand (
     farm_id                TEXT REFERENCES org_farm(id),
     invnt_item_id          UUID NOT NULL REFERENCES invnt_item(id),
     onhand_date            DATE NOT NULL,
-    onhand_uom             TEXT REFERENCES org_uom(code),
+    onhand_uom             TEXT REFERENCES sys_uom(code),
     onhand_quantity        NUMERIC NOT NULL,
     burn_per_onhand   NUMERIC,
 

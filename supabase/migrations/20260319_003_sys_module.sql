@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS system_module (
+CREATE TABLE IF NOT EXISTS sys_module (
     id          TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     description TEXT,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS system_module (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by  TEXT,
     is_deleted  BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT uq_system_module_name UNIQUE (name)
+    CONSTRAINT uq_sys_module_name UNIQUE (name)
 );
 
-COMMENT ON TABLE system_module IS 'System-level lookup defining the application modules available for access control (e.g. Inventory, HR, Operations, Pack, Sales, Maintenance, Food Safety).';
+COMMENT ON TABLE sys_module IS 'System-level lookup defining the application modules available for access control (e.g. Inventory, HR, Operations, Pack, Sales, Maintenance, Food Safety).';

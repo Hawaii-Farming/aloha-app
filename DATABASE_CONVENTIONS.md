@@ -8,7 +8,7 @@ These rules apply to every schema change in this project. All contributors must 
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| `system_` | System (`org_uom`, `system_access_level`, `system_module`, `system_sub_module`) | 001–004 | 01 |
+| `sys_`    | System (`sys_uom`, `sys_access_level`, `sys_module`, `sys_sub_module`) | 001–004 | 01 |
 | `org_`    | Org (`org`, `org_module`, `org_sub_module`, `org_farm`, `org_site`, `org_equipment`) | 005–010 | 02 |
 | `grow_`   | Grow (`grow_variety`, `grow_grade`) | 011–012 | 02 |
 | `invnt_`  | Inventory       | 013–020 | 03 |

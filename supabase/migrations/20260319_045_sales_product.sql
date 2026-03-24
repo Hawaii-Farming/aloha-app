@@ -10,34 +10,34 @@ CREATE TABLE IF NOT EXISTS sales_product (
     pack_packaging_type_id     TEXT REFERENCES pack_packaging_type(id),
 
     -- Packaging hierarchy: item -> pack -> sale -> shipping
-    item_uom                   TEXT REFERENCES org_uom(code),
+    item_uom                   TEXT REFERENCES sys_uom(code),
 
-    pack_uom                   TEXT REFERENCES org_uom(code),
+    pack_uom                   TEXT REFERENCES sys_uom(code),
     item_per_pack_uom         NUMERIC,
 
-    sale_uom                   TEXT REFERENCES org_uom(code),
+    sale_uom                   TEXT REFERENCES sys_uom(code),
     pack_per_sale_uom         NUMERIC,
 
-    shipping_uom               TEXT REFERENCES org_uom(code),
+    shipping_uom               TEXT REFERENCES sys_uom(code),
     max_sale_per_shipping_uom     NUMERIC,
 
     -- Net weights (all in weight_uom)
     pack_net_weight            NUMERIC,
     sale_net_weight            NUMERIC,
     shipping_net_weight        NUMERIC,
-    weight_uom                 TEXT REFERENCES org_uom(code),
+    weight_uom                 TEXT REFERENCES sys_uom(code),
 
     -- Sale unit dimensions (all in dimension_uom)
     sale_uom_length            NUMERIC,
     sale_uom_width             NUMERIC,
     sale_uom_height            NUMERIC,
-    dimension_uom              TEXT REFERENCES org_uom(code),
+    dimension_uom              TEXT REFERENCES sys_uom(code),
 
     -- Storage & shelf life
     manufacture_storage_method TEXT,
     minimum_storage_temperature NUMERIC,
     maximum_storage_temperature NUMERIC,
-    temperature_uom            TEXT REFERENCES org_uom(code),
+    temperature_uom            TEXT REFERENCES sys_uom(code),
     shelf_life_days            INT,
 
     -- Shipping

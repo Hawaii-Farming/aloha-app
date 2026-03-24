@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS invnt_usage (
     reference_table        TEXT,
     reference_id           UUID,
     usage_date             DATE NOT NULL,
-    burn_uom               TEXT REFERENCES org_uom(code),
+    burn_uom               TEXT REFERENCES sys_uom(code),
     quantity_burn          NUMERIC NOT NULL,
 
     created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),

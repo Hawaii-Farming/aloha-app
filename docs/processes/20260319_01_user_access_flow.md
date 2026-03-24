@@ -18,13 +18,13 @@ This system combines three distinct access control mechanisms:
 
 | Table | Type | Purpose |
 |-------|------|---------|
-| `system_access_level` | System | Defines the 5 access tiers (employee, team_lead, manager, admin, owner) |
-| `system_module` | System | Master list of application modules |
-| `system_sub_module` | System | Master list of sub-modules with minimum access level |
+| `sys_access_level` | System | Defines the 5 access tiers (employee, team_lead, manager, admin, owner) |
+| `sys_module` | System | Master list of application modules |
+| `sys_sub_module` | System | Master list of sub-modules with minimum access level |
 | `org` | Org | Organization record |
 | `org_module` | Org | Org-scoped module toggles with custom display name and order |
 | `org_sub_module` | Org | Org-scoped sub-module toggles with custom display name, order, and access level |
-| `hr_employee` | HR | Employee record with `system_access_level_id` and `user_id` for auth |
+| `hr_employee` | HR | Employee record with `sys_access_level_id` and `user_id` for auth |
 | `hr_module_access` | HR | Maps employee to modules with permissions (`can_view`, `can_edit`, `can_delete`, `can_verify`) |
 | `auth.users` | Auth | Supabase Auth — handles login credentials and session |
 
@@ -84,7 +84,7 @@ When a new organization is created:
 
 1. An `org` record is created with the organization name and default currency.
 2. A **provisioning script** automatically copies all system modules into `org_module` and all system sub-modules into `org_sub_module` for the new organization — all enabled by default, inheriting the access level and display settings from the system templates. This is not done manually.
-3. The first `hr_employee` record is created manually for the organization admin with `system_access_level_id = admin` and a linked `user_id`.
+3. The first `hr_employee` record is created manually for the organization admin with `sys_access_level_id = admin` and a linked `user_id`.
 4. A **provisioning script** then copies all `org_module` records into `hr_module_access` for the admin — all permissions set to `true` (`can_view`, `can_edit`, `can_delete`, `can_verify`). The admin now has full access to every module.
 
 The organization admin can then:
@@ -106,7 +106,7 @@ Employees who do not need to log in to the system (e.g. field workers) are added
 
 When an employee is added with a `user_id` (linked to a Supabase Auth account):
 
-1. An `hr_employee` record is created with the appropriate `system_access_level_id` (e.g. employee, team_lead, manager, admin, or owner).
+1. An `hr_employee` record is created with the appropriate `sys_access_level_id` (e.g. employee, team_lead, manager, admin, or owner).
 2. A **provisioning script** automatically copies all `org_module` records into `hr_module_access` for the new employee — inheriting the organization's current module settings. Permissions use column defaults: `can_view = true`, `can_edit = true`, `can_delete = false`, `can_verify = false`.
 3. The admin can then toggle individual modules on/off per employee and adjust permissions (`can_edit`, `can_delete`, `can_verify`) if needed.
 
