@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS invnt_po (
 
     -- Item identification
     invnt_category_id      TEXT REFERENCES invnt_category(id),
-    invnt_item_id          UUID REFERENCES invnt_item(id),
+    invnt_item_id          TEXT REFERENCES invnt_item(id),
     item_name              TEXT NOT NULL,
 
     -- Order quantities & units (snapshots from item at order time)

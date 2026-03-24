@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS grow_seed_mix_item (
     org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT NOT NULL REFERENCES org_farm(id),
     grow_seed_mix_id TEXT NOT NULL REFERENCES grow_seed_mix(id),
-    invnt_item_id   UUID NOT NULL REFERENCES invnt_item(id),
+    invnt_item_id   TEXT NOT NULL REFERENCES invnt_item(id),
     lot_number      TEXT,
     percentage      NUMERIC NOT NULL,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),

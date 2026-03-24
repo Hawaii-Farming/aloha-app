@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS maint_request_invnt_item (
     org_id              TEXT        NOT NULL REFERENCES org(id),
     farm_id             TEXT        REFERENCES org_farm(id),
     maint_request_id    UUID        NOT NULL REFERENCES maint_request(id),
-    invnt_item_id       UUID        NOT NULL REFERENCES invnt_item(id),
+    invnt_item_id       TEXT        NOT NULL REFERENCES invnt_item(id),
     uom                 TEXT REFERENCES sys_uom(code),
     quantity_used       NUMERIC,
 

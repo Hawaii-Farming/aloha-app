@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS grow_seeding_batch (
     batch_code          TEXT NOT NULL,
     grow_trial_type_id  TEXT REFERENCES grow_trial_type(id),
     grow_seed_mix_id    TEXT REFERENCES grow_seed_mix(id),
-    invnt_item_id       UUID REFERENCES invnt_item(id),
+    invnt_item_id       TEXT REFERENCES invnt_item(id),
     lot_number          TEXT,
     seeding_uom         TEXT NOT NULL REFERENCES sys_uom(code),
     number_of_units     INTEGER NOT NULL,
