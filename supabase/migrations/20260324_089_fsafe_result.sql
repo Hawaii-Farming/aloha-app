@@ -43,15 +43,6 @@ CREATE INDEX idx_fsafe_result_test_hold ON fsafe_result (fsafe_test_hold_id);
 CREATE INDEX idx_fsafe_result_original  ON fsafe_result (fsafe_result_id_original);
 CREATE INDEX idx_fsafe_result_status    ON fsafe_result (org_id, status);
 
-COMMENT ON COLUMN fsafe_result.fsafe_test_hold_id IS 'Set for test-and-hold results; null for EMP results';
-COMMENT ON COLUMN fsafe_result.site_id IS 'Zone classification is stored on the site record; set for EMP results';
-COMMENT ON COLUMN fsafe_result.fsafe_lab_id IS 'Null if tested internally';
-COMMENT ON COLUMN fsafe_result.test_method IS 'Selected from the test methods list on the test definition (e.g. PCR, Culture); null for test-and-hold';
-COMMENT ON COLUMN fsafe_result.initial_retest_vector IS 'Type of test: initial (first run), retest (triggered by any fail), vector (triggered by any fail); null for test-and-hold';
-COMMENT ON COLUMN fsafe_result.status IS 'Workflow status: pending, in_progress, completed';
-COMMENT ON COLUMN fsafe_result.result_enum IS 'Selected from test enum_options when result_type is enum';
-COMMENT ON COLUMN fsafe_result.result_numeric IS 'Numeric result value when result_type is numeric';
-COMMENT ON COLUMN fsafe_result.result_pass IS 'Whether the result meets the pass criteria; null until result is entered';
-COMMENT ON COLUMN fsafe_result.fail_code IS 'Human-readable failure code (e.g. LM-001)';
-COMMENT ON COLUMN fsafe_result.fsafe_result_id_original IS 'Initial test that triggered this retest or vector test; null for initial tests';
+COMMENT ON COLUMN fsafe_result.initial_retest_vector IS 'initial, retest, vector';
+COMMENT ON COLUMN fsafe_result.status IS 'pending, in_progress, completed';
 

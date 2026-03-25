@@ -22,5 +22,4 @@ COMMENT ON TABLE invnt_sales_product_item IS 'Junction table linking sales produ
 CREATE INDEX idx_invnt_sales_product_item_product ON invnt_sales_product_item (product_id);
 CREATE INDEX idx_invnt_sales_product_item_item ON invnt_sales_product_item (invnt_item_id);
 
-COMMENT ON COLUMN invnt_sales_product_item.packaging_level IS 'Which packaging level consumes this item: pack or sale';
-COMMENT ON COLUMN invnt_sales_product_item.quantity_per_sale_uom IS 'Quantity of the inventory item consumed per unit at the specified packaging level';
+COMMENT ON COLUMN invnt_sales_product_item.packaging_level IS 'pack, sale';
