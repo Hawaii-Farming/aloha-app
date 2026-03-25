@@ -33,6 +33,5 @@ CREATE INDEX idx_sales_po_farm     ON sales_po (farm_id);
 CREATE INDEX idx_sales_po_customer ON sales_po (sales_customer_id);
 CREATE INDEX idx_sales_po_status   ON sales_po (org_id, status);
 
-COMMENT ON COLUMN sales_po.sales_donation_recipient_id IS 'Donation recipient if this order is a donation; null for regular sales orders';
-COMMENT ON COLUMN sales_po.recurring_frequency IS 'Standing order frequency: weekly, biweekly, or monthly; null for one-time orders';
-COMMENT ON COLUMN sales_po.status IS 'Order status: draft (new), approved (ready to fulfill), fulfilled (shipped)';
+COMMENT ON COLUMN sales_po.recurring_frequency IS 'weekly, biweekly, monthly';
+COMMENT ON COLUMN sales_po.status IS 'draft, approved, fulfilled';

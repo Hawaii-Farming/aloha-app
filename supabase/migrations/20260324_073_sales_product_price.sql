@@ -21,7 +21,3 @@ COMMENT ON TABLE sales_product_price IS 'Manages product pricing with three tier
 CREATE INDEX idx_sales_product_price_lookup ON sales_product_price (sales_product_id, sales_fob_id);
 
 CREATE INDEX idx_sales_product_price_org ON sales_product_price (org_id);
-
-COMMENT ON COLUMN sales_product_price.sales_customer_group_id IS 'NULL for customer-specific or default pricing';
-COMMENT ON COLUMN sales_product_price.sales_customer_id IS 'NULL for group or default pricing';
-COMMENT ON COLUMN sales_product_price.effective_to IS 'NULL means no expiry';

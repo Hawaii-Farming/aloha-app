@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sales_po_fulfillment (
     sales_po_line_id    UUID NOT NULL REFERENCES sales_po_line(id),
     pack_lot_id         UUID REFERENCES pack_lot(id),
 
-    quantity_fulfilled  NUMERIC NOT NULL,
+    fulfilled_quantity  NUMERIC NOT NULL,
     notes               TEXT,
 
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -22,4 +22,3 @@ CREATE INDEX idx_sales_po_fulfillment_org_id     ON sales_po_fulfillment (org_id
 CREATE INDEX idx_sales_po_fulfillment_order_line ON sales_po_fulfillment (sales_po_line_id);
 CREATE INDEX idx_sales_po_fulfillment_lot        ON sales_po_fulfillment (pack_lot_id);
 
-COMMENT ON COLUMN sales_po_fulfillment.pack_lot_id IS 'Null if lot tracking is not applicable';

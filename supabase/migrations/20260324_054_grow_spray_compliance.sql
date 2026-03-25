@@ -33,14 +33,5 @@ CREATE TABLE IF NOT EXISTS grow_spray_compliance (
 
 COMMENT ON TABLE grow_spray_compliance IS 'Chemical label registry storing regulatory information per product. One row per chemical/fertilizer item with REI, PHI, label rates, and application restrictions.';
 
-COMMENT ON COLUMN grow_spray_compliance.epa_registration IS 'EPA registration number for the chemical product';
-COMMENT ON COLUMN grow_spray_compliance.phi_days IS 'Pre-Harvest Interval in days — minimum days between last application and harvest';
-COMMENT ON COLUMN grow_spray_compliance.rei_hours IS 'Restricted Entry Interval in hours — minimum hours before workers can re-enter treated area';
-COMMENT ON COLUMN grow_spray_compliance.application_method IS 'JSON array of application methods (e.g. ["spray", "drench", "granular"])';
-COMMENT ON COLUMN grow_spray_compliance.target_pest_disease IS 'JSON array of pests and diseases this product is intended to treat';
-COMMENT ON COLUMN grow_spray_compliance.application_uom IS 'Unit of measure for the application rate';
-COMMENT ON COLUMN grow_spray_compliance.maximum_quantity_per_acre IS 'Maximum label rate per acre per application';
-COMMENT ON COLUMN grow_spray_compliance.burn_uom IS 'Smallest consumption unit for this product';
-COMMENT ON COLUMN grow_spray_compliance.application_per_burn IS 'Application rate expressed in burn units';
 
 CREATE INDEX idx_grow_spray_compliance_item ON grow_spray_compliance (invnt_item_id);

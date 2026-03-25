@@ -73,10 +73,4 @@ COMMENT ON TABLE sales_product IS 'The sellable products from each farm. Combine
 
 CREATE INDEX idx_sales_product_farm_id ON sales_product (farm_id);
 
-COMMENT ON COLUMN sales_product.segment IS 'Market segment: wholesale, retail, or food_service';
-COMMENT ON COLUMN sales_product.max_sale_per_shipping_uom IS 'Maximum sale units the shipping unit can hold beyond the standard TI x HI configuration';
-COMMENT ON COLUMN sales_product.shipping_ti IS 'TI — number of sale units per layer on the shipping unit';
-COMMENT ON COLUMN sales_product.shipping_hi IS 'HI — number of layers stacked on the shipping unit';
-COMMENT ON COLUMN sales_product.is_catch_weight IS 'Whether this product is sold by actual weight rather than fixed weight';
-COMMENT ON COLUMN sales_product.is_fsma_traceable IS 'Whether this product is on the FDA FSMA 204 Food Traceability List';
-COMMENT ON COLUMN sales_product.display_order IS 'Sort order for UI display within the farm';
+COMMENT ON COLUMN sales_product.segment IS 'wholesale, retail, food_service';

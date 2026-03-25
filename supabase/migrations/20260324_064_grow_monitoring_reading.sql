@@ -22,11 +22,6 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_reading (
 
 COMMENT ON TABLE grow_monitoring_reading IS 'Individual measurement recorded during a monitoring event. One row per point per station. Calculated points store the computed result for historical record.';
 
-COMMENT ON COLUMN grow_monitoring_reading.monitoring_station IS 'Selected from org_site.monitoring_stations JSONB dropdown';
-COMMENT ON COLUMN grow_monitoring_reading.reading_boolean IS 'Used when point response_type is boolean';
-COMMENT ON COLUMN grow_monitoring_reading.reading_text IS 'Used when point response_type is text';
-COMMENT ON COLUMN grow_monitoring_reading.is_out_of_range IS 'Auto-set by comparing reading against grow_monitoring_metric.minimum_value and maximum_value';
-COMMENT ON COLUMN grow_monitoring_reading.corrective_action IS 'Selected from grow_monitoring_metric.corrective_actions when reading is out of range';
 
 CREATE INDEX idx_grow_monitoring_reading_tracker ON grow_monitoring_reading (ops_task_tracker_id);
 CREATE INDEX idx_grow_monitoring_reading_site ON grow_monitoring_reading (site_id);

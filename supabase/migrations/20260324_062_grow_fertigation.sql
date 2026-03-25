@@ -17,6 +17,5 @@ CREATE TABLE IF NOT EXISTS grow_fertigation (
 
 COMMENT ON TABLE grow_fertigation IS 'Tanks used during a fertigation event with the volume applied per tank.';
 
-COMMENT ON COLUMN grow_fertigation.volume_uom IS 'Unit for volume applied (e.g. gallons, liters)';
 
 CREATE INDEX idx_grow_fertigation_tracker ON grow_fertigation (ops_task_tracker_id);

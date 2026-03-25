@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_trial (
     trial_number                INTEGER,
     trial_purpose               TEXT,
     target_shelf_life_days      INTEGER,
-    final_shelf_life_days       INTEGER,
     sample_location             TEXT,
     notes                       TEXT,
 

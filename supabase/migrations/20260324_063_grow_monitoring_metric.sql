@@ -29,13 +29,7 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_metric (
 
 COMMENT ON TABLE grow_monitoring_metric IS 'Defines what to measure per farm and site category. Direct points are entered manually; calculated points are derived from other points using a formula.';
 
-COMMENT ON COLUMN grow_monitoring_metric.site_category IS 'Matches org_site.category to scope which points apply (e.g. greenhouse, nursery, pond)';
-COMMENT ON COLUMN grow_monitoring_metric.minimum_value IS 'Below this value the reading is flagged as out of range';
-COMMENT ON COLUMN grow_monitoring_metric.maximum_value IS 'Above this value the reading is flagged as out of range';
-COMMENT ON COLUMN grow_monitoring_metric.response_type IS 'How the reading is captured: numeric (number input), boolean (yes/no toggle), text (free text)';
-COMMENT ON COLUMN grow_monitoring_metric.point_type IS 'direct = manually entered; calculated = derived from formula';
-COMMENT ON COLUMN grow_monitoring_metric.formula IS 'Expression string for calculated points (e.g. (drain_ml / (drip_ml * dripper) * 100)); null for direct points';
-COMMENT ON COLUMN grow_monitoring_metric.input_point_ids IS 'JSON array of grow_monitoring_metric IDs that feed into this calculation; null for direct points';
-COMMENT ON COLUMN grow_monitoring_metric.corrective_actions IS 'JSON array of available corrective action options for out-of-range readings (e.g. ["Adjust pH", "Add nutrients", "Flush lines"])';
+COMMENT ON COLUMN grow_monitoring_metric.response_type IS 'numeric, boolean, text';
+COMMENT ON COLUMN grow_monitoring_metric.point_type IS 'direct, calculated';
 
 CREATE INDEX idx_grow_monitoring_metric_farm ON grow_monitoring_metric (org_id, farm_id, site_category);

@@ -16,5 +16,3 @@ CREATE TABLE IF NOT EXISTS grow_seed_mix_item (
 
 COMMENT ON TABLE grow_seed_mix_item IS 'Individual seed items within a mix recipe with their proportion. Each row defines one seed and its percentage in the blend.';
 
-COMMENT ON COLUMN grow_seed_mix_item.lot_number IS 'Supplier seed lot number for traceability';
-COMMENT ON COLUMN grow_seed_mix_item.percentage IS 'Proportion in the mix (e.g. 0.6 for 60%)';

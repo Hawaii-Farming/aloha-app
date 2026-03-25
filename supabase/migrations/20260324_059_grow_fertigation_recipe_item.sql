@@ -20,7 +20,5 @@ CREATE TABLE IF NOT EXISTS grow_fertigation_recipe_item (
 
 COMMENT ON TABLE grow_fertigation_recipe_item IS 'Individual fertilizer items within a recipe. invnt_item_id is nullable for products not stored in-house; item_name is always set for display.';
 
-COMMENT ON COLUMN grow_fertigation_recipe_item.invnt_item_id IS 'Null for one-off fertilizers not tracked in inventory';
-COMMENT ON COLUMN grow_fertigation_recipe_item.item_name IS 'Display name; auto-filled from invnt_item if linked, manually entered otherwise';
 
 CREATE INDEX idx_grow_fertigation_recipe_item_recipe ON grow_fertigation_recipe_item (grow_fertigation_recipe_id);

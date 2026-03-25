@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS grow_spray_equipment (
 
 COMMENT ON TABLE grow_spray_equipment IS 'Equipment used during a spraying event with the water quantity per piece of equipment.';
 
-COMMENT ON COLUMN grow_spray_equipment.water_uom IS 'Unit for water quantity (e.g. gallons, liters)';
 
 CREATE INDEX idx_grow_spray_equipment_spraying ON grow_spray_equipment (ops_task_tracker_id);
 CREATE INDEX idx_grow_spray_equipment_equip ON grow_spray_equipment (equipment_id);

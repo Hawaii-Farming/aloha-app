@@ -21,5 +21,3 @@ CREATE INDEX idx_pack_packaging_type_org_id ON pack_packaging_type (org_id);
 -- Partial unique indexes handle NULL farm_id correctly
 CREATE UNIQUE INDEX uq_pack_packaging_type_org_level  ON pack_packaging_type (org_id, name) WHERE farm_id IS NULL;
 CREATE UNIQUE INDEX uq_pack_packaging_type_farm_level ON pack_packaging_type (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
-
-COMMENT ON COLUMN pack_packaging_type.display_order IS 'Sort position for ordering packaging types in the UI';

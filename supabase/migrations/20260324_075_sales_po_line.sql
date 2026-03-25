@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sales_po_line (
     sales_product_id    TEXT NOT NULL REFERENCES sales_product(id),
 
     sale_uom            TEXT NOT NULL REFERENCES sys_uom(code),
-    quantity_ordered    NUMERIC NOT NULL,
+    order_quantity      NUMERIC NOT NULL,
     price_per_unit NUMERIC NOT NULL,
     notes               TEXT,
 
@@ -25,4 +25,3 @@ CREATE INDEX idx_sales_po_line_org_id  ON sales_po_line (org_id);
 CREATE INDEX idx_sales_po_line_order   ON sales_po_line (sales_po_id);
 CREATE INDEX idx_sales_po_line_product ON sales_po_line (sales_product_id);
 
-COMMENT ON COLUMN sales_po_line.price_per_unit IS 'Snapshot price per unit at time of order';

@@ -17,6 +17,3 @@ CREATE TABLE IF NOT EXISTS grow_harvest_container (
 
 COMMENT ON TABLE grow_harvest_container IS 'Harvest container definitions with tare weight per container type, optionally specific to variety and grade. Used to auto-calculate tare during weigh-ins.';
 
-COMMENT ON COLUMN grow_harvest_container.tare_weight IS 'Weight of one empty container in the specified weight_uom';
-COMMENT ON COLUMN grow_harvest_container.grow_variety_id IS 'Null means this tare applies to any variety';
-COMMENT ON COLUMN grow_harvest_container.grow_grade_id IS 'Null means this tare applies to any grade';

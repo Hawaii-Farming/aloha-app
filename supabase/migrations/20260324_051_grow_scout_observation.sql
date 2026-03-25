@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS grow_scout_observation (
 
 COMMENT ON TABLE grow_scout_observation IS 'Individual pest or disease finding within a scouting event. Either a pest or disease, enforced by CHECK constraint.';
 
-COMMENT ON COLUMN grow_scout_observation.observation_type IS 'Type of finding: pest or disease';
-COMMENT ON COLUMN grow_scout_observation.severity_level IS 'Severity: low, moderate, high, severe';
-COMMENT ON COLUMN grow_scout_observation.disease_infection_stage IS 'Stage of infection for disease observations: early, mid, late, advanced; null for pest observations';
+COMMENT ON COLUMN grow_scout_observation.observation_type IS 'pest, disease';
+COMMENT ON COLUMN grow_scout_observation.severity_level IS 'low, moderate, high, severe';
+COMMENT ON COLUMN grow_scout_observation.disease_infection_stage IS 'early, mid, late, advanced';
 
 CREATE INDEX idx_grow_scout_observation_scouting ON grow_scout_observation (ops_task_tracker_id);

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS pack_lot_item (
 
     best_by_date        DATE NOT NULL,
     uom                 TEXT NOT NULL REFERENCES sys_uom(code),
-    quantity_packed     NUMERIC NOT NULL,
+    pack_quantity     NUMERIC NOT NULL,
 
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
@@ -24,4 +24,3 @@ CREATE INDEX idx_pack_lot_item_org_id   ON pack_lot_item (org_id);
 CREATE INDEX idx_pack_lot_item_lot      ON pack_lot_item (pack_lot_id);
 CREATE INDEX idx_pack_lot_item_product  ON pack_lot_item (sales_product_id);
 
-COMMENT ON COLUMN pack_lot_item.uom IS 'Defaults to the product sale unit (e.g. case)';

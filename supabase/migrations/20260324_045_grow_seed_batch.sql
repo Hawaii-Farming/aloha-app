@@ -33,10 +33,7 @@ CREATE TABLE IF NOT EXISTS grow_seed_batch (
 
 COMMENT ON TABLE grow_seed_batch IS 'Individual seeding batch linked to an ops activity. Either a single seed item or a seed mix, never both.';
 
-COMMENT ON COLUMN grow_seed_batch.batch_code IS 'System-generated traceability code that carries through to transplanting and harvest; editable by user';
-COMMENT ON COLUMN grow_seed_batch.lot_number IS 'Supplier seed lot number for single-variety batches; populated from frontend dropdown';
-COMMENT ON COLUMN grow_seed_batch.seeding_uom IS 'Unit used for seeding (e.g. board, flat, tray)';
-COMMENT ON COLUMN grow_seed_batch.status IS 'Lifecycle status: planned, seeded, transplanted, harvesting, harvested';
+COMMENT ON COLUMN grow_seed_batch.status IS 'planned, seeded, transplanted, harvesting, harvested';
 
 CREATE INDEX idx_grow_seed_batch_org ON grow_seed_batch (org_id);
 CREATE INDEX idx_grow_seed_batch_tracker ON grow_seed_batch (ops_task_tracker_id);
