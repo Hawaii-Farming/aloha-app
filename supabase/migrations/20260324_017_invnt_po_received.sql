@@ -4,9 +4,9 @@ CREATE TABLE IF NOT EXISTS invnt_po_received (
     farm_id                TEXT REFERENCES org_farm(id),
     invnt_po_id            UUID NOT NULL REFERENCES invnt_po(id),
     received_date          DATE NOT NULL,
-    received_uom           TEXT REFERENCES sys_uom(code),
+    received_uom           TEXT NOT NULL REFERENCES sys_uom(code),
     received_quantity      NUMERIC NOT NULL,
-    burn_per_received      NUMERIC,
+    burn_per_received      NUMERIC NOT NULL DEFAULT 0,
 
     -- Lot tracking
     lot_number             TEXT,
@@ -32,4 +32,3 @@ COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a 
 CREATE INDEX idx_invnt_po_received_po  ON invnt_po_received (invnt_po_id);
 CREATE INDEX idx_invnt_po_received_org ON invnt_po_received (org_id);
 
-COMMENT ON COLUMN invnt_po_received.burn_per_received IS 'Conversion factor: burn units per received unit at time of delivery';

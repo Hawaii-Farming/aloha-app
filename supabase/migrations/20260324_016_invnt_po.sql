@@ -8,21 +8,21 @@ CREATE TABLE IF NOT EXISTS invnt_po (
     urgency_level          TEXT CHECK (urgency_level IN ('today', '2_days', '7_days', 'not_urgent')),
 
     -- Item identification
-    invnt_category_id      TEXT REFERENCES invnt_category(id),
+    invnt_category_id      TEXT NOT NULL REFERENCES invnt_category(id),
     invnt_item_id          TEXT REFERENCES invnt_item(id),
     item_name              TEXT NOT NULL,
 
     -- Order quantities & units (snapshots from item at order time)
-    burn_uom               TEXT REFERENCES sys_uom(code),
-    order_uom              TEXT REFERENCES sys_uom(code),
+    burn_uom               TEXT NOT NULL REFERENCES sys_uom(code),
+    order_uom              TEXT NOT NULL REFERENCES sys_uom(code),
     order_quantity         NUMERIC NOT NULL,
-    burn_per_order         NUMERIC,
+    burn_per_order         NUMERIC NOT NULL DEFAULT 0,
 
     -- Vendor & cost
     vendor_po_number       TEXT,
     invnt_vendor_id        TEXT REFERENCES invnt_vendor(id),
     total_cost             NUMERIC,
-    is_freight_included    BOOLEAN NOT NULL DEFAULT false,
+    is_freight_included    BOOLEAN,
     expected_delivery_date DATE,
     tracking_number        TEXT,
 
@@ -52,13 +52,6 @@ CREATE INDEX idx_invnt_po_org_id ON invnt_po (org_id);
 CREATE INDEX idx_invnt_po_status ON invnt_po (org_id, status);
 CREATE INDEX idx_invnt_po_item   ON invnt_po (invnt_item_id);
 
-COMMENT ON COLUMN invnt_po.request_type IS 'Whether this is a non-inventory purchase or an inventory item purchase: non_inventory_item, inventory_item';
-COMMENT ON COLUMN invnt_po.urgency_level IS 'How urgently the item is needed: today, 2_days, 7_days, not_urgent';
-COMMENT ON COLUMN invnt_po.invnt_category_id IS 'Category for non_inventory_item requests; references invnt_category rows where sub_category_name IS NULL';
-COMMENT ON COLUMN invnt_po.invnt_item_id IS 'Linked inventory item; NULL for non_inventory_item requests';
-COMMENT ON COLUMN invnt_po.item_name IS 'Snapshot of item name at order time; manually entered for non_inventory_item requests';
-COMMENT ON COLUMN invnt_po.burn_uom IS 'Snapshot from item at order time';
-COMMENT ON COLUMN invnt_po.order_uom IS 'Snapshot from item at order time';
-COMMENT ON COLUMN invnt_po.burn_per_order IS 'Snapshot of burn units per order unit at order time';
-COMMENT ON COLUMN invnt_po.is_freight_included IS 'Whether total_cost includes freight charges';
-COMMENT ON COLUMN invnt_po.status IS 'Workflow status: requested, approved, rejected, ordered, partial, received, cancelled';
+COMMENT ON COLUMN invnt_po.request_type IS 'non_inventory_item, inventory_item';
+COMMENT ON COLUMN invnt_po.urgency_level IS 'today, 2_days, 7_days, not_urgent';
+COMMENT ON COLUMN invnt_po.status IS 'requested, approved, rejected, ordered, partial, received, cancelled';

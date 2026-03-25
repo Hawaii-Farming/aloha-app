@@ -77,11 +77,5 @@ CREATE INDEX idx_hr_employee_team_lead  ON hr_employee (team_lead_id);
 CREATE INDEX idx_hr_employee_department ON hr_employee (hr_department_id);
 CREATE INDEX idx_hr_employee_title      ON hr_employee (hr_title_id);
 
-COMMENT ON COLUMN hr_employee.is_minority IS 'Whether the employee is classified as a minority for compliance reporting';
-COMMENT ON COLUMN hr_employee.user_id IS 'Link to Supabase auth user; nullable for employees without system access';
-COMMENT ON COLUMN hr_employee.sys_access_level_id IS 'System access level: owner, manager, team_lead, or employee. Drives frontend permissions via dropdown selection.';
-COMMENT ON COLUMN hr_employee.hr_work_authorization_id IS 'Visa/work authorization type; references hr_work_authorization (e.g. local, wfe, furte, h1b)';
-COMMENT ON COLUMN hr_employee.pay_structure IS 'Pay structure type: hourly or salary';
+COMMENT ON COLUMN hr_employee.pay_structure IS 'hourly, salary';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';
-COMMENT ON COLUMN hr_employee.payroll_processor IS 'Payroll administrator responsible for employee compensation (e.g. HRB, HF)';
-COMMENT ON COLUMN hr_employee.pay_delivery_method IS 'How pay stubs are delivered (e.g. email, print, portal)';

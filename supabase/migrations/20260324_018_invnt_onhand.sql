@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS invnt_onhand (
     onhand_date            DATE NOT NULL,
     onhand_uom             TEXT REFERENCES sys_uom(code),
     onhand_quantity        NUMERIC NOT NULL,
-    burn_per_onhand   NUMERIC,
+    burn_per_onhand   NUMERIC NOT NULL DEFAULT 0,
 
     -- Lot tracking
     lot_number             TEXT,
@@ -27,4 +27,3 @@ COMMENT ON TABLE invnt_onhand IS 'Records on-hand inventory snapshots per item. 
 CREATE INDEX idx_invnt_onhand_org_id ON invnt_onhand (org_id);
 CREATE INDEX idx_invnt_onhand_item ON invnt_onhand (invnt_item_id, onhand_date);
 
-COMMENT ON COLUMN invnt_onhand.burn_per_onhand IS 'Burn units per onhand unit at time of record';

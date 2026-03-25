@@ -29,4 +29,3 @@ CREATE INDEX idx_ops_training_attendee_training ON ops_training_attendee (ops_tr
 CREATE INDEX idx_ops_training_attendee_employee ON ops_training_attendee (hr_employee_id);
 CREATE INDEX idx_ops_training_attendee_org      ON ops_training_attendee (org_id);
 
-COMMENT ON COLUMN ops_training_attendee.hr_employee_id IS 'Row is created only when attendance is confirmed';

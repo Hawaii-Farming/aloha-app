@@ -12,23 +12,23 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     burn_uom                 TEXT REFERENCES sys_uom(code),
     onhand_uom               TEXT REFERENCES sys_uom(code),
     order_uom                TEXT REFERENCES sys_uom(code),
-    burn_per_onhand     NUMERIC,
-    burn_per_order      NUMERIC,
+    burn_per_onhand     NUMERIC NOT NULL DEFAULT 0,
+    burn_per_order      NUMERIC NOT NULL DEFAULT 0,
 
     -- Logistics
     is_palletized            BOOLEAN NOT NULL DEFAULT false,
-    order_per_pallet    NUMERIC,
-    pallet_per_truckload NUMERIC,
+    order_per_pallet    NUMERIC NOT NULL DEFAULT 0,
+    pallet_per_truckload NUMERIC NOT NULL DEFAULT 0,
 
     -- Burn rates & forecasting
     is_frequently_used       BOOLEAN NOT NULL DEFAULT false,
-    burn_per_week            NUMERIC,
-    cushion_weeks            NUMERIC,
+    burn_per_week            NUMERIC NOT NULL DEFAULT 0,
+    cushion_weeks            NUMERIC NOT NULL DEFAULT 0,
 
     -- Reorder settings
     is_auto_reorder          BOOLEAN NOT NULL DEFAULT false,
-    reorder_point_in_burn       NUMERIC,
-    reorder_quantity_in_burn    NUMERIC,
+    reorder_point_in_burn       NUMERIC NOT NULL DEFAULT 0,
+    reorder_quantity_in_burn    NUMERIC NOT NULL DEFAULT 0,
 
     -- Tracking flags
     requires_lot_tracking    BOOLEAN NOT NULL DEFAULT false,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     invnt_vendor_id          TEXT REFERENCES invnt_vendor(id),
     manufacturer             TEXT,
     grow_variety_id          TEXT REFERENCES grow_variety(id),
-    seed_is_pelleted         BOOLEAN NOT NULL DEFAULT false,
+    seed_is_pelleted         BOOLEAN,
     maint_part_type          TEXT,
     maint_part_number        TEXT,
 
@@ -72,9 +72,7 @@ CREATE INDEX idx_invnt_item_equipment ON invnt_item (equipment_id);
 COMMENT ON COLUMN invnt_item.invnt_category_id IS 'References invnt_category rows where sub_category_name IS NULL';
 COMMENT ON COLUMN invnt_item.invnt_subcategory_id IS 'References invnt_category rows where sub_category_name IS NOT NULL';
 COMMENT ON COLUMN invnt_item.burn_uom IS 'Smallest consumption unit used for burn rate tracking (e.g. ml, g, seed)';
-COMMENT ON COLUMN invnt_item.onhand_uom IS 'Unit used for physical stock counts (e.g. bottle, bag, box)';
-COMMENT ON COLUMN invnt_item.order_uom IS 'Unit used when placing orders with vendors (e.g. case, pallet)';
-COMMENT ON COLUMN invnt_item.burn_per_onhand IS 'Number of burn units in one onhand unit';
-COMMENT ON COLUMN invnt_item.burn_per_order IS 'Number of burn units in one order unit';
 COMMENT ON COLUMN invnt_item.cushion_weeks IS 'Safety stock buffer in weeks used in next-order-date calculations';
+COMMENT ON COLUMN invnt_item.seed_is_pelleted IS 'Whether seed item is pelleted; null for non-seed items';
+COMMENT ON COLUMN invnt_item.maint_part_type IS 'Type classification for parts (e.g. electrical, mechanical, plumbing)';
 COMMENT ON COLUMN invnt_item.is_active IS 'Whether this item is currently active for ordering and tracking; false means inactive but not deleted';
