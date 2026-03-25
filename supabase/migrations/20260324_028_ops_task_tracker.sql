@@ -6,10 +6,8 @@ CREATE TABLE IF NOT EXISTS ops_task_tracker (
     ops_task_id     TEXT NOT NULL REFERENCES ops_task(id),
     start_time      TIMESTAMPTZ NOT NULL,
     stop_time       TIMESTAMPTZ,
-    status          TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'completed')),
+    status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed')),
     notes           TEXT,
-    photos          JSONB NOT NULL DEFAULT '[]',
-
     verified_at     TIMESTAMPTZ,
     verified_by     TEXT REFERENCES hr_employee(id),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     first_name                   TEXT NOT NULL,
     last_name                    TEXT NOT NULL,
     preferred_name               TEXT,
-    gender                       TEXT,
+    gender                       TEXT CHECK (gender IN ('male', 'female')),
     date_of_birth                DATE,
     is_minority                  BOOLEAN NOT NULL DEFAULT false,
     profile_photo_url            TEXT,
