@@ -100,7 +100,7 @@ aloha-app/
 - **grow_harvest_weight** — Individual weigh-ins per container type; links directly to seeding batch for traceability with grade assignment. Tare auto-calculated.
 - **grow_pest** — Standardized pest names for scouting observations. Farm-scoped (TEXT PK).
 - **grow_disease** — Standardized disease names for scouting observations. Farm-scoped (TEXT PK).
-- **grow_task_seed_batch** — Unified join table linking any grow activity (scouting, spraying, fertigation, monitoring) to seeding batches. Nullable fertigation recipe link.
+- **grow_task_seed_batch** — Unified join table linking any grow activity (scouting, spraying, fertigation, monitoring) to seeding batches.
 - **grow_task_photo** — Unified photo table for any grow activity (scouting, monitoring) with optional caption.
 - **grow_scout_observation** — Individual pest or disease finding with side, severity, and infection stage.
 - **grow_scout_observation_row** — Rows affected by a specific observation; one row per growing row.

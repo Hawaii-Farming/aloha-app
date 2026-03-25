@@ -68,18 +68,14 @@ Each activity records its own seedings snapshot, tank volumes, and timing indepe
 
 ---
 
-## Design Decision: Recipe ID on Seed Batch Table
+## Design Decision: Recipe ID on Tank Table
 
-The `grow_fertigation_recipe_id` is stored on `grow_task_seed_batch` (nullable — only set for fertigation activities) rather than on a separate header table or on `ops_task_tracker`. This decision was made for three reasons:
-
-1. **`ops_task_tracker` stays module-agnostic** — adding grow-specific FKs to a shared ops table would bloat it as every module adds their own fields
-2. **No header table needed** — the only header-level business field is the recipe link. Creating a table with just `ops_task_tracker_id` + `grow_fertigation_recipe_id` adds complexity for one column
-3. **The recipe ID on the seeding row is semantically correct** — each row says "this recipe was applied to this seeding on this event," which is exactly what we need for historical traceability
+The `grow_fertigation_recipe_id` is stored on `grow_fertigation_tank` rather than on `grow_task_seed_batch` or `ops_task_tracker`. This keeps the unified `grow_task_seed_batch` table clean (no activity-specific columns) and `ops_task_tracker` module-agnostic. The recipe link lives on the fertigation-specific tank table where it belongs — each tank row says "this tank delivered this recipe's mix."
 
 To query which recipe was used for a fertigation event:
 ```sql
 SELECT DISTINCT grow_fertigation_recipe_id
-FROM grow_task_seed_batch
+FROM grow_fertigation_tank
 WHERE ops_task_tracker_id = ?
 ```
 

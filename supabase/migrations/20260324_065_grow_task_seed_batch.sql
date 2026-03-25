@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS grow_task_seed_batch (
     farm_id                     TEXT NOT NULL REFERENCES org_farm(id),
     ops_task_tracker_id         UUID NOT NULL REFERENCES ops_task_tracker(id),
     grow_seed_batch_id          UUID NOT NULL REFERENCES grow_seed_batch(id),
-    grow_fertigation_recipe_id  TEXT REFERENCES grow_fertigation_recipe(id),
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                  TEXT,
     updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -13,10 +12,7 @@ CREATE TABLE IF NOT EXISTS grow_task_seed_batch (
     CONSTRAINT uq_grow_task_seed_batch UNIQUE (ops_task_tracker_id, grow_seed_batch_id)
 );
 
-COMMENT ON TABLE grow_task_seed_batch IS 'Unified join table linking any grow activity (scouting, spraying, fertigation, monitoring) to the seeding batches involved. Activity type is derived from ops_task_tracker → ops_task_id. grow_fertigation_recipe_id is only set for fertigation activities.';
-
-COMMENT ON COLUMN grow_task_seed_batch.grow_fertigation_recipe_id IS 'Only set for fertigation activities; identifies which recipe was applied to these seedings';
+COMMENT ON TABLE grow_task_seed_batch IS 'Unified join table linking any grow activity (scouting, spraying, fertigation, monitoring) to the seeding batches involved. Activity type is derived from ops_task_tracker → ops_task_id.';
 
 CREATE INDEX idx_grow_task_seed_batch_tracker ON grow_task_seed_batch (ops_task_tracker_id);
 CREATE INDEX idx_grow_task_seed_batch_seed ON grow_task_seed_batch (grow_seed_batch_id);
-CREATE INDEX idx_grow_task_seed_batch_recipe ON grow_task_seed_batch (grow_fertigation_recipe_id);
