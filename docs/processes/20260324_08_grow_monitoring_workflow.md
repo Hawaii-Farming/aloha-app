@@ -11,17 +11,17 @@ This document describes the environmental monitoring activity flow using `ops_ta
 | Table | Purpose |
 |-------|---------|
 | `ops_task_tracker` | Activity header — captures org, farm, site, date, start/stop time, notes |
-| `grow_monitoring_point` | Defines what to measure per farm + site category with UOM, thresholds, and formulas |
+| `grow_monitoring_metric` | Defines what to measure per farm + site category with UOM, thresholds, and formulas |
 | `grow_monitoring_reading` | Individual measurement per point per station per event |
-| `grow_monitoring_seed_batch` | Snapshot of seedings present during the event |
-| `grow_monitoring_photo` | Photos taken during monitoring with optional caption |
+| `grow_task_seed_batch` | Snapshot of seedings present during the event |
+| `grow_task_photo` | Photos taken during monitoring with optional caption |
 | `org_site` | Provides `monitoring_stations` JSONB for station selection |
 
 ---
 
 ## Setup: Monitoring Points
 
-Before monitoring can begin, an admin creates `grow_monitoring_point` records scoped to farm + site category:
+Before monitoring can begin, an admin creates `grow_monitoring_metric` records scoped to farm + site category:
 
 ### Example: Cuke Farm — Greenhouse
 
@@ -88,15 +88,15 @@ The app evaluates the formula after the input readings are entered and stores th
    - **Text**: user enters free text (e.g. Substrate type)
    - **Calculated points**: app computes the value from the formula once all input readings are entered
 5. The app auto-flags `is_out_of_range = true` for any numeric reading outside the point's `minimum_value` / `maximum_value`
-7. App snapshots active seedings in the site via `grow_monitoring_seed_batch` (`status IN ('transplanted', 'harvesting')`)
-8. Upload photos via `grow_monitoring_photo` (one row per photo with optional caption)
+7. App snapshots active seedings in the site via `grow_task_seed_batch` (`status IN ('transplanted', 'harvesting')`)
+8. Upload photos via `grow_task_photo` (one row per photo with optional caption)
 9. Complete the activity
 
 ---
 
 ## Notes
 
-- Monitoring snapshots which seedings are present in the site at the time of the event via `grow_monitoring_seed_batch`.
+- Monitoring snapshots which seedings are present in the site at the time of the event via `grow_task_seed_batch`.
 - Monitoring stations are stored as a JSONB array on `org_site.monitoring_stations` and rendered as a dropdown.
 - Each reading row stores the computed result for calculated points, providing a historical record even if the formula changes later.
 - Out-of-range detection is automatic based on the point's thresholds. The frontend can highlight flagged readings.
@@ -115,7 +115,7 @@ flowchart TD
     F --> G[App flags out-of-range readings]
     G --> H{More stations?}
     H -->|Yes| D
-    H -->|No| I[Snapshot active seedings\nvia grow_monitoring_seed_batch]
-    I --> J[Upload photos\nvia grow_monitoring_photo]
+    H -->|No| I[Snapshot active seedings\nvia grow_task_seed_batch]
+    I --> J[Upload photos\nvia grow_task_photo]
     J --> K[Complete activity]
 ```
