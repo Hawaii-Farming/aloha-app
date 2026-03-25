@@ -15,7 +15,7 @@ This document describes the fertigation activity flow using `ops_task_tracker` d
 | `grow_fertigation_recipe_item` | Items in the recipe with quantities |
 | `grow_fertigation_recipe_site` | Sites that receive this recipe (configuration) |
 | `grow_task_seed_batch` | Snapshot — which seedings were fertigated on this event + recipe link |
-| `grow_fertigation_tank` | Tanks used with volume applied per tank |
+| `grow_fertigation` | Tanks used with volume applied per tank |
 
 ---
 
@@ -61,7 +61,7 @@ Each activity records its own seedings snapshot, tank volumes, and timing indepe
 3. App pre-fills sites from `grow_fertigation_recipe_site`
 4. App looks up active seedings in those sites (`grow_seed_batch.status IN ('transplanted', 'harvesting')`)
 5. User confirms — seedings are recorded in `grow_task_seed_batch` as a point-in-time snapshot
-6. For each tank used, create a `grow_fertigation_tank` record:
+6. For each tank used, create a `grow_fertigation` record:
    - Select the equipment (`equipment_id`)
    - Enter volume UOM and quantity applied
 7. Complete the activity (stop time)
@@ -70,12 +70,12 @@ Each activity records its own seedings snapshot, tank volumes, and timing indepe
 
 ## Design Decision: Recipe ID on Tank Table
 
-The `grow_fertigation_recipe_id` is stored on `grow_fertigation_tank` rather than on `grow_task_seed_batch` or `ops_task_tracker`. This keeps the unified `grow_task_seed_batch` table clean (no activity-specific columns) and `ops_task_tracker` module-agnostic. The recipe link lives on the fertigation-specific tank table where it belongs — each tank row says "this tank delivered this recipe's mix."
+The `grow_fertigation_recipe_id` is stored on `grow_fertigation` rather than on `grow_task_seed_batch` or `ops_task_tracker`. This keeps the unified `grow_task_seed_batch` table clean (no activity-specific columns) and `ops_task_tracker` module-agnostic. The recipe link lives on the fertigation-specific tank table where it belongs — each tank row says "this tank delivered this recipe's mix."
 
 To query which recipe was used for a fertigation event:
 ```sql
 SELECT DISTINCT grow_fertigation_recipe_id
-FROM grow_fertigation_tank
+FROM grow_fertigation
 WHERE ops_task_tracker_id = ?
 ```
 
@@ -97,7 +97,7 @@ flowchart TD
     B --> C[App pre-fills sites from\ngrow_fertigation_recipe_site]
     C --> D[App looks up active seedings\nin those sites]
     D --> E[User confirms seedings\n→ grow_task_seed_batch snapshot]
-    E --> F[Add tank: grow_fertigation_tank]
+    E --> F[Add tank: grow_fertigation]
     F --> F1[Select equipment + volume UOM + quantity]
     F1 --> F2{More tanks?}
     F2 -->|Yes| F

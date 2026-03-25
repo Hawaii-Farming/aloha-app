@@ -55,7 +55,3 @@ COMMENT ON COLUMN fsafe_result.result_pass IS 'Whether the result meets the pass
 COMMENT ON COLUMN fsafe_result.fail_code IS 'Human-readable failure code (e.g. LM-001)';
 COMMENT ON COLUMN fsafe_result.fsafe_result_id_original IS 'Initial test that triggered this retest or vector test; null for initial tests';
 
--- Add FK from ops_corrective_action_taken now that fsafe_result exists
-ALTER TABLE ops_corrective_action_taken
-    ADD CONSTRAINT fk_ops_corrective_action_taken_fsafe_result
-    FOREIGN KEY (fsafe_result_id) REFERENCES fsafe_result(id);

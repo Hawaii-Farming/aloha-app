@@ -31,7 +31,7 @@ This document describes the spraying activity flow using `ops_task_tracker` dire
    - Select from the active compliance records (`grow_spray_compliance_id`) — only compliant products are available (filtered by `effective_date <= today` and `expiration_date IS NULL OR >= today`)
    - The inventory item is derived from the compliance record (no separate item selection)
    - Enter the target pest/disease, application UOM, and quantity applied
-   - The app enforces that `quantity_applied` does not exceed the compliance record's `maximum_quantity_per_acre`
+   - The app enforces that `application_quantity` does not exceed the compliance record's `maximum_quantity_per_acre`
 5. For each piece of equipment used, create a `grow_spray_equipment` record:
    - Select the equipment (`equipment_id`)
    - Enter water UOM and quantity

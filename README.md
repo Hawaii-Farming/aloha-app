@@ -110,7 +110,7 @@ aloha-app/
 - **grow_fertigation_recipe** — Reusable fertigation recipe with flush water config and top-up hours (TEXT PK).
 - **grow_fertigation_recipe_item** — Fertilizer items in a recipe with quantities; invnt_item_id nullable for one-off products.
 - **grow_fertigation_recipe_site** — Sites that receive a recipe (configuration for pre-filling).
-- **grow_fertigation_tank** — Tanks used per fertigation event with volume applied.
+- **grow_fertigation** — Tanks used per fertigation event with volume applied.
 - **grow_monitoring_metric** — Defines what to measure per farm and site category with UOM, thresholds, and optional formula for calculated points.
 - **grow_monitoring_reading** — Individual measurement per monitoring event per point per station.
 

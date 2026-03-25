@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS grow_fertigation_tank (
+CREATE TABLE IF NOT EXISTS grow_fertigation (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id              TEXT NOT NULL REFERENCES org(id),
     farm_id             TEXT NOT NULL REFERENCES org_farm(id),
@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS grow_fertigation_tank (
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by          TEXT,
     is_deleted          BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT uq_grow_fertigation_tank UNIQUE (ops_task_tracker_id, equipment_id)
+    CONSTRAINT uq_grow_fertigation UNIQUE (ops_task_tracker_id, equipment_id)
 );
 
-COMMENT ON TABLE grow_fertigation_tank IS 'Tanks used during a fertigation event with the volume applied per tank.';
+COMMENT ON TABLE grow_fertigation IS 'Tanks used during a fertigation event with the volume applied per tank.';
 
-COMMENT ON COLUMN grow_fertigation_tank.volume_uom IS 'Unit for volume applied (e.g. gallons, liters)';
+COMMENT ON COLUMN grow_fertigation.volume_uom IS 'Unit for volume applied (e.g. gallons, liters)';
 
-CREATE INDEX idx_grow_fertigation_tank_tracker ON grow_fertigation_tank (ops_task_tracker_id);
+CREATE INDEX idx_grow_fertigation_tracker ON grow_fertigation (ops_task_tracker_id);

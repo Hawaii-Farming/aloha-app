@@ -10,12 +10,12 @@ CREATE TABLE IF NOT EXISTS grow_spray_compliance (
     rei_hours                   INTEGER NOT NULL,
 
     -- Application & Usage
-    application_method          TEXT NOT NULL,
+    application_method          JSONB NOT NULL DEFAULT '[]',
     target_pest_disease         JSONB NOT NULL DEFAULT '[]',
     application_uom             TEXT NOT NULL REFERENCES sys_uom(code),
     maximum_quantity_per_acre   NUMERIC NOT NULL,
     burn_uom                    TEXT NOT NULL REFERENCES sys_uom(code),
-    application_per_burn_unit   NUMERIC NOT NULL,
+    application_per_burn   NUMERIC NOT NULL,
 
     -- Label & Compliance
     label_date                  DATE NOT NULL,
@@ -36,11 +36,11 @@ COMMENT ON TABLE grow_spray_compliance IS 'Chemical label registry storing regul
 COMMENT ON COLUMN grow_spray_compliance.epa_registration IS 'EPA registration number for the chemical product';
 COMMENT ON COLUMN grow_spray_compliance.phi_days IS 'Pre-Harvest Interval in days — minimum days between last application and harvest';
 COMMENT ON COLUMN grow_spray_compliance.rei_hours IS 'Restricted Entry Interval in hours — minimum hours before workers can re-enter treated area';
-COMMENT ON COLUMN grow_spray_compliance.application_method IS 'How the product is applied (e.g. spray, drench, granular)';
+COMMENT ON COLUMN grow_spray_compliance.application_method IS 'JSON array of application methods (e.g. ["spray", "drench", "granular"])';
 COMMENT ON COLUMN grow_spray_compliance.target_pest_disease IS 'JSON array of pests and diseases this product is intended to treat';
 COMMENT ON COLUMN grow_spray_compliance.application_uom IS 'Unit of measure for the application rate';
 COMMENT ON COLUMN grow_spray_compliance.maximum_quantity_per_acre IS 'Maximum label rate per acre per application';
 COMMENT ON COLUMN grow_spray_compliance.burn_uom IS 'Smallest consumption unit for this product';
-COMMENT ON COLUMN grow_spray_compliance.application_per_burn_unit IS 'Application rate expressed in burn units';
+COMMENT ON COLUMN grow_spray_compliance.application_per_burn IS 'Application rate expressed in burn units';
 
 CREATE INDEX idx_grow_spray_compliance_item ON grow_spray_compliance (invnt_item_id);
