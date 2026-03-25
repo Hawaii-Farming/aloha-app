@@ -14,5 +14,3 @@ CREATE TABLE IF NOT EXISTS sys_sub_module (
 );
 
 COMMENT ON TABLE sys_sub_module IS 'System-level lookup defining sub-modules within each module. sys_access_level_id determines the minimum employee access level required to see this sub-module.';
-
-COMMENT ON COLUMN sys_sub_module.sys_access_level_id IS 'Minimum access level required to view this sub-module; references sys_access_level';

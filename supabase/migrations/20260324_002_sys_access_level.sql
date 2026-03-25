@@ -13,5 +13,3 @@ CREATE TABLE IF NOT EXISTS sys_access_level (
 );
 
 COMMENT ON TABLE sys_access_level IS 'System-level lookup defining the access levels available for employee roles. The level integer is used to compare against sys_sub_module.min_access_level for visibility control.';
-
-COMMENT ON COLUMN sys_access_level.level IS 'Numeric rank used for access comparisons: higher number = more access (e.g. employee=1, team_lead=2, manager=3, owner=5)';

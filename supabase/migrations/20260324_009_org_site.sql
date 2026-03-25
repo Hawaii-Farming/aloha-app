@@ -36,8 +36,4 @@ CREATE INDEX idx_org_site_org_id ON org_site (org_id);
 CREATE INDEX idx_org_site_farm ON org_site (farm_id);
 CREATE INDEX idx_org_site_category ON org_site (category);
 
-COMMENT ON COLUMN org_site.category IS 'Top-level classification selected from dropdown (e.g. growing, packaging, storage, maintenance)';
-COMMENT ON COLUMN org_site.subcategory IS 'Second-level classification within category (e.g. greenhouse, nursery, packroom, equipment, vehicle)';
-COMMENT ON COLUMN org_site.metadata IS 'Flexible JSON for display-only details (dimensions, capacity, environmental settings)';
-COMMENT ON COLUMN org_site.is_food_contact_surface IS 'Whether this site or surface comes into contact with food; requires sanitization before reuse if true';
-COMMENT ON COLUMN org_site.zone IS 'EMP zone classification for this site as defined in food safety documentation: zone_1, zone_2, zone_3, zone_4; null if not applicable';
+COMMENT ON COLUMN org_site.zone IS 'zone_1, zone_2, zone_3, zone_4';

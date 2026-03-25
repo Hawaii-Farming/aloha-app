@@ -23,6 +23,4 @@ CREATE TABLE IF NOT EXISTS org_equipment (
 
 COMMENT ON TABLE org_equipment IS 'Equipment register for all physical assets across the organization. Farm-level or shared (farm_id null).';
 
-COMMENT ON COLUMN org_equipment.type IS 'Equipment classification: vehicle, tool, machine, ppe';
-COMMENT ON COLUMN org_equipment.assigned_to IS 'Employee currently responsible for this equipment';
-COMMENT ON COLUMN org_equipment.previously_assigned_to IS 'Employee who last had this equipment before the current assignment';
+COMMENT ON COLUMN org_equipment.type IS 'vehicle, tool, machine, ppe';

@@ -15,5 +15,3 @@ CREATE TABLE IF NOT EXISTS grow_variety (
 );
 
 COMMENT ON TABLE grow_variety IS 'Crop varieties grown on a specific farm, each with a short code for quick reference during data entry. Used across seeding, growing, and harvest modules.';
-
-COMMENT ON COLUMN grow_variety.code IS 'Short code for the variety, unique within the farm (e.g. K, J, GR)';

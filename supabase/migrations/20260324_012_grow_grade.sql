@@ -14,5 +14,3 @@ CREATE TABLE IF NOT EXISTS grow_grade (
 );
 
 COMMENT ON TABLE grow_grade IS 'Harvest quality grades for a specific farm, each with a short code. Applied during harvest logging and carried through to product definition, packing, and sales.';
-
-COMMENT ON COLUMN grow_grade.code IS 'Short code for the grade, unique within the farm (e.g. A, B, C)';

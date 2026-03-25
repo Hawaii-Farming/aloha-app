@@ -14,7 +14,3 @@ CREATE TABLE IF NOT EXISTS org_farm (
 );
 
 COMMENT ON TABLE org_farm IS 'Represents a crop or product line within an organization (e.g. Cuke Farm, Lettuce Farm). Each farm has its own sites, varieties, grades, and products. Farm-level defaults reference units of measure for weighing and growing operations.';
-
-COMMENT ON COLUMN org_farm.weighing_uom IS 'Default unit of measure for weighing operations on this farm (e.g. lb, kg)';
-COMMENT ON COLUMN org_farm.growing_uom IS 'Default unit of measure for growing/harvest tracking on this farm';
-COMMENT ON COLUMN org_farm.volume_uom IS 'Default unit of measure for water and liquid volumes on this farm (e.g. gallons, liters)';

@@ -12,5 +12,3 @@ CREATE TABLE IF NOT EXISTS org (
 );
 
 COMMENT ON TABLE org IS 'Root entity for multi-org support. Every org-scoped table references this. Stores org-level settings such as default currency.';
-
-COMMENT ON COLUMN org.currency IS 'Default currency code for the organization (e.g. USD, KES)';
