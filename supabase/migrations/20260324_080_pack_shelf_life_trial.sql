@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_trial (
     trial_number                INTEGER,
     trial_purpose               TEXT,
     target_shelf_life_days      INTEGER,
-    sample_location             TEXT,
+    site_id_storage             TEXT REFERENCES org_site(id),
     notes                       TEXT,
 
     status                      TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'terminated')),
@@ -29,6 +29,4 @@ CREATE INDEX idx_pack_shelf_life_trial_lot      ON pack_shelf_life_trial (pack_l
 CREATE INDEX idx_pack_shelf_life_trial_product  ON pack_shelf_life_trial (sales_product_id);
 CREATE INDEX idx_pack_shelf_life_trial_status   ON pack_shelf_life_trial (org_id, status);
 
-COMMENT ON COLUMN pack_shelf_life_trial.pack_lot_id IS 'Null if the trial is not tied to a specific lot';
-COMMENT ON COLUMN pack_shelf_life_trial.pack_packaging_type_id IS 'Null if same as the product default';
-COMMENT ON COLUMN pack_shelf_life_trial.status IS 'Trial status: active (in progress) or terminated (ended early or completed)';
+COMMENT ON COLUMN pack_shelf_life_trial.status IS 'active, terminated';

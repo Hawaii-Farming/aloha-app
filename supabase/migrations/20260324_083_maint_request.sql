@@ -34,5 +34,5 @@ CREATE INDEX idx_maint_request_status  ON maint_request (org_id, status);
 CREATE INDEX idx_maint_request_fixer   ON maint_request (fixer_id);
 CREATE INDEX idx_maint_request_due     ON maint_request (org_id, due_date);
 
-COMMENT ON COLUMN maint_request.status IS 'Workflow status: new, pending, priority, done';
-COMMENT ON COLUMN maint_request.recurring_frequency IS 'How often this task recurs: daily, weekly, monthly, quarterly; NULL if not recurring';
+COMMENT ON COLUMN maint_request.status IS 'new, pending, priority, done';
+COMMENT ON COLUMN maint_request.recurring_frequency IS 'daily, weekly, monthly, quarterly';
