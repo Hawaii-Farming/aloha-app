@@ -15,3 +15,5 @@ CREATE TABLE IF NOT EXISTS grow_scout_observation_row (
 COMMENT ON TABLE grow_scout_observation_row IS 'Rows affected by a specific scouting observation. One row per affected growing row per observation.';
 
 CREATE INDEX idx_grow_scout_observation_row_obs ON grow_scout_observation_row (grow_scout_observation_id);
+
+COMMENT ON COLUMN grow_scout_observation_row.row_number IS 'The specific growing row within the site where this pest/disease was observed';

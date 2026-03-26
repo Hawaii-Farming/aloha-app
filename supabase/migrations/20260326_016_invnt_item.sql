@@ -75,6 +75,7 @@ COMMENT ON COLUMN invnt_item.burn_uom IS 'Smallest consumption unit used for bur
 COMMENT ON COLUMN invnt_item.cushion_weeks IS 'Safety stock buffer in weeks used in next-order-date calculations';
 COMMENT ON COLUMN invnt_item.seed_is_pelleted IS 'Whether seed item is pelleted; null for non-seed items';
 COMMENT ON COLUMN invnt_item.maint_part_type IS 'Type classification for parts (e.g. electrical, mechanical, plumbing)';
+COMMENT ON COLUMN invnt_item.photos IS 'Reference photos of the item used for visual identification during ordering';
 COMMENT ON COLUMN invnt_item.is_active IS 'Whether this item is currently active for ordering and tracking; false means inactive but not deleted';
 COMMENT ON COLUMN invnt_item.reorder_point_in_burn IS 'Auto-calculated: burn_per_week * cushion_weeks; triggers reorder alert when on-hand falls below this';
 COMMENT ON COLUMN invnt_item.reorder_quantity_in_burn IS 'Auto-calculated: burn_per_week * cushion_weeks; default quantity for auto-reorder in burn units';

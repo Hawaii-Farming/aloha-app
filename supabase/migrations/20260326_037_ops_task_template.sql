@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS ops_task_template (
     CONSTRAINT uq_ops_task_template UNIQUE (ops_task_id, ops_template_id)
 );
 
-COMMENT ON TABLE ops_task_template IS 'Many-to-many link between tasks and checklist templates. When a user creates an activity for a task, the app loads all templates linked to that task.';
+COMMENT ON TABLE ops_task_template IS 'Many-to-many link between tasks and checklist templates. One task can require multiple checklists and the same checklist can be reused across tasks (e.g. spraying → pre_spray_safety_check + ppe_checklist). When a user creates an activity, the app auto-loads all templates linked to that task.';
 
 COMMENT ON COLUMN ops_task_template.farm_id IS 'Inherited from ops_task.farm_id or ops_template.farm_id when the link is created';
 

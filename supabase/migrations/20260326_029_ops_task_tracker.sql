@@ -25,4 +25,5 @@ CREATE INDEX idx_ops_task_tracker_completed ON ops_task_tracker (org_id, is_comp
 CREATE INDEX idx_ops_task_tracker_site   ON ops_task_tracker (site_id);
 
 COMMENT ON COLUMN ops_task_tracker.farm_id IS 'Pre-filled from ops_task.farm_id when task is selected; editable';
+COMMENT ON COLUMN ops_task_tracker.is_completed IS 'Auto-set to true when stop_time is entered and activity is submitted';
 

@@ -31,6 +31,7 @@ COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a 
 COMMENT ON COLUMN invnt_po_received.farm_id IS 'Inherited from invnt_po.farm_id when receiving against a PO';
 COMMENT ON COLUMN invnt_po_received.received_uom IS 'Pre-filled from invnt_po.order_uom; editable at receive time';
 COMMENT ON COLUMN invnt_po_received.burn_per_received IS 'Snapshot from invnt_po.burn_per_order at receive time';
+COMMENT ON COLUMN invnt_po_received.received_photos IS 'Photos taken at delivery for audit and quality verification';
 
 CREATE INDEX idx_invnt_po_received_po  ON invnt_po_received (invnt_po_id);
 CREATE INDEX idx_invnt_po_received_org ON invnt_po_received (org_id);

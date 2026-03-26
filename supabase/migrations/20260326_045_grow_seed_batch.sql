@@ -33,9 +33,16 @@ CREATE TABLE IF NOT EXISTS grow_seed_batch (
 
 COMMENT ON TABLE grow_seed_batch IS 'Individual seeding batch linked to an ops activity. Either a single seed item or a seed mix, never both.';
 
-COMMENT ON COLUMN grow_seed_batch.status IS 'planned, seeded, transplanted, harvesting, harvested';
-COMMENT ON COLUMN grow_seed_batch.invnt_lot_id IS 'Sourced from invnt_lot filtered by the selected invnt_item_id';
-COMMENT ON COLUMN grow_seed_batch.estimated_harvest_date IS 'Auto-calculated: seeding_date plus grow_cycle_pattern duration';
+COMMENT ON COLUMN grow_seed_batch.batch_code IS 'System-generated traceability code; carries through to harvesting; editable';
+COMMENT ON COLUMN grow_seed_batch.grow_cycle_pattern_id IS 'Describes the cycle pattern (e.g. 18/17/17 harvest pattern); does not drive calculations';
+COMMENT ON COLUMN grow_seed_batch.grow_trial_type_id IS 'Null if not a trial; set when testing a new lot, variety, or seed source';
+COMMENT ON COLUMN grow_seed_batch.grow_seed_mix_id IS 'Set when seeding a mix; null when seeding a single variety. Mutually exclusive with invnt_item_id';
+COMMENT ON COLUMN grow_seed_batch.invnt_item_id IS 'Set when seeding a single seed item; null when seeding a mix. Mutually exclusive with grow_seed_mix_id';
+COMMENT ON COLUMN grow_seed_batch.invnt_lot_id IS 'Only when invnt_item_id is set; sourced from invnt_lot filtered by the selected item';
+COMMENT ON COLUMN grow_seed_batch.seeding_uom IS 'Unit for number_of_units (e.g. board, flat, tray)';
+COMMENT ON COLUMN grow_seed_batch.transplant_date IS 'Planned or actual transplant date';
+COMMENT ON COLUMN grow_seed_batch.estimated_harvest_date IS 'User-selected estimated harvest date';
+COMMENT ON COLUMN grow_seed_batch.status IS 'Auto-set: planned (seeding_date > today), seeded (seeding_date <= today < transplant_date), transplanted (transplant_date <= today < estimated_harvest_date), harvesting (estimated_harvest_date <= today), harvested (manually set when complete)';
 
 CREATE INDEX idx_grow_seed_batch_org ON grow_seed_batch (org_id);
 CREATE INDEX idx_grow_seed_batch_tracker ON grow_seed_batch (ops_task_tracker_id);

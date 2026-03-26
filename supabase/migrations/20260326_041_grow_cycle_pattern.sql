@@ -12,4 +12,4 @@ CREATE TABLE IF NOT EXISTS grow_cycle_pattern (
     CONSTRAINT uq_grow_cycle_pattern UNIQUE (org_id, farm_id, name)
 );
 
-COMMENT ON TABLE grow_cycle_pattern IS 'Defines growing cycle patterns per farm (e.g. 14-Day Lettuce, 42-Day Cucumber). Used to classify seeding batches by their growth cycle.';
+COMMENT ON TABLE grow_cycle_pattern IS 'Defines growing cycle patterns per farm (e.g. 18/17/17 harvest pattern). Used to classify seeding batches by their growth cycle.';

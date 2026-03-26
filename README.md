@@ -40,7 +40,6 @@ aloha-app/
 - **sys_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
 - **sys_module** — Master list of application modules for access control
 - **sys_sub_module** — Master list of sub-modules within each module with minimum access level requirements
-- **sys_business_rule** — Central registry for business rules, workflows, calculations, customer requirements, and definitions
 
 ## Organization Module (8 tables) — [Docs](docs/schemas/20260325_02_org.md)
 
@@ -50,6 +49,7 @@ aloha-app/
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
 - **org_site** — Unified site register for all locations and assets (growing, packaging, storage, maintenance) with category/subcategory-driven fields
 - **org_equipment** — Equipment register for physical assets; farm-level or shared, with current/previous employee assignment
+- **org_business_rule** — Org-scoped registry for business rules, workflows, calculations, requirements, and definitions
 
 ## Inventory Module (6 tables, 2 views) — [Docs](docs/schemas/20260325_03_invnt.md)
 

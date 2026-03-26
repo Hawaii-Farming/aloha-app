@@ -17,6 +17,6 @@ COMMENT ON TABLE org_module IS 'Org-scoped copy of system modules. Seeded when a
 
 COMMENT ON COLUMN org_module.sys_module_id IS 'Sourced from sys_module; identifies which system module this org copy represents';
 COMMENT ON COLUMN org_module.display_name IS 'Pre-filled from sys_module.name at seeding time; editable by org admins';
-COMMENT ON COLUMN org_module.is_enabled IS 'Auto-set to true when seeded; toggled by org admins to enable/disable the module';
+COMMENT ON COLUMN org_module.is_enabled IS 'Auto-set to true when provisioned; toggled by org admins to enable/disable the module';
 
 CREATE INDEX idx_org_module_org ON org_module (org_id);
