@@ -16,13 +16,13 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 | `invnt_`  | Inventory       | 014–021 | 03 |
 | `hr_`     | Human Resources | 022–027 | 04 |
 | `ops_`    | Operations      | 028–040, 084 | 05 |
-| `sales_`  | Sales           | 063–072 | 08 |
-| `pack_`   | Pack            | 070–076 | 07 |
+| `sales_`  | Sales           | 063–069, 072 | 08 |
+| `pack_`   | Pack            | 070–071, 073–076 | 07 |
 | `maint_`  | Maintenance     | 077–078 | 09 |
 | `fsafe_`  | Food Safety     | 079–083 | 10 |
 | (deferred)| Future          | —       | 11 |
 
-Sales & Pack migration ranges are interleaved (067–082) due to cross-module FK dependencies.
+Sales & Pack migration ranges are interleaved (063–076) due to cross-module FK dependencies.
 
 Tables designed but not yet ready for deployment go in `supabase/migrations_future/` and are documented in the `_11_future.md` schema doc.
 
