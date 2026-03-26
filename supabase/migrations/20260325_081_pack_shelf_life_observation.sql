@@ -2,8 +2,8 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_observation (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                      TEXT NOT NULL REFERENCES org(id),
     farm_id                     TEXT REFERENCES org_farm(id),
-    pack_shelf_life_trial_id    UUID NOT NULL REFERENCES pack_shelf_life_trial(id),
-    pack_shelf_life_check_id    TEXT NOT NULL REFERENCES pack_shelf_life_check(id),
+    pack_shelf_life_id    UUID NOT NULL REFERENCES pack_shelf_life(id),
+    pack_shelf_life_metric_id    TEXT NOT NULL REFERENCES pack_shelf_life_metric(id),
 
     observation_date            DATE NOT NULL,
     shelf_life_day              INTEGER NOT NULL,
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_observation (
     updated_by                  TEXT,
     is_deleted                   BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT uq_pack_shelf_life_observation UNIQUE (pack_shelf_life_trial_id, pack_shelf_life_check_id, observation_date)
+    CONSTRAINT uq_pack_shelf_life_observation UNIQUE (pack_shelf_life_id, pack_shelf_life_metric_id, observation_date)
 );
 
 COMMENT ON TABLE pack_shelf_life_observation IS 'Individual observation responses for a shelf life trial. One row per check per observation date per trial.';
 
 CREATE INDEX idx_pack_shelf_life_observation_org_id ON pack_shelf_life_observation (org_id);
-CREATE INDEX idx_pack_shelf_life_observation_trial  ON pack_shelf_life_observation (pack_shelf_life_trial_id);
-CREATE INDEX idx_pack_shelf_life_observation_check  ON pack_shelf_life_observation (pack_shelf_life_check_id);
+CREATE INDEX idx_pack_shelf_life_observation_trial  ON pack_shelf_life_observation (pack_shelf_life_id);
+CREATE INDEX idx_pack_shelf_life_observation_check  ON pack_shelf_life_observation (pack_shelf_life_metric_id);
 

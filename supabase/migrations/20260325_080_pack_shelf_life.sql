@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS pack_shelf_life_trial (
+CREATE TABLE IF NOT EXISTS pack_shelf_life (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                      TEXT NOT NULL REFERENCES org(id),
     farm_id                     TEXT REFERENCES org_farm(id),
@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_trial (
     is_deleted                   BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE pack_shelf_life_trial IS 'Shelf life trial header. One row per trial. Tracks the product, lot, packaging type, target shelf life, and trial outcome.';
+COMMENT ON TABLE pack_shelf_life IS 'Shelf life trial header. One row per trial. Tracks the product, lot, packaging type, target shelf life, and trial outcome.';
 
-CREATE INDEX idx_pack_shelf_life_trial_org_id   ON pack_shelf_life_trial (org_id);
-CREATE INDEX idx_pack_shelf_life_trial_lot      ON pack_shelf_life_trial (pack_lot_id);
-CREATE INDEX idx_pack_shelf_life_trial_product  ON pack_shelf_life_trial (sales_product_id);
-CREATE INDEX idx_pack_shelf_life_trial_status   ON pack_shelf_life_trial (org_id, status);
+CREATE INDEX idx_pack_shelf_life_org_id   ON pack_shelf_life (org_id);
+CREATE INDEX idx_pack_shelf_life_lot      ON pack_shelf_life (pack_lot_id);
+CREATE INDEX idx_pack_shelf_life_product  ON pack_shelf_life (sales_product_id);
+CREATE INDEX idx_pack_shelf_life_status   ON pack_shelf_life (org_id, status);
 
-COMMENT ON COLUMN pack_shelf_life_trial.status IS 'active, terminated';
+COMMENT ON COLUMN pack_shelf_life.status IS 'active, terminated';

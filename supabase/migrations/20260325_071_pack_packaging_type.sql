@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS pack_packaging_type (
     is_deleted       BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE pack_packaging_type IS 'Org-defined packaging type lookup (e.g. clamshell, bag, sleeve, tray wrap). Referenced by both sales_product and pack_shelf_life_trial.';
+COMMENT ON TABLE pack_packaging_type IS 'Org-defined packaging type lookup (e.g. clamshell, bag, sleeve, tray wrap). Referenced by both sales_product and pack_shelf_life.';
 
 CREATE INDEX idx_pack_packaging_type_org_id ON pack_packaging_type (org_id);
 

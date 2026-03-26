@@ -2,10 +2,10 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_photo (
     id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                      TEXT NOT NULL REFERENCES org(id),
     farm_id                     TEXT REFERENCES org_farm(id),
-    pack_shelf_life_trial_id    UUID NOT NULL REFERENCES pack_shelf_life_trial(id),
+    pack_shelf_life_id    UUID NOT NULL REFERENCES pack_shelf_life(id),
 
     observation_date            DATE NOT NULL,
-    shelf_life_day              INTEGER NOT NULL,
+    side                 TEXT NOT NULL CHECK (side IN ('top', 'side', 'bottom')),
     photo_url                   TEXT NOT NULL,
     caption                     TEXT,
 
@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_photo (
 
 COMMENT ON TABLE pack_shelf_life_photo IS 'Photos taken during a shelf life trial observation. Multiple photos per observation date per trial.';
 
+COMMENT ON COLUMN pack_shelf_life_photo.side IS 'top, side, bottom';
+
 CREATE INDEX idx_pack_shelf_life_photo_org_id ON pack_shelf_life_photo (org_id);
-CREATE INDEX idx_pack_shelf_life_photo_trial  ON pack_shelf_life_photo (pack_shelf_life_trial_id);
+CREATE INDEX idx_pack_shelf_life_photo_trial  ON pack_shelf_life_photo (pack_shelf_life_id);
 

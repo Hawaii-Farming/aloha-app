@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS pack_shelf_life_check (
+CREATE TABLE IF NOT EXISTS pack_shelf_life_metric (
     id              TEXT PRIMARY KEY,
     org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT REFERENCES org_farm(id),
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_check (
     is_deleted       BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE pack_shelf_life_check IS 'Defines what gets checked during a shelf life trial observation (e.g. color, texture, moisture, physical damage). Each check specifies a response type and optional termination criteria.';
+COMMENT ON TABLE pack_shelf_life_metric IS 'Defines what gets checked during a shelf life trial observation (e.g. color, texture, moisture, physical damage). Each check specifies a response type and optional termination criteria.';
 
-CREATE INDEX idx_pack_shelf_life_check_org_id ON pack_shelf_life_check (org_id);
+CREATE INDEX idx_pack_shelf_life_metric_org_id ON pack_shelf_life_metric (org_id);
 
 -- Partial unique indexes handle NULL farm_id correctly
-CREATE UNIQUE INDEX uq_pack_shelf_life_check_org_level  ON pack_shelf_life_check (org_id, name) WHERE farm_id IS NULL;
-CREATE UNIQUE INDEX uq_pack_shelf_life_check_farm_level ON pack_shelf_life_check (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
+CREATE UNIQUE INDEX uq_pack_shelf_life_metric_org_level  ON pack_shelf_life_metric (org_id, name) WHERE farm_id IS NULL;
+CREATE UNIQUE INDEX uq_pack_shelf_life_metric_farm_level ON pack_shelf_life_metric (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
 
-COMMENT ON COLUMN pack_shelf_life_check.response_type IS 'boolean, numeric, enum, text';
+COMMENT ON COLUMN pack_shelf_life_metric.response_type IS 'boolean, numeric, enum, text';

@@ -2,7 +2,7 @@
 
 This document describes the scouting activity flow using `ops_task_tracker` directly as the header — no separate scouting header table is needed since all header data (site, date, notes) is already on the tracker.
 
-> **Prerequisite:** The "Scouting" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260324_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The "Scouting" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260325_01_org_provisioning.md) for setup steps.
 
 ---
 
