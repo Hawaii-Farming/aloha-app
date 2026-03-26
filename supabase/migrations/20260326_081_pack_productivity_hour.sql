@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS pack_productivity_hour (
-    id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                      TEXT PRIMARY KEY,
     org_id                  TEXT NOT NULL REFERENCES org(id),
     farm_id                 TEXT NOT NULL REFERENCES org_farm(id),
     ops_task_tracker_id     UUID NOT NULL REFERENCES ops_task_tracker(id),
@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS pack_productivity_hour (
     boxers                  INTEGER NOT NULL DEFAULT 0,
 
     -- Quality & status
+    leftover_pounds         NUMERIC NOT NULL DEFAULT 0,
     is_metal_detected       BOOLEAN NOT NULL DEFAULT false,
     notes                   TEXT,
 
@@ -29,4 +30,4 @@ COMMENT ON COLUMN pack_productivity_hour.is_metal_detected IS 'Whether metal was
 
 CREATE INDEX idx_pack_productivity_hour_tracker ON pack_productivity_hour (ops_task_tracker_id);
 CREATE INDEX idx_pack_productivity_hour_date ON pack_productivity_hour (org_id, pack_hour);
-CREATE UNIQUE INDEX uq_pack_productivity_hour ON pack_productivity_hour (ops_task_tracker_id, pack_hour);
+CREATE UNIQUE INDEX uq_pack_productivity_hour ON pack_productivity_hour (org_id, farm_id, pack_hour);
