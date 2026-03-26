@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS ops_template_question (
     farm_id             TEXT        REFERENCES org_farm(id),
     ops_template_id     TEXT        NOT NULL REFERENCES ops_template(id),
 
-    display_order       INTEGER     NOT NULL DEFAULT 0,
     question_text       TEXT        NOT NULL,
     response_type       TEXT        NOT NULL CHECK (response_type IN ('boolean', 'numeric', 'enum')),
     is_required         BOOLEAN     NOT NULL DEFAULT true,
@@ -22,6 +21,8 @@ CREATE TABLE IF NOT EXISTS ops_template_question (
 
     warning_message                     TEXT,
     ops_corrective_action_choice_ids    JSONB,
+
+    display_order       INTEGER     NOT NULL DEFAULT 0,
 
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,

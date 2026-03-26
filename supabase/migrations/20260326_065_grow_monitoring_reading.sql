@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_reading (
     monitoring_station          TEXT,
     reading                     NUMERIC,
     reading_boolean             BOOLEAN,
-    reading_text                TEXT,
+    reading_enum                TEXT,
     is_out_of_range             BOOLEAN NOT NULL DEFAULT false,
     corrective_action           TEXT,
     notes                       TEXT,
@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_reading (
 
 COMMENT ON TABLE grow_monitoring_reading IS 'Individual measurement recorded during a monitoring event. One row per point per station. Calculated points store the computed result for historical record.';
 
-COMMENT ON COLUMN grow_monitoring_reading.is_out_of_range IS 'Auto-set by comparing reading against grow_monitoring_metric.minimum_value and maximum_value';
+COMMENT ON COLUMN grow_monitoring_reading.reading_enum IS 'Selected from grow_monitoring_metric.enum_options when response_type is enum';
+COMMENT ON COLUMN grow_monitoring_reading.is_out_of_range IS 'Auto-set by comparing reading against grow_monitoring_metric min/max values or enum_pass_options';
 COMMENT ON COLUMN grow_monitoring_reading.corrective_action IS 'Pre-filled from grow_monitoring_metric.corrective_actions when is_out_of_range is true; editable';
 COMMENT ON COLUMN grow_monitoring_reading.reading IS 'Auto-calculated from grow_monitoring_metric.formula when point_type is calculated';
 

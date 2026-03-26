@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_metric (
     farm_id         TEXT REFERENCES org_farm(id),
     name            TEXT NOT NULL,
     description     TEXT,
-    display_order   INTEGER NOT NULL DEFAULT 0,
 
     -- Response configuration
     response_type   TEXT NOT NULL CHECK (response_type IN ('boolean', 'numeric', 'enum')),
@@ -15,6 +14,8 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_metric (
     fail_enum_values    JSONB,
     fail_minimum_value        NUMERIC,
     fail_maximum_value        NUMERIC,
+
+    display_order   INTEGER NOT NULL DEFAULT 0,
 
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
@@ -32,3 +33,8 @@ CREATE UNIQUE INDEX uq_pack_shelf_life_metric_org_level  ON pack_shelf_life_metr
 CREATE UNIQUE INDEX uq_pack_shelf_life_metric_farm_level ON pack_shelf_life_metric (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
 
 COMMENT ON COLUMN pack_shelf_life_metric.response_type IS 'boolean, numeric, enum';
+COMMENT ON COLUMN pack_shelf_life_metric.enum_options IS 'JSON array of allowed observation values when response_type is enum (e.g. ["Green", "Yellow", "Brown"])';
+COMMENT ON COLUMN pack_shelf_life_metric.fail_boolean IS 'Boolean value that triggers trial termination when matched; null if response_type is not boolean';
+COMMENT ON COLUMN pack_shelf_life_metric.fail_enum_values IS 'JSON array of enum values that trigger trial termination; null if response_type is not enum';
+COMMENT ON COLUMN pack_shelf_life_metric.fail_minimum_value IS 'Reading below this value triggers termination; use alone, with max for a range, or null if not numeric';
+COMMENT ON COLUMN pack_shelf_life_metric.fail_maximum_value IS 'Reading above this value triggers termination; use alone, with min for a range, or null if not numeric';

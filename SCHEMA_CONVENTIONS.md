@@ -82,6 +82,10 @@ is_deleted
 
 CRUD fields always close the column list in this exact order. Workflow fields sit between business fields and CRUD fields.
 
+**UOM before measurement** — When a UOM column and its associated measurement columns appear together, the UOM column always comes first (e.g. `weight_uom` before `pack_net_weight`, `seeding_uom` before `number_of_units`, `application_uom` before `application_quantity`).
+
+**display_order** — Always placed as the last business field, right before CRUD fields.
+
 ---
 
 ## 4. Table Design

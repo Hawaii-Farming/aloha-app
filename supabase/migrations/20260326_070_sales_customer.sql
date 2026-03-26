@@ -19,3 +19,7 @@ CREATE TABLE IF NOT EXISTS sales_customer (
 COMMENT ON TABLE sales_customer IS 'Stores an organization''s customers with their group classification, preferred delivery method, billing address, and a link to external accounting software via qb_account. Additional contact emails are stored in cc_emails.';
 
 CREATE INDEX idx_sales_customer_org_id ON sales_customer (org_id);
+
+COMMENT ON COLUMN sales_customer.sales_customer_group_id IS 'Cascades to sales_po.sales_customer_group_id when an order is created for this customer';
+COMMENT ON COLUMN sales_customer.sales_fob_id IS 'Default FOB delivery point; cascades to sales_po.sales_fob_id when an order is created for this customer';
+COMMENT ON COLUMN sales_customer.qb_account IS 'QuickBooks account identifier for accounting integration';

@@ -32,7 +32,7 @@ CREATE INDEX idx_sales_po_farm     ON sales_po (farm_id);
 CREATE INDEX idx_sales_po_customer ON sales_po (sales_customer_id);
 CREATE INDEX idx_sales_po_status   ON sales_po (org_id, status);
 
-COMMENT ON COLUMN sales_po.recurring_frequency IS 'weekly, biweekly, monthly';
-COMMENT ON COLUMN sales_po.status IS 'draft, approved, fulfilled, past_due';
-COMMENT ON COLUMN sales_po.sales_customer_group_id IS 'Pre-filled from sales_customer.sales_customer_group_id; editable';
-COMMENT ON COLUMN sales_po.sales_fob_id IS 'Pre-filled from sales_customer.sales_fob_id; editable';
+COMMENT ON COLUMN sales_po.recurring_frequency IS 'weekly, biweekly, monthly; null means not recurring; auto-creates a new order after status is marked fulfilled';
+COMMENT ON COLUMN sales_po.status IS 'draft → approved → fulfilled; auto-set to past_due when order_date passes without fulfillment';
+COMMENT ON COLUMN sales_po.sales_customer_group_id IS 'Auto-set from sales_customer.sales_customer_group_id; read-only';
+COMMENT ON COLUMN sales_po.sales_fob_id IS 'Auto-set from sales_customer.sales_fob_id; read-only';

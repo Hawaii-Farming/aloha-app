@@ -6,11 +6,12 @@ CREATE TABLE IF NOT EXISTS ops_template (
     name                        TEXT        NOT NULL,
     ops_template_category_id    TEXT        REFERENCES ops_template_category(id),
     description                 TEXT,
-    display_order               INTEGER     NOT NULL DEFAULT 0,
 
     atp_site_count              INTEGER,
     minimum_rlu_value   NUMERIC,
     maximum_rlu_value   NUMERIC,
+
+    display_order               INTEGER     NOT NULL DEFAULT 0,
 
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                  TEXT,

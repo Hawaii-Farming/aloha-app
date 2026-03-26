@@ -3,12 +3,11 @@ CREATE TABLE IF NOT EXISTS fsafe_test_hold (
     org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT NOT NULL REFERENCES org_farm(id),
     pack_lot_id     UUID NOT NULL REFERENCES pack_lot(id),
-    sales_customer_id       TEXT REFERENCES sales_customer(id),
     sales_customer_group_id TEXT REFERENCES sales_customer_group(id),
+    sales_customer_id       TEXT REFERENCES sales_customer(id),
     fsafe_lab_id    TEXT REFERENCES fsafe_lab(id),
     lab_test_id     TEXT,
 
-    status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed')),
     notes           TEXT,
 
     delivered_to_lab_on DATE,
@@ -25,8 +24,5 @@ CREATE INDEX idx_fsafe_test_hold_org      ON fsafe_test_hold (org_id);
 CREATE INDEX idx_fsafe_test_hold_farm     ON fsafe_test_hold (farm_id);
 CREATE INDEX idx_fsafe_test_hold_lot      ON fsafe_test_hold (pack_lot_id);
 CREATE INDEX idx_fsafe_test_hold_customer ON fsafe_test_hold (sales_customer_id);
-CREATE INDEX idx_fsafe_test_hold_status   ON fsafe_test_hold (org_id, status);
-
-COMMENT ON COLUMN fsafe_test_hold.status IS 'pending, in_progress, completed';
 COMMENT ON COLUMN fsafe_test_hold.sales_customer_id IS 'Pre-filled from the linked sales_po customer; editable';
 COMMENT ON COLUMN fsafe_test_hold.sales_customer_group_id IS 'Pre-filled from sales_customer.sales_customer_group_id; editable';

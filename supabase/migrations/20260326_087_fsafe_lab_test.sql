@@ -31,4 +31,11 @@ COMMENT ON TABLE fsafe_lab_test IS 'Catalog of EMP test definitions and their re
 
 CREATE INDEX idx_fsafe_lab_test_org ON fsafe_lab_test (org_id);
 
+COMMENT ON COLUMN fsafe_lab_test.test_methods IS 'JSON array of available testing methods; fsafe_result.test_method is selected from this list';
 COMMENT ON COLUMN fsafe_lab_test.result_type IS 'enum, numeric';
+COMMENT ON COLUMN fsafe_lab_test.enum_options IS 'JSON array of allowed result values when result_type is enum (e.g. ["Positive", "Negative"])';
+COMMENT ON COLUMN fsafe_lab_test.enum_pass_options IS 'Subset of enum_options that indicate a passing result; used to auto-set fsafe_result.result_pass';
+COMMENT ON COLUMN fsafe_lab_test.minimum_value IS 'Numeric result at or above this value passes; used to auto-set fsafe_result.result_pass when result_type is numeric';
+COMMENT ON COLUMN fsafe_lab_test.maximum_value IS 'Numeric result at or below this value passes; used to auto-set fsafe_result.result_pass when result_type is numeric';
+COMMENT ON COLUMN fsafe_lab_test.required_retests IS 'Number of retest results to auto-create in fsafe_result when a result fails';
+COMMENT ON COLUMN fsafe_lab_test.required_vector_tests IS 'Number of vector test results to auto-create in fsafe_result when a result fails';

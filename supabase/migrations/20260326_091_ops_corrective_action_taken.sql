@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     assigned_to         TEXT        REFERENCES hr_employee(id),
     due_date            DATE,
     completed_on        DATE,
-    status              TEXT        NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'completed')),
+    is_resolved         BOOLEAN     NOT NULL DEFAULT false,
     notes               TEXT,
 
     result_description  TEXT,
@@ -31,9 +31,7 @@ CREATE INDEX idx_ops_corrective_action_taken_org_id   ON ops_corrective_action_t
 CREATE INDEX idx_ops_corrective_action_taken_response ON ops_corrective_action_taken (ops_template_response_id);
 CREATE INDEX idx_ops_corrective_action_taken_result   ON ops_corrective_action_taken (fsafe_result_id);
 CREATE INDEX idx_ops_corrective_action_taken_assigned ON ops_corrective_action_taken (assigned_to);
-CREATE INDEX idx_ops_corrective_action_taken_status   ON ops_corrective_action_taken (org_id, status);
-
-COMMENT ON COLUMN ops_corrective_action_taken.status IS 'open, completed';
+CREATE INDEX idx_ops_corrective_action_taken_resolved ON ops_corrective_action_taken (org_id, is_resolved);
 COMMENT ON COLUMN ops_corrective_action_taken.ops_template_id IS 'Inherited from ops_template_response.ops_template_id when sourced from a failing checklist response';
 COMMENT ON COLUMN ops_corrective_action_taken.ops_template_response_id IS 'Sourced from the failing ops_template_response that triggered this corrective action';
 COMMENT ON COLUMN ops_corrective_action_taken.fsafe_result_id IS 'Sourced from the failing fsafe_result that triggered this corrective action';

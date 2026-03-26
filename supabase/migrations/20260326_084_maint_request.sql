@@ -35,4 +35,4 @@ CREATE INDEX idx_maint_request_fixer   ON maint_request (fixer_id);
 CREATE INDEX idx_maint_request_due     ON maint_request (org_id, due_date);
 
 COMMENT ON COLUMN maint_request.status IS 'new, pending, priority, done';
-COMMENT ON COLUMN maint_request.recurring_frequency IS 'daily, weekly, monthly, quarterly';
+COMMENT ON COLUMN maint_request.recurring_frequency IS 'daily, weekly, monthly, quarterly; null means not recurring; auto-creates a new request after status is marked done';

@@ -72,7 +72,21 @@ minimum_value: 20
 maximum_value: 40
 ```
 
-The app evaluates the formula after the input readings are entered and stores the computed result. Out-of-range is checked against the thresholds.
+**Frontend behavior for calculated points:**
+- The field is **read-only** — the user cannot type in it
+- `input_point_ids` tells the frontend which other metric fields to watch
+- When ALL input fields have values, the frontend evaluates the formula and auto-fills the result
+- The result is saved to `grow_monitoring_reading.reading` for historical record
+- The frontend must use a safe expression evaluator (e.g. `mathjs`) — never `eval()`
+
+**How admins create formulas:**
+
+| Approach | Description | Target |
+|----------|-------------|--------|
+| **Formula builder (recommended)** | Admin selects input metrics from a dropdown and chains them with operators (+, -, ×, ÷, parentheses). The UI generates the formula string. No syntax knowledge required. | MVP target |
+| **Direct text entry (fallback)** | Admin types the expression directly (e.g. `(drain_ml / (drip_ml * drippers)) * 100`). Simpler to build but requires the admin to know the metric IDs. | Interim option |
+
+Both approaches store the same `formula` TEXT in the database — the UI method is a frontend decision.
 
 ---
 
@@ -85,9 +99,11 @@ The app evaluates the formula after the input readings are entered and stores th
 4. For each monitoring point, enter the reading based on its `response_type`:
    - **Numeric**: user enters a number (e.g. EC, pH, mL, temperature)
    - **Boolean**: user toggles yes/no (e.g. Is Injection)
-   - **Text**: user enters free text (e.g. Substrate type)
-   - **Calculated points**: app computes the value from the formula once all input readings are entered
-5. The app auto-flags `is_out_of_range = true` for any numeric reading outside the point's `minimum_value` / `maximum_value`
+   - **Enum**: user selects from dropdown populated by `enum_options` (e.g. Substrate type)
+   - **Calculated points**: app computes the value from the formula once all input readings are entered (read-only field)
+5. The app auto-flags `is_out_of_range = true` when:
+   - **Numeric**: reading is below `minimum_value` or above `maximum_value`
+   - **Enum**: selected value is not in `enum_pass_options`
 7. App snapshots active seedings in the site via `grow_task_seed_batch` (`status IN ('transplanted', 'harvesting')`)
 8. Upload photos via `grow_task_photo` (one row per photo with optional caption)
 9. Complete the activity

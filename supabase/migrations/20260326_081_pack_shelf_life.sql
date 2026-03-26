@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life (
     farm_id                     TEXT REFERENCES org_farm(id),
     pack_lot_id                 UUID REFERENCES pack_lot(id),
     sales_product_id            TEXT NOT NULL REFERENCES sales_product(id),
-    invnt_item_id               TEXT REFERENCES invnt_item(id),
+    invnt_item_id_pack               TEXT REFERENCES invnt_item(id),
 
     trial_number                INTEGER,
     trial_purpose               TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life (
 COMMENT ON TABLE pack_shelf_life IS 'Shelf life trial header. One row per trial. Tracks the product, lot, packaging type, target shelf life, and trial outcome.';
 
 COMMENT ON COLUMN pack_shelf_life.target_shelf_life_days IS 'Pre-filled from sales_product.shelf_life_days; editable';
-COMMENT ON COLUMN pack_shelf_life.invnt_item_id IS 'Pre-filled from sales_product.invnt_item_id; editable';
+COMMENT ON COLUMN pack_shelf_life.invnt_item_id_pack IS 'Pre-filled from sales_product.invnt_item_id_pack; filtered to packaging items in inventory';
 
 CREATE INDEX idx_pack_shelf_life_org_id   ON pack_shelf_life (org_id);
 CREATE INDEX idx_pack_shelf_life_lot      ON pack_shelf_life (pack_lot_id);
