@@ -118,7 +118,7 @@ aloha-app/
 - **grow_monitoring_metric** — Defines what to measure per farm and site category with UOM, thresholds, and optional formula for calculated points.
 - **grow_monitoring_reading** — Individual measurement per monitoring event per point per station.
 
-## Pack Module (6 tables) — [Docs](docs/schemas/20260326_07_pack.md)
+## Pack Module (10 tables) — [Docs](docs/schemas/20260326_07_pack.md)
 
 - **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
 - **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
@@ -126,6 +126,10 @@ aloha-app/
 - **pack_shelf_life** — Shelf life trial header linking product, lot, packaging type, target vs actual shelf life, and trial status
 - **pack_shelf_life_observation** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
+- **pack_fail_category** — Lookup for pack line fail categories (e.g. film, tray, printer, leaves, ridges)
+- **pack_productivity_hour** — Hourly pack line snapshot with crew counts by role and metal detection flag
+- **pack_productivity_hour_product** — Cases packed per product per hour (delta) with leftover pounds
+- **pack_productivity_hour_fail** — Fail counts per category per hour
 
 ## Sales Module (8 tables) — [Docs](docs/schemas/20260326_08_sales.md)
 
