@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS grow_monitoring_metric (
     enum_pass_options   JSONB,
 
     -- Calculation
-    point_type          TEXT NOT NULL DEFAULT 'direct' CHECK (point_type IN ('direct', 'calculated')),
+    is_calculated       BOOLEAN NOT NULL DEFAULT false,
     formula             TEXT,
     input_point_ids     JSONB,
 
@@ -40,9 +40,8 @@ COMMENT ON COLUMN grow_monitoring_metric.minimum_value IS 'Reading below this va
 COMMENT ON COLUMN grow_monitoring_metric.maximum_value IS 'Reading above this value auto-sets grow_monitoring_reading.is_out_of_range to true; null if not numeric';
 COMMENT ON COLUMN grow_monitoring_metric.enum_options IS 'JSON array of allowed values when response_type is enum; null if not enum';
 COMMENT ON COLUMN grow_monitoring_metric.enum_pass_options IS 'Subset of enum_options that are acceptable; values outside this set auto-set is_out_of_range to true';
-COMMENT ON COLUMN grow_monitoring_metric.point_type IS 'direct, calculated';
-COMMENT ON COLUMN grow_monitoring_metric.formula IS 'Expression for calculated points (e.g. (drain_ml / (drip_ml * drippers)) * 100); null for direct points';
-COMMENT ON COLUMN grow_monitoring_metric.input_point_ids IS 'JSON array of grow_monitoring_metric IDs that feed into this calculation; null for direct points';
+COMMENT ON COLUMN grow_monitoring_metric.formula IS 'Expression for calculated points (e.g. (drain_ml / (drip_ml * drippers)) * 100); null when is_calculated = false';
+COMMENT ON COLUMN grow_monitoring_metric.input_point_ids IS 'JSON array of grow_monitoring_metric IDs that feed into this calculation; null when is_calculated = false';
 COMMENT ON COLUMN grow_monitoring_metric.corrective_actions IS 'JSON array of corrective action options shown when reading is out of range; selected value stored in grow_monitoring_reading.corrective_action';
 
 CREATE INDEX idx_grow_monitoring_metric_farm ON grow_monitoring_metric (org_id, farm_id, site_category);
