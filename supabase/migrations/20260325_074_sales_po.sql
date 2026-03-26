@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS sales_po (
     recurring_frequency             TEXT CHECK (recurring_frequency IN ('weekly', 'biweekly', 'monthly')),
     notes                           TEXT,
 
-    status                          TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'approved', 'fulfilled')),
+    status                          TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'approved', 'fulfilled', 'past_due')),
 
     approved_at                     TIMESTAMPTZ,
     approved_by                     TEXT REFERENCES hr_employee(id),
@@ -33,4 +33,4 @@ CREATE INDEX idx_sales_po_customer ON sales_po (sales_customer_id);
 CREATE INDEX idx_sales_po_status   ON sales_po (org_id, status);
 
 COMMENT ON COLUMN sales_po.recurring_frequency IS 'weekly, biweekly, monthly';
-COMMENT ON COLUMN sales_po.status IS 'draft, approved, fulfilled';
+COMMENT ON COLUMN sales_po.status IS 'draft, approved, fulfilled, past_due';

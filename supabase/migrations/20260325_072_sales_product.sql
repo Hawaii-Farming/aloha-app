@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS sales_product (
     name                       TEXT NOT NULL,
     segment                    TEXT CHECK (segment IN ('wholesale', 'retail', 'food_service')),
     description                TEXT,
-    pack_packaging_type_id     TEXT REFERENCES pack_packaging_type(id),
+    invnt_item_id              TEXT REFERENCES invnt_item(id),
 
     -- Packaging hierarchy: item -> pack -> sale -> shipping
     item_uom                   TEXT REFERENCES sys_uom(code),
@@ -15,34 +15,32 @@ CREATE TABLE IF NOT EXISTS sales_product (
     pack_uom                   TEXT REFERENCES sys_uom(code),
     item_per_pack         NUMERIC,
 
-    sale_uom                   TEXT REFERENCES sys_uom(code),
-    pack_per_sale         NUMERIC,
+    pack_per_case              NUMERIC,
 
-    shipping_uom               TEXT REFERENCES sys_uom(code),
-    max_sale_per_shipping     NUMERIC,
+    maximum_case_per_pallet        NUMERIC,
 
     -- Net weights (all in weight_uom)
     pack_net_weight            NUMERIC,
-    sale_net_weight            NUMERIC,
-    shipping_net_weight        NUMERIC,
+    case_net_weight            NUMERIC,
+    pallet_net_weight          NUMERIC,
     weight_uom                 TEXT REFERENCES sys_uom(code),
 
-    -- Sale unit dimensions (all in dimension_uom)
-    sale_uom_length            NUMERIC,
-    sale_uom_width             NUMERIC,
-    sale_uom_height            NUMERIC,
+    -- Case dimensions (all in dimension_uom)
+    case_length                NUMERIC,
+    case_width                 NUMERIC,
+    case_height                NUMERIC,
     dimension_uom              TEXT REFERENCES sys_uom(code),
 
     -- Storage & shelf life
-    manufacture_storage_method TEXT,
+    manufacturer_storage_method TEXT,
     minimum_storage_temperature NUMERIC,
     maximum_storage_temperature NUMERIC,
     temperature_uom            TEXT REFERENCES sys_uom(code),
     shelf_life_days            INT,
 
-    -- Shipping
-    shipping_ti                NUMERIC,
-    shipping_hi                NUMERIC,
+    -- Pallet
+    pallet_ti                  NUMERIC,
+    pallet_hi                  NUMERIC,
     shipping_requirements      TEXT,
 
     -- Flags
@@ -69,7 +67,7 @@ CREATE TABLE IF NOT EXISTS sales_product (
     CONSTRAINT uq_sales_product_name UNIQUE (farm_id, name)
 );
 
-COMMENT ON TABLE sales_product IS 'The sellable products from each farm. Combines a grade with a full packaging hierarchy (item, pack, sale, shipping) that drives inventory calculations.';
+COMMENT ON TABLE sales_product IS 'The sellable products from each farm. Combines a grade with a full packaging hierarchy (item → pack → case → pallet). The sale unit is always a case; the shipping unit is always a pallet.';
 
 CREATE INDEX idx_sales_product_farm_id ON sales_product (farm_id);
 

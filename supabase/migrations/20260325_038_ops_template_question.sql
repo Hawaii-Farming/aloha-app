@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS ops_template_question (
     boolean_pass_value          BOOLEAN,
 
     -- Numeric response settings
-    numeric_minimum_value       NUMERIC,
-    numeric_maximum_value       NUMERIC,
+    minimum_value       NUMERIC,
+    maximum_value       NUMERIC,
 
     -- Enum response settings
     enum_options                JSONB,

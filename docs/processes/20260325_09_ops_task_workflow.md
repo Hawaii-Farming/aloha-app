@@ -67,7 +67,7 @@ Some templates require ATP surface testing. This is configured on the template v
 
 When `ops_template.atp_site_count > 0`, the system randomly selects that many active food contact sites within the farm and adds a numeric RLU input field for each one. The employee swabs each surface and enters the RLU reading.
 
-Pass/fail is evaluated against `ops_template.numeric_minimum_rlu_value` and `ops_template.numeric_maximum_rlu_value`.
+Pass/fail is evaluated against `ops_template.minimum_rlu_value` and `ops_template.maximum_rlu_value`.
 
 > **Note:** ATP readings are stored in `ops_template_response` with `site_id` populated and `ops_template_question_id = null`. Standard checklist rows are the inverse — `ops_template_question_id` populated, `site_id` null.
 

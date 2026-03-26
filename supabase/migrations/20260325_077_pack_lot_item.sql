@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS pack_lot_item (
     sales_product_id    TEXT NOT NULL REFERENCES sales_product(id),
 
     best_by_date        DATE NOT NULL,
-    uom                 TEXT NOT NULL REFERENCES sys_uom(code),
-    pack_quantity     NUMERIC NOT NULL,
+    pack_quantity       NUMERIC NOT NULL,
 
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
@@ -18,7 +17,7 @@ CREATE TABLE IF NOT EXISTS pack_lot_item (
     CONSTRAINT uq_pack_lot_item UNIQUE (pack_lot_id, sales_product_id)
 );
 
-COMMENT ON TABLE pack_lot_item IS 'Individual products packed within a lot. One row per product per lot.';
+COMMENT ON TABLE pack_lot_item IS 'Individual products packed within a lot. One row per product per lot. pack_quantity is always in the product sale_uom.';
 
 CREATE INDEX idx_pack_lot_item_org_id   ON pack_lot_item (org_id);
 CREATE INDEX idx_pack_lot_item_lot      ON pack_lot_item (pack_lot_id);

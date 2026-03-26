@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS ops_training_attendee (
     signed_at                   TIMESTAMPTZ,
 
     certification_number        TEXT,
+    certificate_issuer          TEXT,
     certification_issued_on     DATE,
     certification_expires_on    DATE,
     certificate_url             TEXT,

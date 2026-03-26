@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS fsafe_lab_test (
     result_type     TEXT NOT NULL CHECK (result_type IN ('enum', 'numeric')),
     enum_options         JSONB,
     enum_pass_options    JSONB,
-    numeric_minimum_value NUMERIC,
-    numeric_maximum_value NUMERIC,
+    minimum_value NUMERIC,
+    maximum_value NUMERIC,
 
     -- Retest & vector test thresholds
     required_retests        INTEGER NOT NULL DEFAULT 0,

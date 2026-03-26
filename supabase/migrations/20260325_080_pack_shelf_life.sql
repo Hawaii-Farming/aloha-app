@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life (
     farm_id                     TEXT REFERENCES org_farm(id),
     pack_lot_id                 UUID REFERENCES pack_lot(id),
     sales_product_id            TEXT NOT NULL REFERENCES sales_product(id),
-    pack_packaging_type_id      TEXT REFERENCES pack_packaging_type(id),
+    invnt_item_id               TEXT REFERENCES invnt_item(id),
 
     trial_number                INTEGER,
     trial_purpose               TEXT,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life (
     site_id_storage             TEXT REFERENCES org_site(id),
     notes                       TEXT,
 
-    status                      TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'terminated')),
+    is_terminated               BOOLEAN NOT NULL DEFAULT false,
     termination_reason          TEXT,
 
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -27,6 +27,4 @@ COMMENT ON TABLE pack_shelf_life IS 'Shelf life trial header. One row per trial.
 CREATE INDEX idx_pack_shelf_life_org_id   ON pack_shelf_life (org_id);
 CREATE INDEX idx_pack_shelf_life_lot      ON pack_shelf_life (pack_lot_id);
 CREATE INDEX idx_pack_shelf_life_product  ON pack_shelf_life (sales_product_id);
-CREATE INDEX idx_pack_shelf_life_status   ON pack_shelf_life (org_id, status);
 
-COMMENT ON COLUMN pack_shelf_life.status IS 'active, terminated';

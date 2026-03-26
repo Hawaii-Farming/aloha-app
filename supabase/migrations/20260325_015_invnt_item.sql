@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     invnt_category_id        TEXT REFERENCES invnt_category(id),
     invnt_subcategory_id     TEXT REFERENCES invnt_category(id),
     name                     TEXT NOT NULL,
-    accounting_id            TEXT,
+    qb_account            TEXT,
     description              TEXT,
 
     -- Three-unit system

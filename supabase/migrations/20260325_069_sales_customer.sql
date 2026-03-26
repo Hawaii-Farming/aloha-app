@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS sales_customer (
     org_id          TEXT NOT NULL REFERENCES org(id),
     sales_customer_group_id   TEXT REFERENCES sales_customer_group(id),
     sales_fob_id          TEXT REFERENCES sales_fob(id),
-    accounting_id     TEXT,
+    qb_account     TEXT,
     name            TEXT NOT NULL,
     email           TEXT,
     cc_emails       JSONB NOT NULL DEFAULT '[]',
@@ -16,6 +16,6 @@ CREATE TABLE IF NOT EXISTS sales_customer (
     CONSTRAINT uq_sales_customer_org_name UNIQUE (org_id, name)
 );
 
-COMMENT ON TABLE sales_customer IS 'Stores an organization''s customers with their group classification, preferred delivery method, billing address, and a link to external accounting software via accounting_id. Additional contact emails are stored in cc_emails.';
+COMMENT ON TABLE sales_customer IS 'Stores an organization''s customers with their group classification, preferred delivery method, billing address, and a link to external accounting software via qb_account. Additional contact emails are stored in cc_emails.';
 
 CREATE INDEX idx_sales_customer_org_id ON sales_customer (org_id);

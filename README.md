@@ -114,9 +114,8 @@ aloha-app/
 - **grow_monitoring_metric** — Defines what to measure per farm and site category with UOM, thresholds, and optional formula for calculated points.
 - **grow_monitoring_reading** — Individual measurement per monitoring event per point per station.
 
-## Pack Module (7 tables) — [Docs](docs/schemas/20260325_07_pack.md)
+## Pack Module (6 tables) — [Docs](docs/schemas/20260325_07_pack.md)
 
-- **pack_packaging_type** — Org-defined packaging type lookup (e.g. clamshell, bag, sleeve, tray wrap); also referenced by sales_product (TEXT PK)
 - **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
 - **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
 - **pack_shelf_life_metric** — Defines what gets checked during shelf life observations with response type and termination criteria (TEXT PK)

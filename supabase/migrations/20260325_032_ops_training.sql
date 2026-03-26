@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS ops_training (
     ops_training_type_id    TEXT REFERENCES ops_training_type(id),
     training_date           DATE,
     topics_covered          JSONB NOT NULL DEFAULT '[]',
-    trainer_names           JSONB NOT NULL DEFAULT '[]',
+    trainer_id              TEXT REFERENCES hr_employee(id),
     materials_url           TEXT,
 
     notes                   TEXT,
@@ -28,5 +28,4 @@ CREATE INDEX idx_ops_training_date   ON ops_training (org_id, training_date);
 CREATE INDEX idx_ops_training_type   ON ops_training (ops_training_type_id);
 
 COMMENT ON COLUMN ops_training.topics_covered IS 'JSON array of topic strings covered during the training session';
-COMMENT ON COLUMN ops_training.trainer_names IS 'JSON array of trainer names; may include external trainers or internal employee names';
 

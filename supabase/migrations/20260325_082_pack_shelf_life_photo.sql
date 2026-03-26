@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_photo (
     pack_shelf_life_id    UUID NOT NULL REFERENCES pack_shelf_life(id),
 
     observation_date            DATE NOT NULL,
+    shelf_life_day              INTEGER NOT NULL,
     side                 TEXT NOT NULL CHECK (side IN ('top', 'side', 'bottom')),
     photo_url                   TEXT NOT NULL,
     caption                     TEXT,

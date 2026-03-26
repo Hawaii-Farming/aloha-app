@@ -32,4 +32,4 @@ CREATE INDEX idx_hr_time_off_request_status ON hr_time_off_request (org_id, stat
 CREATE INDEX idx_hr_time_off_request_dates ON hr_time_off_request (hr_employee_id, start_date);
 
 COMMENT ON COLUMN hr_time_off_request.non_pto_days IS 'Days not charged to PTO or sick leave (e.g. unpaid leave, personal days)';
-COMMENT ON COLUMN hr_time_off_request.status IS 'Approval status: pending, approved, denied';
+COMMENT ON COLUMN hr_time_off_request.status IS 'pending, approved, denied';

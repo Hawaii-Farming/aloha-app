@@ -24,5 +24,5 @@ CREATE INDEX idx_ops_task_tracker_task   ON ops_task_tracker (ops_task_id);
 CREATE INDEX idx_ops_task_tracker_status ON ops_task_tracker (org_id, status);
 CREATE INDEX idx_ops_task_tracker_site   ON ops_task_tracker (site_id);
 
-COMMENT ON COLUMN ops_task_tracker.status IS 'Workflow status: open, in_progress, completed';
+COMMENT ON COLUMN ops_task_tracker.status IS 'pending, completed';
 
