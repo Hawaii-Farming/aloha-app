@@ -124,12 +124,11 @@ aloha-app/
 - **pack_shelf_life_observation** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
 
-## Sales Module (9 tables) — [Docs](docs/schemas/20260324_08_sales.md)
+## Sales Module (8 tables) — [Docs](docs/schemas/20260324_08_sales.md)
 
 - **sales_fob** — Org-specific FOB (Freight On Board) delivery points (TEXT PK)
 - **sales_customer_group** — Org-specific customer classifications for reporting and group pricing (TEXT PK)
 - **sales_customer** — Org customers with group, FOB preference, billing, and external accounting link (TEXT PK)
-- **sales_donation_recipient** — Org-defined lookup of places product can be donated to (e.g. food banks, shelters, community programs) (TEXT PK)
 - **sales_product** — Sellable products with full packaging hierarchy (content → pack → sale → shipping) (TEXT PK)
 - **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 - **sales_po** — Customer order header with customer, FOB, dates, approval workflow, accounting upload tracking, and optional recurring frequency for standing orders

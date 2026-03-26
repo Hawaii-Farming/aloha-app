@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS sales_po_line (
     sales_po_id         UUID NOT NULL REFERENCES sales_po(id),
     sales_product_id    TEXT NOT NULL REFERENCES sales_product(id),
 
-    sale_uom            TEXT NOT NULL REFERENCES sys_uom(code),
     order_quantity      NUMERIC NOT NULL,
     price_per_unit NUMERIC NOT NULL,
     notes               TEXT,
