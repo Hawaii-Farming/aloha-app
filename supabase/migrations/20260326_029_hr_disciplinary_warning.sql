@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS hr_disciplinary_warning (
 
     -- Warning details
     warning_date                    DATE,
-    warning_type                    TEXT CHECK (warning_type IN ('verbal_warning', 'written_warning', 'final_warning', 'suspension', 'termination')),
+    warning_type                    TEXT CHECK (warning_type IN ('verbal_warning', 'written_warning', 'final_warning')),
     offense_type                    TEXT,
     offense_description             TEXT,
 

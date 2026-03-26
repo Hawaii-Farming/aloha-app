@@ -62,7 +62,7 @@ aloha-app/
 - **invnt_onhand** — On-hand inventory snapshots per item with burn unit conversion
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 
-## Human Resources Module (6 tables) — [Docs](docs/schemas/20260326_04_hr.md)
+## Human Resources Module (8 tables) — [Docs](docs/schemas/20260326_04_hr.md)
 
 - **hr_department** — Org-specific department lookup for classifying employees (e.g. GH, PH, Lettuce). TEXT PK derived from name.
 - **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). TEXT PK derived from name.
@@ -70,6 +70,8 @@ aloha-app/
 - **hr_employee** — Unified employee register and org membership; every system user has a row here with a role. Tracks employment details, compensation, and access level. Department, work authorization, and title are FK references. Users are duplicated per org they belong to.
 - **hr_module_access** — Controls which application modules each employee can access; one row per employee per module with is_enabled toggle
 - **hr_time_off_request** — Employee time off requests with PTO/sick leave breakdown and approval workflow (pending → approved/denied)
+- **hr_travel_request** — Employee travel requests with trip details and approval workflow (pending → approved/denied)
+- **hr_disciplinary_warning** — Employee disciplinary warning records with acknowledgment and review workflow
 
 ## Operations Module (14 tables, includes 1 view) — [Docs](docs/schemas/20260326_05_ops.md)
 
