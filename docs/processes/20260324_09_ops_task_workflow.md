@@ -15,8 +15,8 @@ This document describes the general ops task workflow — how any task activity 
 | `ops_task_template` | Many-to-many link between tasks and templates; determines which checklists auto-load |
 | `ops_task_schedule` | Employees assigned to the activity |
 | `ops_template` | Checklist template definition; holds ATP site count and RLU thresholds |
-| `ops_question` | Individual checklist questions within a template |
-| `ops_response` | All responses for an activity — both checklist answers and ATP readings |
+| `ops_template_question` | Individual checklist questions within a template |
+| `ops_template_response` | All responses for an activity — both checklist answers and ATP readings |
 | `ops_corrective_action_choice` | Predefined corrective action options |
 | `ops_corrective_action_taken` | Corrective actions raised against any failing response |
 
@@ -51,7 +51,7 @@ If templates are found, their questions render automatically on the same form. M
 
 ### 3. Complete the Checklist
 
-Questions are loaded from `ops_question` for each linked template, ordered by `display_order`. Each question has a defined response type:
+Questions are loaded from `ops_template_question` for each linked template, ordered by `display_order`. Each question has a defined response type:
 
 | Response Type | How the Employee Answers |
 |--------------|--------------------------|
@@ -69,7 +69,7 @@ When `ops_template.atp_site_count > 0`, the system randomly selects that many ac
 
 Pass/fail is evaluated against `ops_template.numeric_minimum_rlu_value` and `ops_template.numeric_maximum_rlu_value`.
 
-> **Note:** ATP readings are stored in `ops_response` with `site_id` populated and `ops_question_id = null`. Standard checklist rows are the inverse — `ops_question_id` populated, `site_id` null.
+> **Note:** ATP readings are stored in `ops_template_response` with `site_id` populated and `ops_template_question_id = null`. Standard checklist rows are the inverse — `ops_template_question_id` populated, `site_id` null.
 
 ### 5. Submit the Activity
 
@@ -78,9 +78,9 @@ On submission:
 | What | Table | Key Fields |
 |------|-------|------------|
 | Activity closed | `ops_task_tracker` | `stop_time`, `status = completed` |
-| One row per checklist question | `ops_response` | `ops_task_tracker_id`, `ops_question_id`, response value |
-| One row per ATP site tested | `ops_response` | `ops_task_tracker_id`, `response_numeric`, `site_id` |
-| One row per failing response | `ops_corrective_action_taken` | `ops_response_id` |
+| One row per checklist question | `ops_template_response` | `ops_task_tracker_id`, `ops_template_question_id`, response value |
+| One row per ATP site tested | `ops_template_response` | `ops_task_tracker_id`, `response_numeric`, `site_id` |
+| One row per failing response | `ops_corrective_action_taken` | `ops_template_response_id` |
 
 ### 6. Corrective Actions
 
@@ -102,7 +102,7 @@ The frontend handles this by silently creating the `ops_task_tracker` record on 
 
 - `start_time` and `stop_time` are both set to the submission timestamp
 - `status` is set to `completed`
-- All `ops_response` rows are written as normal
+- All `ops_template_response` rows are written as normal
 
 From the user's perspective: select template → answer questions → submit. The database still holds a complete tracker record for every set of responses.
 
@@ -124,15 +124,15 @@ WHERE tt.id = '[tracker_id]';
 -- Checklist responses
 SELECT q.question_text, q.response_type,
        r.response_boolean, r.response_numeric, r.response_enum, r.response_text
-FROM ops_response r
-JOIN ops_question q ON q.id = r.ops_question_id
+FROM ops_template_response r
+JOIN ops_template_question q ON q.id = r.ops_template_question_id
 WHERE r.ops_task_tracker_id = '[tracker_id]'
   AND r.site_id IS NULL
 ORDER BY q.display_order;
 
 -- ATP results
 SELECT s.name AS site_name, s.zone, r.response_numeric
-FROM ops_response r
+FROM ops_template_response r
 JOIN org_site s ON s.id = r.site_id
 WHERE r.ops_task_tracker_id = '[tracker_id]'
   AND r.site_id IS NOT NULL;
@@ -163,8 +163,8 @@ flowchart TD
 
     K --> L[INSERT ops_task_tracker\nstatus = completed]
 
-    L --> M[INSERT ops_response rows\nper checklist question]
-    L --> N[INSERT ops_response rows\nper ATP site tested]
+    L --> M[INSERT ops_template_response rows\nper checklist question]
+    L --> N[INSERT ops_template_response rows\nper ATP site tested]
 
     M --> O{Any responses\nfail pass criteria?}
     N --> P{Any RLU readings\noutside thresholds?}

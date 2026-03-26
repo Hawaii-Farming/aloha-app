@@ -83,8 +83,8 @@ aloha-app/
 - **ops_template** — Master checklist template definition with name, category, and optional farm scope
 - **ops_task_template** — Many-to-many link between tasks and templates; app loads linked templates when creating an activity
 - **ops_corrective_action_choice** — Org-defined reusable corrective action options selectable from a dropdown
-- **ops_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
-- **ops_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
+- **ops_template_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
+- **ops_template_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
 ## Grow Module (23 tables) — [Docs](docs/schemas/20260324_06_grow.md)

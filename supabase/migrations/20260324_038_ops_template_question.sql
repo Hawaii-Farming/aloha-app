@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS ops_question (
+CREATE TABLE IF NOT EXISTS ops_template_question (
     id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id              TEXT        NOT NULL REFERENCES org(id),
     farm_id             TEXT        REFERENCES org_farm(id),
@@ -30,13 +30,13 @@ CREATE TABLE IF NOT EXISTS ops_question (
     is_deleted           BOOLEAN     NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE ops_question IS 'Questions within a checklist template. Ordered by display_order within each template.';
+COMMENT ON TABLE ops_template_question IS 'Questions within a checklist template. Ordered by display_order within each template.';
 
-CREATE INDEX idx_ops_question_org_id   ON ops_question (org_id);
-CREATE INDEX idx_ops_question_template ON ops_question (ops_template_id, display_order);
+CREATE INDEX idx_ops_template_question_org_id   ON ops_template_question (org_id);
+CREATE INDEX idx_ops_template_question_template ON ops_template_question (ops_template_id, display_order);
 
-COMMENT ON COLUMN ops_question.response_type IS 'boolean, numeric, enum';
-COMMENT ON COLUMN ops_question.boolean_pass_value IS 'The boolean value that constitutes a pass';
-COMMENT ON COLUMN ops_question.enum_options IS 'JSON array of available options when response_type is enum';
-COMMENT ON COLUMN ops_question.enum_pass_options IS 'JSON array of enum values that constitute a pass';
-COMMENT ON COLUMN ops_question.ops_corrective_action_choice_ids IS 'JSON array of suggested corrective action choice IDs when this question fails';
+COMMENT ON COLUMN ops_template_question.response_type IS 'boolean, numeric, enum';
+COMMENT ON COLUMN ops_template_question.boolean_pass_value IS 'The boolean value that constitutes a pass';
+COMMENT ON COLUMN ops_template_question.enum_options IS 'JSON array of available options when response_type is enum';
+COMMENT ON COLUMN ops_template_question.enum_pass_options IS 'JSON array of enum values that constitute a pass';
+COMMENT ON COLUMN ops_template_question.ops_corrective_action_choice_ids IS 'JSON array of suggested corrective action choice IDs when this question fails';

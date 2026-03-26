@@ -13,13 +13,13 @@ CREATE TABLE IF NOT EXISTS sales_product (
     item_uom                   TEXT REFERENCES sys_uom(code),
 
     pack_uom                   TEXT REFERENCES sys_uom(code),
-    item_per_pack_uom         NUMERIC,
+    item_per_pack         NUMERIC,
 
     sale_uom                   TEXT REFERENCES sys_uom(code),
-    pack_per_sale_uom         NUMERIC,
+    pack_per_sale         NUMERIC,
 
     shipping_uom               TEXT REFERENCES sys_uom(code),
-    max_sale_per_shipping_uom     NUMERIC,
+    max_sale_per_shipping     NUMERIC,
 
     -- Net weights (all in weight_uom)
     pack_net_weight            NUMERIC,

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     org_id                              TEXT        NOT NULL REFERENCES org(id),
     farm_id                             TEXT        REFERENCES org_farm(id),
     ops_template_id                     TEXT        REFERENCES ops_template(id),
-    ops_response_id                     UUID        REFERENCES ops_response(id),
+    ops_template_response_id                     UUID        REFERENCES ops_template_response(id),
     fsafe_result_id                 UUID        REFERENCES fsafe_result(id),
     ops_corrective_action_choice_id     TEXT        REFERENCES ops_corrective_action_choice(id),
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
 COMMENT ON TABLE ops_corrective_action_taken IS 'Corrective actions raised against a failing checklist response or EMP test result. Tracks the action required, who is responsible, and the resolution status.';
 
 CREATE INDEX idx_ops_corrective_action_taken_org_id   ON ops_corrective_action_taken (org_id);
-CREATE INDEX idx_ops_corrective_action_taken_response ON ops_corrective_action_taken (ops_response_id);
+CREATE INDEX idx_ops_corrective_action_taken_response ON ops_corrective_action_taken (ops_template_response_id);
 CREATE INDEX idx_ops_corrective_action_taken_result   ON ops_corrective_action_taken (fsafe_result_id);
 CREATE INDEX idx_ops_corrective_action_taken_assigned ON ops_corrective_action_taken (assigned_to);
 CREATE INDEX idx_ops_corrective_action_taken_status   ON ops_corrective_action_taken (org_id, status);
