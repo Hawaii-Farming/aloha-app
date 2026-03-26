@@ -77,7 +77,7 @@ On submission:
 
 | What | Table | Key Fields |
 |------|-------|------------|
-| Activity closed | `ops_task_tracker` | `stop_time`, `status = completed` |
+| Activity closed | `ops_task_tracker` | `stop_time`, `is_completed = true` |
 | One row per checklist question | `ops_template_response` | `ops_task_tracker_id`, `ops_template_question_id`, response value |
 | One row per ATP site tested | `ops_template_response` | `ops_task_tracker_id`, `response_numeric`, `site_id` |
 | One row per failing response | `ops_corrective_action_taken` | `ops_template_response_id` |
@@ -161,7 +161,7 @@ flowchart TD
     I --> K[Enter stop time and submit]
     J --> K
 
-    K --> L[INSERT ops_task_tracker\nstatus = completed]
+    K --> L[INSERT ops_task_tracker\nis_completed = true]
 
     L --> M[INSERT ops_template_response rows\nper checklist question]
     L --> N[INSERT ops_template_response rows\nper ATP site tested]

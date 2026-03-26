@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS ops_task_tracker (
     ops_task_id     TEXT NOT NULL REFERENCES ops_task(id),
     start_time      TIMESTAMPTZ NOT NULL,
     stop_time       TIMESTAMPTZ,
-    status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed')),
+    is_completed    BOOLEAN NOT NULL DEFAULT false,
     notes           TEXT,
     verified_at     TIMESTAMPTZ,
     verified_by     TEXT REFERENCES hr_employee(id),
@@ -21,8 +21,8 @@ COMMENT ON TABLE ops_task_tracker IS 'Header record for a task event. One record
 
 CREATE INDEX idx_ops_task_tracker_org_id ON ops_task_tracker (org_id);
 CREATE INDEX idx_ops_task_tracker_task   ON ops_task_tracker (ops_task_id);
-CREATE INDEX idx_ops_task_tracker_status ON ops_task_tracker (org_id, status);
+CREATE INDEX idx_ops_task_tracker_completed ON ops_task_tracker (org_id, is_completed);
 CREATE INDEX idx_ops_task_tracker_site   ON ops_task_tracker (site_id);
 
-COMMENT ON COLUMN ops_task_tracker.status IS 'pending, completed';
+COMMENT ON COLUMN ops_task_tracker.farm_id IS 'Pre-filled from ops_task.farm_id when task is selected; editable';
 

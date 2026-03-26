@@ -45,4 +45,8 @@ CREATE INDEX idx_fsafe_result_status    ON fsafe_result (org_id, status);
 
 COMMENT ON COLUMN fsafe_result.initial_retest_vector IS 'initial, retest, vector';
 COMMENT ON COLUMN fsafe_result.status IS 'pending, in_progress, completed';
+COMMENT ON COLUMN fsafe_result.fsafe_lab_id IS 'Pre-filled from fsafe_test_hold.fsafe_lab_id for test-and-hold results; editable';
+COMMENT ON COLUMN fsafe_result.test_method IS 'Pre-filled from fsafe_lab_test.test_methods; editable';
+COMMENT ON COLUMN fsafe_result.result_pass IS 'Auto-set by evaluating result against fsafe_lab_test pass/fail criteria';
+COMMENT ON COLUMN fsafe_result.fsafe_result_id_original IS 'Sourced from the original fsafe_result when initial_retest_vector is retest or vector';
 

@@ -191,6 +191,25 @@ Add `COMMENT ON COLUMN` and `.md` descriptions for **all non-PK, non-audit field
 
 Everything else — business fields, workflow fields, FK references, status, dates, configuration fields, etc. — gets a comment. When in doubt, add the comment.
 
+### Rich comments for source and calculation
+
+Two types of information **must** be stored as `COMMENT ON COLUMN` in the schema (not in process docs or business rules):
+
+1. **Column source / editability** — Where the data comes from and whether it's user-editable. This tells developers and AI how to populate the field.
+   ```sql
+   COMMENT ON COLUMN invnt_po.item_name IS 'Snapshot from invnt_item.name at order time; manually entered for non-inventory items';
+   COMMENT ON COLUMN invnt_onhand.invnt_lot_id IS 'Sourced from invnt_lot at stock-in time';
+   COMMENT ON COLUMN sales_product_price.farm_id IS 'Inherited from parent sales_product';
+   ```
+
+2. **Column calculation method** — How a computed or auto-populated value is derived.
+   ```sql
+   COMMENT ON COLUMN grow_harvest_weight.net_weight IS 'Auto-calculated: gross_weight - (grow_harvest_container.tare_weight × number_of_containers)';
+   COMMENT ON COLUMN grow_monitoring_reading.is_out_of_range IS 'Auto-set by comparing reading against grow_monitoring_metric min/max values';
+   ```
+
+These comments stay in the schema because they are read directly from PostgreSQL catalog when building frontend forms, APIs, and AI-assisted development.
+
 ### Schema doc format
 
 Each `.md` doc must include:

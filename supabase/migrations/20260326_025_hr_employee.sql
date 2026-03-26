@@ -77,5 +77,7 @@ CREATE INDEX idx_hr_employee_team_lead  ON hr_employee (team_lead_id);
 CREATE INDEX idx_hr_employee_department ON hr_employee (hr_department_id);
 CREATE INDEX idx_hr_employee_title      ON hr_employee (hr_title_id);
 
+COMMENT ON COLUMN hr_employee.sys_access_level_id IS 'Sourced from sys_access_level; determines the employee role and module visibility';
 COMMENT ON COLUMN hr_employee.pay_structure IS 'hourly, salary';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';
+COMMENT ON COLUMN hr_employee.site_id_housing IS 'Sourced from org_site where category is housing; links employee to their assigned housing site';

@@ -14,5 +14,7 @@ CREATE TABLE IF NOT EXISTS ops_task_template (
 
 COMMENT ON TABLE ops_task_template IS 'Many-to-many link between tasks and checklist templates. When a user creates an activity for a task, the app loads all templates linked to that task.';
 
+COMMENT ON COLUMN ops_task_template.farm_id IS 'Inherited from ops_task.farm_id or ops_template.farm_id when the link is created';
+
 CREATE INDEX idx_ops_task_template_task ON ops_task_template (ops_task_id);
 CREATE INDEX idx_ops_task_template_template ON ops_task_template (ops_template_id);

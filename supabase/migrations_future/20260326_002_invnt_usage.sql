@@ -18,6 +18,9 @@ CREATE TABLE IF NOT EXISTS invnt_usage (
 
 COMMENT ON TABLE invnt_usage IS 'Tracks inventory consumption linked back to the source module that triggered it. The reference_table and reference_id columns provide a generic FK to any table so usage can be traced to its origin.';
 
+COMMENT ON COLUMN invnt_usage.burn_uom IS 'Sourced from the triggering module record (e.g. grow_spray_compliance.burn_uom)';
+COMMENT ON COLUMN invnt_usage.quantity_burn IS 'Auto-calculated from the triggering module based on application quantity and burn rate';
+
 CREATE INDEX idx_invnt_usage_org_id ON invnt_usage (org_id);
 CREATE INDEX idx_invnt_usage_item ON invnt_usage (invnt_item_id, usage_date);
 CREATE INDEX idx_invnt_usage_ref ON invnt_usage (reference_table, reference_id);

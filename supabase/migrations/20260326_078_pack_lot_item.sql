@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS pack_lot_item (
 
 COMMENT ON TABLE pack_lot_item IS 'Individual products packed within a lot. One row per product per lot. pack_quantity is always in the product sale_uom.';
 
+COMMENT ON COLUMN pack_lot_item.pack_quantity IS 'Always in the sale_uom defined on the associated sales_product';
+COMMENT ON COLUMN pack_lot_item.best_by_date IS 'Auto-calculated: pack_lot.pack_date plus sales_product.shelf_life_days';
+
 CREATE INDEX idx_pack_lot_item_org_id   ON pack_lot_item (org_id);
 CREATE INDEX idx_pack_lot_item_lot      ON pack_lot_item (pack_lot_id);
 CREATE INDEX idx_pack_lot_item_product  ON pack_lot_item (sales_product_id);

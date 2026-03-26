@@ -34,4 +34,7 @@ CREATE INDEX idx_ops_corrective_action_taken_assigned ON ops_corrective_action_t
 CREATE INDEX idx_ops_corrective_action_taken_status   ON ops_corrective_action_taken (org_id, status);
 
 COMMENT ON COLUMN ops_corrective_action_taken.status IS 'open, completed';
+COMMENT ON COLUMN ops_corrective_action_taken.ops_template_id IS 'Inherited from ops_template_response.ops_template_id when sourced from a failing checklist response';
+COMMENT ON COLUMN ops_corrective_action_taken.ops_template_response_id IS 'Sourced from the failing ops_template_response that triggered this corrective action';
+COMMENT ON COLUMN ops_corrective_action_taken.fsafe_result_id IS 'Sourced from the failing fsafe_result that triggered this corrective action';
 

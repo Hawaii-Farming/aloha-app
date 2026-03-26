@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS invnt_onhand (
 
 COMMENT ON TABLE invnt_onhand IS 'Records on-hand inventory snapshots per item. References invnt_lot for lot tracking. Source of truth for computed totals like current stock, burn-per-week, and weeks-on-hand.';
 
+COMMENT ON COLUMN invnt_onhand.farm_id IS 'Inherited from invnt_item.farm_id when on-hand record is created';
+COMMENT ON COLUMN invnt_onhand.onhand_uom IS 'Pre-filled from invnt_item.onhand_uom; editable';
+COMMENT ON COLUMN invnt_onhand.burn_per_onhand IS 'Snapshot from invnt_item.burn_per_onhand at record creation time';
+
 CREATE INDEX idx_invnt_onhand_org_id ON invnt_onhand (org_id);
 CREATE INDEX idx_invnt_onhand_item ON invnt_onhand (invnt_item_id, onhand_date);
 

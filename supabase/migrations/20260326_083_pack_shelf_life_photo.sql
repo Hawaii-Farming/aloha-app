@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_photo (
 COMMENT ON TABLE pack_shelf_life_photo IS 'Photos taken during a shelf life trial observation. Multiple photos per observation date per trial.';
 
 COMMENT ON COLUMN pack_shelf_life_photo.side IS 'top, side, bottom';
+COMMENT ON COLUMN pack_shelf_life_photo.shelf_life_day IS 'Auto-calculated: observation_date minus pack_lot.pack_date';
 
 CREATE INDEX idx_pack_shelf_life_photo_org_id ON pack_shelf_life_photo (org_id);
 CREATE INDEX idx_pack_shelf_life_photo_trial  ON pack_shelf_life_photo (pack_shelf_life_id);

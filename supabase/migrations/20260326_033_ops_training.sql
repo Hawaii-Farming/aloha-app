@@ -27,5 +27,6 @@ CREATE INDEX idx_ops_training_farm   ON ops_training (farm_id);
 CREATE INDEX idx_ops_training_date   ON ops_training (org_id, training_date);
 CREATE INDEX idx_ops_training_type   ON ops_training (ops_training_type_id);
 
+COMMENT ON COLUMN ops_training.trainer_id IS 'Sourced from hr_employee; the employee who conducted the training session';
 COMMENT ON COLUMN ops_training.topics_covered IS 'JSON array of topic strings covered during the training session';
 

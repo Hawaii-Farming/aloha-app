@@ -17,5 +17,11 @@ CREATE TABLE IF NOT EXISTS hr_module_access (
 
 COMMENT ON TABLE hr_module_access IS 'Controls which modules each employee can access. One row per employee per module; is_enabled toggles access without deleting the record.';
 
+COMMENT ON COLUMN hr_module_access.org_module_id IS 'Sourced from org_module; identifies which module this access record controls';
+COMMENT ON COLUMN hr_module_access.is_enabled IS 'Pre-filled from org_module.is_enabled when employee access is seeded; editable per employee';
+COMMENT ON COLUMN hr_module_access.can_edit IS 'Auto-set to true when seeded; controls whether employee can edit records in this module';
+COMMENT ON COLUMN hr_module_access.can_delete IS 'Auto-set to false when seeded; controls whether employee can delete records in this module';
+COMMENT ON COLUMN hr_module_access.can_verify IS 'Auto-set to false when seeded; controls whether employee can verify/approve records in this module';
+
 CREATE INDEX idx_hr_module_access_employee ON hr_module_access (hr_employee_id);
 CREATE INDEX idx_hr_module_access_module ON hr_module_access (org_module_id);

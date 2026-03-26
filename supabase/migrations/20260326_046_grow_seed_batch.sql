@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS grow_seed_batch (
 COMMENT ON TABLE grow_seed_batch IS 'Individual seeding batch linked to an ops activity. Either a single seed item or a seed mix, never both.';
 
 COMMENT ON COLUMN grow_seed_batch.status IS 'planned, seeded, transplanted, harvesting, harvested';
+COMMENT ON COLUMN grow_seed_batch.invnt_lot_id IS 'Sourced from invnt_lot filtered by the selected invnt_item_id';
+COMMENT ON COLUMN grow_seed_batch.estimated_harvest_date IS 'Auto-calculated: seeding_date plus grow_cycle_pattern duration';
 
 CREATE INDEX idx_grow_seed_batch_org ON grow_seed_batch (org_id);
 CREATE INDEX idx_grow_seed_batch_tracker ON grow_seed_batch (ops_task_tracker_id);

@@ -34,3 +34,5 @@ CREATE INDEX idx_sales_po_status   ON sales_po (org_id, status);
 
 COMMENT ON COLUMN sales_po.recurring_frequency IS 'weekly, biweekly, monthly';
 COMMENT ON COLUMN sales_po.status IS 'draft, approved, fulfilled, past_due';
+COMMENT ON COLUMN sales_po.sales_customer_group_id IS 'Pre-filled from sales_customer.sales_customer_group_id; editable';
+COMMENT ON COLUMN sales_po.sales_fob_id IS 'Pre-filled from sales_customer.sales_fob_id; editable';

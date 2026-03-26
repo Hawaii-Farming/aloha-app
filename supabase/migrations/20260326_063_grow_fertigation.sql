@@ -17,5 +17,7 @@ CREATE TABLE IF NOT EXISTS grow_fertigation (
 
 COMMENT ON TABLE grow_fertigation IS 'Tanks used during a fertigation event with the volume applied per tank.';
 
+COMMENT ON COLUMN grow_fertigation.grow_fertigation_recipe_id IS 'Pre-filled from grow_fertigation_recipe_site based on selected sites; editable';
+COMMENT ON COLUMN grow_fertigation.equipment_id IS 'Pre-filled from grow_fertigation_recipe_item.equipment_id for the selected recipe; editable';
 
 CREATE INDEX idx_grow_fertigation_tracker ON grow_fertigation (ops_task_tracker_id);

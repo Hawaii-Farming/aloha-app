@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS sales_po_fulfillment (
 
 COMMENT ON TABLE sales_po_fulfillment IS 'Fulfillment records linking order lines to pack lots. One row per lot per order line, supporting partial fulfillment across multiple lots.';
 
+COMMENT ON COLUMN sales_po_fulfillment.pack_lot_id IS 'Sourced from pack_lot; links fulfilled quantity to a specific production lot';
+
 CREATE INDEX idx_sales_po_fulfillment_org_id     ON sales_po_fulfillment (org_id);
 CREATE INDEX idx_sales_po_fulfillment_order_line ON sales_po_fulfillment (sales_po_line_id);
 CREATE INDEX idx_sales_po_fulfillment_lot        ON sales_po_fulfillment (pack_lot_id);

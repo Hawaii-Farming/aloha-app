@@ -20,5 +20,8 @@ CREATE TABLE IF NOT EXISTS grow_fertigation_recipe_item (
 
 COMMENT ON TABLE grow_fertigation_recipe_item IS 'Individual fertilizer items within a recipe. invnt_item_id is nullable for products not stored in-house; item_name is always set for display.';
 
+COMMENT ON COLUMN grow_fertigation_recipe_item.item_name IS 'Pre-filled from invnt_item.name when invnt_item_id is set; editable';
+COMMENT ON COLUMN grow_fertigation_recipe_item.burn_uom IS 'Pre-filled from grow_spray_compliance.burn_uom when a compliance record exists; editable';
+COMMENT ON COLUMN grow_fertigation_recipe_item.application_per_burn IS 'Pre-filled from grow_spray_compliance.application_per_burn when a compliance record exists; editable';
 
 CREATE INDEX idx_grow_fertigation_recipe_item_recipe ON grow_fertigation_recipe_item (grow_fertigation_recipe_id);

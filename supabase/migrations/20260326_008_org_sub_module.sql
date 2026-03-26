@@ -17,5 +17,11 @@ CREATE TABLE IF NOT EXISTS org_sub_module (
 
 COMMENT ON TABLE org_sub_module IS 'Org-scoped copy of system sub-modules. Seeded when a new org is created. Org admins toggle is_enabled to control which sub-modules are available within each enabled module.';
 
+COMMENT ON COLUMN org_sub_module.sys_module_id IS 'Sourced from sys_sub_module.sys_module_id at seeding time';
+COMMENT ON COLUMN org_sub_module.sys_sub_module_id IS 'Sourced from sys_sub_module; identifies which system sub-module this org copy represents';
+COMMENT ON COLUMN org_sub_module.sys_access_level_id IS 'Pre-filled from sys_sub_module.sys_access_level_id at seeding time; editable by org admins';
+COMMENT ON COLUMN org_sub_module.display_name IS 'Pre-filled from sys_sub_module.name at seeding time; editable by org admins';
+COMMENT ON COLUMN org_sub_module.is_enabled IS 'Auto-set to true when seeded; toggled by org admins to enable/disable the sub-module';
+
 CREATE INDEX idx_org_sub_module_org ON org_sub_module (org_id);
 CREATE INDEX idx_org_sub_module_module ON org_sub_module (sys_module_id);

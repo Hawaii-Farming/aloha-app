@@ -23,4 +23,6 @@ CREATE TABLE IF NOT EXISTS org_equipment (
 
 COMMENT ON TABLE org_equipment IS 'Equipment register for all physical assets across the organization. Farm-level or shared (farm_id null).';
 
+COMMENT ON COLUMN org_equipment.farm_id IS 'Inherited from parent org_farm when equipment is farm-scoped; null for org-wide equipment';
+COMMENT ON COLUMN org_equipment.previously_assigned_to IS 'Auto-set by system when assigned_to changes; stores the prior assignee';
 COMMENT ON COLUMN org_equipment.type IS 'vehicle, tool, machine, ppe';

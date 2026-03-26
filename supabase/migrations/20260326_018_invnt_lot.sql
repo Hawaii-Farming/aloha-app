@@ -15,4 +15,7 @@ CREATE TABLE IF NOT EXISTS invnt_lot (
 
 COMMENT ON TABLE invnt_lot IS 'Tracks unique inventory lots by item and lot number; quantities updated on receive and on-hand changes; lot is complete when received minus on-hand equals zero';
 
+COMMENT ON COLUMN invnt_lot.farm_id IS 'Inherited from invnt_item.farm_id when lot is created';
+COMMENT ON COLUMN invnt_lot.is_active IS 'Auto-set to false when latest invnt_onhand quantity is zero; can also be manually set to false by user';
+
 CREATE UNIQUE INDEX uq_invnt_lot_org_item ON invnt_lot (org_id, invnt_item_id, id);

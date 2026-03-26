@@ -26,6 +26,11 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_observation (
 
 COMMENT ON TABLE pack_shelf_life_observation IS 'Individual observation responses for a shelf life trial. One row per check per observation date per trial.';
 
+COMMENT ON COLUMN pack_shelf_life_observation.response_boolean IS 'Used when pack_shelf_life_metric.response_type is boolean';
+COMMENT ON COLUMN pack_shelf_life_observation.response_numeric IS 'Used when pack_shelf_life_metric.response_type is numeric';
+COMMENT ON COLUMN pack_shelf_life_observation.response_enum IS 'Used when pack_shelf_life_metric.response_type is enum; value from metric enum_options';
+COMMENT ON COLUMN pack_shelf_life_observation.shelf_life_day IS 'Auto-calculated: observation_date minus pack_lot.pack_date';
+
 CREATE INDEX idx_pack_shelf_life_observation_org_id ON pack_shelf_life_observation (org_id);
 CREATE INDEX idx_pack_shelf_life_observation_trial  ON pack_shelf_life_observation (pack_shelf_life_id);
 CREATE INDEX idx_pack_shelf_life_observation_check  ON pack_shelf_life_observation (pack_shelf_life_metric_id);

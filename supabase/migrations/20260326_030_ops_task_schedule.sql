@@ -23,6 +23,11 @@ CREATE TABLE IF NOT EXISTS ops_task_schedule (
 
 COMMENT ON TABLE ops_task_schedule IS 'Employee task assignments for both planning and execution. When ops_task_tracker_id is null, the row is a planned schedule entry. When set, it is an executed activity. ops_task_id is always set — derived from the tracker when linked, or selected by the user for planned entries.';
 
+COMMENT ON COLUMN ops_task_schedule.farm_id IS 'Inherited from ops_task_tracker.farm_id when linked to a tracker; user-selected for planned entries';
+COMMENT ON COLUMN ops_task_schedule.ops_task_id IS 'Inherited from ops_task_tracker.ops_task_id when linked to a tracker; user-selected for planned entries';
+COMMENT ON COLUMN ops_task_schedule.start_time IS 'Inherited from ops_task_tracker.start_time when linked to a tracker; user-selected for planned entries';
+COMMENT ON COLUMN ops_task_schedule.stop_time IS 'Inherited from ops_task_tracker.stop_time when linked to a tracker; user-selected for planned entries';
+
 -- Executed: one employee per tracker
 CREATE UNIQUE INDEX uq_ops_task_schedule_executed ON ops_task_schedule (ops_task_tracker_id, hr_employee_id) WHERE ops_task_tracker_id IS NOT NULL;
 -- Planned: one employee per task per start_time

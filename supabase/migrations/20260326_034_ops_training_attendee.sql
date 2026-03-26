@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS ops_training_attendee (
 
 COMMENT ON TABLE ops_training_attendee IS 'Individual attendance and certification records for each employee per training session. One row per employee per training.';
 
+COMMENT ON COLUMN ops_training_attendee.farm_id IS 'Inherited from ops_training.farm_id when attendee record is created';
+
 CREATE INDEX idx_ops_training_attendee_training ON ops_training_attendee (ops_training_id);
 CREATE INDEX idx_ops_training_attendee_employee ON ops_training_attendee (hr_employee_id);
 CREATE INDEX idx_ops_training_attendee_org      ON ops_training_attendee (org_id);

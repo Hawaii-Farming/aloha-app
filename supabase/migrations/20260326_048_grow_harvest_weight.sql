@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS grow_harvest_weight (
 
 COMMENT ON TABLE grow_harvest_weight IS 'Individual weigh-in for a harvest. One row per container type weighed. Links directly to the seeding batch for traceability. Tare is calculated on the fly from grow_harvest_container.tare_weight × number_of_containers.';
 
-COMMENT ON COLUMN grow_harvest_weight.net_weight IS 'gross_weight minus calculated tare (grow_harvest_container.tare_weight × number_of_containers)';
+COMMENT ON COLUMN grow_harvest_weight.net_weight IS 'Auto-calculated: gross_weight minus (grow_harvest_container.tare_weight × number_of_containers)';
+COMMENT ON COLUMN grow_harvest_weight.weight_uom IS 'Pre-filled from grow_harvest_container.weight_uom; editable';
 
 CREATE INDEX idx_grow_harvest_weight_tracker ON grow_harvest_weight (ops_task_tracker_id);
 CREATE INDEX idx_grow_harvest_weight_seed_batch ON grow_harvest_weight (grow_seed_batch_id);

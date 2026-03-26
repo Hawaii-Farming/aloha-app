@@ -28,3 +28,5 @@ CREATE INDEX idx_fsafe_test_hold_customer ON fsafe_test_hold (sales_customer_id)
 CREATE INDEX idx_fsafe_test_hold_status   ON fsafe_test_hold (org_id, status);
 
 COMMENT ON COLUMN fsafe_test_hold.status IS 'pending, in_progress, completed';
+COMMENT ON COLUMN fsafe_test_hold.sales_customer_id IS 'Pre-filled from the linked sales_po customer; editable';
+COMMENT ON COLUMN fsafe_test_hold.sales_customer_group_id IS 'Pre-filled from sales_customer.sales_customer_group_id; editable';

@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS sales_po_line (
 
 COMMENT ON TABLE sales_po_line IS 'Individual products within an order. One row per product per order with snapshot pricing at time of order.';
 
+COMMENT ON COLUMN sales_po_line.price_per_unit IS 'Snapshot from sales_product_price at time of order creation';
+
 CREATE INDEX idx_sales_po_line_org_id  ON sales_po_line (org_id);
 CREATE INDEX idx_sales_po_line_order   ON sales_po_line (sales_po_id);
 CREATE INDEX idx_sales_po_line_product ON sales_po_line (sales_product_id);

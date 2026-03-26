@@ -36,4 +36,5 @@ CREATE INDEX idx_org_site_org_id ON org_site (org_id);
 CREATE INDEX idx_org_site_farm ON org_site (farm_id);
 CREATE INDEX idx_org_site_category ON org_site (category);
 
+COMMENT ON COLUMN org_site.farm_id IS 'Inherited from parent org_farm when site is farm-scoped; null for org-wide sites';
 COMMENT ON COLUMN org_site.zone IS 'zone_1, zone_2, zone_3, zone_4';

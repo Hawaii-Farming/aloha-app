@@ -33,3 +33,4 @@ CREATE INDEX idx_hr_time_off_request_dates ON hr_time_off_request (hr_employee_i
 
 COMMENT ON COLUMN hr_time_off_request.non_pto_days IS 'Days not charged to PTO or sick leave (e.g. unpaid leave, personal days)';
 COMMENT ON COLUMN hr_time_off_request.status IS 'pending, approved, denied';
+COMMENT ON COLUMN hr_time_off_request.requested_by IS 'Auto-set to the logged-in employee when the request is created';

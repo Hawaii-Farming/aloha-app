@@ -54,4 +54,10 @@ CREATE INDEX idx_invnt_po_item   ON invnt_po (invnt_item_id);
 
 COMMENT ON COLUMN invnt_po.request_type IS 'non_inventory_item, inventory_item';
 COMMENT ON COLUMN invnt_po.urgency_level IS 'today, 2_days, 7_days, not_urgent';
+COMMENT ON COLUMN invnt_po.invnt_category_id IS 'Pre-filled from invnt_item for inventory_item; user-selected for non_inventory_item';
+COMMENT ON COLUMN invnt_po.item_name IS 'Snapshot from invnt_item.name for inventory_item; manually entered for non_inventory_item';
+COMMENT ON COLUMN invnt_po.burn_uom IS 'Snapshot from invnt_item.burn_uom for inventory_item; defaults to order_uom for non_inventory_item';
+COMMENT ON COLUMN invnt_po.order_uom IS 'Snapshot from invnt_item.order_uom for inventory_item; user-selected for non_inventory_item';
+COMMENT ON COLUMN invnt_po.burn_per_order IS 'Snapshot from invnt_item.burn_per_order for inventory_item; defaults to 1 for non_inventory_item';
+COMMENT ON COLUMN invnt_po.invnt_vendor_id IS 'Pre-filled from invnt_item.invnt_vendor_id when item is selected; editable';
 COMMENT ON COLUMN invnt_po.status IS 'requested, approved, rejected, ordered, partial, received, cancelled';
