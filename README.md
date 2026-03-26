@@ -40,6 +40,7 @@ aloha-app/
 - **sys_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
 - **sys_module** — Master list of application modules for access control
 - **sys_sub_module** — Master list of sub-modules within each module with minimum access level requirements
+- **sys_business_rule** — Central registry for business rules, workflows, calculations, customer requirements, and definitions
 
 ## Organization Module (8 tables) — [Docs](docs/schemas/20260325_02_org.md)
 
@@ -56,10 +57,10 @@ aloha-app/
 - **invnt_category** — Two-level category hierarchy; rows with `sub_category_name` null are top-level categories, rows with `sub_category_name` set are subcategories (TEXT PK)
 - **invnt_item** — Items with unit conversions, burn rates, reorder settings, and proper columns for all details
 - **invnt_po** — Purchase order requests with workflow (requested → approved → ordered → received) and snapshot pricing
-- **invnt_po_received** — Individual deliveries received against a purchase order with lot tracking and partial delivery support
-- **invnt_onhand** — On-hand inventory snapshots per item with lot tracking and burn unit conversion
+- **invnt_lot** — Unique inventory lots by item and lot number; active while stock remains (TEXT PK)
+- **invnt_po_received** — Individual deliveries received against a purchase order with partial delivery support
+- **invnt_onhand** — On-hand inventory snapshots per item with burn unit conversion
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
-- **invnt_lot_summary** (view) — Current on-hand quantity per lot with expiry dates
 
 ## Human Resources Module (5 tables) — [Docs](docs/schemas/20260325_04_hr.md)
 

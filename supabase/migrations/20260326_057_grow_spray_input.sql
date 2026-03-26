@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS grow_spray_input (
     grow_spray_compliance_id    UUID NOT NULL REFERENCES grow_spray_compliance(id),
     invnt_item_id                  TEXT NOT NULL REFERENCES invnt_item(id),
     target_pest_disease         JSONB NOT NULL DEFAULT '[]',
+    invnt_lot_id                TEXT REFERENCES invnt_lot(id),
     application_uom             TEXT NOT NULL REFERENCES sys_uom(code),
     application_quantity            NUMERIC NOT NULL,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),

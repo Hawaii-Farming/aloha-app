@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS invnt_po_received (
     burn_per_received      NUMERIC NOT NULL DEFAULT 0,
 
     -- Lot tracking
-    lot_number             TEXT,
-    lot_expiry_date        DATE,
+    invnt_lot_id           TEXT REFERENCES invnt_lot(id),
 
     -- Delivery acceptance
     delivery_truck_clean   BOOLEAN,
@@ -27,7 +26,7 @@ CREATE TABLE IF NOT EXISTS invnt_po_received (
     is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a purchase order. One order can have multiple received records to handle partial deliveries. Each record captures its own lot number, expiry date, quantity, and acceptance details.';
+COMMENT ON TABLE invnt_po_received IS 'Individual deliveries received against a purchase order. One order can have multiple received records to handle partial deliveries. References invnt_lot for lot tracking.';
 
 CREATE INDEX idx_invnt_po_received_po  ON invnt_po_received (invnt_po_id);
 CREATE INDEX idx_invnt_po_received_org ON invnt_po_received (org_id);

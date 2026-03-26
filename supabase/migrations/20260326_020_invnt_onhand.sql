@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS invnt_onhand (
     burn_per_onhand   NUMERIC NOT NULL DEFAULT 0,
 
     -- Lot tracking
-    lot_number             TEXT,
-    lot_expiry_date        DATE,
+    invnt_lot_id           TEXT REFERENCES invnt_lot(id),
 
     notes                  TEXT,
 
@@ -22,7 +21,7 @@ CREATE TABLE IF NOT EXISTS invnt_onhand (
     is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE invnt_onhand IS 'Records on-hand inventory snapshots per item. Each record captures the quantity in onhand units with burn unit conversion and optional lot tracking. Source of truth for computed totals like current stock, burn-per-week, and weeks-on-hand.';
+COMMENT ON TABLE invnt_onhand IS 'Records on-hand inventory snapshots per item. References invnt_lot for lot tracking. Source of truth for computed totals like current stock, burn-per-week, and weeks-on-hand.';
 
 CREATE INDEX idx_invnt_onhand_org_id ON invnt_onhand (org_id);
 CREATE INDEX idx_invnt_onhand_item ON invnt_onhand (invnt_item_id, onhand_date);
