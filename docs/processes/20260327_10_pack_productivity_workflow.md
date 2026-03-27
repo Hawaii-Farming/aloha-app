@@ -16,6 +16,10 @@ This document describes how pack line productivity is tracked hourly, including 
 | `pack_productivity_hour_fail` | Fail counts per category per hour |
 | `pack_fail_category` | Lookup — defines available fail categories |
 | `sales_product` | Referenced for derived metrics (pack_per_case, case_net_weight) |
+| `ops_task_template` | Links templates to the Packing task; determines which checklists auto-load |
+| `ops_template` | Checklist template (e.g. foreign material inspection, pre-pack safety check) |
+| `ops_template_question` | Individual checklist questions |
+| `ops_template_response` | Checklist responses for this packing session |
 | `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---
@@ -24,14 +28,15 @@ This document describes how pack line productivity is tracked hourly, including 
 
 1. **Create the activity** — user creates an `ops_task_tracker` with task = "Packing", selects the farm and start time
 2. **Assign employees** working on this packing session via `ops_task_schedule` (one row per employee)
-3. **Log each hour** — for every clock hour during the packing session:
+3. **Complete linked templates** — if templates are linked to the "Packing" task via `ops_task_template`, they are presented for completion (e.g. foreign material inspection, pre-pack safety check). See [09_ops_template_workflow.md](20260327_09_ops_template_workflow.md) for template details.
+4. **Log each hour** — for every clock hour during the packing session:
    - Enter crew counts: catchers, packers, mixers, boxers
    - For each product packed that hour, enter the number of cases packed (delta — just this hour, not cumulative)
    - For each product, optionally enter leftover pounds
    - For each fail that occurred, select the fail category and enter the count
    - Toggle metal detected if applicable
    - Add notes (e.g. "Start LW at 10:20", "Fixing Proseal at 2:20-2:30")
-4. **Complete the activity** — enter stop time, mark as complete
+5. **Complete the activity** — enter stop time, mark as complete
 
 ---
 
@@ -49,9 +54,9 @@ These values are calculated on-the-fly from the stored data, not stored in the d
 
 ---
 
-## Seeding Status Filter
+## Provisioning
 
-The "Packing" task should be provisioned as a pre-seeded task during org onboarding. Fail categories (e.g. film, tray, printer, leaves, ridges, unexplained) should also be pre-seeded.
+The "Packing" task and fail categories (e.g. film, tray, printer, leaves, ridges, unexplained) should be provisioned during org onboarding. Templates for pack-related checklists (e.g. foreign material inspection) should be linked to the Packing task via `ops_task_template`.
 
 ---
 
@@ -60,7 +65,10 @@ The "Packing" task should be provisioned as a pre-seeded task during org onboard
 ```mermaid
 flowchart TD
     A[Create ops_task_tracker\nTask = Packing] --> A1[Assign employees\nvia ops_task_schedule]
-    A1 --> B[Start packing session]
+    A1 --> A2{Linked templates?}
+    A2 -->|Yes| A3[Complete checklists\ne.g. foreign material inspection]
+    A2 -->|No| B
+    A3 --> B[Start packing session]
     B --> C[New clock hour]
     C --> D[Enter crew counts\ncatchers, packers, mixers, boxers]
     D --> E[For each product packed:\nenter cases_packed delta]
