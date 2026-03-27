@@ -26,12 +26,13 @@ Pricing is managed with three tiers of specificity — default prices by product
 ```
 aloha-app/
   supabase/
-    migrations/          # Sequential SQL migration files (source of truth)
-    migrations_future/   # Designed but not yet deployed tables
+    migrations/          # Sequential SQL migration files (001-091, source of truth)
   docs/
-    schemas/             # Human-readable schema documentation per module
-    processes/           # Business process documentation with flow diagrams
+    schemas/             # Schema documentation per module (01_sys through 11_future)
+    processes/           # Business process and workflow documentation (01-10)
+  scripts/               # ETL and import scripts (e.g. payroll processing)
   src/                   # React application (coming soon)
+  SCHEMA_CONVENTIONS.md  # Schema design rules — read before every change
 ```
 
 ## System Module (4 tables) — [Docs](docs/schemas/20260326_01_sys.md)
@@ -155,13 +156,6 @@ aloha-app/
 - **fsafe_test_hold** — Test-and-hold header; one record per pack lot tested, tracks sample collection, lab submission, and test timeline
 - **fsafe_test_hold_po** — Links test-and-hold records to sales POs on hold pending results
 
-## Planned Modules
-
-- **Grow** — Seed mix recipes, seeding batches with traceability codes, growth stage tracking, nutrient recipes, environmental monitoring
-- **Organisation** — Site enhancements (grow zone tracking, environmental sensors), equipment maintenance schedules, org-level reporting and analytics
-- **Human Resources** — Payroll processing integration
-- **Pack** — Pack line productivity tracking and reporting
-
 ## Schema Conventions
 
 See [SCHEMA_CONVENTIONS.md](SCHEMA_CONVENTIONS.md) for the full set of schema design rules followed across this project.
@@ -175,9 +169,24 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Inventory Schema](docs/schemas/20260326_03_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260326_04_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260326_05_ops.md) — Task tracking, training, and food safety checklists
-- [Grow Schema](docs/schemas/20260326_06_grow.md) — Crop varieties and harvest grades
-- [Pack Schema](docs/schemas/20260326_07_pack.md) — Production lot tracking and shelf life trials
+- [Grow Schema](docs/schemas/20260326_06_grow.md) — Seeding, harvesting, scouting, spraying, fertigation, and monitoring
+- [Pack Schema](docs/schemas/20260326_07_pack.md) — Lot tracking, shelf life trials, and hourly productivity
 - [Sales Schema](docs/schemas/20260326_08_sales.md) — Product catalog, pricing, orders, and fulfillment
 - [Maintenance Schema](docs/schemas/20260326_09_maint.md) — Work orders and parts usage
 - [Food Safety Schema](docs/schemas/20260326_10_fsafe.md) — EMP testing, lab management, and test-and-hold
-- [Future Improvements](docs/schemas/20260326_11_future.md) — Deferred tables and planned features (migrations staged in `supabase/migrations_future/`)
+- [Future Improvements](docs/schemas/20260326_11_future.md) — Deferred features
+
+## Process Documentation
+
+Workflow and business process documentation with flow diagrams:
+
+- [Org Provisioning](docs/processes/20260326_01_org_provisioning.md) — New org setup and module seeding
+- [User Access Flow](docs/processes/20260326_02_user_access_flow.md) — Login, org selection, and multi-layered access control
+- [Grow Seeding](docs/processes/20260326_03_grow_seeding_workflow.md) — Seeding batch creation and lifecycle
+- [Grow Harvesting](docs/processes/20260326_04_grow_harvesting_workflow.md) — Harvest weigh-in and grading
+- [Grow Scouting](docs/processes/20260326_05_grow_scouting_workflow.md) — Pest and disease observation
+- [Grow Spraying](docs/processes/20260326_06_grow_spraying_workflow.md) — Chemical application with compliance enforcement
+- [Grow Fertigation](docs/processes/20260326_07_grow_fertigation_workflow.md) — Fertilizer recipe application
+- [Grow Monitoring](docs/processes/20260326_08_grow_monitoring_workflow.md) — Environmental readings with calculated points
+- [Ops Task Workflow](docs/processes/20260326_09_ops_task_workflow.md) — General task + checklist workflow with ATP testing
+- [Pack Productivity](docs/processes/20260326_10_pack_productivity_workflow.md) — Hourly pack line tracking with crew and fail logging
