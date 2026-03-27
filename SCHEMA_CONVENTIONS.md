@@ -10,16 +10,16 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| `sys_`    | System          | 001–004 | 01 |
-| `org_`    | Org             | 005–012 | 02 |
-| `grow_`   | Grow            | 013–014, 045–066 | 06 |
-| `invnt_`  | Inventory       | 015–022 | 03 |
-| `hr_`     | Human Resources | 023–031 | 04 |
-| `ops_`    | Operations      | 032–044, 093 | 05 |
-| `sales_`  | Sales           | 067–073, 076 | 08 |
-| `pack_`   | Pack            | 074–075, 077–084 | 07 |
-| `maint_`  | Maintenance     | 085–086 | 09 |
-| `fsafe_`  | Food Safety     | 087–092 | 10 |
+| `sys_`    | System          | 001–006 | 01 |
+| `org_`    | Org             | 007–014 | 02 |
+| `grow_`   | Grow            | 015–016, 047–064 | 06 |
+| `invnt_`  | Inventory       | 017–024 | 03 |
+| `hr_`     | Human Resources | 025–033 | 04 |
+| `ops_`    | Operations      | 034–046, 093 | 05 |
+| `sales_`  | Sales           | 065–071, 074 | 08 |
+| `pack_`   | Pack            | 072–073, 075–082 | 07 |
+| `maint_`  | Maintenance     | 083–084 | 09 |
+| `fsafe_`  | Food Safety     | 085–091 | 10 |
 | (deferred)| Future          | —       | 11 |
 
 Sales & Pack migration ranges are interleaved (067–084) due to cross-module FK dependencies.

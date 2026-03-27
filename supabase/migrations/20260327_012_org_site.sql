@@ -1,30 +1,33 @@
 CREATE TABLE IF NOT EXISTS org_site (
-    id              TEXT PRIMARY KEY,
-    org_id          TEXT NOT NULL REFERENCES org(id),
-    farm_id         TEXT REFERENCES org_farm(id),
-    site_id_parent  TEXT REFERENCES org_site(id),
-    name            TEXT NOT NULL,
+    id                      TEXT PRIMARY KEY,
+    org_id                  TEXT NOT NULL REFERENCES org(id),
+    farm_id                 TEXT REFERENCES org_farm(id),
+    name                    TEXT NOT NULL,
     org_site_category_id    TEXT NOT NULL REFERENCES org_site_category(id),
     org_site_subcategory_id TEXT REFERENCES org_site_category(id),
+    site_id_parent          TEXT REFERENCES org_site(id),
 
     -- Growing site details (shown when category = growing)
-    acres           NUMERIC,
+    acres                   NUMERIC,
 
     -- Food safety details (shown for food safety child sites)
-    zone            TEXT CHECK (zone IN ('zone_1', 'zone_2', 'zone_3', 'zone_4', 'water')),
+    zone                    TEXT CHECK (zone IN ('zone_1', 'zone_2', 'zone_3', 'zone_4', 'water')),
 
-    notes           TEXT,
-    display_order   INTEGER NOT NULL DEFAULT 0,
+    notes                   TEXT,
+    is_active               BOOLEAN NOT NULL DEFAULT true,
+    display_order           INTEGER NOT NULL DEFAULT 0,
 
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by      TEXT,
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by      TEXT,
-    is_deleted      BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT uq_org_site UNIQUE (org_id, farm_id, name)
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by              TEXT,
+    updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by              TEXT,
+    is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
 
 COMMENT ON TABLE org_site IS 'Unified site register for all physical locations across the organization. Supports a parent-child hierarchy via site_id_parent — top-level sites (greenhouses, packhouses, housing) contain child sites (food safety surfaces, pest traps, rooms). The category drives which fields are relevant in the UI.';
+
+CREATE UNIQUE INDEX uq_org_site_org_level ON org_site (org_id, name) WHERE farm_id IS NULL;
+CREATE UNIQUE INDEX uq_org_site_farm_level ON org_site (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
 
 CREATE INDEX idx_org_site_org_id ON org_site (org_id);
 CREATE INDEX idx_org_site_farm ON org_site (farm_id);

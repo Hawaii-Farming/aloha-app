@@ -35,12 +35,14 @@ aloha-app/
   SCHEMA_CONVENTIONS.md  # Schema design rules — read before every change
 ```
 
-## System Module (4 tables) — [Docs](docs/schemas/20260327_01_sys.md)
+## System Module (6 tables) — [Docs](docs/schemas/20260327_01_sys.md)
 
 - **sys_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
 - **sys_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
 - **sys_module** — Master list of application modules for access control
 - **sys_sub_module** — Master list of sub-modules within each module with minimum access level requirements
+- **sys_pest** — System-wide pest catalog for scouting observations
+- **sys_disease** — System-wide disease catalog for scouting observations
 
 ## Organization Module (8 tables) — [Docs](docs/schemas/20260327_02_org.md)
 
@@ -93,7 +95,7 @@ aloha-app/
 - **ops_template_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (24 tables) — [Docs](docs/schemas/20260327_06_grow.md)
+## Grow Module (22 tables) — [Docs](docs/schemas/20260327_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
@@ -104,8 +106,6 @@ aloha-app/
 - **grow_seed_batch** — Seeding batch linked to ops activity; either single variety or mix, with traceability code and lifecycle status.
 - **grow_harvest_container** — Container definitions with tare weight, optionally specific to variety and grade for auto-calculation
 - **grow_harvest_weight** — Individual weigh-ins per container type; links directly to seeding batch for traceability with grade assignment. Tare auto-calculated.
-- **grow_pest** — Standardized pest names for scouting observations. Org-scoped (TEXT PK).
-- **grow_disease** — Standardized disease names for scouting observations. Org-scoped (TEXT PK).
 - **grow_task_seed_batch** — Unified join table linking any grow activity (scouting, spraying, fertigation, monitoring) to seeding batches.
 - **grow_task_photo** — Unified photo table for any grow activity (scouting, monitoring) with optional caption.
 - **grow_scout_observation** — Individual pest or disease finding with severity and infection stage.

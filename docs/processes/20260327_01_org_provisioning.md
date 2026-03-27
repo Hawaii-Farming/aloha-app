@@ -1,6 +1,6 @@
 # Organization Provisioning
 
-This document lists everything that must be seeded or created when a new organization is onboarded. Each section describes what is provisioned, the source data, and the target table.
+This document lists everything that must be provisioned when a new organization is onboarded. Each section describes what is created, the source data, and the target table.
 
 ---
 
@@ -11,10 +11,10 @@ Steps must be executed in this order due to FK dependencies:
 1. Create `org` record
 2. Copy system modules → `org_module`
 3. Copy system sub-modules → `org_sub_module`
-4. Seed default site categories → `org_site_category`
+4. Provision default site categories → `org_site_category`
 5. Create admin `hr_employee` record (manual)
 6. Copy org modules → `hr_module_access` for admin
-7. Seed default `ops_task` records
+7. Provision default `ops_task` records
 
 ---
 
@@ -39,7 +39,7 @@ Steps must be executed in this order due to FK dependencies:
 
 | Target | Source | Notes |
 |--------|--------|-------|
-| `org_site_category` | Hardcoded seed data | Two-level hierarchy for classifying sites |
+| `org_site_category` | Hardcoded defaults | Two-level hierarchy for classifying sites |
 
 Default categories and subcategories:
 
@@ -53,9 +53,6 @@ Default categories and subcategories:
 | packing | packroom |
 | packing | cold_storage |
 | housing | *(top-level)* |
-| housing | house |
-| housing | duplex |
-| housing | ohana |
 | food_safety | *(top-level)* |
 | pest_trap | *(top-level)* |
 | room | *(top-level)* |
@@ -89,7 +86,7 @@ Default categories and subcategories:
 
 | Target | Source | Notes |
 |--------|--------|-------|
-| `ops_task` | Hardcoded seed data | Required for grow module activity flows |
+| `ops_task` | Hardcoded defaults | Required for grow, pack, and food safety activity flows |
 
 Default tasks:
 
@@ -101,6 +98,8 @@ Default tasks:
 | spraying | Spraying | Required by grow_spraying_workflow |
 | fertigation | Fertigation | Required by grow_fertigation_workflow |
 | monitoring | Monitoring | Required by grow_monitoring_workflow |
+| packing | Packing | Required by pack_productivity_workflow |
+| pest_trap_inspection | Pest Trap Inspection | Required by fsafe_pest_trap_inspection |
 
 ---
 
@@ -116,9 +115,9 @@ When a new employee is added with a `user_id` (app access):
 
 ## 9. Future Provisions
 
-As the system grows, additional seed data may be required:
+As the system grows, additional default data may be required:
 
 - **Grow lookups** — default pest types, disease types, trial types per farm
 - **Ops templates** — default checklist templates (e.g. pre-spray safety check)
 - **Food safety** — default lab test definitions per org
-- **UOM** — standard units of measure (system-level, seeded once globally)
+- **UOM** — standard units of measure (system-level, provisioned once globally)

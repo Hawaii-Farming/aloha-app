@@ -1,6 +1,5 @@
-CREATE TABLE IF NOT EXISTS grow_disease (
+CREATE TABLE IF NOT EXISTS sys_disease (
     id          TEXT PRIMARY KEY,
-    org_id      TEXT NOT NULL REFERENCES org(id),
     name        TEXT NOT NULL,
     description TEXT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -8,7 +7,7 @@ CREATE TABLE IF NOT EXISTS grow_disease (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by  TEXT,
     is_deleted  BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT uq_grow_disease UNIQUE (org_id, name)
+    CONSTRAINT uq_sys_disease UNIQUE (name)
 );
 
-COMMENT ON TABLE grow_disease IS 'Standardized disease names for scouting observations. Org-scoped.';
+COMMENT ON TABLE sys_disease IS 'System-wide disease catalog for scouting observations. Diseases are biological facts shared across all organizations.';

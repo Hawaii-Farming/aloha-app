@@ -1,6 +1,5 @@
-CREATE TABLE IF NOT EXISTS grow_pest (
+CREATE TABLE IF NOT EXISTS sys_pest (
     id          TEXT PRIMARY KEY,
-    org_id      TEXT NOT NULL REFERENCES org(id),
     name        TEXT NOT NULL,
     description TEXT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -8,7 +7,7 @@ CREATE TABLE IF NOT EXISTS grow_pest (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by  TEXT,
     is_deleted  BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT uq_grow_pest UNIQUE (org_id, name)
+    CONSTRAINT uq_sys_pest UNIQUE (name)
 );
 
-COMMENT ON TABLE grow_pest IS 'Standardized pest names for scouting observations. Org-scoped.';
+COMMENT ON TABLE sys_pest IS 'System-wide pest catalog for scouting observations. Pests are biological facts shared across all organizations.';
