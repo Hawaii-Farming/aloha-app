@@ -2,7 +2,7 @@
 
 This document describes the spraying activity flow using `ops_task_tracker` directly as the header — no separate spraying header table is needed. The pre-spray safety checklist is handled via the existing ops checklist system (`ops_template` → `ops_template_question` → `ops_template_response`).
 
-> **Prerequisite:** The "Spraying" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260325_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The "Spraying" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260326_01_org_provisioning.md) for setup steps.
 
 ---
 

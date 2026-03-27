@@ -81,7 +81,7 @@ Default categories and subcategories:
 
 | Target | Source | Notes |
 |--------|--------|-------|
-| `hr_module_access` | `org_module` | One row per enabled org module; all permissions set to `true` (`can_view`, `can_edit`, `can_delete`, `can_verify`) |
+| `hr_module_access` | `org_module` | One row per enabled org module; all permissions set to `true` (`is_enabled`, `can_edit`, `can_delete`, `can_verify`) |
 
 ---
 
@@ -110,7 +110,7 @@ When a new employee is added with a `user_id` (app access):
 
 | Target | Source | Notes |
 |--------|--------|-------|
-| `hr_module_access` | `org_module` | One row per enabled org module; permissions use defaults: `can_view = true`, `can_edit = true`, `can_delete = false`, `can_verify = false` |
+| `hr_module_access` | `org_module` | One row per enabled org module; permissions use defaults: `is_enabled = true`, `can_edit = true`, `can_delete = false`, `can_verify = false` |
 
 ---
 

@@ -26,7 +26,7 @@ Pricing is managed with three tiers of specificity — default prices by product
 ```
 aloha-app/
   supabase/
-    migrations/          # Sequential SQL migration files (001-091, source of truth)
+    migrations/          # Sequential SQL migration files (001-093, source of truth)
   docs/
     schemas/             # Schema documentation per module (01_sys through 11_future)
     processes/           # Business process and workflow documentation (01-10)
@@ -48,8 +48,8 @@ aloha-app/
 - **org_module** — Org-scoped module toggles with custom display names and ordering
 - **org_sub_module** — Org-scoped sub-module toggles with custom display names, ordering, and access levels
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
-- **org_site_category** — Two-level site category hierarchy (e.g. growing → greenhouse, packing → packroom, housing → duplex)
-- **org_site** — Unified site register with parent-child hierarchy for all locations (growing, packing, housing, food safety, pest traps, rooms)
+- **org_site_category** — Two-level site category hierarchy (e.g. growing/greenhouse, packing/packroom, housing/duplex)
+- **org_site** — Unified site register with parent-child hierarchy for all locations; category and subcategory are FK references to org_site_category
 - **org_equipment** — Equipment register for physical assets; farm-level or shared, with current/previous employee assignment
 - **org_business_rule** — Org-scoped registry for business rules, workflows, calculations, requirements, and definitions
 
@@ -80,7 +80,7 @@ aloha-app/
 
 - **ops_task** — Flat task catalog for labor tracking with name and description (TEXT PK)
 - **ops_task_tracker** — Header record for a task event with task, farm, site, date, start/stop times, and verification status. Site is stored directly on the tracker.
-- **ops_task_schedule** — Employees per task event with individual start/stop times (overridable from tracker) and units completed
+- **ops_task_schedule** — Employees per task event with individual start/stop times (overridable from tracker)
 - **ops_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
 - **ops_training_type** — Org-specific training type lookup (e.g. GMP, Food Safety, HACCP). TEXT PK derived from name.
 - **ops_training** — Staff training session records with type, date, topics, trainer names, and materials
@@ -104,11 +104,11 @@ aloha-app/
 - **grow_seed_batch** — Seeding batch linked to ops activity; either single variety or mix, with traceability code and lifecycle status.
 - **grow_harvest_container** — Container definitions with tare weight, optionally specific to variety and grade for auto-calculation
 - **grow_harvest_weight** — Individual weigh-ins per container type; links directly to seeding batch for traceability with grade assignment. Tare auto-calculated.
-- **grow_pest** — Standardized pest names for scouting observations. Farm-scoped (TEXT PK).
-- **grow_disease** — Standardized disease names for scouting observations. Farm-scoped (TEXT PK).
+- **grow_pest** — Standardized pest names for scouting observations. Org-scoped (TEXT PK).
+- **grow_disease** — Standardized disease names for scouting observations. Org-scoped (TEXT PK).
 - **grow_task_seed_batch** — Unified join table linking any grow activity (scouting, spraying, fertigation, monitoring) to seeding batches.
 - **grow_task_photo** — Unified photo table for any grow activity (scouting, monitoring) with optional caption.
-- **grow_scout_observation** — Individual pest or disease finding with side, severity, and infection stage.
+- **grow_scout_observation** — Individual pest or disease finding with severity and infection stage.
 - **grow_scout_observation_row** — Rows affected by a specific observation; one row per growing row.
 - **grow_spray_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
 - **grow_spray_input** — Individual chemical/fertilizer applied per spraying activity with quantity and compliance link.
@@ -130,7 +130,7 @@ aloha-app/
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
 - **pack_fail_category** — Lookup for pack line fail categories (e.g. film, tray, printer, leaves, ridges)
 - **pack_productivity_hour** — Hourly pack line snapshot with crew counts by role and metal detection flag
-- **pack_productivity_hour_product** — Cases packed per product per hour (delta) with leftover pounds
+- **pack_productivity_hour_product** — Cases packed per product per hour (delta, not cumulative)
 - **pack_productivity_hour_fail** — Fail counts per category per hour
 
 ## Sales Module (8 tables) — [Docs](docs/schemas/20260326_08_sales.md)
@@ -149,13 +149,14 @@ aloha-app/
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (5 tables) — [Docs](docs/schemas/20260326_10_fsafe.md)
+## Food Safety Module (6 tables) — [Docs](docs/schemas/20260326_10_fsafe.md)
 
 - **fsafe_lab_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_result** — Unified food safety test results for both EMP and test-and-hold testing; one row per test event with retest/vector chaining, corrective action linkage, and optional test-and-hold parent reference
 - **fsafe_lab** — Catalog of laboratories used for food safety test submissions (TEXT PK)
 - **fsafe_test_hold** — Test-and-hold header; one record per pack lot tested, tracks sample collection, lab submission, and test timeline
 - **fsafe_test_hold_po** — Links test-and-hold records to sales POs on hold pending results
+- **fsafe_pest_trap_inspection** — Per-station pest trap inspection result; one row per trap station per inspection event
 
 ## Schema Conventions
 
@@ -166,7 +167,7 @@ See [SCHEMA_CONVENTIONS.md](SCHEMA_CONVENTIONS.md) for the full set of schema de
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
 - [System Schema](docs/schemas/20260326_01_sys.md) — 4 system-level tables
-- [Org Schema](docs/schemas/20260326_02_org.md) — 7 organization structure tables
+- [Org Schema](docs/schemas/20260326_02_org.md) — 8 organization structure tables
 - [Inventory Schema](docs/schemas/20260326_03_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260326_04_hr.md) — Employee records and Human Resources lookups
 - [Operations Schema](docs/schemas/20260326_05_ops.md) — Task tracking, training, and food safety checklists
@@ -174,7 +175,7 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Pack Schema](docs/schemas/20260326_07_pack.md) — Lot tracking, shelf life trials, and hourly productivity
 - [Sales Schema](docs/schemas/20260326_08_sales.md) — Product catalog, pricing, orders, and fulfillment
 - [Maintenance Schema](docs/schemas/20260326_09_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260326_10_fsafe.md) — EMP testing, lab management, and test-and-hold
+- [Food Safety Schema](docs/schemas/20260326_10_fsafe.md) — EMP testing, lab management, test-and-hold, and pest trap inspections
 - [Future Improvements](docs/schemas/20260326_11_future.md) — Deferred features
 
 

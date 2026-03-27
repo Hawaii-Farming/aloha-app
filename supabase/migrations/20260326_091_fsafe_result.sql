@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS fsafe_result (
     result_enum     TEXT,
     result_numeric  NUMERIC,
     result_pass     BOOLEAN,
-    warning_message TEXT,
     fail_code       TEXT,
 
     fsafe_result_id_original UUID REFERENCES fsafe_result(id),

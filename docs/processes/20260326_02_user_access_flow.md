@@ -2,7 +2,7 @@
 
 This document describes what happens at runtime when a user logs in — how they authenticate, select an organization, and see only the modules and sub-modules they are authorized to access.
 
-> **Prerequisite:** The organization, modules, employee, and module access must already be provisioned. See [01_org_provisioning.md](20260325_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The organization, modules, employee, and module access must already be provisioned. See [01_org_provisioning.md](20260326_01_org_provisioning.md) for setup steps.
 
 ---
 
@@ -14,7 +14,7 @@ This system combines three distinct access control mechanisms:
 |-------|-------|-----------------|
 | **Feature Toggling** | Org-level switches | Organization admins enable or disable entire modules and sub-modules for their org. Disabled features are invisible to all users regardless of role. |
 | **Role-Based Access Control (RBAC)** | Hierarchical access levels (1–5) | Each employee is assigned an access level (employee, team_lead, manager, admin, owner). Sub-modules define a minimum access level. Employees can only see sub-modules at or below their level. Higher roles inherit all visibility of lower roles. |
-| **Attribute-Based Access Control (ABAC)** | Per-employee, per-module permissions | Each employee has individual permission flags per module (`can_view`, `can_edit`, `can_delete`, `can_verify`) that control what actions they can perform on records within that module. |
+| **Attribute-Based Access Control (ABAC)** | Per-employee, per-module permissions | Each employee has individual permission flags per module (`is_enabled`, `can_edit`, `can_delete`, `can_verify`) that control what actions they can perform on records within that module. |
 
 ---
 
@@ -25,7 +25,7 @@ This system combines three distinct access control mechanisms:
 | `org_module` | Org | Org-scoped module toggles with custom display name and order |
 | `org_sub_module` | Org | Org-scoped sub-module toggles with custom display name, order, and access level |
 | `hr_employee` | HR | Employee record with `sys_access_level_id` and `user_id` for auth |
-| `hr_module_access` | HR | Maps employee to modules with permissions (`can_view`, `can_edit`, `can_delete`, `can_verify`) |
+| `hr_module_access` | HR | Maps employee to modules with permissions (`is_enabled`, `can_edit`, `can_delete`, `can_verify`) |
 | `auth.users` | Auth | Supabase Auth — handles login credentials and session |
 
 ---
@@ -58,7 +58,7 @@ Once inside a module, the employee's actions are governed by their `hr_module_ac
 
 | Permission | What it allows |
 |------------|---------------|
-| `can_view` | View records within the module |
+| `is_enabled` | Module is visible and accessible to the employee |
 | `can_edit` | Create and update records |
 | `can_delete` | Soft-delete records |
 | `can_verify` | Mark records as verified |
@@ -75,7 +75,7 @@ At any point during their session, the user can switch to a different organizati
 |---------|-------|
 | Organization | Hawaii Farming |
 | Employee | Michael (Manager, level 3) |
-| Module: Inventory | org enabled, Michael has access (`can_view`, `can_edit` = true; `can_delete`, `can_verify` = false) |
+| Module: Inventory | org enabled, Michael has access (`is_enabled`, `can_edit` = true; `can_delete`, `can_verify` = false) |
 | Sub-module: Vendors (level 1) | Visible — Michael's level 3 ≥ 1 |
 | Sub-module: Items (level 1) | Visible — Michael's level 3 ≥ 1 |
 | Sub-module: Purchase Orders (level 3) | Visible — Michael's level 3 ≥ 3 |
@@ -90,7 +90,7 @@ At any point during their session, the user can switch to a different organizati
 |-------|----------------|--------------|
 | Org module/sub-module toggles | Admin | Controls what is available to the entire organization |
 | Employee module access | Admin | Controls which modules each employee can see |
-| Record-level permissions | Admin | Controls what actions (view, edit, delete, verify) each employee can perform per module |
+| Record-level permissions | Admin | Controls what actions (edit, delete, verify) each employee can perform per module |
 | Access level on sub-modules | Admin (inherited from system) | Controls which sub-modules are visible based on the employee's role |
 | Employee access level | Admin | Assigned per employee; determines sub-module visibility |
 
@@ -109,5 +109,5 @@ flowchart TD
     E1 --> E2[2. Employee Filter: hr_module_access.is_enabled = true]
     E2 --> E3[3. Access Level Filter: employee level ≥ sub-module level]
     E3 --> F[Employee Sees Permitted Modules & Sub-Modules]
-    F --> G[Actions Governed by can_view, can_edit, can_delete, can_verify]
+    F --> G[Actions Governed by is_enabled, can_edit, can_delete, can_verify]
 ```

@@ -2,7 +2,7 @@
 
 This document describes the general ops task workflow — how any task activity flows from creation through checklist completion to corrective actions. This is the foundation that all grow module activities (seeding, harvesting, scouting, spraying, fertigation, monitoring) and non-grow tasks (pre-ops, post-ops, house inspections) build on.
 
-> **Prerequisite:** Tasks must be provisioned in `ops_task` and templates linked via `ops_task_template`. See [01_org_provisioning.md](20260325_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** Tasks must be provisioned in `ops_task` and templates linked via `ops_task_template`. See [01_org_provisioning.md](20260326_01_org_provisioning.md) for setup steps.
 
 ---
 

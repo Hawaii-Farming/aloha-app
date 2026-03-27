@@ -2,7 +2,7 @@
 
 This document describes the environmental monitoring activity flow using `ops_task_tracker` directly as the header. Monitoring points are configurable per farm and site category, with support for direct readings and calculated values.
 
-> **Prerequisite:** The "Monitoring" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260325_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The "Monitoring" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260326_01_org_provisioning.md) for setup steps.
 
 ---
 
@@ -15,7 +15,7 @@ This document describes the environmental monitoring activity flow using `ops_ta
 | `grow_monitoring_reading` | Individual measurement per point per station per event |
 | `grow_task_seed_batch` | Snapshot of seedings present during the event |
 | `grow_task_photo` | Photos taken during monitoring with optional caption |
-| `org_site` | Provides `monitoring_stations` JSONB for station selection |
+| `org_site` | Site where monitoring is performed |
 
 ---
 
@@ -95,7 +95,7 @@ Both approaches store the same `formula` TEXT in the database — the UI method 
 1. Create an `ops_task_tracker` activity with task = "Monitoring"
    - If templates are linked to the "Monitoring" task via `ops_task_template`, they are presented for completion
 2. Select the site — the app loads monitoring points matching `farm_id` + `site.category`
-3. Select the monitoring station from `org_site.monitoring_stations` dropdown
+3. Enter the monitoring station name (free-text `grow_monitoring_reading.monitoring_station`)
 4. For each monitoring point, enter the reading based on its `response_type`:
    - **Numeric**: user enters a number (e.g. EC, pH, mL, temperature)
    - **Boolean**: user toggles yes/no (e.g. Is Injection)
@@ -113,7 +113,7 @@ Both approaches store the same `formula` TEXT in the database — the UI method 
 ## Notes
 
 - Monitoring snapshots which seedings are present in the site at the time of the event via `grow_task_seed_batch`.
-- Monitoring stations are stored as a JSONB array on `org_site.monitoring_stations` and rendered as a dropdown.
+- Monitoring station is a free-text field on `grow_monitoring_reading.monitoring_station`.
 - Each reading row stores the computed result for calculated points, providing a historical record even if the formula changes later.
 - Out-of-range detection is automatic based on the point's thresholds. The frontend can highlight flagged readings.
 
@@ -125,8 +125,8 @@ Both approaches store the same `formula` TEXT in the database — the UI method 
 flowchart TD
     A[Create ops_task_tracker\nTask = Monitoring] --> B[Select site]
     B --> C[App loads monitoring points\nfor farm + site category]
-    C --> D[Select monitoring station\nfrom site JSONB dropdown]
-    D --> E[Enter direct readings]
+    C --> D[Enter monitoring station name]
+    D --> E[Enter readings per point]
     E --> F[App calculates derived values\nfrom formulas]
     F --> G[App flags out-of-range readings]
     G --> H{More stations?}

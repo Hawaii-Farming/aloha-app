@@ -2,7 +2,7 @@
 
 This document describes the fertigation activity flow using `ops_task_tracker` directly as the header. Recipes are reusable and define the fertilizer mix and target sites.
 
-> **Prerequisite:** The "Fertigation" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260325_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The "Fertigation" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260326_01_org_provisioning.md) for setup steps.
 
 ---
 

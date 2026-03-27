@@ -2,7 +2,7 @@
 
 This document describes the harvesting activity flow using `ops_task_tracker` directly as the header. Harvest data (seeding batch, grade, date, container weigh-ins) is recorded in `grow_harvest_weight`.
 
-> **Prerequisite:** The "Harvesting" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260325_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The "Harvesting" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260326_01_org_provisioning.md) for setup steps.
 
 ---
 
