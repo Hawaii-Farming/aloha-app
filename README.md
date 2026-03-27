@@ -191,5 +191,5 @@ Workflow and business process documentation with flow diagrams:
 - [Grow Spraying](docs/processes/20260327_06_grow_spraying_workflow.md) — Chemical application with compliance enforcement
 - [Grow Fertigation](docs/processes/20260327_07_grow_fertigation_workflow.md) — Fertilizer recipe application
 - [Grow Monitoring](docs/processes/20260327_08_grow_monitoring_workflow.md) — Environmental readings with calculated points
-- [Ops Task Workflow](docs/processes/20260327_09_ops_task_workflow.md) — General task + checklist workflow with ATP testing
+- [Ops Task Workflow](docs/processes/20260327_09_ops_template_workflow.md) — General task + checklist workflow with ATP testing
 - [Pack Productivity](docs/processes/20260327_10_pack_productivity_workflow.md) — Hourly pack line tracking with crew and fail logging
