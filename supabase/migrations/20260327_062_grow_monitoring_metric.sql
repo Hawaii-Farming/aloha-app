@@ -36,12 +36,12 @@ COMMENT ON TABLE grow_monitoring_metric IS 'Defines what to measure per farm and
 
 COMMENT ON COLUMN grow_monitoring_metric.site_category IS 'Matches org_site.category to scope which metrics apply (e.g. greenhouse, nursery, pond)';
 COMMENT ON COLUMN grow_monitoring_metric.response_type IS 'boolean, numeric, enum';
-COMMENT ON COLUMN grow_monitoring_metric.minimum_value IS 'Reading below this value auto-sets grow_monitoring_reading.is_out_of_range to true; null if not numeric';
-COMMENT ON COLUMN grow_monitoring_metric.maximum_value IS 'Reading above this value auto-sets grow_monitoring_reading.is_out_of_range to true; null if not numeric';
+COMMENT ON COLUMN grow_monitoring_metric.minimum_value IS 'Reading below this value auto-sets grow_monitoring_result.is_out_of_range to true; null if not numeric';
+COMMENT ON COLUMN grow_monitoring_metric.maximum_value IS 'Reading above this value auto-sets grow_monitoring_result.is_out_of_range to true; null if not numeric';
 COMMENT ON COLUMN grow_monitoring_metric.enum_options IS 'JSON array of allowed values when response_type is enum; null if not enum';
 COMMENT ON COLUMN grow_monitoring_metric.enum_pass_options IS 'Subset of enum_options that are acceptable; values outside this set auto-set is_out_of_range to true';
 COMMENT ON COLUMN grow_monitoring_metric.formula IS 'Expression for calculated points (e.g. (drain_ml / (drip_ml * drippers)) * 100); null when is_calculated = false';
 COMMENT ON COLUMN grow_monitoring_metric.input_point_ids IS 'JSON array of grow_monitoring_metric IDs that feed into this calculation; null when is_calculated = false';
-COMMENT ON COLUMN grow_monitoring_metric.corrective_actions IS 'JSON array of corrective action options shown when reading is out of range; selected value stored in grow_monitoring_reading.corrective_action';
+COMMENT ON COLUMN grow_monitoring_metric.corrective_actions IS 'JSON array of corrective action options shown when reading is out of range; selected value stored in grow_monitoring_result.corrective_action';
 
 CREATE INDEX idx_grow_monitoring_metric_farm ON grow_monitoring_metric (org_id, farm_id, site_category);

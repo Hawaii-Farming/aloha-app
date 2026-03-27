@@ -209,7 +209,7 @@ Two types of information **must** be stored as `COMMENT ON COLUMN` in the schema
 2. **Column calculation method** — How a computed or auto-populated value is derived.
    ```sql
    COMMENT ON COLUMN grow_harvest_weight.net_weight IS 'Auto-calculated: gross_weight - (grow_harvest_container.tare_weight × number_of_containers)';
-   COMMENT ON COLUMN grow_monitoring_reading.is_out_of_range IS 'Auto-set by comparing reading against grow_monitoring_metric min/max values';
+   COMMENT ON COLUMN grow_monitoring_result.is_out_of_range IS 'Auto-set by comparing reading against grow_monitoring_metric min/max values';
    ```
 
 These comments stay in the schema because they are read directly from PostgreSQL catalog when building frontend forms, APIs, and AI-assisted development.

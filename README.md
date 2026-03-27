@@ -95,7 +95,7 @@ aloha-app/
 - **ops_template_response** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (22 tables) — [Docs](docs/schemas/20260327_06_grow.md)
+## Grow Module (20 tables) — [Docs](docs/schemas/20260327_06_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
@@ -108,8 +108,7 @@ aloha-app/
 - **grow_harvest_weight** — Individual weigh-ins per container type; links directly to seeding batch for traceability with grade assignment. Tare auto-calculated.
 - **grow_task_seed_batch** — Unified join table linking any grow activity (scouting, spraying, fertigation, monitoring) to seeding batches.
 - **grow_task_photo** — Unified photo table for any grow activity (scouting, monitoring) with optional caption.
-- **grow_scout_observation** — Individual pest or disease finding with severity and infection stage.
-- **grow_scout_observation_row** — Rows affected by a specific observation; one row per growing row.
+- **grow_scout_result** — Individual pest or disease finding with severity and infection stage.
 - **grow_spray_compliance** — Chemical label registry with REI, PHI, application rates, and regulatory info per product.
 - **grow_spray_input** — Individual chemical/fertilizer applied per spraying activity with quantity and compliance link.
 - **grow_spray_equipment** — Equipment used per spraying activity with water UOM and quantity per piece.
@@ -118,7 +117,7 @@ aloha-app/
 - **grow_fertigation_recipe_site** — Sites that receive a recipe (configuration for pre-filling).
 - **grow_fertigation** — Tanks used per fertigation event with volume applied.
 - **grow_monitoring_metric** — Defines what to measure per farm and site category with UOM, thresholds, and optional formula for calculated points.
-- **grow_monitoring_reading** — Individual measurement per monitoring event per point per station.
+- **grow_monitoring_result** — Individual measurement per monitoring event per point per station.
 
 ## Pack Module (10 tables) — [Docs](docs/schemas/20260327_07_pack.md)
 
@@ -126,7 +125,7 @@ aloha-app/
 - **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
 - **pack_shelf_life_metric** — Defines what gets checked during shelf life observations with response type and termination criteria (TEXT PK)
 - **pack_shelf_life** — Shelf life trial header linking product, lot, packaging type, target vs actual shelf life, and trial status
-- **pack_shelf_life_observation** — Individual observation responses per check per date per trial with typed responses
+- **pack_shelf_life_result** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
 - **pack_fail_category** — Lookup for pack line fail categories (e.g. film, tray, printer, leaves, ridges)
 - **pack_productivity_hour** — Hourly pack line snapshot with crew counts by role and metal detection flag
@@ -156,7 +155,7 @@ aloha-app/
 - **fsafe_lab** — Catalog of laboratories used for food safety test submissions (TEXT PK)
 - **fsafe_test_hold** — Test-and-hold header; one record per pack lot tested, tracks sample collection, lab submission, and test timeline
 - **fsafe_test_hold_po** — Links test-and-hold records to sales POs on hold pending results
-- **fsafe_pest_trap_inspection** — Per-station pest trap inspection result; one row per trap station per inspection event
+- **fsafe_pest_result** — Per-station pest trap inspection result; one row per trap station per inspection event
 
 ## Schema Conventions
 

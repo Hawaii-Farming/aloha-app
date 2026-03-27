@@ -12,7 +12,7 @@ This document describes the environmental monitoring activity flow using `ops_ta
 |-------|---------|
 | `ops_task_tracker` | Activity header — captures org, farm, site, date, start/stop time, notes |
 | `grow_monitoring_metric` | Defines what to measure per farm + site category with UOM, thresholds, and formulas |
-| `grow_monitoring_reading` | Individual measurement per point per station per event |
+| `grow_monitoring_result` | Individual measurement per point per station per event |
 | `grow_task_seed_batch` | Snapshot of seedings present during the event |
 | `grow_task_photo` | Photos taken during monitoring with optional caption |
 | `org_site` | Site where monitoring is performed |
@@ -76,7 +76,7 @@ maximum_value: 40
 - The field is **read-only** — the user cannot type in it
 - `input_point_ids` tells the frontend which other metric fields to watch
 - When ALL input fields have values, the frontend evaluates the formula and auto-fills the result
-- The result is saved to `grow_monitoring_reading.reading` for historical record
+- The result is saved to `grow_monitoring_result.reading` for historical record
 - The frontend must use a safe expression evaluator (e.g. `mathjs`) — never `eval()`
 
 **How admins create formulas:**
@@ -95,7 +95,7 @@ Both approaches store the same `formula` TEXT in the database — the UI method 
 1. Create an `ops_task_tracker` activity with task = "Monitoring"
    - If templates are linked to the "Monitoring" task via `ops_task_template`, they are presented for completion
 2. Select the site — the app loads monitoring points matching `farm_id` + `site.category`
-3. Enter the monitoring station name (free-text `grow_monitoring_reading.monitoring_station`)
+3. Enter the monitoring station name (free-text `grow_monitoring_result.monitoring_station`)
 4. For each monitoring point, enter the reading based on its `response_type`:
    - **Numeric**: user enters a number (e.g. EC, pH, mL, temperature)
    - **Boolean**: user toggles yes/no (e.g. Is Injection)
@@ -113,7 +113,7 @@ Both approaches store the same `formula` TEXT in the database — the UI method 
 ## Notes
 
 - Monitoring snapshots which seedings are present in the site at the time of the event via `grow_task_seed_batch`.
-- Monitoring station is a free-text field on `grow_monitoring_reading.monitoring_station`.
+- Monitoring station is a free-text field on `grow_monitoring_result.monitoring_station`.
 - Each reading row stores the computed result for calculated points, providing a historical record even if the formula changes later.
 - Out-of-range detection is automatic based on the point's thresholds. The frontend can highlight flagged readings.
 

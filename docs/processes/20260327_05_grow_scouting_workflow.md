@@ -12,11 +12,11 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 |-------|---------|
 | `ops_task_tracker` | Activity header — captures org, farm, site, date, start/stop time, notes |
 | `grow_task_seed_batch` | Join table — which seeding batches were inspected |
-| `grow_scout_observation` | Individual pest or disease finding with side, severity, and infection stage |
-| `grow_scout_observation_row` | Rows affected per observation |
+| `grow_scout_result` | Individual pest or disease finding with severity, infection stage, and affected row |
 | `grow_task_photo` | Photos taken during the scouting event with optional captions |
 | `sys_pest` | Standardized pest names (lookup) |
 | `sys_disease` | Standardized disease names (lookup) |
+| `org_site` | Growing rows (category = grow_row) referenced by observation site_id |
 
 ---
 
@@ -24,22 +24,23 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 
 1. Create an `ops_task_tracker` activity with task = "Scouting" (captures farm, site, date, start/stop time)
    - If templates are linked to the "Scouting" task via `ops_task_template`, they are presented for completion
-2. Link the seeding batches being inspected via `grow_task_seed_batch` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
-3. For each pest or disease found, create a `grow_scout_observation` record:
+2. App snapshots active seeding batches present in the site via `grow_task_seed_batch` (batches with status `transplanted` or `harvesting`) — this records which batches were in the site at the time of scouting
+3. For each pest or disease found, create a `grow_scout_result` record:
    - Set `observation_type` to `pest` or `disease`
    - Select the pest (`sys_pest_id`) or disease (`sys_disease_id`) from the lookup — enforced by CHECK constraint
-   - Enter which side of the site (e.g. East, West)
+   - Select the specific growing row (`site_id` referencing org_site where category = grow_row)
    - Set severity level (`low`, `moderate`, `high`, `severe`)
    - For diseases, set infection stage (`early`, `mid`, `late`, `advanced`)
-4. For each observation, log which rows are affected via `grow_scout_observation_row` (one row per growing row number)
-5. Upload photos via `grow_task_photo` linked to the activity (one row per photo with optional caption)
+   - If the same pest/disease is found in multiple rows, create one observation per row
+4. Upload photos via `grow_task_photo` linked to the activity (one row per photo with optional caption)
 
 ---
 
 ## Notes
 
 - There is no separate scouting header table. The `ops_task_tracker` serves as the header since scouting has no additional header-level business fields beyond what the tracker already captures.
-- A single observation (e.g. "aphids, high severity") can affect multiple rows — the `grow_scout_observation_row` table captures this one-to-many relationship.
+- Growing rows are `org_site` children (category = `grow_row`) under the parent growing site. Each observation references one row — multiple affected rows = multiple observation records.
+- Seed batch association is at the activity level via `grow_task_seed_batch`, not on individual observations. This snapshots which batches were present during the scouting event.
 - Photos are stored as individual rows (not JSONB) because each photo can have its own caption.
 
 ---
@@ -49,13 +50,12 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 ```mermaid
 flowchart TD
     A[Create ops_task_tracker\nTask = Scouting] --> B[Link seeding batches\nvia grow_task_seed_batch]
-    B --> C[Add observation:\ngrow_scout_observation]
+    B --> C[Add observation:\ngrow_scout_result]
     C --> D{Pest or Disease?}
-    D -->|Pest| E[Select sys_pest + severity + side]
-    D -->|Disease| F[Select sys_disease + severity\n+ side + infection stage]
-    E --> G[Log affected rows\nvia grow_scout_observation_row]
+    D -->|Pest| E[Select sys_pest + row + severity]
+    D -->|Disease| F[Select sys_disease + row\n+ severity + infection stage]
+    E --> G{More observations?}
     F --> G
-    G --> H{More observations?}
-    H -->|Yes| C
-    H -->|No| I[Upload photos\nvia grow_task_photo]
+    G -->|Yes| C
+    G -->|No| H[Upload photos\nvia grow_task_photo]
 ```

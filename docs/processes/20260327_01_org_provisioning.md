@@ -100,7 +100,7 @@ Default tasks:
 | fertigation | Fertigation | Required by grow_fertigation_workflow |
 | monitoring | Monitoring | Required by grow_monitoring_workflow |
 | packing | Packing | Required by pack_productivity_workflow |
-| pest_trap_inspection | Pest Trap Inspection | Required by fsafe_pest_trap_inspection |
+| pest_trap_inspection | Pest Trap Inspection | Required by fsafe_pest_result |
 
 ---
 

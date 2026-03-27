@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS grow_scout_observation (
+CREATE TABLE IF NOT EXISTS grow_scout_result (
     id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                  TEXT NOT NULL REFERENCES org(id),
     farm_id                 TEXT NOT NULL REFERENCES org_farm(id),
@@ -15,19 +15,19 @@ CREATE TABLE IF NOT EXISTS grow_scout_observation (
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by              TEXT,
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
-    CONSTRAINT chk_grow_scout_observation_type CHECK (
+    CONSTRAINT chk_grow_scout_result_type CHECK (
         (observation_type = 'pest' AND sys_pest_id IS NOT NULL AND sys_disease_id IS NULL)
         OR (observation_type = 'disease' AND sys_disease_id IS NOT NULL AND sys_pest_id IS NULL)
     )
 );
 
-COMMENT ON TABLE grow_scout_observation IS 'Individual pest or disease finding within a scouting event. Either a pest or disease, enforced by CHECK constraint.';
+COMMENT ON TABLE grow_scout_result IS 'Individual pest or disease finding within a scouting event. Either a pest or disease, enforced by CHECK constraint.';
 
-COMMENT ON COLUMN grow_scout_observation.site_id IS 'The specific growing row (org_site where category = grow_row); one observation per row per pest/disease';
-COMMENT ON COLUMN grow_scout_observation.observation_type IS 'pest, disease';
-COMMENT ON COLUMN grow_scout_observation.sys_pest_id IS 'Shown when observation_type is pest; null when disease';
-COMMENT ON COLUMN grow_scout_observation.sys_disease_id IS 'Shown when observation_type is disease; null when pest';
-COMMENT ON COLUMN grow_scout_observation.disease_infection_stage IS 'early, mid, late, advanced; shown when observation_type is disease; null when pest';
-COMMENT ON COLUMN grow_scout_observation.severity_level IS 'low, moderate, high, severe';
+COMMENT ON COLUMN grow_scout_result.site_id IS 'The specific growing row (org_site where category = grow_row); one observation per row per pest/disease';
+COMMENT ON COLUMN grow_scout_result.observation_type IS 'pest, disease';
+COMMENT ON COLUMN grow_scout_result.sys_pest_id IS 'Shown when observation_type is pest; null when disease';
+COMMENT ON COLUMN grow_scout_result.sys_disease_id IS 'Shown when observation_type is disease; null when pest';
+COMMENT ON COLUMN grow_scout_result.disease_infection_stage IS 'early, mid, late, advanced; shown when observation_type is disease; null when pest';
+COMMENT ON COLUMN grow_scout_result.severity_level IS 'low, moderate, high, severe';
 
-CREATE INDEX idx_grow_scout_observation_scouting ON grow_scout_observation (ops_task_tracker_id);
+CREATE INDEX idx_grow_scout_result_scouting ON grow_scout_result (ops_task_tracker_id);
