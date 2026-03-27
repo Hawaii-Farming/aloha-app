@@ -54,6 +54,7 @@ Default categories and subcategories:
 | packing | cold_storage |
 | housing | *(top-level)* |
 | food_safety | *(top-level)* |
+| grow_row | *(top-level)* |
 | pest_trap | *(top-level)* |
 | room | *(top-level)* |
 | infrastructure | *(top-level)* |

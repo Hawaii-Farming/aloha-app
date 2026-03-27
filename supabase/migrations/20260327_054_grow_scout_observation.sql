@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS grow_scout_observation (
     org_id                  TEXT NOT NULL REFERENCES org(id),
     farm_id                 TEXT NOT NULL REFERENCES org_farm(id),
     ops_task_tracker_id        UUID NOT NULL REFERENCES ops_task_tracker(id),
+    site_id                 TEXT REFERENCES org_site(id),
     observation_type        TEXT NOT NULL CHECK (observation_type IN ('pest', 'disease')),
     sys_pest_id            TEXT REFERENCES sys_pest(id),
     sys_disease_id         TEXT REFERENCES sys_disease(id),
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS grow_scout_observation (
 
 COMMENT ON TABLE grow_scout_observation IS 'Individual pest or disease finding within a scouting event. Either a pest or disease, enforced by CHECK constraint.';
 
+COMMENT ON COLUMN grow_scout_observation.site_id IS 'The specific growing row (org_site where category = grow_row); one observation per row per pest/disease';
 COMMENT ON COLUMN grow_scout_observation.observation_type IS 'pest, disease';
 COMMENT ON COLUMN grow_scout_observation.sys_pest_id IS 'Shown when observation_type is pest; null when disease';
 COMMENT ON COLUMN grow_scout_observation.sys_disease_id IS 'Shown when observation_type is disease; null when pest';
