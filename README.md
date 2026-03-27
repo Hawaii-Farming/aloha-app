@@ -83,7 +83,7 @@ aloha-app/
 - **ops_task** — Flat task catalog for labor tracking with name and description (TEXT PK)
 - **ops_task_tracker** — Header record for a task event with task, farm, site, date, start/stop times, and verification status. Site is stored directly on the tracker.
 - **ops_task_schedule** — Employees per task event with individual start/stop times (overridable from tracker)
-- **ops_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
+- **ops_task_weekly_schedule** (view) — Pivoted weekly schedule with Sun–Sat time columns, total hours, and OT threshold flag derived from each employee's bi-weekly `overtime_threshold`
 - **ops_training_type** — Org-specific training type lookup (e.g. GMP, Food Safety, HACCP). TEXT PK derived from name.
 - **ops_training** — Staff training session records with type, date, topics, trainer names, and materials
 - **ops_training_attendee** — Per-employee attendance and certification records for each training session
