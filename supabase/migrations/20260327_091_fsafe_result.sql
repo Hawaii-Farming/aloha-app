@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS fsafe_result (
     is_deleted      BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE fsafe_result IS 'Unified food safety test results table. Stores both EMP results (site_id set, fsafe_test_hold_id null) and test-and-hold results (fsafe_test_hold_id set). Retests and vector tests link back to the original via fsafe_result_id_original.';
+COMMENT ON TABLE fsafe_result IS 'Unified food safety test results table. Result type is derived from existing fields: EMP (site_id set, fsafe_test_hold_id null, zone != water), Test-and-Hold (fsafe_test_hold_id set), Water (site_id set, zone = water). Retests and vector tests link back to the original via fsafe_result_id_original.';
 
 CREATE INDEX idx_fsafe_result_org       ON fsafe_result (org_id);
 CREATE INDEX idx_fsafe_result_lab       ON fsafe_result (fsafe_lab_id);
