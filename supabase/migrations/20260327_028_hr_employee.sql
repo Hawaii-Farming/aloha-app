@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     email                        TEXT,
     company_email                TEXT,
     user_id                      UUID REFERENCES auth.users(id),
+    is_primary_org               BOOLEAN NOT NULL DEFAULT false,
 
     -- =============================================
     -- ORGANISATION & ROLE
@@ -77,6 +78,7 @@ CREATE INDEX idx_hr_employee_team_lead  ON hr_employee (team_lead_id);
 CREATE INDEX idx_hr_employee_department ON hr_employee (hr_department_id);
 CREATE INDEX idx_hr_employee_title      ON hr_employee (hr_title_id);
 
+COMMENT ON COLUMN hr_employee.is_primary_org IS 'When user belongs to multiple orgs, the primary org auto-loads on login; only one row per user_id should be true';
 COMMENT ON COLUMN hr_employee.team_lead_id IS 'Filtered to employees with sys_access_level_id = team_lead';
 COMMENT ON COLUMN hr_employee.compensation_manager_id IS 'Filtered to employees with sys_access_level_id = manager';
 COMMENT ON COLUMN hr_employee.sys_access_level_id IS 'Sourced from sys_access_level; determines the employee role and module visibility';

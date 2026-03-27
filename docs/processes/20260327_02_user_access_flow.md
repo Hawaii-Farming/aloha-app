@@ -24,7 +24,7 @@ This system combines three distinct access control mechanisms:
 |-------|------|---------|
 | `org_module` | Org | Org-scoped module toggles with custom display name and order |
 | `org_sub_module` | Org | Org-scoped sub-module toggles with custom display name, order, and access level |
-| `hr_employee` | HR | Employee record with `sys_access_level_id` and `user_id` for auth |
+| `hr_employee` | HR | Employee record with `sys_access_level_id`, `user_id` for auth, and `is_primary_org` for default org on login |
 | `hr_module_access` | HR | Maps employee to modules with permissions (`is_enabled`, `can_edit`, `can_delete`, `can_verify`) |
 | `auth.users` | Auth | Supabase Auth — handles login credentials and session |
 
@@ -38,7 +38,9 @@ The user logs in via Supabase Auth (email/password or Single Sign-On (SSO)). Thi
 
 ### Step 2 — Organization Selection
 
-The system looks up all `hr_employee` records linked to the user's `auth.users.id`. If the user belongs to multiple organizations, they are presented with an **organization selector** to choose which organization they want to work in. If they belong to only one organization, this step is skipped.
+The system looks up all `hr_employee` records linked to the user's `auth.users.id`.
+
+The org where `hr_employee.is_primary_org = true` is auto-loaded. For single-org users, their only record has `is_primary_org = true` by default. For multi-org users, one record is always marked as primary. The user can switch to other orgs from the menu at any time.
 
 The selected `org_id` is stored in the user's session for the duration of their login. All subsequent data queries are filtered by this organization.
 
@@ -100,14 +102,13 @@ At any point during their session, the user can switch to a different organizati
 
 ```mermaid
 flowchart TD
-    A[Employee Logs In via Supabase Auth] --> B{Multiple Orgs?}
-    B -->|Yes| C[Select Organization]
-    B -->|No| D[Auto-Select Org]
-    C --> E[Build Menu]
-    D --> E
-    E --> E1[1. Org Filter: org_module.is_enabled = true]
-    E1 --> E2[2. Employee Filter: hr_module_access.is_enabled = true]
-    E2 --> E3[3. Access Level Filter: employee level ≥ sub-module level]
-    E3 --> F[Employee Sees Permitted Modules & Sub-Modules]
-    F --> G[Actions Governed by is_enabled, can_edit, can_delete, can_verify]
+    A[Employee Logs In via Supabase Auth] --> B[Auto-Load Primary Org\nis_primary_org = true]
+    B --> C[Build Menu]
+    C --> C1[1. Org Filter: org_module.is_enabled = true]
+    C1 --> C2[2. Employee Filter: hr_module_access.is_enabled = true]
+    C2 --> C3[3. Access Level Filter: employee level ≥ sub-module level]
+    C3 --> D[Employee Sees Permitted Modules & Sub-Modules]
+    D --> E[Actions Governed by is_enabled, can_edit, can_delete, can_verify]
+    D --> F{Switch Org?}
+    F -->|Yes| B
 ```

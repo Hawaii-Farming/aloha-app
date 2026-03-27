@@ -15,8 +15,8 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 | `grow_scout_observation` | Individual pest or disease finding with side, severity, and infection stage |
 | `grow_scout_observation_row` | Rows affected per observation |
 | `grow_task_photo` | Photos taken during the scouting event with optional captions |
-| `grow_pest` | Standardized pest names (lookup) |
-| `grow_disease` | Standardized disease names (lookup) |
+| `sys_pest` | Standardized pest names (lookup) |
+| `sys_disease` | Standardized disease names (lookup) |
 
 ---
 
@@ -27,7 +27,7 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 2. Link the seeding batches being inspected via `grow_task_seed_batch` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
 3. For each pest or disease found, create a `grow_scout_observation` record:
    - Set `observation_type` to `pest` or `disease`
-   - Select the pest (`grow_pest_id`) or disease (`grow_disease_id`) from the lookup — enforced by CHECK constraint
+   - Select the pest (`sys_pest_id`) or disease (`sys_disease_id`) from the lookup — enforced by CHECK constraint
    - Enter which side of the site (e.g. East, West)
    - Set severity level (`low`, `moderate`, `high`, `severe`)
    - For diseases, set infection stage (`early`, `mid`, `late`, `advanced`)
@@ -51,8 +51,8 @@ flowchart TD
     A[Create ops_task_tracker\nTask = Scouting] --> B[Link seeding batches\nvia grow_task_seed_batch]
     B --> C[Add observation:\ngrow_scout_observation]
     C --> D{Pest or Disease?}
-    D -->|Pest| E[Select grow_pest + severity + side]
-    D -->|Disease| F[Select grow_disease + severity\n+ side + infection stage]
+    D -->|Pest| E[Select sys_pest + severity + side]
+    D -->|Disease| F[Select sys_disease + severity\n+ side + infection stage]
     E --> G[Log affected rows\nvia grow_scout_observation_row]
     F --> G
     G --> H{More observations?}
