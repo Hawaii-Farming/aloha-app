@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS ops_template (
     farm_id                     TEXT        REFERENCES org_farm(id),
 
     name                        TEXT        NOT NULL,
-    ops_template_category_id    TEXT        REFERENCES ops_template_category(id),
+    org_module_id               TEXT        REFERENCES org_module(id),
     description                 TEXT,
 
     atp_site_count              INTEGER,
