@@ -15,6 +15,7 @@ This document describes the harvesting activity flow using `ops_task_tracker` di
 | `grow_harvest_container` | Container definitions with tare weight (per variety/grade) |
 | `grow_seed_batch` | Source batch being harvested (traceability link) |
 | `grow_grade` | Harvest quality grade assignment |
+| `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---
 
@@ -22,7 +23,8 @@ This document describes the harvesting activity flow using `ops_task_tracker` di
 
 1. Create an `ops_task_tracker` activity with task = "Harvesting"
    - If templates are linked to the "Harvesting" task via `ops_task_template`, they are presented for completion
-2. For each weigh-in, create a `grow_harvest_weight` record:
+2. Assign employees working on this harvesting via `ops_task_schedule` (one row per employee)
+3. For each weigh-in, create a `grow_harvest_weight` record:
    - Select the seeding batch (`grow_seed_batch_id`) — only batches with status `transplanted` or `harvesting` are available
    - Optionally assign a harvest grade (`grow_grade_id`)
    - Enter the harvest date
@@ -30,7 +32,7 @@ This document describes the harvesting activity flow using `ops_task_tracker` di
    - Enter number of containers and gross weight
    - Tare weight is calculated on the fly from `grow_harvest_container.tare_weight × number_of_containers`
    - Net weight = gross weight minus calculated tare
-3. Multiple weigh-ins per harvest are supported (e.g. 20 totes + 2 pallets)
+4. Multiple weigh-ins per harvest are supported (e.g. 20 totes + 2 pallets)
 
 ---
 
@@ -46,7 +48,8 @@ This document describes the harvesting activity flow using `ops_task_tracker` di
 
 ```mermaid
 flowchart TD
-    A[Create ops_task_tracker\nTask = Harvesting] --> B[Add weigh-in:\ngrow_harvest_weight]
+    A[Create ops_task_tracker\nTask = Harvesting] --> A1[Assign employees\nvia ops_task_schedule]
+    A1 --> B[Add weigh-in:\ngrow_harvest_weight]
     B --> C[Select grow_seed_batch\nfor traceability]
     C --> D[Assign grow_grade + harvest date]
     D --> E[Select container type]

@@ -16,6 +16,7 @@ This document describes the environmental monitoring activity flow using `ops_ta
 | `grow_task_seed_batch` | Snapshot of seedings present during the event |
 | `grow_task_photo` | Photos taken during monitoring with optional caption |
 | `org_site` | Site where monitoring is performed |
+| `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---
 
@@ -94,14 +95,15 @@ Both approaches store the same `formula` TEXT in the database — the UI method 
 
 1. Create an `ops_task_tracker` activity with task = "Monitoring"
    - If templates are linked to the "Monitoring" task via `ops_task_template`, they are presented for completion
-2. Select the site — the app loads monitoring points matching `farm_id` + `site.category`
-3. Enter the monitoring station name (free-text `grow_monitoring_result.monitoring_station`)
-4. For each monitoring point, enter the reading based on its `response_type`:
+2. Assign employees working on this monitoring via `ops_task_schedule` (one row per employee)
+3. Select the site — the app loads monitoring points matching `farm_id` + `site.category`
+4. Enter the monitoring station name (free-text `grow_monitoring_result.monitoring_station`)
+5. For each monitoring point, enter the reading based on its `response_type`:
    - **Numeric**: user enters a number (e.g. EC, pH, mL, temperature)
    - **Boolean**: user toggles yes/no (e.g. Is Injection)
    - **Enum**: user selects from dropdown populated by `enum_options` (e.g. Substrate type)
    - **Calculated points**: app computes the value from the formula once all input readings are entered (read-only field)
-5. The app auto-flags `is_out_of_range = true` when:
+6. The app auto-flags `is_out_of_range = true` when:
    - **Numeric**: reading is below `minimum_value` or above `maximum_value`
    - **Enum**: selected value is not in `enum_pass_options`
 7. App snapshots active seedings in the site via `grow_task_seed_batch` (`status IN ('transplanted', 'harvesting')`)
@@ -123,7 +125,8 @@ Both approaches store the same `formula` TEXT in the database — the UI method 
 
 ```mermaid
 flowchart TD
-    A[Create ops_task_tracker\nTask = Monitoring] --> B[Select site]
+    A[Create ops_task_tracker\nTask = Monitoring] --> A1[Assign employees\nvia ops_task_schedule]
+    A1 --> B[Select site]
     B --> C[App loads monitoring points\nfor farm + site category]
     C --> D[Enter monitoring station name]
     D --> E[Enter readings per point]

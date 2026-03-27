@@ -16,20 +16,22 @@ This document describes how pack line productivity is tracked hourly, including 
 | `pack_productivity_hour_fail` | Fail counts per category per hour |
 | `pack_fail_category` | Lookup — defines available fail categories |
 | `sales_product` | Referenced for derived metrics (pack_per_case, case_net_weight) |
+| `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---
 
 ## Flow
 
 1. **Create the activity** — user creates an `ops_task_tracker` with task = "Packing", selects the farm and start time
-2. **Log each hour** — for every clock hour during the packing session:
+2. **Assign employees** working on this packing session via `ops_task_schedule` (one row per employee)
+3. **Log each hour** — for every clock hour during the packing session:
    - Enter crew counts: catchers, packers, mixers, boxers
    - For each product packed that hour, enter the number of cases packed (delta — just this hour, not cumulative)
    - For each product, optionally enter leftover pounds
    - For each fail that occurred, select the fail category and enter the count
    - Toggle metal detected if applicable
    - Add notes (e.g. "Start LW at 10:20", "Fixing Proseal at 2:20-2:30")
-3. **Complete the activity** — enter stop time, mark as complete
+4. **Complete the activity** — enter stop time, mark as complete
 
 ---
 
@@ -57,7 +59,8 @@ The "Packing" task should be provisioned as a pre-seeded task during org onboard
 
 ```mermaid
 flowchart TD
-    A[Create ops_task_tracker\nTask = Packing] --> B[Start packing session]
+    A[Create ops_task_tracker\nTask = Packing] --> A1[Assign employees\nvia ops_task_schedule]
+    A1 --> B[Start packing session]
     B --> C[New clock hour]
     C --> D[Enter crew counts\ncatchers, packers, mixers, boxers]
     D --> E[For each product packed:\nenter cases_packed delta]

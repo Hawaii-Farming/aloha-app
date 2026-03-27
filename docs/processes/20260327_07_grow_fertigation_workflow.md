@@ -16,6 +16,7 @@ This document describes the fertigation activity flow using `ops_task_tracker` d
 | `grow_fertigation_recipe_site` | Sites that receive this recipe (configuration) |
 | `grow_task_seed_batch` | Snapshot — which seedings were fertigated on this event + recipe link |
 | `grow_fertigation` | Tanks used with volume applied per tank |
+| `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---
 
@@ -57,14 +58,15 @@ Each activity records its own seedings snapshot, tank volumes, and timing indepe
 
 1. Create an `ops_task_tracker` activity with task = "Fertigation"
    - If templates are linked to the "Fertigation" task via `ops_task_template`, they are presented for completion
-2. Select the recipe (`grow_fertigation_recipe`)
-3. App pre-fills sites from `grow_fertigation_recipe_site`
-4. App looks up active seedings in those sites (`grow_seed_batch.status IN ('transplanted', 'harvesting')`)
-5. User confirms — seedings are recorded in `grow_task_seed_batch` as a point-in-time snapshot
-6. For each tank used, create a `grow_fertigation` record:
+2. Assign employees working on this fertigation via `ops_task_schedule` (one row per employee)
+3. Select the recipe (`grow_fertigation_recipe`)
+4. App pre-fills sites from `grow_fertigation_recipe_site`
+5. App looks up active seedings in those sites (`grow_seed_batch.status IN ('transplanted', 'harvesting')`)
+6. User confirms — seedings are recorded in `grow_task_seed_batch` as a point-in-time snapshot
+7. For each tank used, create a `grow_fertigation` record:
    - Select the equipment (`equipment_id`)
    - Enter volume UOM and quantity applied
-7. Complete the activity (stop time)
+8. Complete the activity (stop time)
 
 ---
 
@@ -93,7 +95,8 @@ WHERE ops_task_tracker_id = ?
 
 ```mermaid
 flowchart TD
-    A[Create ops_task_tracker\nTask = Fertigation] --> B[Select grow_fertigation_recipe]
+    A[Create ops_task_tracker\nTask = Fertigation] --> A1[Assign employees\nvia ops_task_schedule]
+    A1 --> B[Select grow_fertigation_recipe]
     B --> C[App pre-fills sites from\ngrow_fertigation_recipe_site]
     C --> D[App looks up active seedings\nin those sites]
     D --> E[User confirms seedings\n→ grow_task_seed_batch snapshot]

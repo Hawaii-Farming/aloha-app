@@ -20,20 +20,22 @@ This document describes the spraying activity flow using `ops_task_tracker` dire
 | `grow_spray_restriction` (view) | Derived daily NE/NH restriction calendar per site from completed spray events |
 | `invnt_item` | The chemical or fertilizer product |
 | `org_equipment` | The spraying equipment (e.g. foggers) |
+| `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---
 
 ## Flow
 
 1. Create an `ops_task_tracker` activity with task = "Spraying" (captures farm, site, date, start/stop time)
-2. If templates are linked to the "Spraying" task via `ops_task_template`, the app presents them for completion (e.g. pre-spray safety checklist) — responses are recorded via `ops_template_response`
-3. Link the seeding batches being treated via `grow_task_seed_batch` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
-4. For each chemical or fertilizer applied, create a `grow_spray_input` record:
+2. Assign employees working on this spraying via `ops_task_schedule` (one row per employee)
+3. If templates are linked to the "Spraying" task via `ops_task_template`, the app presents them for completion (e.g. pre-spray safety checklist) — responses are recorded via `ops_template_response`
+4. Link the seeding batches being treated via `grow_task_seed_batch` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
+5. For each chemical or fertilizer applied, create a `grow_spray_input` record:
    - Select from the active compliance records (`grow_spray_compliance_id`) — only compliant products are available (filtered by `effective_date <= today` and `expiration_date IS NULL OR >= today`)
    - The inventory item is derived from the compliance record (no separate item selection)
    - Enter the target pest/disease, application UOM, and quantity applied
    - The app enforces that `application_quantity` does not exceed the compliance record's `maximum_quantity_per_acre`
-5. For each piece of equipment used, create a `grow_spray_equipment` record:
+6. For each piece of equipment used, create a `grow_spray_equipment` record:
    - Select the equipment (`equipment_id`)
    - Enter water UOM and quantity
 
@@ -89,7 +91,8 @@ The frontend can display these restrictions on a calendar or block harvesting/en
 
 ```mermaid
 flowchart TD
-    A[Create ops_task_tracker\nTask = Spraying] --> B[Fill pre-spray checklist\nvia ops_template + ops_template_response]
+    A[Create ops_task_tracker\nTask = Spraying] --> A1[Assign employees\nvia ops_task_schedule]
+    A1 --> B[Fill pre-spray checklist\nvia ops_template + ops_template_response]
     B --> C[Link seeding batches\nvia grow_task_seed_batch]
     C --> D[Add input:\ngrow_spray_input]
     D --> D1[Select chemical + compliance record]

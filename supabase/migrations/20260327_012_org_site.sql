@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS org_site (
 
     -- Growing site details (shown when category = growing)
     acres                   NUMERIC,
+    monitoring_stations     JSONB NOT NULL DEFAULT '[]',
 
     -- Food safety details (shown for food safety child sites)
     zone                    TEXT CHECK (zone IN ('zone_1', 'zone_2', 'zone_3', 'zone_4', 'water')),
@@ -35,6 +36,7 @@ CREATE INDEX idx_org_site_category ON org_site (org_site_category_id);
 CREATE INDEX idx_org_site_parent ON org_site (site_id_parent);
 
 COMMENT ON COLUMN org_site.farm_id IS 'Inherited from parent org_farm when site is farm-scoped; null for org-wide sites';
+COMMENT ON COLUMN org_site.monitoring_stations IS 'JSON array of station names for monitoring; rendered as dropdown in grow_monitoring_result.monitoring_station';
 COMMENT ON COLUMN org_site.org_site_category_id IS 'References org_site_category rows where sub_category_name IS NULL';
 COMMENT ON COLUMN org_site.org_site_subcategory_id IS 'References org_site_category rows where sub_category_name IS NOT NULL';
 COMMENT ON COLUMN org_site.site_id_parent IS 'Null for top-level sites; set for child locations within a parent site (e.g. food safety surfaces, pest traps, housing rooms)';
