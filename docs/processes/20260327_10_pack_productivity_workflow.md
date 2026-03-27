@@ -2,7 +2,7 @@
 
 This document describes how pack line productivity is tracked hourly, including crew assignments, product output, and fail tracking.
 
-> **Prerequisite:** The "Packing" task must be provisioned in `ops_task`. Fail categories must be configured in `pack_fail_category`. See [01_org_provisioning.md](20260326_01_org_provisioning.md).
+> **Prerequisite:** The "Packing" task must be provisioned in `ops_task`. Fail categories must be configured in `pack_fail_category`. See [01_org_provisioning.md](20260327_01_org_provisioning.md).
 
 ---
 
