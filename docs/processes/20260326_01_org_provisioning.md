@@ -11,9 +11,10 @@ Steps must be executed in this order due to FK dependencies:
 1. Create `org` record
 2. Copy system modules → `org_module`
 3. Copy system sub-modules → `org_sub_module`
-4. Create admin `hr_employee` record (manual)
-5. Copy org modules → `hr_module_access` for admin
-6. Seed default `ops_task` records
+4. Seed default site categories → `org_site_category`
+5. Create admin `hr_employee` record (manual)
+6. Copy org modules → `hr_module_access` for admin
+7. Seed default `ops_task` records
 
 ---
 
@@ -34,7 +35,41 @@ Steps must be executed in this order due to FK dependencies:
 
 ---
 
-## 4. Admin Employee
+## 4. Default Site Categories
+
+| Target | Source | Notes |
+|--------|--------|-------|
+| `org_site_category` | Hardcoded seed data | Two-level hierarchy for classifying sites |
+
+Default categories and subcategories:
+
+| category_name | sub_category_name |
+|---|---|
+| growing | *(top-level)* |
+| growing | greenhouse |
+| growing | nursery |
+| growing | pond |
+| packing | *(top-level)* |
+| packing | packroom |
+| packing | cold_storage |
+| housing | *(top-level)* |
+| housing | house |
+| housing | duplex |
+| housing | ohana |
+| food_safety | *(top-level)* |
+| pest_trap | *(top-level)* |
+| room | *(top-level)* |
+| infrastructure | *(top-level)* |
+| infrastructure | water_system |
+| infrastructure | fert_station |
+| infrastructure | weather_station |
+| storage | *(top-level)* |
+| storage | warehouse |
+| storage | chemical_storage |
+
+---
+
+## 5. Admin Employee
 
 | Target | Source | Notes |
 |--------|--------|-------|
@@ -42,7 +77,7 @@ Steps must be executed in this order due to FK dependencies:
 
 ---
 
-## 5. Admin Module Access
+## 6. Admin Module Access
 
 | Target | Source | Notes |
 |--------|--------|-------|
@@ -50,7 +85,7 @@ Steps must be executed in this order due to FK dependencies:
 
 ---
 
-## 6. Default Operations Tasks
+## 7. Default Operations Tasks
 
 | Target | Source | Notes |
 |--------|--------|-------|
@@ -69,7 +104,7 @@ Default tasks:
 
 ---
 
-## 7. New Employee Provisioning
+## 8. New Employee Provisioning
 
 When a new employee is added with a `user_id` (app access):
 
@@ -79,7 +114,7 @@ When a new employee is added with a `user_id` (app access):
 
 ---
 
-## 8. Future Provisions
+## 9. Future Provisions
 
 As the system grows, additional seed data may be required:
 

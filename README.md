@@ -42,13 +42,14 @@ aloha-app/
 - **sys_module** — Master list of application modules for access control
 - **sys_sub_module** — Master list of sub-modules within each module with minimum access level requirements
 
-## Organization Module (7 tables) — [Docs](docs/schemas/20260326_02_org.md)
+## Organization Module (8 tables) — [Docs](docs/schemas/20260326_02_org.md)
 
 - **org** — Root entity for multi-org support with currency setting
 - **org_module** — Org-scoped module toggles with custom display names and ordering
 - **org_sub_module** — Org-scoped sub-module toggles with custom display names, ordering, and access levels
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
-- **org_site** — Unified site register for all locations and assets (growing, packaging, storage, maintenance) with category/subcategory-driven fields
+- **org_site_category** — Two-level site category hierarchy (e.g. growing → greenhouse, packing → packroom, housing → duplex)
+- **org_site** — Unified site register with parent-child hierarchy for all locations (growing, packing, housing, food safety, pest traps, rooms)
 - **org_equipment** — Equipment register for physical assets; farm-level or shared, with current/previous employee assignment
 - **org_business_rule** — Org-scoped registry for business rules, workflows, calculations, requirements, and definitions
 
@@ -176,9 +177,6 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Food Safety Schema](docs/schemas/20260326_10_fsafe.md) — EMP testing, lab management, and test-and-hold
 - [Future Improvements](docs/schemas/20260326_11_future.md) — Deferred features
 
-## Pending Review
-
-- **org_site** — Grow site fields need review; current table has basic fields (acres, total_rows, avg_units_per_row) but may need additional grow-specific columns (e.g. water system type, capacity, environmental sensor config)
 
 ## Process Documentation
 

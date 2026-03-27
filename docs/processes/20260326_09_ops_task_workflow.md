@@ -152,7 +152,7 @@ flowchart TD
 
     E --> F{Any template has\natp_site_count > 0?}
     F -- No --> G[Standard checklist\nquestions only]
-    F -- Yes --> H[Randomly select N sites\nWHERE is_food_contact_surface = true\nAdd RLU input fields]
+    F -- Yes --> H[Randomly select N sites\nWHERE zone = zone_1\nAdd RLU input fields]
 
     G --> I[Employee fills in checklist\nand activity fields in any order\nStart time required before save]
     H --> I
