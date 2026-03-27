@@ -176,6 +176,10 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Food Safety Schema](docs/schemas/20260326_10_fsafe.md) — EMP testing, lab management, and test-and-hold
 - [Future Improvements](docs/schemas/20260326_11_future.md) — Deferred features
 
+## Pending Review
+
+- **org_site** — Grow site fields need review; current table has basic fields (acres, total_rows, avg_units_per_row) but may need additional grow-specific columns (e.g. water system type, capacity, environmental sensor config)
+
 ## Process Documentation
 
 Workflow and business process documentation with flow diagrams:
