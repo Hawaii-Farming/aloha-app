@@ -14,7 +14,8 @@ This document describes how checklist templates are filled out during any task a
 | `ops_task_tracker` | Activity header — one per event; links task, site, farm, and timing |
 | `ops_task_template` | Many-to-many link between tasks and templates; determines which checklists auto-load |
 | `ops_task_schedule` | Employees assigned to the activity with individual start/stop times |
-| `ops_template` | Checklist template definition; holds ATP site count and RLU thresholds |
+| `ops_template` | Checklist template definition with module assignment |
+| `fsafe_lab_test` | Test definitions including ATP configuration (atp_site_count, RLU thresholds) |
 | `ops_template_question` | Individual checklist questions within a template |
 | `ops_template_response` | All responses for an activity — both checklist answers and ATP readings |
 | `ops_corrective_action_choice` | Predefined corrective action options |
@@ -66,11 +67,11 @@ Each question carries its pass criteria. When a response fails, a corrective act
 
 ### 5. ATP Surface Testing (When Required)
 
-Some templates require ATP surface testing. This is configured on the template via `atp_site_count` and RLU thresholds.
+ATP testing is configured on `fsafe_lab_test` via `atp_site_count` and RLU thresholds (`minimum_value`, `maximum_value`).
 
-When `ops_template.atp_site_count > 0`, the system randomly selects that many sites where `zone = 'zone_1'` (food contact surfaces) within the farm and adds a numeric RLU input field for each one. The employee swabs each surface and enters the RLU reading.
+When an ATP test is linked to the activity, the system randomly selects `atp_site_count` sites where `zone = 'zone_1'` (food contact surfaces) within the farm and adds a numeric RLU input field for each one. The employee swabs each surface and enters the RLU reading.
 
-Pass/fail is evaluated against `ops_template.minimum_rlu_value` and `ops_template.maximum_rlu_value`.
+Pass/fail is evaluated against the `fsafe_lab_test` thresholds. Results are stored in `fsafe_result` linked to the `ops_task_tracker`.
 
 > **Note:** ATP readings are stored in `ops_template_response` with `site_id` populated and `ops_template_question_id = null`. Standard checklist rows are the inverse — `ops_template_question_id` populated, `site_id` null.
 

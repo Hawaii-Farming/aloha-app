@@ -7,10 +7,6 @@ CREATE TABLE IF NOT EXISTS ops_template (
     org_module_id               TEXT        REFERENCES org_module(id),
     description                 TEXT,
 
-    atp_site_count              INTEGER,
-    minimum_rlu_value   NUMERIC,
-    maximum_rlu_value   NUMERIC,
-
     display_order               INTEGER     NOT NULL DEFAULT 0,
 
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -28,6 +24,3 @@ CREATE INDEX idx_ops_template_org_id ON ops_template (org_id);
 CREATE UNIQUE INDEX uq_ops_template_org_level  ON ops_template (org_id, name) WHERE farm_id IS NULL;
 CREATE UNIQUE INDEX uq_ops_template_farm_level ON ops_template (org_id, farm_id, name) WHERE farm_id IS NOT NULL;
 
-COMMENT ON COLUMN ops_template.atp_site_count IS 'Number of sites to randomly select for ATP testing; null means no ATP testing for this template';
-COMMENT ON COLUMN ops_template.minimum_rlu_value IS 'Minimum acceptable RLU value for ATP tests on this template; results below this are a fail';
-COMMENT ON COLUMN ops_template.maximum_rlu_value IS 'Maximum acceptable RLU value for ATP tests on this template; results above this are a fail';

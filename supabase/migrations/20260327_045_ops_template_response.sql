@@ -32,4 +32,4 @@ CREATE UNIQUE INDEX uq_ops_template_response_atp      ON ops_template_response (
 COMMENT ON COLUMN ops_template_response.farm_id IS 'Inherited from ops_task_tracker.farm_id when response is created';
 COMMENT ON COLUMN ops_template_response.ops_template_id IS 'Sourced from ops_task_template; identifies which template this response belongs to';
 COMMENT ON COLUMN ops_template_response.ops_template_question_id IS 'Sourced from ops_template_question; null for ATP surface test results';
-COMMENT ON COLUMN ops_template_response.site_id IS 'Sourced from ops_template.atp_site_count random selection; null for standard checklist responses';
+COMMENT ON COLUMN ops_template_response.site_id IS 'Sourced from fsafe_lab_test.atp_site_count random selection of zone_1 sites; null for standard checklist responses';
