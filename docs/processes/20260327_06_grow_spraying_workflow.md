@@ -17,6 +17,7 @@ This document describes the spraying activity flow using `ops_task_tracker` dire
 | `grow_spray_input` | Individual chemical/fertilizer applied with quantity and compliance link |
 | `grow_spray_equipment` | Equipment used with water UOM and quantity per piece |
 | `grow_spray_compliance` | Chemical label registry — provides PHI/REI for safety interval calculation |
+| `grow_spray_restriction` (view) | Derived daily NE/NH restriction calendar per site from completed spray events |
 | `invnt_item` | The chemical or fertilizer product |
 | `org_equipment` | The spraying equipment (e.g. foggers) |
 
@@ -52,6 +53,26 @@ PHI (Pre-Harvest Interval) and REI (Restricted Entry Interval) safety intervals 
    - `rei_stop_datetime = spraying_stop_time + maximum_rei_hours`
 
 This ensures that if any input has a longer safety interval, it governs the entire spraying event.
+
+### Restriction Calendar
+
+The `grow_spray_restriction` view generates a daily restriction calendar for each completed spray event:
+
+- **NE (No Entry)** — workers cannot enter the site until REI expires. One row per calendar day from spray stop to REI expiry.
+- **NH (No Harvest)** — cannot harvest from the site until PHI expires. One row per calendar day from spray stop to PHI expiry.
+
+**Example:** Sprayed on 3/27 at 3:00 PM, max REI = 12 hours, max PHI = 7 days:
+
+| Type | Date | Start | End |
+|------|------|-------|-----|
+| NE | 3/27 | 3:00 PM | 11:59 PM |
+| NE | 3/28 | 12:00 AM | 3:00 AM |
+| NH | 3/27 | 3:00 PM | 11:59 PM |
+| NH | 3/28 | 12:00 AM | 11:59 PM |
+| NH | ... | ... | ... |
+| NH | 4/3 | 12:00 AM | 3:00 PM |
+
+The frontend can display these restrictions on a calendar or block harvesting/entry for affected sites.
 
 ---
 
