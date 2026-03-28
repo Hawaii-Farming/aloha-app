@@ -52,7 +52,7 @@ aloha-app/
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
 - **org_site_category** — Two-level site category hierarchy (e.g. growing/greenhouse, packing/packroom, housing/duplex)
 - **org_site** — Unified site register with parent-child hierarchy for all locations; category and subcategory are FK references to org_site_category
-- **org_equipment** — Equipment register for physical assets; farm-level or shared, with current/previous employee assignment
+- **org_equipment** — Equipment register for physical assets; farm-level or shared
 - **org_business_rule** — Org-scoped registry for business rules, workflows, calculations, requirements, and definitions
 
 ## Inventory Module (8 tables, includes 1 view) — [Docs](docs/schemas/20260327_03_invnt.md)
@@ -87,12 +87,12 @@ aloha-app/
 - **ops_training_type** — Org-specific training type lookup (e.g. GMP, Food Safety, HACCP). TEXT PK derived from name.
 - **ops_training** — Staff training session records with type, date, topics, trainer names, and materials
 - **ops_training_attendee** — Per-employee attendance and certification records for each training session
-- **ops_template_category** — Org-defined categories for grouping checklist templates by module or purpose (TEXT PK)
-- **ops_template** — Master checklist template definition with name, category, and optional farm scope
+- **ops_template** — Master checklist template definition with name and optional farm scope
 - **ops_task_template** — Many-to-many link between tasks and templates; app loads linked templates when creating an activity
 - **ops_corrective_action_choice** — Org-defined reusable corrective action options selectable from a dropdown
 - **ops_template_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
 - **ops_template_result** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
+- **ops_template_result_photo** — Photos attached to a checklist response; one row per photo, only used when ops_template_question.include_photo = true
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
 ## Grow Module (20 tables, 1 view) — [Docs](docs/schemas/20260327_06_grow.md)
