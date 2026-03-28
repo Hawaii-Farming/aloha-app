@@ -14,8 +14,8 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 | `grow_task_seed_batch` | Join table — which seeding batches were inspected |
 | `grow_scout_result` | Individual pest or disease finding with severity, infection stage, and affected row |
 | `grow_task_photo` | Photos taken during the scouting event with optional captions |
-| `sys_pest` | Standardized pest names (lookup) |
-| `sys_disease` | Standardized disease names (lookup) |
+| `grow_pest` | Standardized pest names (lookup) |
+| `grow_disease` | Standardized disease names (lookup) |
 | `org_site` | Growing rows (category = grow_row) referenced by observation site_id |
 | `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
@@ -29,7 +29,7 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 3. App snapshots active seeding batches present in the site via `grow_task_seed_batch` (batches with status `transplanted` or `harvesting`) — this records which batches were in the site at the time of scouting
 4. For each pest or disease found, create a `grow_scout_result` record:
    - Set `observation_type` to `pest` or `disease`
-   - Select the pest (`sys_pest_id`) or disease (`sys_disease_id`) from the lookup — enforced by CHECK constraint
+   - Select the pest (`grow_pest_id`) or disease (`grow_disease_id`) from the lookup — enforced by CHECK constraint
    - Select the specific growing row (`site_id` referencing org_site where category = grow_row)
    - Set severity level (`low`, `moderate`, `high`, `severe`)
    - For diseases, set infection stage (`early`, `mid`, `late`, `advanced`)
@@ -55,8 +55,8 @@ flowchart TD
     A1 --> B[Link seeding batches\nvia grow_task_seed_batch]
     B --> C[Add observation:\ngrow_scout_result]
     C --> D{Pest or Disease?}
-    D -->|Pest| E[Select sys_pest + row + severity]
-    D -->|Disease| F[Select sys_disease + row\n+ severity + infection stage]
+    D -->|Pest| E[Select grow_pest + row + severity]
+    D -->|Disease| F[Select grow_disease + row\n+ severity + infection stage]
     E --> G{More observations?}
     F --> G
     G -->|Yes| C

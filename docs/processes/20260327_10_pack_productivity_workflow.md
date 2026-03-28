@@ -2,7 +2,7 @@
 
 This document describes how pack line productivity is tracked hourly, including crew assignments, product output, and fail tracking.
 
-> **Prerequisite:** The "Packing" task must be provisioned in `ops_task`. Fail categories must be configured in `pack_fail_category`. See [01_org_provisioning.md](20260327_01_org_provisioning.md).
+> **Prerequisite:** The "Packing" task must be provisioned in `ops_task`. Fail categories must be configured in `pack_productivity_fail_category`. See [01_org_provisioning.md](20260327_01_org_provisioning.md).
 
 ---
 
@@ -14,7 +14,7 @@ This document describes how pack line productivity is tracked hourly, including 
 | `pack_productivity_hour` | One row per clock hour with crew counts by role and metal detection flag |
 | `pack_productivity_hour_product` | Cases packed per product per hour (delta) with leftover pounds |
 | `pack_productivity_hour_fail` | Fail counts per category per hour |
-| `pack_fail_category` | Lookup — defines available fail categories |
+| `pack_productivity_fail_category` | Lookup — defines available fail categories |
 | `sales_product` | Referenced for derived metrics (pack_per_case, case_net_weight) |
 | `ops_task_template` | Links templates to the Packing task; determines which checklists auto-load |
 | `ops_template` | Checklist template (e.g. foreign material inspection, pre-pack safety check) |

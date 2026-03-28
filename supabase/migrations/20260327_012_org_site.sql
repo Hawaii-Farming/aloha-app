@@ -14,6 +14,11 @@ CREATE TABLE IF NOT EXISTS org_site (
     -- Food safety details (shown for food safety child sites)
     zone                    TEXT CHECK (zone IN ('zone_1', 'zone_2', 'zone_3', 'zone_4', 'water')),
 
+    -- Geo coordinates
+    latitude                NUMERIC,
+    longitude               NUMERIC,
+    elevation               NUMERIC,
+
     notes                   TEXT,
     is_active               BOOLEAN NOT NULL DEFAULT true,
     display_order           INTEGER NOT NULL DEFAULT 0,

@@ -20,11 +20,8 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 | `pack_`   | Pack            | 072–073, 075–082 | 07 |
 | `maint_`  | Maintenance     | 083–084 | 09 |
 | `fsafe_`  | Food Safety     | 085–091 | 10 |
-| (deferred)| Future          | —       | 11 |
 
 Sales & Pack migration ranges are interleaved (067–084) due to cross-module FK dependencies.
-
-Tables designed but not yet ready for deployment go in `supabase/migrations_future/` and are documented in the `_11_future.md` schema doc.
 
 ---
 

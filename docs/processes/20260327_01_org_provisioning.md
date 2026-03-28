@@ -49,21 +49,17 @@ Default categories and subcategories:
 | growing | greenhouse |
 | growing | nursery |
 | growing | pond |
+| growing | grow_row |
 | packing | *(top-level)* |
 | packing | packroom |
-| packing | cold_storage |
 | housing | *(top-level)* |
+| housing | room |
 | food_safety | *(top-level)* |
-| grow_row | *(top-level)* |
 | pest_trap | *(top-level)* |
-| room | *(top-level)* |
-| infrastructure | *(top-level)* |
-| infrastructure | water_system |
-| infrastructure | fert_station |
-| infrastructure | weather_station |
 | storage | *(top-level)* |
 | storage | warehouse |
 | storage | chemical_storage |
+| storage | cold_storage |
 
 ---
 

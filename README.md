@@ -28,7 +28,7 @@ aloha-app/
   supabase/
     migrations/          # Sequential SQL migration files (001-093, source of truth)
   docs/
-    schemas/             # Schema documentation per module (01_sys through 11_future)
+    schemas/             # Schema documentation per module (01_sys through 10_fsafe)
     processes/           # Business process and workflow documentation (01-10)
   scripts/               # ETL and import scripts (e.g. payroll processing)
   src/                   # React application (coming soon)
@@ -41,8 +41,8 @@ aloha-app/
 - **sys_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
 - **sys_module** — Master list of application modules for access control
 - **sys_sub_module** — Master list of sub-modules within each module with minimum access level requirements
-- **sys_pest** — System-wide pest catalog for scouting observations
-- **sys_disease** — System-wide disease catalog for scouting observations
+- **grow_pest** — System-wide pest catalog for scouting observations
+- **grow_disease** — System-wide disease catalog for scouting observations
 
 ## Organization Module (8 tables) — [Docs](docs/schemas/20260327_02_org.md)
 
@@ -128,7 +128,7 @@ aloha-app/
 - **pack_shelf_life** — Shelf life trial header linking product, lot, packaging type, target vs actual shelf life, and trial status
 - **pack_shelf_life_result** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
-- **pack_fail_category** — Lookup for pack line fail categories (e.g. film, tray, printer, leaves, ridges)
+- **pack_productivity_fail_category** — Lookup for pack line fail categories (e.g. film, tray, printer, leaves, ridges)
 - **pack_productivity_hour** — Hourly pack line snapshot with crew counts by role and metal detection flag
 - **pack_productivity_hour_product** — Cases packed per product per hour (delta, not cumulative)
 - **pack_productivity_hour_fail** — Fail counts per category per hour
@@ -176,7 +176,6 @@ Detailed table documentation with column definitions, constraints, and relations
 - [Sales Schema](docs/schemas/20260327_08_sales.md) — Product catalog, pricing, orders, and fulfillment
 - [Maintenance Schema](docs/schemas/20260327_09_maint.md) — Work orders and parts usage
 - [Food Safety Schema](docs/schemas/20260327_10_fsafe.md) — EMP testing, lab management, test-and-hold, and pest trap inspections
-- [Future Improvements](docs/schemas/20260327_11_future.md) — Deferred features
 
 
 ## Process Documentation
