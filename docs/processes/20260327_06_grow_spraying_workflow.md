@@ -1,6 +1,6 @@
 # Grow Spraying Workflow
 
-This document describes the spraying activity flow using `ops_task_tracker` directly as the header — no separate spraying header table is needed. The pre-spray safety checklist is handled via the existing ops checklist system (`ops_template` → `ops_template_question` → `ops_template_response`).
+This document describes the spraying activity flow using `ops_task_tracker` directly as the header — no separate spraying header table is needed. The pre-spray safety checklist is handled via the existing ops checklist system (`ops_template` → `ops_template_question` → `ops_template_result`).
 
 > **Prerequisite:** The "Spraying" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260327_01_org_provisioning.md) for setup steps.
 
@@ -12,7 +12,7 @@ This document describes the spraying activity flow using `ops_task_tracker` dire
 |-------|---------|
 | `ops_task_tracker` | Activity header — captures org, farm, site, date, start/stop time, notes |
 | `ops_template` | Pre-spray safety checklist template attached to the tracker |
-| `ops_template_response` | Checklist responses for the pre-spray safety check |
+| `ops_template_result` | Checklist responses for the pre-spray safety check |
 | `grow_task_seed_batch` | Join table — which seeding batches were treated |
 | `grow_spray_input` | Individual chemical/fertilizer applied with quantity and compliance link |
 | `grow_spray_equipment` | Equipment used with water UOM and quantity per piece |
@@ -28,7 +28,7 @@ This document describes the spraying activity flow using `ops_task_tracker` dire
 
 1. Create an `ops_task_tracker` activity with task = "Spraying" (captures farm, site, date, start/stop time)
 2. Assign employees working on this spraying via `ops_task_schedule` (one row per employee)
-3. If templates are linked to the "Spraying" task via `ops_task_template`, the app presents them for completion (e.g. pre-spray safety checklist) — responses are recorded via `ops_template_response`
+3. If templates are linked to the "Spraying" task via `ops_task_template`, the app presents them for completion (e.g. pre-spray safety checklist) — responses are recorded via `ops_template_result`
 4. Link the seeding batches being treated via `grow_task_seed_batch` (one row per batch) — only batches with status `transplanted` or `harvesting` are available
 5. For each chemical or fertilizer applied, create a `grow_spray_input` record:
    - Select from the active compliance records (`grow_spray_compliance_id`) — only compliant products are available (filtered by `effective_date <= today` and `expiration_date IS NULL OR >= today`)
@@ -92,7 +92,7 @@ The frontend can display these restrictions on a calendar or block harvesting/en
 ```mermaid
 flowchart TD
     A[Create ops_task_tracker\nTask = Spraying] --> A1[Assign employees\nvia ops_task_schedule]
-    A1 --> B[Fill pre-spray checklist\nvia ops_template + ops_template_response]
+    A1 --> B[Fill pre-spray checklist\nvia ops_template + ops_template_result]
     B --> C[Link seeding batches\nvia grow_task_seed_batch]
     C --> D[Add input:\ngrow_spray_input]
     D --> D1[Select chemical + compliance record]

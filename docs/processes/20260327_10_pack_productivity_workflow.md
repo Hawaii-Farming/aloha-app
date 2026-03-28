@@ -19,7 +19,7 @@ This document describes how pack line productivity is tracked hourly, including 
 | `ops_task_template` | Links templates to the Packing task; determines which checklists auto-load |
 | `ops_template` | Checklist template (e.g. foreign material inspection, pre-pack safety check) |
 | `ops_template_question` | Individual checklist questions |
-| `ops_template_response` | Checklist responses for this packing session |
+| `ops_template_result` | Checklist responses for this packing session |
 | `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---

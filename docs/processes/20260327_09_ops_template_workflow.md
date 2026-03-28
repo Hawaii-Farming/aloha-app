@@ -17,7 +17,7 @@ This document describes how checklist templates are filled out during any task a
 | `ops_template` | Checklist template definition with module assignment |
 | `fsafe_lab_test` | Test definitions including ATP configuration (atp_site_count, RLU thresholds) |
 | `ops_template_question` | Individual checklist questions within a template |
-| `ops_template_response` | All responses for an activity — both checklist answers and ATP readings |
+| `ops_template_result` | All responses for an activity — both checklist answers and ATP readings |
 | `ops_corrective_action_choice` | Predefined corrective action options |
 | `ops_corrective_action_taken` | Corrective actions raised against any failing response |
 
@@ -73,7 +73,7 @@ When an ATP test is linked to the activity, the system randomly selects `atp_sit
 
 Pass/fail is evaluated against the `fsafe_lab_test` thresholds. Results are stored in `fsafe_result` linked to the `ops_task_tracker`.
 
-> **Note:** ATP readings are stored in `ops_template_response` with `site_id` populated and `ops_template_question_id = null`. Standard checklist rows are the inverse — `ops_template_question_id` populated, `site_id` null.
+> **Note:** ATP readings are stored in `ops_template_result` with `site_id` populated and `ops_template_question_id = null`. Standard checklist rows are the inverse — `ops_template_question_id` populated, `site_id` null.
 
 ### 6. Submit the Activity
 
@@ -82,9 +82,9 @@ On submission:
 | What | Table | Key Fields |
 |------|-------|------------|
 | Activity closed | `ops_task_tracker` | `stop_time`, `is_completed = true` |
-| One row per checklist question | `ops_template_response` | `ops_task_tracker_id`, `ops_template_question_id`, response value |
-| One row per ATP site tested | `ops_template_response` | `ops_task_tracker_id`, `response_numeric`, `site_id` |
-| One row per failing response | `ops_corrective_action_taken` | `ops_template_response_id` |
+| One row per checklist question | `ops_template_result` | `ops_task_tracker_id`, `ops_template_question_id`, response value |
+| One row per ATP site tested | `ops_template_result` | `ops_task_tracker_id`, `response_numeric`, `site_id` |
+| One row per failing response | `ops_corrective_action_taken` | `ops_template_result_id` |
 
 ### 7. Corrective Actions
 
@@ -106,7 +106,7 @@ The frontend handles this by silently creating the `ops_task_tracker` record on 
 
 - `start_time` and `stop_time` are both set to the submission timestamp
 - `is_completed` is set to `true`
-- All `ops_template_response` rows are written as normal
+- All `ops_template_result` rows are written as normal
 
 From the user's perspective: select template → answer questions → submit. The database still holds a complete tracker record for every set of responses.
 
@@ -135,8 +135,8 @@ flowchart TD
     I --> K[Submit activity\nis_completed = true]
     J --> K
 
-    K --> L[INSERT ops_template_response rows\nper checklist question]
-    K --> M[INSERT ops_template_response rows\nper ATP site tested]
+    K --> L[INSERT ops_template_result rows\nper checklist question]
+    K --> M[INSERT ops_template_result rows\nper ATP site tested]
 
     L --> N{Any responses\nfail pass criteria?}
     M --> O{Any RLU readings\noutside thresholds?}

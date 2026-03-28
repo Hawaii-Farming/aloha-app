@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS ops_template_question (
 
     warning_message                     TEXT,
     ops_corrective_action_choice_ids    JSONB,
+    include_photo                       BOOLEAN NOT NULL DEFAULT false,
 
     display_order       INTEGER     NOT NULL DEFAULT 0,
 
