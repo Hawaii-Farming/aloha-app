@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS grow_seed_batch (
 
 COMMENT ON TABLE grow_seed_batch IS 'Individual seeding batch linked to an ops activity. Either a single seed item or a seed mix, never both.';
 
+COMMENT ON COLUMN grow_seed_batch.site_id IS 'Filtered to org_site where category = growing (subcategory: nursery, greenhouse, or pond)';
 COMMENT ON COLUMN grow_seed_batch.batch_code IS 'System-generated traceability code; carries through to harvesting; editable';
 COMMENT ON COLUMN grow_seed_batch.grow_cycle_pattern_id IS 'Describes the cycle pattern (e.g. 18/17/17 harvest pattern); does not drive calculations';
 COMMENT ON COLUMN grow_seed_batch.grow_trial_type_id IS 'Null if not a trial; set when testing a new lot, variety, or seed source';

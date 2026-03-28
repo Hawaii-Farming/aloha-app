@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS fsafe_result (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          TEXT NOT NULL REFERENCES org(id),
-    farm_id         TEXT REFERENCES org_farm(id),
+    farm_id         TEXT NOT NULL REFERENCES org_farm(id),
     site_id         TEXT REFERENCES org_site(id),
     fsafe_test_hold_id  UUID REFERENCES fsafe_test_hold(id),
     fsafe_lab_id    TEXT REFERENCES fsafe_lab(id),
@@ -44,6 +44,7 @@ CREATE INDEX idx_fsafe_result_status    ON fsafe_result (org_id, status);
 
 COMMENT ON COLUMN fsafe_result.initial_retest_vector IS 'initial, retest, vector';
 COMMENT ON COLUMN fsafe_result.status IS 'pending, in_progress, completed';
+COMMENT ON COLUMN fsafe_result.site_id IS 'Food safety site (org_site where category = food_safety or zone = water); set for EMP and water results, null for test-and-hold';
 COMMENT ON COLUMN fsafe_result.fsafe_lab_id IS 'Pre-filled from fsafe_test_hold.fsafe_lab_id for test-and-hold results; editable';
 COMMENT ON COLUMN fsafe_result.test_method IS 'Pre-filled from fsafe_lab_test.test_methods; editable';
 COMMENT ON COLUMN fsafe_result.result_pass IS 'Auto-set by evaluating result against fsafe_lab_test pass/fail criteria';

@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS invnt_item (
     requires_expiry_date     BOOLEAN NOT NULL DEFAULT false,
 
     -- Site references
-    site_id_storage      TEXT REFERENCES org_site(id),
+    site_id              TEXT REFERENCES org_site(id),
     equipment_id   TEXT REFERENCES org_equipment(id),
 
     -- Item details
@@ -66,7 +66,7 @@ CREATE INDEX idx_invnt_item_org_id ON invnt_item (org_id);
 CREATE INDEX idx_invnt_item_vendor      ON invnt_item (invnt_vendor_id);
 CREATE INDEX idx_invnt_item_category    ON invnt_item (invnt_category_id);
 CREATE INDEX idx_invnt_item_subcategory ON invnt_item (invnt_subcategory_id);
-CREATE INDEX idx_invnt_item_site_storage ON invnt_item (site_id_storage);
+CREATE INDEX idx_invnt_item_site ON invnt_item (site_id);
 CREATE INDEX idx_invnt_item_equipment ON invnt_item (equipment_id);
 
 COMMENT ON COLUMN invnt_item.invnt_category_id IS 'References invnt_category rows where sub_category_name IS NULL';
@@ -75,6 +75,7 @@ COMMENT ON COLUMN invnt_item.burn_uom IS 'Smallest consumption unit used for bur
 COMMENT ON COLUMN invnt_item.cushion_weeks IS 'Safety stock buffer in weeks used in next-order-date calculations';
 COMMENT ON COLUMN invnt_item.seed_is_pelleted IS 'Whether seed item is pelleted; null for non-seed items';
 COMMENT ON COLUMN invnt_item.maint_part_type IS 'Type classification for parts (e.g. electrical, mechanical, plumbing)';
+COMMENT ON COLUMN invnt_item.site_id IS 'Filtered to org_site where category = storage; the storage location for this item';
 COMMENT ON COLUMN invnt_item.photos IS 'Reference photos of the item used for visual identification during ordering';
 COMMENT ON COLUMN invnt_item.is_active IS 'Whether this item is currently active for ordering and tracking; false means inactive but not deleted';
 COMMENT ON COLUMN invnt_item.reorder_point_in_burn IS 'Auto-calculated: burn_per_week * cushion_weeks; triggers reorder alert when on-hand falls below this';

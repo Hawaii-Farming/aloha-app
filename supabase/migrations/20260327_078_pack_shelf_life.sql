@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life (
     trial_number                INTEGER,
     trial_purpose               TEXT,
     target_shelf_life_days      INTEGER,
-    site_id_storage             TEXT REFERENCES org_site(id),
+    site_id                     TEXT REFERENCES org_site(id),
     notes                       TEXT,
 
     is_terminated               BOOLEAN NOT NULL DEFAULT false,
@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life (
 COMMENT ON TABLE pack_shelf_life IS 'Shelf life trial header. One row per trial. Tracks the product, lot, packaging type, target shelf life, and trial outcome.';
 
 COMMENT ON COLUMN pack_shelf_life.target_shelf_life_days IS 'Pre-filled from sales_product.shelf_life_days; editable';
+COMMENT ON COLUMN pack_shelf_life.site_id IS 'Filtered to org_site where category = storage; the storage location for this trial';
 COMMENT ON COLUMN pack_shelf_life.invnt_item_id_pack IS 'Pre-filled from sales_product.invnt_item_id_pack; filtered to packaging items in inventory';
 
 CREATE INDEX idx_pack_shelf_life_org_id   ON pack_shelf_life (org_id);

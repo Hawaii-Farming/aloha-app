@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     -- =============================================
     -- HOUSING
     -- =============================================
-    site_id_housing              TEXT REFERENCES org_site(id),
+    site_id                      TEXT REFERENCES org_site(id),
 
     -- =============================================
     -- AUDIT
@@ -85,4 +85,4 @@ COMMENT ON COLUMN hr_employee.sys_access_level_id IS 'Sourced from sys_access_le
 COMMENT ON COLUMN hr_employee.overtime_threshold IS 'Hours per week before overtime applies; only relevant when pay_structure = hourly';
 COMMENT ON COLUMN hr_employee.pay_structure IS 'hourly, salary';
 COMMENT ON COLUMN hr_employee.wc IS 'Workers compensation code identifying the compensation plan or pay grade';
-COMMENT ON COLUMN hr_employee.site_id_housing IS 'Sourced from org_site where category is housing; links employee to their assigned housing site';
+COMMENT ON COLUMN hr_employee.site_id IS 'Filtered to org_site where category = housing; the employee assigned housing site';
