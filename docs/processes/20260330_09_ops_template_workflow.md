@@ -2,7 +2,7 @@
 
 This document describes how checklist templates are filled out during any task activity. Templates are linked to tasks and auto-loaded when a user creates an activity. This is the foundation for food safety checklists, pre-spray safety checks, post-ops inspections, and any other configurable checklist.
 
-> **Prerequisite:** Tasks must be provisioned in `ops_task` and templates linked via `ops_task_template`. See [01_org_provisioning.md](20260327_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** Tasks must be provisioned in `ops_task` and templates linked via `ops_task_template`. See [01_org_provisioning.md](20260330_01_org_provisioning.md) for setup steps.
 
 ---
 

@@ -2,7 +2,7 @@
 
 This document describes the environmental monitoring activity flow using `ops_task_tracker` directly as the header. Monitoring points are configurable per farm and site category, with support for direct readings and calculated values.
 
-> **Prerequisite:** The "Monitoring" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260327_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The "Monitoring" task must be provisioned in `ops_task`. See [01_org_provisioning.md](20260330_01_org_provisioning.md) for setup steps.
 
 ---
 

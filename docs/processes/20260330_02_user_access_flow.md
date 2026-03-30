@@ -2,7 +2,7 @@
 
 This document describes what happens at runtime when a user logs in — how they authenticate, select an organization, and see only the modules and sub-modules they are authorized to access.
 
-> **Prerequisite:** The organization, modules, employee, and module access must already be provisioned. See [01_org_provisioning.md](20260327_01_org_provisioning.md) for setup steps.
+> **Prerequisite:** The organization, modules, employee, and module access must already be provisioned. See [01_org_provisioning.md](20260330_01_org_provisioning.md) for setup steps.
 
 ---
 

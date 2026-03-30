@@ -2,7 +2,7 @@
 
 This document describes how pack line productivity is tracked hourly, including crew assignments, product output, and fail tracking.
 
-> **Prerequisite:** The "Packing" task must be provisioned in `ops_task`. Fail categories must be configured in `pack_productivity_fail_category`. See [01_org_provisioning.md](20260327_01_org_provisioning.md).
+> **Prerequisite:** The "Packing" task must be provisioned in `ops_task`. Fail categories must be configured in `pack_productivity_fail_category`. See [01_org_provisioning.md](20260330_01_org_provisioning.md).
 
 ---
 
@@ -28,7 +28,7 @@ This document describes how pack line productivity is tracked hourly, including 
 
 1. **Create the activity** — user creates an `ops_task_tracker` with task = "Packing", selects the farm and start time
 2. **Assign employees** working on this packing session via `ops_task_schedule` (one row per employee)
-3. **Complete linked templates** — if templates are linked to the "Packing" task via `ops_task_template`, they are presented for completion (e.g. foreign material inspection, pre-pack safety check). See [09_ops_template_workflow.md](20260327_09_ops_template_workflow.md) for template details.
+3. **Complete linked templates** — if templates are linked to the "Packing" task via `ops_task_template`, they are presented for completion (e.g. foreign material inspection, pre-pack safety check). See [09_ops_template_workflow.md](20260330_09_ops_template_workflow.md) for template details.
 4. **Log each hour** — for every clock hour during the packing session:
    - Enter crew counts: catchers, packers, mixers, boxers
    - For each product packed that hour, enter the number of cases packed (delta — just this hour, not cumulative)

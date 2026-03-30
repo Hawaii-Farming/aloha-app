@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS ops_task_tracker (
     org_id          TEXT NOT NULL REFERENCES org(id),
     farm_id         TEXT REFERENCES org_farm(id),
     site_id         TEXT REFERENCES org_site(id),
+    sales_product_id TEXT,    -- FK added via ALTER TABLE in sales_product migration
     ops_task_id     TEXT NOT NULL REFERENCES ops_task(id),
     start_time      TIMESTAMPTZ NOT NULL,
     stop_time       TIMESTAMPTZ,
@@ -25,5 +26,6 @@ CREATE INDEX idx_ops_task_tracker_completed ON ops_task_tracker (org_id, is_comp
 CREATE INDEX idx_ops_task_tracker_site   ON ops_task_tracker (site_id);
 
 COMMENT ON COLUMN ops_task_tracker.farm_id IS 'Pre-filled from ops_task.farm_id when task is selected; editable';
+COMMENT ON COLUMN ops_task_tracker.sales_product_id IS 'The product being packed; set for packing activities, null for all other task types';
 COMMENT ON COLUMN ops_task_tracker.is_completed IS 'Auto-set to true when stop_time is entered and activity is submitted';
 

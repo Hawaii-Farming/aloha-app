@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS pack_productivity_hour (
     mixers                  INTEGER NOT NULL DEFAULT 0,
     boxers                  INTEGER NOT NULL DEFAULT 0,
 
+    cases_packed            INTEGER NOT NULL DEFAULT 0,
+
     -- Quality & status
     leftover_pounds         NUMERIC NOT NULL DEFAULT 0,
     is_metal_detected       BOOLEAN NOT NULL DEFAULT false,
@@ -23,7 +25,7 @@ CREATE TABLE IF NOT EXISTS pack_productivity_hour (
     is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE pack_productivity_hour IS 'Hourly pack line productivity snapshot. One row per hour per packing session. Crew counts track role assignments for that hour. Derived metrics: total_trays = SUM(cases × pack_per_case), trays_per_packer_per_minute = total_trays / (packers × 60), packed_pounds = SUM(cases × case_net_weight).';
+COMMENT ON TABLE pack_productivity_hour IS 'Hourly pack line productivity snapshot. One row per hour per packing session. Product is on ops_task_tracker.sales_product_id. Derived metrics: trays = cases_packed × product.pack_per_case, trays_per_packer_per_minute = trays / (packers × 60), pounds = cases_packed × product.case_net_weight.';
 
 COMMENT ON COLUMN pack_productivity_hour.pack_end_hour IS 'The hour being recorded (e.g. 2026-03-26 11:00); one row per clock hour';
 COMMENT ON COLUMN pack_productivity_hour.is_metal_detected IS 'Whether metal was detected during this hour';
