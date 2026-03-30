@@ -161,17 +161,29 @@ Every schema change requires these steps in this order:
 
 ### File naming
 
+All file types use the same `YYYYMMDDHHMMSS` timestamp format for consistent ordering:
+
 **Migration files:**
 ```
-supabase/migrations/YYYYMMDD_NNN_module_tablename.sql
+supabase/migrations/YYYYMMDDHHMMSS_tablename.sql
 ```
 
 **Schema doc files:**
 ```
-docs/schemas/YYYYMMDD_NN_module.md
+docs/schemas/YYYYMMDDHHMMSS_module.md
 ```
 
-**Date prefix rule** — the `YYYYMMDD` prefix on all migration files, schema docs, and process docs must be updated to **today's date** on every commit.
+**Process doc files:**
+```
+docs/processes/YYYYMMDDHHMMSS_workflow_name.md
+```
+
+**Seed/ETL scripts:**
+```
+scripts/YYYYMMDDHHMMSS_script_name.py
+```
+
+The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260330000001_sys.md`, `20260330000001_sys_uom.sql`, `20260330000001_seed_system_data.py`).
 
 ---
 
