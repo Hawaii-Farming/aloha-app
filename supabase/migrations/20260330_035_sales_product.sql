@@ -81,8 +81,3 @@ COMMENT ON COLUMN sales_product.is_catch_weight IS 'Whether sold by actual weigh
 COMMENT ON COLUMN sales_product.is_fsma_traceable IS 'Whether this product requires FSMA traceability documentation';
 COMMENT ON COLUMN sales_product.gtin IS 'Global Trade Item Number for supply chain identification';
 COMMENT ON COLUMN sales_product.upc IS 'Universal Product Code for retail scanning';
-
--- Deferred FK: ops_task_tracker.sales_product_id was defined without constraint because sales_product migrates after ops_task_tracker
-ALTER TABLE ops_task_tracker
-    ADD CONSTRAINT fk_ops_task_tracker_sales_product
-    FOREIGN KEY (sales_product_id) REFERENCES sales_product(id);
