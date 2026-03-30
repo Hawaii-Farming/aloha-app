@@ -30,7 +30,9 @@ aloha-app/
   docs/
     schemas/             # Schema documentation per module (01_sys through 10_fsafe)
     processes/           # Business process and workflow documentation (01-10)
-  scripts/               # ETL and import scripts (e.g. payroll processing)
+  scripts/
+    migrations/          # One-time data import from legacy systems
+    processes/           # Ongoing operational workflows (e.g. payroll processing)
   src/                   # React application (coming soon)
   SCHEMA_CONVENTIONS.md  # Schema design rules — read before every change
 ```

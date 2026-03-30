@@ -178,9 +178,14 @@ docs/schemas/YYYYMMDDHHMMSS_module.md
 docs/processes/YYYYMMDDHHMMSS_workflow_name.md
 ```
 
-**Seed/ETL scripts:**
+**Migration scripts (one-time data import from legacy systems):**
 ```
-scripts/YYYYMMDDHHMMSS_script_name.py
+scripts/migrations/YYYYMMDDHHMMSS_module.py
+```
+
+**Process scripts (ongoing operational workflows):**
+```
+scripts/processes/YYYYMMDDHHMMSS_module.py
 ```
 
 The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260330000001_sys.md`, `20260330000001_sys_uom.sql`, `20260330000001_seed_system_data.py`).
