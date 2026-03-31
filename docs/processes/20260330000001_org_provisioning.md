@@ -63,7 +63,28 @@ Default categories and subcategories:
 
 ---
 
-## 5. Admin Employee
+## 5. Default Inventory Categories
+
+| Target | Source | Notes |
+|--------|--------|-------|
+| `invnt_category` | Hardcoded defaults | Standard inventory categories provisioned for every org |
+
+Default categories and subcategories:
+
+| category_name | sub_category_name |
+|---|---|
+| chemicals_pesticides | *(top-level)* |
+| fertilizers | *(top-level)* |
+| seeds | *(top-level)* |
+| seeds | trial |
+| growing | *(top-level)* |
+| packing | *(top-level)* |
+| maintenance | *(top-level)* |
+| food_safety | *(top-level)* |
+
+---
+
+## 6. Admin Employee
 
 | Target | Source | Notes |
 |--------|--------|-------|
@@ -71,7 +92,7 @@ Default categories and subcategories:
 
 ---
 
-## 6. Admin Module Access
+## 7. Admin Module Access
 
 | Target | Source | Notes |
 |--------|--------|-------|
@@ -79,7 +100,7 @@ Default categories and subcategories:
 
 ---
 
-## 7. Default Operations Tasks
+## 8. Default Operations Tasks
 
 | Target | Source | Notes |
 |--------|--------|-------|
@@ -100,7 +121,7 @@ Default tasks:
 
 ---
 
-## 8. New Employee Provisioning
+## 9. New Employee Provisioning
 
 When a new employee is added with a `user_id` (app access):
 
@@ -110,7 +131,7 @@ When a new employee is added with a `user_id` (app access):
 
 ---
 
-## 9. Future Provisions
+## 10. Future Provisions
 
 As the system grows, additional default data may be required:
 
