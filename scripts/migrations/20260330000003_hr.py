@@ -426,6 +426,70 @@ def migrate_hr_time_off_request(supabase, emp_records):
     insert_rows(supabase, "hr_time_off_request", rows)
 
 
+def migrate_hr_travel_request(supabase, emp_records):
+    """Migrate travel requests from proc_requests sheet (request_type = Travel)."""
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
+    client = gspread.authorize(creds)
+    ws = client.open_by_key("1EFgT0XyBlUe10ENVkm4-_bb4uSPyd9hPbCIzD-RKNRA").worksheet("proc_requests")
+    records = ws.get_all_records()
+
+    # Build email -> employee ID lookup
+    email_to_id = {}
+    name_to_id = {}
+    for r in emp_records:
+        email = str(r.get("Email", "")).strip().lower()
+        full = str(r.get("FullName", "")).strip()
+        if email:
+            email_to_id[email] = to_id(full)
+        if full:
+            name_to_id[to_id(full)] = to_id(full)
+
+    rows = []
+    for r in records:
+        req_type = str(r.get("request_type", "")).strip()
+        if req_type != "Travel":
+            continue
+
+        # Resolve traveler to employee ID
+        traveler = str(r.get("traveler_name", "")).strip()
+        emp_id = name_to_id.get(to_id(traveler))
+        if not emp_id:
+            print(f"  SKIP travel: Unknown traveler '{traveler}'")
+            continue
+
+        # Resolve created_by
+        created_email = str(r.get("created_by", "")).strip().lower()
+        requested_by = email_to_id.get(created_email, emp_id)
+
+        # Resolve updated_by for review
+        updated_email = str(r.get("updated_by", "")).strip().lower()
+        reviewed_by = email_to_id.get(updated_email)
+
+        status = str(r.get("request_status", "")).strip().lower()
+        status_map = {"requested": "pending", "ordered": "approved"}
+        mapped_status = status_map.get(status, "pending")
+
+        row = {
+            "org_id": ORG_ID,
+            "hr_employee_id": emp_id,
+            "request_type": str(r.get("travel_type", "")).strip() or None,
+            "travel_from": str(r.get("flight_from", "")).strip() or None,
+            "travel_to": str(r.get("flight_to", "")).strip() or None,
+            "travel_start_date": parse_date(r.get("departure_date", "")),
+            "travel_return_date": parse_date(r.get("return_date", "")),
+            "notes": str(r.get("request_notes", "")).strip() or None,
+            "status": mapped_status,
+            "requested_at": parse_timestamp(r.get("created_on", "")),
+            "requested_by": requested_by,
+            "reviewed_at": parse_timestamp(r.get("updated_on", "")) if mapped_status == "approved" else None,
+            "reviewed_by": reviewed_by if mapped_status == "approved" else None,
+        }
+        rows.append(audit(row))
+
+    insert_rows(supabase, "hr_travel_request", rows)
+
+
 def main():
     if not SUPABASE_KEY:
         print("ERROR: Set SUPABASE_SERVICE_KEY in .env or environment")
@@ -443,6 +507,7 @@ def main():
 
     # Clear in reverse FK order
     print("\nClearing tables...")
+    supabase.table("hr_travel_request").delete().neq("org_id", "___never___").execute()
     supabase.table("hr_time_off_request").delete().neq("org_id", "___never___").execute()
     supabase.table("hr_module_access").delete().neq("org_id", "___never___").execute()
     supabase.table("hr_employee").delete().neq("id", "___never___").execute()
@@ -458,6 +523,7 @@ def main():
     employees, user_lookup, module_map = migrate_hr_employee(supabase, records, app_users)
     migrate_hr_module_access(supabase, employees, user_lookup, module_map)
     migrate_hr_time_off_request(supabase, records)
+    migrate_hr_travel_request(supabase, records)
 
     print("\nHR data migrated successfully")
 

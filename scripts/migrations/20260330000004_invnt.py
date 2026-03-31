@@ -394,6 +394,321 @@ def migrate_invnt_item(supabase, client):
     return records  # Return for downstream use
 
 
+def parse_date(date_str):
+    """Parse date string to YYYY-MM-DD or None."""
+    if not date_str or not str(date_str).strip():
+        return None
+    from datetime import datetime
+    for fmt in ("%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(str(date_str).strip(), fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
+
+
+def parse_timestamp(ts_str):
+    """Parse timestamp to ISO format or None."""
+    if not ts_str or not str(ts_str).strip():
+        return None
+    from datetime import datetime
+    for fmt in ("%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(str(ts_str).strip(), fmt).isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def parse_bool(val):
+    """Parse boolean from various formats."""
+    return str(val).strip().upper() in ("TRUE", "YES", "1", "ACCEPTABLE")
+
+
+def safe_float(val, default=0):
+    try:
+        v = str(val).strip().replace(",", "")
+        return float(v) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def migrate_invnt_po(supabase, client):
+    """Migrate POs from both invnt_item_po (historical) and proc_requests (active)."""
+
+    # Build employee email -> id lookup from Supabase
+    emp_result = supabase.table("hr_employee").select("id, company_email").execute()
+    email_to_emp = {}
+    for e in emp_result.data:
+        if e.get("company_email"):
+            email_to_emp[e["company_email"].lower()] = e["id"]
+
+    # Fallback employee for unresolved emails
+    FALLBACK_EMP = email_to_emp.get("data@hawaiifarming.com") or email_to_emp.get("admin@hawaiifarming.com")
+
+    # Build item name -> id lookup
+    item_result = supabase.table("invnt_item").select("id, name, invnt_category_id, burn_uom, order_uom, burn_per_order, farm_id").execute()
+    item_by_name = {}
+    item_by_id = {}
+    for it in item_result.data:
+        item_by_name[it["name"].lower()] = it
+        item_by_id[it["id"]] = it
+
+    # Build vendor name -> id lookup
+    vendor_result = supabase.table("invnt_vendor").select("id, name").execute()
+    vendor_by_name = {v["name"].lower(): v["id"] for v in vendor_result.data}
+
+    # UOM mapping
+    UOM_MAP = {
+        "seeds": "seed", "pieces": "piece", "bags": "bag", "boxes": "box",
+        "pounds": "pound", "rolls": "roll", "bottles": "bottle",
+        "gallons": "gallon", "trays": "tray", "packs": "pack",
+        "labels": "label", "cases": "case", "drums": "drum",
+        "clips": "clip", "kits": "kit", "pallets": "pallet",
+        "units": "unit", "dozen": "dozen", "lids": "lid",
+        "quarts": "quart", "ounces": "ounce", "grams": "gram",
+        "feet": "feet", "meters": "meter", "impressions": "impression",
+        "blades": "blade", "reactions": "reactions", "cubes": "cubes",
+        "fluid ounces": "fluid_ounce", "fluid_ounces": "fluid_ounce",
+        "ml": "milliliter", "milliliters": "milliliter",
+        "seed": "seed", "piece": "piece", "bag": "bag", "box": "box",
+        "pound": "pound", "roll": "roll", "bottle": "bottle",
+        "gallon": "gallon", "tray": "tray", "pack": "pack",
+        "label": "label", "case": "case", "drum": "drum",
+        "clip": "clip", "kit": "kit", "pallet": "pallet",
+        "unit": "unit", "lid": "lid", "quart": "quart",
+        "ounce": "ounce", "gram": "gram", "blade": "blade",
+        "impression": "impression", "count": "count",
+    }
+
+    def map_uom(val):
+        v = str(val).strip().lower()
+        return UOM_MAP.get(v, v) if v else None
+
+    # ========================================
+    # PART 1: Historical POs from invnt_item_po
+    # ========================================
+    sheet = client.open_by_key(SHEET_ID)
+    ws_po = sheet.worksheet("invnt_item_po")
+    po_records = ws_po.get_all_records()
+
+    # Status mapping
+    STATUS_MAP = {
+        "received": "received", "ordered": "ordered", "cancelled": "cancelled",
+        "partial": "partial", "approved": "approved", "requested": "requested",
+    }
+
+    po_rows = []
+    lot_rows = []
+    received_rows = []
+    lot_seen = set()
+
+    for r_raw in po_records:
+        r = {str(k).strip(): v for k, v in r_raw.items()}
+
+        item_name = str(r.get("ItemName", "")).strip()
+        if not item_name:
+            continue
+
+        # Resolve item
+        item = item_by_name.get(item_name.lower(), {})
+        item_id = item.get("id")
+
+        # Status
+        raw_status = str(r.get("OrderStatus", "")).strip().lower()
+        status = STATUS_MAP.get(raw_status, "received")
+
+        # Vendor
+        vendor_name = str(r.get("SupplierName", "")).strip()
+        vendor_id = vendor_by_name.get(vendor_name.lower()) if vendor_name else None
+
+        # Employee lookups
+        ordered_by_email = str(r.get("OrderedBy", "")).strip().lower()
+        received_by_email = str(r.get("ReceivedBy", "")).strip().lower()
+        ordered_by = email_to_emp.get(ordered_by_email)
+        received_by = email_to_emp.get(received_by_email)
+
+        # UOMs
+        order_uom = map_uom(r.get("OrderUnits", ""))
+        burn_uom = map_uom(r.get("BurnUnits", ""))
+        received_uom = map_uom(r.get("ReceivedUnits", ""))
+
+        # PO row
+        po = {
+            "org_id": ORG_ID,
+            "farm_id": item.get("farm_id"),
+            "request_type": "inventory_item",
+            "invnt_category_id": item.get("invnt_category_id") or "packing",
+            "invnt_item_id": item_id,
+            "item_name": item_name,
+            "burn_uom": burn_uom or item.get("burn_uom") or order_uom or "unit",
+            "order_uom": order_uom or item.get("order_uom") or burn_uom or "unit",
+            "order_quantity": safe_float(r.get("OrderedQuantity", "")),
+            "burn_per_order": safe_float(r.get("BurnPerReceivedUnits", "")) or item.get("burn_per_order", 0),
+            "total_cost": safe_float(r.get("TotalCost", "")) or None,
+            "is_freight_included": parse_bool(r.get("PriceIncludesFreight", "")),
+            "invnt_vendor_id": vendor_id,
+            "expected_delivery_date": parse_date(r.get("ExpectedArrivalDate", "")),
+            "request_photos": [],
+            "status": status,
+            "requested_at": parse_timestamp(r.get("OrderPlacedDate", "")),
+            "requested_by": ordered_by or FALLBACK_EMP,
+            "reviewed_at": parse_timestamp(r.get("OrderPlacedDate", "")),
+            "reviewed_by": ordered_by or FALLBACK_EMP,
+            "ordered_at": parse_timestamp(r.get("OrderPlacedDate", "")),
+            "ordered_by": ordered_by or FALLBACK_EMP,
+        }
+        po_rows.append(audit(po))
+        po_index = len(po_rows) - 1
+
+        # Lot
+        lot_number = str(r.get("ItemLot", "")).strip()
+        lot_id = None
+        if lot_number and lot_number.upper() != "NA" and item_id:
+            lot_key = f"{item_id}_{to_id(lot_number)}"
+            lot_id = lot_key  # Include item_id in lot_id for uniqueness
+            if lot_key not in lot_seen:
+                lot_seen.add(lot_key)
+                lot_rows.append(audit({
+                    "id": lot_id,
+                    "org_id": ORG_ID,
+                    "farm_id": item.get("farm_id"),
+                    "invnt_item_id": item_id,
+                    "lot_number": lot_number,
+                    "lot_expiry_date": parse_date(r.get("ExpiryDate", "")),
+                }))
+
+        # Received record (only if status implies receipt)
+        if status in ("received", "partial"):
+            arrival = parse_date(r.get("ArrivalDate", ""))
+            if arrival:
+                photo = str(r.get("DeliveryPhoto", "")).strip()
+                recv = {
+                    "org_id": ORG_ID,
+                    "farm_id": item.get("farm_id"),
+                    "received_date": arrival,
+                    "received_uom": received_uom or order_uom,
+                    "received_quantity": safe_float(r.get("ReceivedQuantity", "")),
+                    "burn_per_received": safe_float(r.get("BurnPerReceivedUnits", "")),
+                    "invnt_lot_id": lot_id,
+                    "delivery_truck_clean": parse_bool(r.get("TruckCleanIntactAndPestFree", "")),
+                    "delivery_acceptable": str(r.get("ItemCondition", "")).strip().lower() == "acceptable",
+                    "received_photos": [photo] if photo else [],
+                    "received_at": parse_timestamp(r.get("LastUpdateDateTime", "")),
+                    "received_by": received_by,
+                }
+                received_rows.append((po_index, audit(recv)))
+
+    # ========================================
+    # PART 2: Active requests from proc_requests
+    # ========================================
+    proc_ws = client.open_by_key("1EFgT0XyBlUe10ENVkm4-_bb4uSPyd9hPbCIzD-RKNRA").worksheet("proc_requests")
+    proc_records = proc_ws.get_all_records()
+
+    URGENCY_MAP = {
+        "today": "today", "2 days": "2_days", "1 week": "7_days",
+        "2 weeks": "not_urgent", "month": "not_urgent",
+    }
+
+    PROC_STATUS_MAP = {
+        "requested": "requested", "ordered": "ordered",
+    }
+
+    for r in proc_records:
+        req_type = str(r.get("request_type", "")).strip()
+        if req_type == "Travel":
+            continue  # Handled in HR migration
+
+        # Map request type
+        if req_type == "Inventory Item":
+            mapped_type = "inventory_item"
+        else:
+            mapped_type = "non_inventory_item"
+
+        # Item name
+        item_name = str(r.get("item_name", "")).strip() or str(r.get("general_item_name", "")).strip()
+        if not item_name:
+            continue
+
+        # Resolve item for inventory items
+        item = item_by_name.get(item_name.lower(), {}) if mapped_type == "inventory_item" else {}
+        item_id = item.get("id") if mapped_type == "inventory_item" else None
+
+        # Vendor
+        vendor_name = str(r.get("manufacturer_vendor", "")).strip()
+        vendor_id = vendor_by_name.get(vendor_name.lower()) if vendor_name else None
+
+        # Employee
+        created_email = str(r.get("created_by", "")).strip().lower()
+        updated_email = str(r.get("updated_by", "")).strip().lower()
+        requested_by = email_to_emp.get(created_email)
+        reviewed_by = email_to_emp.get(updated_email)
+
+        # Status
+        raw_status = str(r.get("request_status", "")).strip().lower()
+        status = PROC_STATUS_MAP.get(raw_status, "requested")
+
+        # Photos
+        photos = []
+        for col in ["request_image_01_url", "request_image_02_url", "request_image_03_url"]:
+            p = str(r.get(col, "")).strip()
+            if p:
+                photos.append(p)
+
+        po = {
+            "org_id": ORG_ID,
+            "farm_id": item.get("farm_id"),
+            "request_type": mapped_type,
+            "urgency_level": URGENCY_MAP.get(str(r.get("urgency_level", "")).strip().lower()),
+            "invnt_category_id": item.get("invnt_category_id") or "maintenance",
+            "invnt_item_id": item_id,
+            "item_name": item_name,
+            "burn_uom": item.get("burn_uom") or "unit",
+            "order_uom": item.get("order_uom") or "unit",
+            "order_quantity": safe_float(r.get("request_quantity", "")),
+            "burn_per_order": item.get("burn_per_order", 0),
+            "invnt_vendor_id": vendor_id,
+            "expected_delivery_date": parse_date(r.get("expected_delivery_date", "")),
+            "notes": str(r.get("request_notes", "")).strip() or None,
+            "request_photos": photos,
+            "status": status,
+            "requested_at": parse_timestamp(r.get("created_on", "")),
+            "requested_by": requested_by or FALLBACK_EMP,
+            "reviewed_at": parse_timestamp(r.get("updated_on", "")) if status != "requested" else None,
+            "reviewed_by": reviewed_by if status != "requested" else None,
+            "ordered_at": parse_timestamp(r.get("updated_on", "")) if status == "ordered" else None,
+            "ordered_by": reviewed_by if status == "ordered" else None,
+        }
+        po_rows.append(audit(po))
+
+    # ========================================
+    # INSERT: lots first, then POs with received
+    # ========================================
+
+    # Insert lots
+    if lot_rows:
+        insert_rows(supabase, "invnt_lot", lot_rows)
+
+    # Insert POs in batches and collect returned IDs
+    print(f"\n--- invnt_po ---")
+    po_ids = []
+    for i in range(0, len(po_rows), 100):
+        batch = po_rows[i:i + 100]
+        result = supabase.table("invnt_po").insert(batch).execute()
+        for row in result.data:
+            po_ids.append(row["id"])
+    print(f"  Inserted {len(po_ids)} rows")
+
+    # Insert received records with resolved PO IDs
+    recv_to_insert = []
+    for po_idx, recv in received_rows:
+        if po_idx < len(po_ids):
+            recv["invnt_po_id"] = po_ids[po_idx]
+            recv_to_insert.append(recv)
+    if recv_to_insert:
+        insert_rows(supabase, "invnt_po_received", recv_to_insert)
+
+
 def main():
     if not SUPABASE_KEY:
         print("ERROR: Set SUPABASE_SERVICE_KEY in .env or environment")
@@ -426,6 +741,7 @@ def main():
     migrate_invnt_category(supabase, client)
     migrate_storage_sites(supabase, client)
     migrate_invnt_item(supabase, client)
+    migrate_invnt_po(supabase, client)
 
     print("\nInventory data migrated successfully")
 
