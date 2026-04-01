@@ -17,7 +17,6 @@
   "devDependencies": {
     "@aloha/eslint-config": "workspace:*",
     "@aloha/prettier-config": "workspace:*",
-    "@aloha/shared": "workspace:*",
     "@aloha/supabase": "workspace:*",
     "@aloha/tailwind-config": "workspace:*",
     "@aloha/tsconfig": "workspace:*",

@@ -19,9 +19,6 @@
     "./auth": "./src/auth.ts",
     "./database": "./src/database.types.ts"
   },
-  "dependencies": {
-    "@aloha/shared": "workspace:*"
-  },
   "devDependencies": {
     "@aloha/eslint-config": "workspace:*",
     "@aloha/prettier-config": "workspace:*",

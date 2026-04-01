@@ -9,8 +9,6 @@ import {
 
 import { z } from 'zod';
 
-import { CsrfTokenMeta } from '~/lib/csrf/client';
-import { createCsrfProtect } from '~/lib/csrf/server';
 import { cn } from '@aloha/ui/utils';
 
 import { RootErrorBoundary } from '~/components/root-error-boundary';
@@ -18,6 +16,8 @@ import { RootHead } from '~/components/root-head';
 import { RootProviders } from '~/components/root-providers';
 import appConfig from '~/config/app.config';
 import { themeCookie } from '~/lib/cookies';
+import { CsrfTokenMeta } from '~/lib/csrf/client';
+import { createCsrfProtect } from '~/lib/csrf/server';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import type { Route } from '~/types/app/+types/root';
 

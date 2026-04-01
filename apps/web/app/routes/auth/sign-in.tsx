@@ -1,7 +1,6 @@
 import { redirect } from 'react-router';
 
 import { SignInMethodsContainer } from '@aloha/auth/sign-in';
-import { getSafeRedirectPath } from '@aloha/shared/utils';
 import { requireUser } from '@aloha/supabase/require-user';
 import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import { Heading } from '@aloha/ui/heading';
@@ -10,6 +9,7 @@ import { Trans } from '@aloha/ui/trans';
 import authConfig from '~/config/auth.config';
 import pathsConfig from '~/config/paths.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
+import { getSafeRedirectPath } from '~/lib/shared/utils';
 import type { Route } from '~/types/app/routes/auth/+types/sign-in';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

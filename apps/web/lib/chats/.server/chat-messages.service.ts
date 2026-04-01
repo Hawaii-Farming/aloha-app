@@ -2,9 +2,8 @@ import { SupabaseClient } from '@supabase/supabase-js';
 
 import { z } from 'zod';
 
-import { getLogger } from '@aloha/shared/logger';
-
 import { Database } from '~/lib/database.types';
+import { getLogger } from '~/lib/shared/logger';
 
 import { ChatSettingsSchema } from '../schema/chat-settings.schema';
 

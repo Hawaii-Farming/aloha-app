@@ -4,7 +4,31 @@ import {
   SupabaseClient,
 } from '@supabase/supabase-js';
 
-import { getSafeRedirectPath } from '@aloha/shared/utils';
+/**
+ * @name isSafeRedirectPath
+ * @description Checks if a path is safe for redirects (prevents open redirect attacks).
+ */
+function isSafeRedirectPath(path: string): boolean {
+  if (!path || typeof path !== 'string') return false;
+  if (!path.startsWith('/') || path.startsWith('//')) return false;
+  if (path.includes('://')) return false;
+  if (path.includes('\\')) return false;
+  return true;
+}
+
+/**
+ * @name getSafeRedirectPath
+ * @description Returns the path if safe, otherwise returns the fallback.
+ */
+function getSafeRedirectPath(
+  path: string | null | undefined,
+  fallback: string,
+): string {
+  if (path && isSafeRedirectPath(path)) {
+    return path;
+  }
+  return fallback;
+}
 
 /**
  * @name createAuthCallbackService

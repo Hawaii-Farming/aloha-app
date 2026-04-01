@@ -1,8 +1,8 @@
-import { getLogger } from '@aloha/shared/logger';
+import { getLogger } from '~/lib/shared/logger';
 
-import { RecordChange, Tables } from './record-change.type';
 import { createDatabaseWebhookRouterService } from './database-webhook-router.service';
 import { getDatabaseWebhookVerifier } from './database-webhook-verifier-factory';
+import { RecordChange, Tables } from './record-change.type';
 
 /**
  * @name DatabaseChangePayload

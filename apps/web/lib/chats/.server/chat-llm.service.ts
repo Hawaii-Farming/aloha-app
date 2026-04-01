@@ -7,10 +7,9 @@ import { encodeChat } from 'gpt-tokenizer';
 import process from 'node:process';
 import { z } from 'zod';
 
-import { getLogger } from '@aloha/shared/logger';
-
 import { createChatMessagesService } from '~/lib/chats/.server/chat-messages.service';
 import { Database } from '~/lib/database.types';
+import { getLogger } from '~/lib/shared/logger';
 
 export const ChatMessagesSchema = z.object({
   messages: z.array(

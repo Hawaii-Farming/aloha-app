@@ -2,12 +2,12 @@ import { redirect } from 'react-router';
 
 import { UpdatePasswordForm } from '@aloha/auth/password-reset';
 import { AuthLayoutShell } from '@aloha/auth/shared';
-import { getSafeRedirectPath } from '@aloha/shared/utils';
 
 import { AppLogo } from '~/components/app-logo';
 import pathsConfig from '~/config/paths.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { requireUserLoader } from '~/lib/require-user-loader';
+import { getSafeRedirectPath } from '~/lib/shared/utils';
 import type { Route } from '~/types/app/routes/auth/+types/update-password';
 
 export const loader = async (args: Route.LoaderArgs) => {
