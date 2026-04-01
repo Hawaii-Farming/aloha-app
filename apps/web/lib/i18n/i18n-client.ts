@@ -22,19 +22,19 @@ export async function initializeI18nClient(
   await new Promise((resolve) => {
     void i18next
       .use(
-        resourcesToBackend(async (language, namespace, callback) => {
+        resourcesToBackend(async (language: string, namespace: string) => {
           try {
             const data = await resolver(language, namespace);
             loadedNamespaces.add(namespace);
 
-            return callback(null, data);
+            return data;
           } catch (error) {
             console.log(
               `Error loading i18n file: locales/${language}/${namespace}.json`,
               error,
             );
 
-            return callback(null, {});
+            return {};
           }
         }),
       )

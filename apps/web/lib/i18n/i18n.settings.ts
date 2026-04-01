@@ -1,4 +1,4 @@
-import { createI18nSettings } from '@aloha/i18n';
+import { createI18nSettings } from '~/lib/i18n/create-i18n-settings';
 
 /**
  * The default language of the application.

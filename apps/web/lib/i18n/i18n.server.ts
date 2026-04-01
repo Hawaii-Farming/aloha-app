@@ -1,11 +1,10 @@
 import { z } from 'zod';
 
-import { parseAcceptLanguageHeader } from '@aloha/i18n';
-import { initializeServerI18n } from '@aloha/i18n/server';
-
 import featuresFlagConfig from '~/config/feature-flags.config';
 import { languageCookie } from '~/lib/cookies';
+import { initializeServerI18n } from '~/lib/i18n/i18n-server';
 import { getI18nSettings, languages } from '~/lib/i18n/i18n.settings';
+import { parseAcceptLanguageHeader } from '~/lib/i18n/parse-language-header';
 
 import { i18nResolver } from './i18n.resolver';
 
