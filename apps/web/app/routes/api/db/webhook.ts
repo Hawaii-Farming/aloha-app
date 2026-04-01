@@ -1,4 +1,4 @@
-import { getDatabaseWebhookHandlerService } from '@aloha/database-webhooks';
+import { getDatabaseWebhookHandlerService } from '~/lib/webhooks/database-webhook-handler.service';
 
 import type { Route } from '~/types/app/routes/api/db/+types/webhook';
 

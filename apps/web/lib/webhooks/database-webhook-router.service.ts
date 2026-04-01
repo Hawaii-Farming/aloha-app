@@ -1,4 +1,4 @@
-import { RecordChange, Tables } from '../record-change.type';
+import { RecordChange, Tables } from './record-change.type';
 
 export function createDatabaseWebhookRouterService() {
   return new DatabaseWebhookRouterService();
