@@ -1,7 +1,7 @@
 import type { CrudModuleConfig } from '~/lib/crud/types';
 
 import { hrDepartmentConfig } from './hr-department.config';
-import { invProductConfig } from './inv-product.config';
+import { invntItemConfig } from './invnt-item.config';
 
 /**
  * Maps sub-module slugs (from URL params) to their CRUD configs.
@@ -12,7 +12,7 @@ import { invProductConfig } from './inv-product.config';
  */
 const registry = new Map<string, CrudModuleConfig>([
   ['departments', hrDepartmentConfig],
-  ['products', invProductConfig],
+  ['products', invntItemConfig],
 ]);
 
 export function getModuleConfig(

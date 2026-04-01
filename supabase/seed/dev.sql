@@ -4,7 +4,7 @@
 -- This file only inserts test data — do not run in production.
 
 -- ============================================================
--- Test auth user (email: test@test.com / password: password123)
+-- Admin user (email: admin@hawaiifarming.com / password: password123)
 -- ============================================================
 
 INSERT INTO auth.users (
@@ -19,11 +19,11 @@ INSERT INTO auth.users (
   '00000000-0000-0000-0000-000000000000',
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   'authenticated', 'authenticated',
-  'test@test.com',
+  'admin@hawaiifarming.com',
   crypt('password123', gen_salt('bf', 10)),
   now(), now(), now(),
   '{"provider":"email","providers":["email"]}',
-  '{"display_name":"Test User"}',
+  '{"display_name":"Admin User"}',
   false, false,
   '', '', '',
   '', '', '', 0,
@@ -36,7 +36,7 @@ INSERT INTO auth.identities (
 ) VALUES (
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-  jsonb_build_object('sub', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'email', 'test@test.com', 'email_verified', true, 'phone_verified', false),
+  jsonb_build_object('sub', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'email', 'admin@hawaiifarming.com', 'email_verified', true, 'phone_verified', false),
   'email', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   now(), now(), now()
 ) ON CONFLICT (provider_id, provider) DO NOTHING;
@@ -193,13 +193,25 @@ INSERT INTO public.hr_department (id, org_id, name, description, is_deleted, cre
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
--- CRUD Demo: inv_product seed data (exercises all field types + workflow)
+-- CRUD Demo: invnt_category seed data
 -- ============================================================
 
-INSERT INTO public.inv_product (org_id, name, description, quantity, unit_price, purchase_date, is_active, category, department_id, status, created_by, updated_by) VALUES
-  ('acme-farms', 'John Deere Tractor', 'Main field tractor for plowing', 2, 45000.00, '2024-01-15', true, 'Equipment', 'operations', 'active', 'emp-001', 'emp-001'),
-  ('acme-farms', 'Irrigation Hoses', 'Drip irrigation hose 100ft rolls', 50, 25.99, '2024-03-01', true, 'Supplies', 'operations', 'active', 'emp-001', 'emp-001'),
-  ('acme-farms', 'Soil pH Meter', 'Digital soil pH and moisture tester', 5, 89.00, '2024-06-10', true, 'Tools', 'engineering', 'draft', 'emp-001', 'emp-001'),
-  ('acme-farms', 'Tomato Seeds - Roma', 'Organic Roma tomato seeds 1lb bags', 100, 12.50, '2025-01-20', true, 'Seeds', NULL, 'active', 'emp-001', 'emp-001'),
-  ('acme-farms', 'Old Sprayer', 'Backpack sprayer - needs repair', 1, 150.00, '2022-05-01', false, 'Equipment', 'operations', 'retired', 'emp-001', 'emp-001')
+INSERT INTO public.invnt_category (id, org_id, category_name, sub_category_name, created_by, updated_by) VALUES
+  ('cat-equipment', 'acme-farms', 'Equipment', NULL, 'emp-001', 'emp-001'),
+  ('cat-supplies', 'acme-farms', 'Supplies', NULL, 'emp-001', 'emp-001'),
+  ('cat-tools', 'acme-farms', 'Tools', NULL, 'emp-001', 'emp-001'),
+  ('cat-seeds', 'acme-farms', 'Seeds', NULL, 'emp-001', 'emp-001'),
+  ('cat-supplies-irrigation', 'acme-farms', 'Supplies', 'Irrigation', 'emp-001', 'emp-001')
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- CRUD Demo: invnt_item seed data
+-- ============================================================
+
+INSERT INTO public.invnt_item (id, org_id, name, description, invnt_category_id, is_active, created_by, updated_by) VALUES
+  ('item-tractor', 'acme-farms', 'John Deere Tractor', 'Main field tractor for plowing', 'cat-equipment', true, 'emp-001', 'emp-001'),
+  ('item-hoses', 'acme-farms', 'Irrigation Hoses', 'Drip irrigation hose 100ft rolls', 'cat-supplies-irrigation', true, 'emp-001', 'emp-001'),
+  ('item-ph-meter', 'acme-farms', 'Soil pH Meter', 'Digital soil pH and moisture tester', 'cat-tools', true, 'emp-001', 'emp-001'),
+  ('item-tomato-seeds', 'acme-farms', 'Tomato Seeds - Roma', 'Organic Roma tomato seeds 1lb bags', 'cat-seeds', true, 'emp-001', 'emp-001'),
+  ('item-sprayer', 'acme-farms', 'Old Sprayer', 'Backpack sprayer - needs repair', 'cat-equipment', false, 'emp-001', 'emp-001')
 ON CONFLICT DO NOTHING;

@@ -115,7 +115,7 @@ import type { Tables, Enums } from '@aloha/supabase/database';
 
 type Org = Tables<'org'>;
 type Employee = Tables<'hr_employee'>;
-type Product = Tables<'inv_product'>;
+type Item = Tables<'invnt_item'>;
 ```
 
 ## Commands
