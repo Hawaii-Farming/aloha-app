@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router';
 
 import { Home, LogOut, Menu } from 'lucide-react';
 
-import { useSignOut } from '@aloha/supabase/hooks/use-sign-out';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +20,7 @@ import { Trans } from '@aloha/ui/trans';
 
 import pathsConfig from '~/config/paths.config';
 import { getWorkspaceSidebarConfig } from '~/config/workspace-navigation.config';
+import { useSignOut } from '~/lib/supabase/hooks/use-sign-out';
 
 type Accounts = Array<{
   label: string | null;

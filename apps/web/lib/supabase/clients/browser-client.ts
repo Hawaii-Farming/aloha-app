@@ -1,6 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr';
 
-import { Database } from '../database.types';
+import type { Database } from '~/lib/database.types';
+
 import { getSupabaseClientKeys } from '../get-supabase-client-keys';
 
 /**

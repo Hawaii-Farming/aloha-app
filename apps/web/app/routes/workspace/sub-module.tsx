@@ -5,7 +5,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
 import { Button } from '@aloha/ui/button';
 import { DataTableColumnHeader } from '@aloha/ui/data-table-column-header';
@@ -16,6 +15,7 @@ import { Trans } from '@aloha/ui/trans';
 
 import { loadTableData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import {
   requireModuleAccess,
   requireSubModuleAccess,

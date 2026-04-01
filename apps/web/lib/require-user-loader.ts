@@ -1,7 +1,7 @@
 import { redirect } from 'react-router';
 
-import { requireUser } from '@aloha/supabase/require-user';
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
+import { requireUser } from '~/lib/supabase/require-user';
 
 /**
  * @name requireUserLoader

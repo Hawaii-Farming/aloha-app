@@ -1,12 +1,5 @@
-import type {
-  AMREntry,
-  JwtPayload,
-  SupabaseClient,
-} from '@supabase/supabase-js';
+import type { JwtPayload, SupabaseClient } from '@supabase/supabase-js';
 
-import { checkRequiresMultiFactorAuthentication } from './check-requires-mfa';
-
-const MULTI_FACTOR_AUTH_VERIFY_PATH = '/auth/verify';
 const SIGN_IN_PATH = '/auth/sign-in';
 
 /**
@@ -27,21 +20,15 @@ type UserClaims = {
   aal: `aal1` | `aal2`;
   session_id: string;
   is_anonymous: boolean;
-  amr: AMREntry[];
 };
 
 /**
  * @name requireUser
  * @description Require a session to be present in the request
- * @param client
- * @param options
- * @param options.verifyMfa
- * @param options.next
  */
 export async function requireUser(
   client: SupabaseClient,
   options?: {
-    verifyMfa?: boolean;
     next?: string;
   },
 ): Promise<
@@ -49,18 +36,11 @@ export async function requireUser(
       error: null;
       data: JwtPayload;
     }
-  | (
-      | {
-          error: AuthenticationError;
-          data: null;
-          redirectTo: string;
-        }
-      | {
-          error: MultiFactorAuthError;
-          data: null;
-          redirectTo: string;
-        }
-    )
+  | {
+      error: AuthenticationError;
+      data: null;
+      redirectTo: string;
+    }
 > {
   const { data, error } = await client.auth.getClaims();
 
@@ -70,22 +50,6 @@ export async function requireUser(
       error: new AuthenticationError(),
       redirectTo: getRedirectTo(SIGN_IN_PATH, options?.next),
     };
-  }
-
-  const { verifyMfa = true } = options ?? {};
-
-  if (verifyMfa) {
-    const requiresMfa = await checkRequiresMultiFactorAuthentication(client);
-
-    // If the user requires multi-factor authentication,
-    // redirect them to the page where they can verify their identity.
-    if (requiresMfa) {
-      return {
-        data: null,
-        error: new MultiFactorAuthError(),
-        redirectTo: getRedirectTo(MULTI_FACTOR_AUTH_VERIFY_PATH, options?.next),
-      };
-    }
   }
 
   // the client doesn't type the claims, so we need to cast it to the User type
@@ -103,12 +67,6 @@ export async function requireUser(
 class AuthenticationError extends Error {
   constructor() {
     super(`Authentication required`);
-  }
-}
-
-export class MultiFactorAuthError extends Error {
-  constructor() {
-    super(`Multi-factor authentication required`);
   }
 }
 

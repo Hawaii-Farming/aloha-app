@@ -1,4 +1,4 @@
-import { Database } from '@aloha/supabase/database';
+import { Database } from '~/lib/database.types';
 
 export type Tables = Database['public']['Tables'];
 

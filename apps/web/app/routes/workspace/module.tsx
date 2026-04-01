@@ -2,8 +2,7 @@ import { redirect } from 'react-router';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
-
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { requireModuleAccess } from '~/lib/workspace/require-module-access.server';
 
 export const loader = async (args: {

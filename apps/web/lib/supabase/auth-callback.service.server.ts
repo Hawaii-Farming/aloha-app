@@ -33,7 +33,6 @@ function getSafeRedirectPath(
 /**
  * @name createAuthCallbackService
  * @description Creates an instance of the AuthCallbackService
- * @param client
  */
 export function createAuthCallbackService(client: SupabaseClient) {
   return new AuthCallbackService(client);
@@ -49,9 +48,6 @@ class AuthCallbackService {
   /**
    * @name verifyTokenHash
    * @description Verifies the token hash and type and redirects the user to the next page
-   * This should be used when using a token hash to verify the user's email
-   * @param request
-   * @param params
    */
   async verifyTokenHash(
     request: Request,
@@ -143,8 +139,6 @@ class AuthCallbackService {
   /**
    * @name exchangeCodeForSession
    * @description Exchanges the auth code for a session and redirects the user to the next page or an error page
-   * @param request
-   * @param params
    */
   async exchangeCodeForSession(
     request: Request,
@@ -246,29 +240,21 @@ function onError({
 
 /**
  * Checks if the given error message indicates a verifier error.
- * We check for this specific error because it's highly likely that the
- * user is trying to sign in using a different browser than the one they
- * used to request the sign in link. This is a common mistake, so we
- * want to provide a helpful error message.
  */
 function isVerifierError(error: string) {
   return error.includes('both auth code and code verifier should be non-empty');
 }
 
 function getAuthErrorMessage(params: { error: string; code?: string }) {
-  // this error arises when the user tries to sign in with an expired email link
   if (params.code) {
     if (params.code === 'otp_expired') {
       return 'auth:errors.otp_expired';
     }
   }
 
-  // this error arises when the user is trying to sign in with a different
-  // browser than the one they used to request the sign in link
   if (isVerifierError(params.error)) {
     return 'auth:errors.codeVerifierMismatch';
   }
 
-  // fallback to the default error message
   return `auth:authenticationErrorAlertBody`;
 }

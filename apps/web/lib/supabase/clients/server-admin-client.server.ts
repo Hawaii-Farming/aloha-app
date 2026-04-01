@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-import { Database } from '../database.types';
+import type { Database } from '~/lib/database.types';
+
 import {
   getSupabaseSecretKey,
   warnSupabaseSecretKeyUsage,
@@ -11,7 +12,7 @@ const supabaseSecretKey = getSupabaseSecretKey();
 const keys = getSupabaseClientKeys();
 
 /**
- * @name getSupabaseServerClient
+ * @name getSupabaseServerAdminClient
  * @description Get a Supabase client for use in server-side functions as an admin.
  */
 export function getSupabaseServerAdminClient<GenericSchema = Database>() {

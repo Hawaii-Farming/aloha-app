@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuthChangeListener } from '@aloha/supabase/hooks/use-auth-change-listener';
+import { useAuthChangeListener } from '~/lib/supabase/hooks/use-auth-change-listener';
 
 export function AuthProvider(props: React.PropsWithChildren) {
   useAuthChangeListener({ onEvent: () => {} });

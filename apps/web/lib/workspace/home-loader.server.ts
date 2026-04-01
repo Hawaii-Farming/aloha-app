@@ -1,9 +1,8 @@
 import { redirect } from 'react-router';
 
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
-
 import pathsConfig from '~/config/paths.config';
 import { requireUserLoader } from '~/lib/require-user-loader';
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
 interface OrgRow {
   org_id: string;

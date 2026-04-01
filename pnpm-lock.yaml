@@ -81,9 +81,6 @@ importers:
       '@ai-sdk/react':
         specifier: ^3.0.143
         version: 3.0.143(react@19.2.3)(zod@3.25.76)
-      '@aloha/ai':
-        specifier: workspace:*
-        version: link:../../packages/features/ai
       '@aloha/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -223,46 +220,6 @@ importers:
       vite-tsconfig-paths:
         specifier: ^6.0.3
         version: 6.0.3(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2))
-
-  packages/features/ai:
-    dependencies:
-      '@ai-sdk/anthropic':
-        specifier: ^3.0.64
-        version: 3.0.64(zod@3.25.76)
-      '@ai-sdk/react':
-        specifier: ^3.0.143
-        version: 3.0.143(react@19.2.3)(zod@3.25.76)
-      '@aloha/ui':
-        specifier: workspace:*
-        version: link:../../ui
-      ai:
-        specifier: ^6.0.141
-        version: 6.0.141(zod@3.25.76)
-      lucide-react:
-        specifier: ^0.562.0
-        version: 0.562.0(react@19.2.3)
-      zod:
-        specifier: 3.25.76
-        version: 3.25.76
-    devDependencies:
-      '@aloha/tsconfig':
-        specifier: workspace:*
-        version: link:../../../tooling/typescript
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.7
-      react:
-        specifier: ^19.0.0
-        version: 19.2.3
-      react-hook-form:
-        specifier: ^7.69.0
-        version: 7.69.0(react@19.2.3)
-      react-router:
-        specifier: ^7.12.0
-        version: 7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
 
   packages/mcp-server:
     devDependencies:

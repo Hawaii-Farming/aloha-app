@@ -5,8 +5,6 @@ import { JwtPayload } from '@supabase/supabase-js';
 import { LogOut, Palette } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-import { useSignOut } from '@aloha/supabase/hooks/use-sign-out';
-import { useUser } from '@aloha/supabase/hooks/use-user';
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
 import {
   DropdownMenu,
@@ -19,6 +17,8 @@ import {
 import { Trans } from '@aloha/ui/trans';
 
 import featuresFlagConfig from '~/config/feature-flags.config';
+import { useSignOut } from '~/lib/supabase/hooks/use-sign-out';
+import { useUser } from '~/lib/supabase/hooks/use-user';
 
 export function UserProfileDropdown(props: {
   user?: JwtPayload | null;

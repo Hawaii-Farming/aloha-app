@@ -1,6 +1,6 @@
 import { data } from 'react-router';
 
-import { getSupabaseServerAdminClient } from '@aloha/supabase/server-admin-client';
+import { getSupabaseServerAdminClient } from '~/lib/supabase/clients/server-admin-client.server';
 
 export async function loader() {
   const isDbHealthy = await getSupabaseHealthCheck();
