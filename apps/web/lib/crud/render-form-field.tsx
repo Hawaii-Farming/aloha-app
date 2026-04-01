@@ -1,6 +1,5 @@
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
-import type { FormFieldConfig } from '~/lib/crud/types';
 import { FkCombobox } from '@aloha/ui/fk-combobox';
 import {
   FormBooleanField,
@@ -10,6 +9,8 @@ import {
   FormTextField,
   FormTextareaField,
 } from '@aloha/ui/form-fields';
+
+import type { FormFieldConfig } from '~/lib/crud/types';
 
 interface RenderFormFieldParams {
   field: FormFieldConfig;
