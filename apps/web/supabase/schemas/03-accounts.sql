@@ -96,57 +96,6 @@ with
     ) = primary_owner_user_id
   );
 
--- Function "public.transfer_team_account_ownership"
--- Function to transfer the ownership of a team account to another user
-create
-or replace function public.transfer_team_account_ownership (target_account_id uuid, new_owner_id uuid) returns void
-set
-  search_path = '' as $$
-begin
-    if current_user not in('service_role') then
-        raise exception 'You do not have permission to transfer account ownership';
-    end if;
-
-    -- verify the user is already a member of the account
-    if not exists(
-        select
-            1
-        from
-            public.accounts_memberships
-        where
-            target_account_id = account_id
-            and user_id = new_owner_id) then
-        raise exception 'The new owner must be a member of the account';
-    end if;
-
-    -- update the primary owner of the account
-    update
-        public.accounts
-    set
-        primary_owner_user_id = new_owner_id
-    where
-        id = target_account_id
-        and is_personal_account = false;
-
-    -- update membership assigning it the hierarchy role
-    update
-        public.accounts_memberships
-    set
-        account_role =(
-            public.get_upper_system_role())
-    where
-        target_account_id = account_id
-        and user_id = new_owner_id
-        and account_role <>(
-            public.get_upper_system_role());
-
-end;
-
-$$ language plpgsql;
-
-grant
-execute on function public.transfer_team_account_ownership (uuid, uuid) to service_role;
-
 -- Function "public.is_account_owner"
 -- Function to check if a user is the primary owner of an account
 create
@@ -195,55 +144,9 @@ create trigger protect_account_fields before
 update on public.accounts for each row
 execute function kit.protect_account_fields ();
 
--- Function "public.get_upper_system_role"
--- Function to get the highest system role for an account
-create
-or replace function public.get_upper_system_role () returns varchar
-set
-  search_path = '' as $$
-declare
-    role varchar(50);
-begin
-    select name from public.roles
-      where hierarchy_level = 1 into role;
-
-    return role;
-end;
-$$ language plpgsql;
-
-grant
-execute on function public.get_upper_system_role () to service_role;
-
--- Function "kit.add_current_user_to_new_account"
--- Trigger to add the current user to a new account as the primary owner
-create
-or replace function kit.add_current_user_to_new_account () returns trigger language plpgsql security definer
-set
-  search_path = '' as $$
-begin
-    if new.primary_owner_user_id = auth.uid() then
-        insert into public.accounts_memberships(
-            account_id,
-            user_id,
-            account_role)
-        values(
-            new.id,
-            auth.uid(),
-            public.get_upper_system_role());
-
-    end if;
-
-    return NEW;
-
-end;
-
-$$;
-
--- trigger the function whenever a new account is created
-create trigger "add_current_user_to_new_account"
-after insert on public.accounts for each row
-when (new.is_personal_account = false)
-execute function kit.add_current_user_to_new_account ();
+-- TODO: simplify — add_current_user_to_new_account trigger removed;
+-- the template used accounts_memberships + roles (deleted). If team account
+-- membership tracking is needed, wire it to hr_employee instead.
 
 -- create a trigger to update the account email when the primary owner email is updated
 create
@@ -511,50 +414,6 @@ create policy delete_team_account
         auth.uid() = primary_owner_user_id
     );
 
--- Functions "public.get_account_members"
--- Function to get the members of an account by the account slug
-create
-or replace function public.get_account_members (account_slug text) returns table (
-  id uuid,
-  user_id uuid,
-  account_id uuid,
-  role varchar(50),
-  role_hierarchy_level int,
-  primary_owner_user_id uuid,
-  name varchar,
-  email varchar,
-  picture_url varchar,
-  created_at timestamptz,
-  updated_at timestamptz
-) language plpgsql
-set
-  search_path = '' as $$
-begin
-    return QUERY
-    select
-        acc.id,
-        am.user_id,
-        am.account_id,
-        am.account_role,
-        r.hierarchy_level,
-        a.primary_owner_user_id,
-        acc.name,
-        acc.email,
-        acc.picture_url,
-        am.created_at,
-        am.updated_at
-    from
-        public.accounts_memberships am
-        join public.accounts a on a.id = am.account_id
-        join public.accounts acc on acc.id = am.user_id
-        join public.roles r on r.name = am.account_role
-    where
-        a.slug = account_slug;
-
-end;
-
-$$;
-
-grant
-execute on function public.get_account_members (text) to authenticated,
-service_role;
+-- TODO: simplify — get_account_members removed; referenced accounts_memberships
+-- and roles tables which were part of the template RBAC (now deleted).
+-- Member listing should be implemented via hr_employee queries instead.
