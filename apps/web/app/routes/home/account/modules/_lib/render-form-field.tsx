@@ -1,6 +1,6 @@
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
-import type { FormFieldConfig } from '@aloha/crud/types';
+import type { FormFieldConfig } from '~/lib/crud/types';
 import { FkCombobox } from '@aloha/ui/fk-combobox';
 import {
   FormBooleanField,

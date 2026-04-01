@@ -1,15 +1,3 @@
-/**
- * Nav View Contract Types
- *
- * These interfaces document the expected column shapes for the SQL views
- * that provide navigation and access control data. When database.types.ts
- * is populated via `pnpm supabase:web:typegen`, prefer using
- * `Tables<'app_nav_modules'>` etc. These interfaces serve as
- * documentation and fallback.
- *
- * See: apps/web/supabase/schemas/20-nav-view-contracts.sql
- */
-
 /** Row shape from app_nav_modules view */
 export interface AppNavModule {
   module_id: string;

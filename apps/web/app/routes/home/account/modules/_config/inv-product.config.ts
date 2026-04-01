@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { CrudModuleConfig } from '@aloha/crud/types';
+import type { CrudModuleConfig } from '~/lib/crud/types';
 
 const invProductSchema = z.object({
   name: z.string().min(1, 'Name is required'),

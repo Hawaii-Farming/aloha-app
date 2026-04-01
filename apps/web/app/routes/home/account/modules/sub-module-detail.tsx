@@ -4,8 +4,8 @@ import { Link, redirect, useFetcher } from 'react-router';
 
 import { Pencil, Trash2 } from 'lucide-react';
 
-import { AccessGate } from '@aloha/access-control/components';
-import { useModuleAccess } from '@aloha/access-control/hooks';
+import { AccessGate } from '~/lib/workspace/access-gate';
+import { useModuleAccess } from '~/lib/workspace/use-module-access';
 import { createWorkflowAgent } from '@aloha/ai/workflow-automation';
 import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import {

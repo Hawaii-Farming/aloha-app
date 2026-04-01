@@ -1,4 +1,4 @@
-import type { FormFieldConfig, WorkflowConfig } from '@aloha/crud/types';
+import type { FormFieldConfig, WorkflowConfig } from '~/lib/crud/types';
 
 export interface WorkflowHistoryEntry {
   action: string;

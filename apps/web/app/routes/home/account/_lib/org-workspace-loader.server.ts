@@ -5,7 +5,7 @@ import type { JwtPayload, SupabaseClient } from '@supabase/supabase-js';
 import type {
   AppNavModule,
   AppNavSubModule,
-} from '@aloha/access-control/view-contracts';
+} from '~/lib/workspace/types';
 import type { AppOrgContext, AppUserOrgs } from '@aloha/auth/view-contracts';
 
 import type { Database } from '~/lib/database.types';

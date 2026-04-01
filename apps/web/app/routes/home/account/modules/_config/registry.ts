@@ -1,4 +1,4 @@
-import type { CrudModuleConfig } from '@aloha/crud/types';
+import type { CrudModuleConfig } from '~/lib/crud/types';
 
 import { hrDepartmentConfig } from './hr-department.config';
 import { invProductConfig } from './inv-product.config';

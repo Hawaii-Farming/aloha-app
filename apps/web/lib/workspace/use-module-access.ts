@@ -11,14 +11,6 @@ interface ModulePermissions {
   can_verify: boolean;
 }
 
-/**
- * Read module permissions from the current sub-module route's loader data.
- *
- * The sub-module route loader returns `moduleAccess` which contains
- * the permission flags from the app_nav_modules view.
- *
- * Returns null if no module access data is available (e.g., not on a module route).
- */
 export function useModuleAccess(): ModulePermissions | null {
   const listData = useRouteLoaderData(
     'routes/home/account/modules/sub-module',
@@ -44,11 +36,6 @@ export function useModuleAccess(): ModulePermissions | null {
   }, [listData, detailData, createData, editData]);
 }
 
-/**
- * Check a specific permission on the current module.
- *
- * Returns false if no module access data is available.
- */
 export function useHasPermission(
   permission: 'can_edit' | 'can_delete' | 'can_verify',
 ): boolean {

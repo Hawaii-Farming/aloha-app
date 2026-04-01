@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import { useModuleAccess } from '../hooks/use-module-access';
+import { useModuleAccess } from './use-module-access';
 
 interface AccessGateProps {
   permission: 'can_edit' | 'can_delete' | 'can_verify';
@@ -10,12 +10,6 @@ interface AccessGateProps {
   fallback?: ReactNode;
 }
 
-/**
- * Conditionally render children based on the current user's module permissions.
- *
- * Reads permissions from the nearest sub-module route loader data.
- * If no module access data is found, renders fallback (or nothing).
- */
 export function AccessGate(props: AccessGateProps) {
   const access = useModuleAccess();
 

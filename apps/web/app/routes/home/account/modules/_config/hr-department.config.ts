@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { CrudModuleConfig } from '@aloha/crud/types';
+import type { CrudModuleConfig } from '~/lib/crud/types';
 
 const hrDepartmentSchema = z.object({
   id: z.string().min(1, 'ID is required'),

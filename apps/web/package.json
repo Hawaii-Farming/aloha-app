@@ -30,10 +30,8 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
     "@ai-sdk/react": "^3.0.143",
-    "@aloha/access-control": "workspace:*",
     "@aloha/ai": "workspace:*",
     "@aloha/auth": "workspace:*",
-    "@aloha/crud": "workspace:*",
     "@aloha/csrf": "workspace:*",
     "@aloha/database-webhooks": "workspace:*",
     "@aloha/i18n": "workspace:*",

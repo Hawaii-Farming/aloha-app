@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type {
   AppNavModule as NavModule,
   AppNavSubModule as NavSubModule,
-} from '@aloha/access-control/view-contracts';
+} from '~/lib/workspace/types';
 
 /**
  * Server-side guard: verifies the current user has access to the requested module.

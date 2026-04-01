@@ -7,7 +7,7 @@ import { ChevronRight } from 'lucide-react';
 import type {
   AppNavModule,
   AppNavSubModule,
-} from '@aloha/access-control/view-contracts';
+} from '~/lib/workspace/types';
 import {
   Collapsible,
   CollapsibleContent,
