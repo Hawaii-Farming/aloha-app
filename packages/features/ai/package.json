@@ -1,0 +1,37 @@
+{
+  "name": "@aloha/ai",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
+    "format": "prettier --check \"**/*.{ts,tsx}\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./ai-context": "./src/lib/ai-context.ts",
+    "./build-system-prompt": "./src/lib/build-system-prompt.server.ts",
+    "./ai-chat-provider": "./src/components/ai-chat-provider.tsx",
+    "./ai-chat-panel": "./src/components/ai-chat-panel.tsx",
+    "./ai-chat-button": "./src/components/ai-chat-button.tsx",
+    "./ai-form-assist": "./src/components/ai-form-assist.tsx",
+    "./workflow-automation": "./src/lib/workflow-automation.server.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.64",
+    "@ai-sdk/react": "^3.0.143",
+    "@aloha/ui": "workspace:*",
+    "ai": "^6.0.141",
+    "lucide-react": "^0.562.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@aloha/tsconfig": "workspace:*",
+    "@types/react": "catalog:",
+    "react": "^19.0.0",
+    "react-hook-form": "^7.69.0",
+    "react-router": "^7.12.0",
+    "typescript": "^5.9.3"
+  }
+}

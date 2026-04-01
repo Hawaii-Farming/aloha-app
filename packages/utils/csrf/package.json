@@ -1,0 +1,39 @@
+{
+  "name": "@aloha/csrf",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
+    "format": "prettier --check \"**/*.{ts,tsx}\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@aloha/prettier-config",
+  "exports": {
+    "./client": "./src/client/index.ts",
+    "./server": "./src/server/index.ts",
+    "./schema": "./src/schema/csrf-token.schema.ts"
+  },
+  "devDependencies": {
+    "@aloha/eslint-config": "workspace:*",
+    "@aloha/prettier-config": "workspace:*",
+    "@aloha/tailwind-config": "workspace:*",
+    "@aloha/tsconfig": "workspace:*",
+    "@react-router/node": "^7.12.0",
+    "@types/react": "catalog:",
+    "react": "catalog:",
+    "react-hook-form": "^7.69.0",
+    "zod": "catalog:"
+  },
+  "dependencies": {
+    "@edge-csrf/core": "2.5.3-cloudflare-rc1",
+    "react-router": "^7.12.0"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  }
+}

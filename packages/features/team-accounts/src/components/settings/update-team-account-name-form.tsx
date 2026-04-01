@@ -1,0 +1,126 @@
+'use client';
+
+import { useEffect } from 'react';
+
+import { useFetcher } from 'react-router';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+import { useCsrfToken } from '@aloha/csrf/client';
+import { Button } from '@aloha/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@aloha/ui/form';
+import { Input } from '@aloha/ui/input';
+import { Trans } from '@aloha/ui/trans';
+
+import { TeamNameFormSchema, type UpdateTeamNameSchema } from '../../schema';
+
+export const UpdateTeamAccountNameForm = (props: {
+  account: {
+    name: string;
+    slug: string;
+  };
+
+  path: string;
+}) => {
+  const csrfToken = useCsrfToken();
+  const { t } = useTranslation('teams');
+
+  const fetcher = useFetcher<{
+    success: boolean;
+  }>();
+
+  const pending = fetcher.state === 'submitting';
+
+  const form = useForm({
+    resolver: zodResolver(TeamNameFormSchema),
+    defaultValues: {
+      name: props.account.name,
+      csrfToken,
+    },
+  });
+
+  useEffect(() => {
+    if (fetcher.data) {
+      if (fetcher.data.success) {
+        toast.success(t('updateTeamSuccessMessage'));
+      } else {
+        toast.error(t('updateTeamErrorMessage'));
+      }
+    }
+  }, [fetcher.data, t]);
+
+  return (
+    <div className={'space-y-8'}>
+      <Form {...form}>
+        <form
+          data-test={'update-team-account-name-form'}
+          className={'flex flex-col space-y-4'}
+          onSubmit={form.handleSubmit((data) => {
+            return fetcher.submit(
+              {
+                intent: 'update-team-name',
+                payload: {
+                  slug: props.account.slug,
+                  name: data.name,
+                  path: props.path,
+                  csrfToken,
+                },
+              } satisfies z.infer<typeof UpdateTeamNameSchema>,
+              {
+                method: 'POST',
+                encType: 'application/json',
+              },
+            );
+          })}
+        >
+          <FormField
+            name={'name'}
+            render={({ field }) => {
+              return (
+                <FormItem>
+                  <FormLabel>
+                    <Trans i18nKey={'teams:teamNameInputLabel'} />
+                  </FormLabel>
+
+                  <FormControl>
+                    <Input
+                      data-test={'team-name-input'}
+                      required
+                      placeholder={''}
+                      {...field}
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+
+          <div>
+            <Button
+              name={'intent'}
+              value={'update-team-name'}
+              className={'w-full md:w-auto'}
+              data-test={'update-team-submit-button'}
+              disabled={pending}
+            >
+              <Trans i18nKey={'teams:updateTeamSubmitLabel'} />
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};

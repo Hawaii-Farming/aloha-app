@@ -1,0 +1,58 @@
+{
+  "name": "react-router-supabase-saas-kit-turbo",
+  "version": "2.21.14",
+  "private": true,
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20.x"
+  },
+  "author": {
+    "name": "Aloha"
+  },
+  "scripts": {
+    "turbo": "turbo",
+    "postinstall": "manypkg fix",
+    "build": "turbo build --cache-dir=.turbo",
+    "clean": "git clean -xdf node_modules dist",
+    "clean:workspaces": "turbo clean",
+    "dev": "cross-env FORCE_COLOR=1 turbo dev --parallel",
+    "format": "turbo format --cache-dir=.turbo --continue -- --cache --cache-location=\"node_modules/.cache/.prettiercache\" --ignore-path=\"../../.gitignore\"",
+    "format:fix": "turbo format --cache-dir=.turbo --continue -- --write --cache --cache-location=\"node_modules/.cache/.prettiercache\" --ignore-path=\"../../.gitignore\"",
+    "lint": "turbo lint --cache-dir=.turbo --continue -- --cache --cache-location \"node_modules/.cache/.eslintcache\" && manypkg check",
+    "lint:fix": "turbo lint --cache-dir=.turbo --continue -- --fix --cache --cache-location \"node_modules/.cache/.eslintcache\" && manypkg fix",
+    "typecheck": "turbo typecheck --cache-dir=.turbo",
+    "test": "turbo test --cache-dir=.turbo",
+    "update": "pnpm update -r",
+    "syncpack:list": "pnpm dlx syncpack list-mismatches",
+    "syncpack:fix": "pnpm dlx syncpack fix-mismatches",
+    "supabase:web:start": "pnpm --filter web supabase:start",
+    "supabase:web:stop": "pnpm --filter web supabase:stop",
+    "supabase:web:typegen": "pnpm --filter web supabase:typegen",
+    "supabase:web:reset": "pnpm --filter web supabase:reset",
+    "supabase:web:test": "pnpm --filter web supabase:test",
+    "env:generate": "turbo gen env",
+    "env:validate": "turbo gen validate-env"
+  },
+  "prettier": "@aloha/prettier-config",
+  "packageManager": "pnpm@10.18.1",
+  "pnpm": {
+    "overrides": {
+      "react-is": "19.0.0",
+      "zod": "3.25.76"
+    },
+    "ignoredBuiltDependencies": [
+      "core-js-pure",
+      "esbuild",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "@manypkg/cli": "^0.25.1",
+    "@turbo/gen": "^2.6.2",
+    "@types/node": "catalog:",
+    "cross-env": "^10.1.0",
+    "prettier": "^3.7.4",
+    "turbo": "^2.6.2",
+    "typescript": "^5.9.3"
+  }
+}

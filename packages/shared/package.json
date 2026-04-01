@@ -1,0 +1,36 @@
+{
+  "name": "@aloha/shared",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
+    "format": "prettier --check \"**/*.{ts,tsx}\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@aloha/prettier-config",
+  "exports": {
+    "./logger": "./src/logger/index.ts",
+    "./utils": "./src/utils.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./events": "./src/events/index.tsx",
+    "./registry": "./src/registry/index.ts"
+  },
+  "devDependencies": {
+    "@aloha/eslint-config": "workspace:*",
+    "@aloha/prettier-config": "workspace:*",
+    "@aloha/tailwind-config": "workspace:*",
+    "@aloha/tsconfig": "workspace:*",
+    "@types/react": "catalog:"
+  },
+  "dependencies": {
+    "pino": "^10.1.0"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  }
+}
