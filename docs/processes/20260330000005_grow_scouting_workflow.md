@@ -16,7 +16,7 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 | `grow_task_photo` | Photos taken during the scouting event with optional captions |
 | `grow_pest` | Standardized pest names (lookup) |
 | `grow_disease` | Standardized disease names (lookup) |
-| `org_site` | Growing rows (category = grow_row) referenced by observation site_id |
+| `org_site` | Growing rows (category = row) referenced by observation site_id |
 | `ops_task_schedule` | Employees assigned to this activity with individual start/stop times |
 
 ---
@@ -30,7 +30,7 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 4. For each pest or disease found, create a `grow_scout_result` record:
    - Set `observation_type` to `pest` or `disease`
    - Select the pest (`grow_pest_id`) or disease (`grow_disease_id`) from the lookup — enforced by CHECK constraint
-   - Select the specific growing row (`site_id` referencing org_site where category = grow_row)
+   - Select the specific growing row (`site_id` referencing org_site where category = row)
    - Set severity level (`low`, `moderate`, `high`, `severe`)
    - For diseases, set infection stage (`early`, `mid`, `late`, `advanced`)
    - If the same pest/disease is found in multiple rows, create one observation per row
@@ -41,7 +41,7 @@ This document describes the scouting activity flow using `ops_task_tracker` dire
 ## Notes
 
 - There is no separate scouting header table. The `ops_task_tracker` serves as the header since scouting has no additional header-level business fields beyond what the tracker already captures.
-- Growing rows are `org_site` children (category = `grow_row`) under the parent growing site. Each observation references one row — multiple affected rows = multiple observation records.
+- Growing rows are `org_site` children (category = `row`) under the parent growing site. Each observation references one row — multiple affected rows = multiple observation records.
 - Seed batch association is at the activity level via `grow_task_seed_batch`, not on individual observations. This snapshots which batches were present during the scouting event.
 - Photos are stored as individual rows (not JSONB) because each photo can have its own caption.
 

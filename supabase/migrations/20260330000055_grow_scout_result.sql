@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS grow_scout_result (
 
 COMMENT ON TABLE grow_scout_result IS 'Individual pest or disease finding within a scouting event. Either a pest or disease, enforced by CHECK constraint.';
 
-COMMENT ON COLUMN grow_scout_result.site_id IS 'The specific growing row (org_site where category = grow_row); one observation per row per pest/disease';
+COMMENT ON COLUMN grow_scout_result.site_id IS 'The specific growing row (org_site where category = row); one observation per row per pest/disease';
 COMMENT ON COLUMN grow_scout_result.observation_type IS 'pest, disease';
 COMMENT ON COLUMN grow_scout_result.grow_pest_id IS 'Shown when observation_type is pest; null when disease';
 COMMENT ON COLUMN grow_scout_result.grow_disease_id IS 'Shown when observation_type is disease; null when pest';

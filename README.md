@@ -52,7 +52,7 @@ aloha-app/
 - **org_module** — Org-scoped module toggles with custom display names and ordering
 - **org_sub_module** — Org-scoped sub-module toggles with custom display names, ordering, and access levels
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
-- **org_site_category** — Two-level site category hierarchy (e.g. growing/greenhouse, packing/packroom, housing/duplex)
+- **org_site_category** — Two-level site category hierarchy (e.g. growing/greenhouse, packing/room, housing/room)
 - **org_site** — Unified site register with parent-child hierarchy for all locations; category and subcategory are FK references to org_site_category
 - **org_equipment** — Equipment register for physical assets; farm-level or shared
 - **org_business_rule** — Org-scoped registry for business rules, workflows, calculations, requirements, and definitions

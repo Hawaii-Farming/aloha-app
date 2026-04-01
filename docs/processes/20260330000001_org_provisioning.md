@@ -49,9 +49,10 @@ Default categories and subcategories:
 | growing | greenhouse |
 | growing | nursery |
 | growing | pond |
-| growing | grow_row |
+| growing | row |
+| growing | room |
 | packing | *(top-level)* |
-| packing | packroom |
+| packing | room |
 | housing | *(top-level)* |
 | housing | room |
 | food_safety | *(top-level)* |
