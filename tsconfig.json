@@ -6,9 +6,6 @@
     "moduleResolution": "bundler",
     "paths": {
       "~/*": ["./app/*"],
-      "~/config/*": ["./config/*"],
-      "~/components/*": ["./components/*"],
-      "~/lib/*": ["./lib/*"],
       "~/types/*": ["./.react-router/types/*"]
     },
     "noEmit": true,
@@ -18,9 +15,6 @@
   "include": [
     "*.ts",
     "*.tsx",
-    "config/**/*.{ts|tsx}",
-    "components/**/*",
-    "lib/**/*.ts",
     "app",
     ".react-router/types/**/*"
   ],

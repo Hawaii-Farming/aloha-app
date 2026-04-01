@@ -43,7 +43,7 @@
     "supabase:test": "supabase db test",
     "supabase:db:lint": "supabase db lint",
     "supabase:deploy": "supabase link --project-ref $SUPABASE_PROJECT_REF && supabase db push",
-    "supabase:typegen": "supabase gen types typescript --local > ./lib/database.types.ts",
+    "supabase:typegen": "supabase gen types typescript --local > ./app/lib/database.types.ts",
     "supabase:db:dump:local": "supabase db dump --local --data-only",
     "env:generate": "turbo gen env",
     "env:validate": "turbo gen validate-env"
