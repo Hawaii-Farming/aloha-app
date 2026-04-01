@@ -13,8 +13,6 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "@types/node": "catalog:",
-    "node-html-parser": "^7.0.1",
-    "totp-generator": "^2.0.0"
+    "@types/node": "catalog:"
   }
 }
