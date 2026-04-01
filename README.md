@@ -37,7 +37,7 @@ aloha-app/
   SCHEMA_CONVENTIONS.md  # Schema design rules — read before every change
 ```
 
-## System Module (6 tables) — [Docs](docs/schemas/20260330000001_sys.md)
+## System Module (6 tables) — [Docs](docs/schemas/20260401000001_sys.md)
 
 - **sys_uom** — Standardized measurement units with `code` as primary key (kg, L, °C, ppm, etc.)
 - **sys_access_level** — Defines the 5 hierarchical access tiers (employee, team_lead, manager, admin, owner)
@@ -46,7 +46,7 @@ aloha-app/
 - **grow_pest** — System-wide pest catalog for scouting observations
 - **grow_disease** — System-wide disease catalog for scouting observations
 
-## Organization Module (8 tables) — [Docs](docs/schemas/20260330000002_org.md)
+## Organization Module (8 tables) — [Docs](docs/schemas/20260401000002_org.md)
 
 - **org** — Root entity for multi-org support with currency setting
 - **org_module** — Org-scoped module toggles with custom display names and ordering
@@ -57,7 +57,7 @@ aloha-app/
 - **org_equipment** — Equipment register for physical assets; farm-level or shared
 - **org_business_rule** — Org-scoped registry for business rules, workflows, calculations, requirements, and definitions
 
-## Inventory Module (8 tables, includes 1 view) — [Docs](docs/schemas/20260330000003_invnt.md)
+## Inventory Module (8 tables, includes 1 view) — [Docs](docs/schemas/20260401000003_invnt.md)
 
 - **invnt_vendor** — Org-level vendors for procurement with contact details and payment terms (TEXT PK)
 - **invnt_category** — Two-level category hierarchy; rows with `sub_category_name` null are top-level categories, rows with `sub_category_name` set are subcategories (TEXT PK)
@@ -68,7 +68,7 @@ aloha-app/
 - **invnt_onhand** — On-hand inventory snapshots per item with burn unit conversion
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 
-## Human Resources Module (9 tables) — [Docs](docs/schemas/20260330000004_hr.md)
+## Human Resources Module (9 tables) — [Docs](docs/schemas/20260401000004_hr.md)
 
 - **hr_department** — Org-specific department lookup for classifying employees (e.g. GH, PH, Lettuce). TEXT PK derived from name.
 - **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). TEXT PK derived from name.
@@ -80,7 +80,7 @@ aloha-app/
 - **hr_disciplinary_warning** — Employee disciplinary warning records with acknowledgment and review workflow
 - **hr_payroll** — Merged payroll data imported from external processor; one row per employee per check date with snapshotted employee fields
 
-## Operations Module (14 tables, includes 1 view) — [Docs](docs/schemas/20260330000005_ops.md)
+## Operations Module (14 tables, includes 1 view) — [Docs](docs/schemas/20260401000005_ops.md)
 
 - **ops_task** — Flat task catalog for labor tracking with name and description (TEXT PK)
 - **ops_task_tracker** — Header record for a task event with task, farm, site, date, start/stop times, and verification status. Site is stored directly on the tracker.
@@ -97,7 +97,7 @@ aloha-app/
 - **ops_template_result_photo** — Photos attached to a checklist response; one row per photo, only used when ops_template_question.include_photo = true
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
-## Grow Module (20 tables, 1 view) — [Docs](docs/schemas/20260330000006_grow.md)
+## Grow Module (20 tables, 1 view) — [Docs](docs/schemas/20260401000006_grow.md)
 
 - **grow_variety** — Crop varieties with short codes for quick reference (e.g. "K" for Keiki). Farm-scoped.
 - **grow_grade** — Harvest quality grades with short codes (e.g. "A" for Grade A). Farm-scoped.
@@ -122,7 +122,7 @@ aloha-app/
 - **grow_monitoring_result** — Individual measurement per monitoring event per point per station.
 - **grow_spray_restriction** (view) — Derived daily NE (No Entry) and NH (No Harvest) restriction calendar per site from spray events
 
-## Pack Module (10 tables) — [Docs](docs/schemas/20260330000007_pack.md)
+## Pack Module (10 tables) — [Docs](docs/schemas/20260401000007_pack.md)
 
 - **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
 - **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
@@ -135,7 +135,7 @@ aloha-app/
 - **pack_productivity_hour_product** — Cases packed per product per hour (delta, not cumulative)
 - **pack_productivity_hour_fail** — Fail counts per category per hour
 
-## Sales Module (8 tables) — [Docs](docs/schemas/20260330000008_sales.md)
+## Sales Module (8 tables) — [Docs](docs/schemas/20260401000008_sales.md)
 
 - **sales_fob** — Org-specific FOB (Freight On Board) delivery points (TEXT PK)
 - **sales_customer_group** — Org-specific customer classifications for reporting and group pricing (TEXT PK)
@@ -146,12 +146,12 @@ aloha-app/
 - **sales_po_line** — Individual products within an order with snapshot pricing at time of order
 - **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, supporting partial fulfillment across multiple lots
 
-## Maintenance Module (2 tables) — [Docs](docs/schemas/20260330000009_maint.md)
+## Maintenance Module (2 tables) — [Docs](docs/schemas/20260401000009_maint.md)
 
 - **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
 
-## Food Safety Module (6 tables) — [Docs](docs/schemas/20260330000010_fsafe.md)
+## Food Safety Module (6 tables) — [Docs](docs/schemas/20260401000010_fsafe.md)
 
 - **fsafe_lab_test** — Catalog of EMP (Environmental Monitoring Program) test definitions with result type, pass criteria, and retest/vector requirements (TEXT PK)
 - **fsafe_result** — Unified food safety test results for both EMP and test-and-hold testing; one row per test event with retest/vector chaining, corrective action linkage, and optional test-and-hold parent reference
@@ -168,29 +168,29 @@ See [SCHEMA_CONVENTIONS.md](SCHEMA_CONVENTIONS.md) for the full set of schema de
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [System Schema](docs/schemas/20260330000001_sys.md) — 4 system-level tables
-- [Org Schema](docs/schemas/20260330000002_org.md) — 8 organization structure tables
-- [Inventory Schema](docs/schemas/20260330000003_invnt.md) — Items, orders, transactions, and views
-- [Human Resources Schema](docs/schemas/20260330000004_hr.md) — Employee records and Human Resources lookups
-- [Operations Schema](docs/schemas/20260330000005_ops.md) — Task tracking, training, and food safety checklists
-- [Grow Schema](docs/schemas/20260330000006_grow.md) — Seeding, harvesting, scouting, spraying, fertigation, and monitoring
-- [Pack Schema](docs/schemas/20260330000007_pack.md) — Lot tracking, shelf life trials, and hourly productivity
-- [Sales Schema](docs/schemas/20260330000008_sales.md) — Product catalog, pricing, orders, and fulfillment
-- [Maintenance Schema](docs/schemas/20260330000009_maint.md) — Work orders and parts usage
-- [Food Safety Schema](docs/schemas/20260330000010_fsafe.md) — EMP testing, lab management, test-and-hold, and pest trap inspections
+- [System Schema](docs/schemas/20260401000001_sys.md) — 4 system-level tables
+- [Org Schema](docs/schemas/20260401000002_org.md) — 8 organization structure tables
+- [Inventory Schema](docs/schemas/20260401000003_invnt.md) — Items, orders, transactions, and views
+- [Human Resources Schema](docs/schemas/20260401000004_hr.md) — Employee records and Human Resources lookups
+- [Operations Schema](docs/schemas/20260401000005_ops.md) — Task tracking, training, and food safety checklists
+- [Grow Schema](docs/schemas/20260401000006_grow.md) — Seeding, harvesting, scouting, spraying, fertigation, and monitoring
+- [Pack Schema](docs/schemas/20260401000007_pack.md) — Lot tracking, shelf life trials, and hourly productivity
+- [Sales Schema](docs/schemas/20260401000008_sales.md) — Product catalog, pricing, orders, and fulfillment
+- [Maintenance Schema](docs/schemas/20260401000009_maint.md) — Work orders and parts usage
+- [Food Safety Schema](docs/schemas/20260401000010_fsafe.md) — EMP testing, lab management, test-and-hold, and pest trap inspections
 
 
 ## Process Documentation
 
 Workflow and business process documentation with flow diagrams:
 
-- [Org Provisioning](docs/processes/20260330000001_org_provisioning.md) — New org setup and module seeding
-- [User Access Flow](docs/processes/20260330000002_user_access_flow.md) — Login, org selection, and multi-layered access control
-- [Grow Seeding](docs/processes/20260330000003_grow_seeding_workflow.md) — Seeding batch creation and lifecycle
-- [Grow Harvesting](docs/processes/20260330000004_grow_harvesting_workflow.md) — Harvest weigh-in and grading
-- [Grow Scouting](docs/processes/20260330000005_grow_scouting_workflow.md) — Pest and disease observation
-- [Grow Spraying](docs/processes/20260330000006_grow_spraying_workflow.md) — Chemical application with compliance enforcement
-- [Grow Fertigation](docs/processes/20260330000007_grow_fertigation_workflow.md) — Fertilizer recipe application
-- [Grow Monitoring](docs/processes/20260330000008_grow_monitoring_workflow.md) — Environmental readings with calculated points
-- [Ops Task Workflow](docs/processes/20260330000009_ops_template_workflow.md) — General task + checklist workflow with ATP testing
-- [Pack Productivity](docs/processes/20260330000010_pack_productivity_workflow.md) — Hourly pack line tracking with crew and fail logging
+- [Org Provisioning](docs/processes/20260401000001_org_provisioning.md) — New org setup and module seeding
+- [User Access Flow](docs/processes/20260401000002_user_access_flow.md) — Login, org selection, and multi-layered access control
+- [Grow Seeding](docs/processes/20260401000003_grow_seeding_workflow.md) — Seeding batch creation and lifecycle
+- [Grow Harvesting](docs/processes/20260401000004_grow_harvesting_workflow.md) — Harvest weigh-in and grading
+- [Grow Scouting](docs/processes/20260401000005_grow_scouting_workflow.md) — Pest and disease observation
+- [Grow Spraying](docs/processes/20260401000006_grow_spraying_workflow.md) — Chemical application with compliance enforcement
+- [Grow Fertigation](docs/processes/20260401000007_grow_fertigation_workflow.md) — Fertilizer recipe application
+- [Grow Monitoring](docs/processes/20260401000008_grow_monitoring_workflow.md) — Environmental readings with calculated points
+- [Ops Task Workflow](docs/processes/20260401000009_ops_template_workflow.md) — General task + checklist workflow with ATP testing
+- [Pack Productivity](docs/processes/20260401000010_pack_productivity_workflow.md) — Hourly pack line tracking with crew and fail logging

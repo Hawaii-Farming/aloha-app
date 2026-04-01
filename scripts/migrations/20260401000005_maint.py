@@ -8,7 +8,7 @@ Source: https://docs.google.com/spreadsheets/d/1e7AuQAOpKAHpmvizIgBNyUk42GscXNpz
   - maint_req: 8344 maintenance requests → maint_request, maint_request_invnt_item, maint_request_photo
 
 Usage:
-    python scripts/migrations/20260330000005_maint.py
+    python scripts/migrations/20260401000005_maint.py
 
 Rerunnable: clears and reinserts all data on each run.
 """
@@ -105,23 +105,6 @@ def migrate_maint_sites(supabase):
     Review and adjust the mappings below before running.
     """
 
-    # Add "other" site category for sites that don't fit existing categories
-    try:
-        supabase.table("org_site_category").insert({
-            "id": "other",
-            "org_id": ORG_ID,
-            "category_name": "other",
-            "sub_category_name": None,
-            "display_order": 7,
-            "created_by": AUDIT_USER,
-            "updated_by": AUDIT_USER,
-        }).execute()
-        print("\n--- org_site_category ---")
-        print("  Added 'other' category")
-    except Exception:
-        print("\n--- org_site_category ---")
-        print("  'other' category already exists")
-
     # =====================================================================
     # EXPLICIT SITE MAPPING
     # =====================================================================
@@ -155,7 +138,7 @@ def migrate_maint_sites(supabase):
         "GH KO":                ("ko",                      "greenhouse",   None),
         "GH WA":                ("wa",                      "greenhouse",   None),
         "Cravo GH":             ("cravo_gh",                "other",   None),  # NEW
-        "Lettuce GH":           ("gh",                      "greenhouse",   None),  # existing parent
+        "Lettuce GH":           ("gh",                      "growing",      None),  # existing parent
 
         # ----- GROWING: Lettuce ponds P1-P7 → existing sites -----
         "Lettuce P1":           ("p1",                      "pond",         None),
@@ -719,15 +702,6 @@ def main():
             supabase.table(t).delete().neq("org_id", "___never___").execute()
         except Exception:
             pass
-    # Clear "other" category sites and category
-    try:
-        supabase.table("org_site").delete().eq("org_site_category_id", "other").execute()
-    except Exception:
-        pass
-    try:
-        supabase.table("org_site_category").delete().eq("id", "other").execute()
-    except Exception:
-        pass
     # Clear equipment created by this script
     try:
         supabase.table("org_equipment").delete().neq("id", "___never___").execute()

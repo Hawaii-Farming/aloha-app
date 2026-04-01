@@ -61,6 +61,7 @@ Default categories and subcategories:
 | storage | warehouse |
 | storage | chemical_storage |
 | storage | cold_storage |
+| other | *(top-level)* |
 
 ---
 

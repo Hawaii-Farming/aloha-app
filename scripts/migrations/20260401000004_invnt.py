@@ -8,7 +8,7 @@ Source: https://docs.google.com/spreadsheets/d/15ppDoDWLR1TIXCO5Gy3LIvEQ9KpJmtSq
   - invnt_category: from invnt_item_category sheet + unique ItemSubCategory from invnt_item sheet
 
 Usage:
-    python scripts/migrations/20260330000004_invnt.py
+    python scripts/migrations/20260401000004_invnt.py
 
 Rerunnable: clears and reinserts all data on each run.
 """
@@ -447,7 +447,7 @@ def migrate_invnt_po(supabase, client):
     FALLBACK_EMP = email_to_emp.get("data@hawaiifarming.com") or email_to_emp.get("admin@hawaiifarming.com")
 
     # Build item name -> id lookup
-    item_result = supabase.table("invnt_item").select("id, name, invnt_category_id, burn_uom, order_uom, burn_per_order, farm_id").execute()
+    item_result = supabase.table("invnt_item").select("id, name, invnt_category_id, burn_uom, order_uom, burn_per_order, farm_id, is_active").execute()
     item_by_name = {}
     item_by_id = {}
     for it in item_result.data:
@@ -558,25 +558,34 @@ def migrate_invnt_po(supabase, client):
             "ordered_at": parse_timestamp(r.get("OrderPlacedDate", "")),
             "ordered_by": ordered_by or FALLBACK_EMP,
         }
-        po_rows.append(audit(po))
+        po_row = audit(po)
+        po_row["created_by"] = ordered_by_email or AUDIT_USER
+        po_row["updated_by"] = received_by_email or ordered_by_email or AUDIT_USER
+        po_rows.append(po_row)
         po_index = len(po_rows) - 1
 
-        # Lot
+        # Lot — only migrate lots for active items
         lot_number = str(r.get("ItemLot", "")).strip()
         lot_id = None
         if lot_number and lot_number.upper() != "NA" and item_id:
-            lot_key = f"{item_id}_{to_id(lot_number)}"
-            lot_id = lot_key  # Include item_id in lot_id for uniqueness
-            if lot_key not in lot_seen:
-                lot_seen.add(lot_key)
-                lot_rows.append(audit({
-                    "id": lot_id,
-                    "org_id": ORG_ID,
-                    "farm_id": item.get("farm_id"),
-                    "invnt_item_id": item_id,
-                    "lot_number": lot_number,
-                    "lot_expiry_date": parse_date(r.get("ExpiryDate", "")),
-                }))
+            # Check if item is active
+            item_obj = item_by_id.get(item_id, {})
+            if item_obj.get("is_active", True):
+                lot_key = to_id(lot_number)
+                lot_id = lot_key
+                if lot_key not in lot_seen:
+                    lot_seen.add(lot_key)
+                    lot_row = audit({
+                        "id": lot_id,
+                        "org_id": ORG_ID,
+                        "farm_id": item.get("farm_id"),
+                        "invnt_item_id": item_id,
+                        "lot_number": lot_number,
+                        "lot_expiry_date": parse_date(r.get("ExpiryDate", "")),
+                    })
+                    lot_row["created_by"] = received_by_email or ordered_by_email or AUDIT_USER
+                    lot_row["updated_by"] = received_by_email or ordered_by_email or AUDIT_USER
+                    lot_rows.append(lot_row)
 
         # Received record (only if status implies receipt)
         if status in ("received", "partial"):
@@ -597,7 +606,10 @@ def migrate_invnt_po(supabase, client):
                     "received_at": parse_timestamp(r.get("LastUpdateDateTime", "")),
                     "received_by": received_by,
                 }
-                received_rows.append((po_index, audit(recv)))
+                recv_row = audit(recv)
+                recv_row["created_by"] = received_by_email or AUDIT_USER
+                recv_row["updated_by"] = received_by_email or AUDIT_USER
+                received_rows.append((po_index, recv_row))
 
     # ========================================
     # PART 2: Active requests from proc_requests
@@ -611,7 +623,7 @@ def migrate_invnt_po(supabase, client):
     }
 
     PROC_STATUS_MAP = {
-        "requested": "requested", "ordered": "ordered",
+        "requested": "requested", "ordered": "ordered", "completed": "received",
     }
 
     for r in proc_records:
@@ -655,6 +667,17 @@ def migrate_invnt_po(supabase, client):
             if p:
                 photos.append(p)
 
+        # UOMs: non-inventory items use "each", inventory items use item UOMs
+        if mapped_type == "non_inventory_item":
+            po_burn_uom = "each"
+            po_order_uom = "each"
+            po_burn_per_order = 1
+        else:
+            po_burn_uom = item.get("burn_uom") or "unit"
+            po_order_uom = item.get("order_uom") or "unit"
+            po_burn_per_order = item.get("burn_per_order", 0)
+
+        # For completed orders: updated_by is the orderer/reviewer, created_by is the receiver
         po = {
             "org_id": ORG_ID,
             "farm_id": item.get("farm_id"),
@@ -663,10 +686,10 @@ def migrate_invnt_po(supabase, client):
             "invnt_category_id": item.get("invnt_category_id") or "maintenance",
             "invnt_item_id": item_id,
             "item_name": item_name,
-            "burn_uom": item.get("burn_uom") or "unit",
-            "order_uom": item.get("order_uom") or "unit",
+            "burn_uom": po_burn_uom,
+            "order_uom": po_order_uom,
             "order_quantity": safe_float(r.get("request_quantity", "")),
-            "burn_per_order": item.get("burn_per_order", 0),
+            "burn_per_order": po_burn_per_order,
             "invnt_vendor_id": vendor_id,
             "expected_delivery_date": parse_date(r.get("expected_delivery_date", "")),
             "notes": str(r.get("request_notes", "")).strip() or None,
@@ -676,10 +699,13 @@ def migrate_invnt_po(supabase, client):
             "requested_by": requested_by or FALLBACK_EMP,
             "reviewed_at": parse_timestamp(r.get("updated_on", "")) if status != "requested" else None,
             "reviewed_by": reviewed_by if status != "requested" else None,
-            "ordered_at": parse_timestamp(r.get("updated_on", "")) if status == "ordered" else None,
-            "ordered_by": reviewed_by if status == "ordered" else None,
+            "ordered_at": parse_timestamp(r.get("updated_on", "")) if status in ("ordered", "received") else None,
+            "ordered_by": reviewed_by if status in ("ordered", "received") else None,
         }
-        po_rows.append(audit(po))
+        po_row = audit(po)
+        po_row["created_by"] = created_email or AUDIT_USER
+        po_row["updated_by"] = updated_email or created_email or AUDIT_USER
+        po_rows.append(po_row)
 
     # ========================================
     # INSERT: lots first, then POs with received
@@ -709,6 +735,245 @@ def migrate_invnt_po(supabase, client):
         insert_rows(supabase, "invnt_po_received", recv_to_insert)
 
 
+def migrate_invnt_onhand(supabase, client):
+    """Migrate on-hand inventory snapshots from invnt_item_onhand sheet."""
+    ws = client.open_by_key(SHEET_ID).worksheet("invnt_item_onhand")
+    records = ws.get_all_records()
+
+    # Build item name -> record lookup from Supabase
+    item_result = supabase.table("invnt_item").select("id, name, farm_id, burn_uom, onhand_uom, burn_per_onhand, is_active").execute()
+    item_by_name = {}
+    for it in item_result.data:
+        item_by_name[it["name"].lower()] = it
+
+    # Build lot lookup: lot_number -> lot_id (only active-item lots)
+    lot_result = supabase.table("invnt_lot").select("id, lot_number").execute()
+    lot_by_number = {}
+    for lot in lot_result.data:
+        lot_by_number[lot["lot_number"].lower()] = lot["id"]
+
+    # UOM mapping
+    UOM_MAP = {
+        "seeds": "seed", "pieces": "piece", "bags": "bag", "boxes": "box",
+        "pounds": "pound", "rolls": "roll", "bottles": "bottle",
+        "gallons": "gallon", "trays": "tray", "packs": "pack",
+        "labels": "label", "cases": "case", "drums": "drum",
+        "clips": "clip", "kits": "kit", "pallets": "pallet",
+        "units": "unit", "dozen": "dozen", "lids": "lid",
+        "quarts": "quart", "ounces": "ounce", "grams": "gram",
+        "feet": "feet", "meters": "meter", "impressions": "impression",
+        "blades": "blade", "reactions": "reactions", "cubes": "cubes",
+        "fluid ounces": "fluid_ounce", "fluid_ounces": "fluid_ounce",
+        "ml": "milliliter", "milliliters": "milliliter",
+        "seed": "seed", "piece": "piece", "bag": "bag", "box": "box",
+        "pound": "pound", "roll": "roll", "bottle": "bottle",
+        "gallon": "gallon", "tray": "tray", "pack": "pack",
+        "label": "label", "case": "case", "drum": "drum",
+        "clip": "clip", "kit": "kit", "pallet": "pallet",
+        "unit": "unit", "lid": "lid", "quart": "quart",
+        "ounce": "ounce", "gram": "gram", "blade": "blade",
+        "impression": "impression", "count": "count", "each": "each",
+        "lb": "pound", "oz": "ounce", "g": "gram", "kg": "kilogram",
+        "ft": "feet", "fl oz": "fluid_ounce",
+    }
+
+    def map_uom(val):
+        v = str(val).strip().lower()
+        return UOM_MAP.get(v, v) if v else None
+
+    rows = []
+    skipped = 0
+
+    for r_raw in records:
+        r = {str(k).strip(): v for k, v in r_raw.items()}
+
+        item_name = str(r.get("ItemName", "")).strip()
+        if not item_name:
+            continue
+
+        # Resolve item
+        item = item_by_name.get(item_name.lower())
+        if not item:
+            skipped += 1
+            continue
+
+        # Onhand date
+        onhand_date = parse_date(r.get("OnhandReportedDate", ""))
+        if not onhand_date:
+            skipped += 1
+            continue
+
+        # UOM — use OnhandUnits from sheet, fall back to item's onhand_uom
+        onhand_uom = map_uom(r.get("OnhandUnits", "")) or item.get("onhand_uom")
+
+        # Quantity
+        onhand_quantity = safe_float(r.get("OnhandQuantity", ""))
+
+        # Burn per onhand
+        burn_per_onhand = safe_float(r.get("BurnPerOnhandUnit", ""))
+
+        # Lot
+        lot_number = str(r.get("ItemLot", "")).strip()
+        lot_id = None
+        if lot_number and lot_number.upper() != "NA":
+            lot_id = lot_by_number.get(lot_number.lower())
+
+        # Reporter
+        reported_by_email = str(r.get("ReportedBy", "")).strip().lower()
+        reported_at = parse_timestamp(r.get("ReportedDateTime", ""))
+
+        # Burn UOM from legacy BurnUnits, fall back to item's burn_uom
+        burn_uom = map_uom(r.get("BurnUnits", "")) or item.get("burn_uom")
+
+        row = audit({
+            "org_id": ORG_ID,
+            "farm_id": item.get("farm_id"),
+            "invnt_item_id": item["id"],
+            "onhand_date": onhand_date,
+            "burn_uom": burn_uom,
+            "onhand_uom": onhand_uom,
+            "onhand_quantity": onhand_quantity,
+            "burn_per_onhand": burn_per_onhand,
+            "invnt_lot_id": lot_id,
+            "created_at": reported_at,
+            "updated_at": reported_at,
+        })
+        row["created_by"] = reported_by_email or AUDIT_USER
+        row["updated_by"] = reported_by_email or AUDIT_USER
+        rows.append(row)
+
+    insert_rows(supabase, "invnt_onhand", rows)
+    if skipped:
+        print(f"  Skipped {skipped} rows (unknown item or missing date)")
+
+
+def migrate_grow_spray_compliance(supabase, client):
+    """Migrate chemical/fertilizer compliance data from invnt_item_details sheet."""
+    ws = client.open_by_key(SHEET_ID).worksheet("invnt_item_details")
+    records = ws.get_all_records()
+
+    # Build item name -> record lookup
+    item_result = supabase.table("invnt_item").select("id, name, burn_uom, farm_id").execute()
+    item_by_name = {}
+    for it in item_result.data:
+        item_by_name[it["name"].lower()] = it
+
+    # Farm mapping
+    FARM_MAP = {
+        "lettuce": "lettuce",
+        "cuke": "cuke",
+        "cucumber": "cuke",
+    }
+
+    # UOM mapping
+    UOM_MAP = {
+        "fluid_ounces": "fluid_ounce", "fluid ounces": "fluid_ounce",
+        "ounces": "ounce", "oz": "ounce", "ounce": "ounce",
+        "pounds": "pound", "lb": "pound", "pound": "pound",
+        "grams": "gram", "g": "gram", "gram": "gram",
+        "gallons": "gallon", "gallon": "gallon",
+        "quarts": "quart", "quart": "quart",
+        "ml": "milliliter", "milliliters": "milliliter",
+        "pints": "quart", "pint": "quart",
+        "liters": "liter", "liter": "liter",
+    }
+
+    def map_uom(val):
+        v = str(val).strip().lower()
+        return UOM_MAP.get(v, v) if v else None
+
+    rows = []
+    skipped = 0
+
+    for r_raw in records:
+        r = {str(k).strip(): v for k, v in r_raw.items()}
+
+        item_name = str(r.get("ItemName", "")).strip()
+        if not item_name:
+            continue
+
+        item = item_by_name.get(item_name.lower())
+        if not item:
+            print(f"  SKIP: Unknown item '{item_name}'")
+            skipped += 1
+            continue
+
+        # Farm
+        farm_raw = str(r.get("Farm", "")).strip().lower()
+        farm_id = FARM_MAP.get(farm_raw) or item.get("farm_id")
+        if not farm_id:
+            skipped += 1
+            continue
+
+        # Registration
+        epa_reg = str(r.get("RegistrationNumber", "")).strip()
+        if not epa_reg:
+            skipped += 1
+            continue
+
+        # Application method -> JSONB array
+        app_method = str(r.get("ApplicationMethod", "")).strip()
+        application_method = [app_method] if app_method else []
+
+        # Target -> JSONB array
+        target = str(r.get("Target", "")).strip()
+        target_pest_disease = [target] if target else []
+
+        # UOM and quantity
+        app_uom = map_uom(r.get("PerAcreUnits", "")) or "ounce"
+        max_qty = safe_float(r.get("QuantityPerAcre", ""))
+
+        # Burn UOM from item
+        burn_uom = item.get("burn_uom") or app_uom
+
+        # Application per burn
+        app_per_burn = safe_float(r.get("MaximumUsagePerSeason", ""))
+
+        # Dates
+        label_date = parse_date(r.get("LabelDate", ""))
+        if not label_date:
+            skipped += 1
+            continue
+
+        # Label URL
+        label_url = str(r.get("LabelLink", "")).strip() or ""
+
+        # PHI / REI
+        phi_days = int(safe_float(r.get("PHIDays", "")))
+        rei_hours = int(safe_float(r.get("REIHours", "")))
+
+        # Audit
+        updated_by_email = str(r.get("LastUpdateBy", "")).strip().lower()
+        updated_at = parse_timestamp(r.get("LastUpdateDateTime", ""))
+
+        row = {
+            "org_id": ORG_ID,
+            "farm_id": farm_id,
+            "invnt_item_id": item["id"],
+            "epa_registration": epa_reg,
+            "phi_days": phi_days,
+            "rei_hours": rei_hours,
+            "application_method": application_method,
+            "target_pest_disease": target_pest_disease,
+            "application_uom": app_uom,
+            "maximum_quantity_per_acre": max_qty,
+            "burn_uom": burn_uom,
+            "application_per_burn": app_per_burn,
+            "label_date": label_date,
+            "effective_date": label_date,
+            "external_label_url": label_url,
+            "created_at": updated_at,
+            "updated_at": updated_at,
+            "created_by": updated_by_email or AUDIT_USER,
+            "updated_by": updated_by_email or AUDIT_USER,
+        }
+        rows.append(row)
+
+    insert_rows(supabase, "grow_spray_compliance", rows)
+    if skipped:
+        print(f"  Skipped {skipped} rows (unknown item, missing date, or missing registration)")
+
+
 def main():
     if not SUPABASE_KEY:
         print("ERROR: Set SUPABASE_SERVICE_KEY in .env or environment")
@@ -719,7 +984,7 @@ def main():
 
     # Clear in reverse FK order
     print("Clearing tables...")
-    for t in ["invnt_onhand", "invnt_po_received", "invnt_lot", "invnt_po",
+    for t in ["grow_spray_compliance", "invnt_onhand", "invnt_po_received", "invnt_lot", "invnt_po",
               "invnt_item", "invnt_category", "invnt_vendor"]:
         try:
             supabase.table(t).delete().neq("org_id", "___never___").execute()
@@ -742,6 +1007,8 @@ def main():
     migrate_storage_sites(supabase, client)
     migrate_invnt_item(supabase, client)
     migrate_invnt_po(supabase, client)
+    migrate_invnt_onhand(supabase, client)
+    migrate_grow_spray_compliance(supabase, client)
 
     print("\nInventory data migrated successfully")
 

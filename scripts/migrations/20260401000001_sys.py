@@ -15,7 +15,7 @@ Legacy access level mapping:
   Sheet Level 3 -> admin (level 4)
 
 Usage:
-    python scripts/migrations/20260330000001_sys.py
+    python scripts/migrations/20260401000001_sys.py
 
 Rerunnable: clears and reinserts all data on each run.
 """
@@ -231,6 +231,7 @@ def migrate_uom(supabase):
         {"code": "ph",           "name": "pH",           "category": "concentration"},
         {"code": "percent",      "name": "%",            "category": "ratio"},
         {"code": "rlu",          "name": "RLU",          "category": "lab"},
+        {"code": "each",         "name": "each",          "category": "quantity"},
         {"code": "hour",         "name": "hr",           "category": "time"},
         {"code": "day",          "name": "day",          "category": "time"},
     ]

@@ -10,7 +10,7 @@ Source: https://docs.google.com/spreadsheets/d/13DUQTQyZf0CW07xv4FJ4ukP2x3Yoz8Py
   - hr_title: unique values from 'Title' column
 
 Usage:
-    python scripts/migrations/20260330000003_hr.py
+    python scripts/migrations/20260401000003_hr.py
 
 Rerunnable: clears and reinserts all data on each run.
 """

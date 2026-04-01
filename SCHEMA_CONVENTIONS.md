@@ -188,7 +188,7 @@ scripts/migrations/YYYYMMDDHHMMSS_module.py
 scripts/processes/YYYYMMDDHHMMSS_process_name.py
 ```
 
-The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260330000001_sys.md`, `20260330000001_sys_uom.sql`, `20260330000001_seed_system_data.py`).
+The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260401000001_sys.md`, `20260401000001_sys_uom.sql`, `20260401000001_seed_system_data.py`).
 
 ---
 

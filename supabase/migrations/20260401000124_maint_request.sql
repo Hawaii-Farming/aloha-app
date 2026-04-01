@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS maint_request (
 
     status                    TEXT        NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'pending', 'priority', 'done')),
     request_description       TEXT,
-    recurring_frequency       TEXT        CHECK (recurring_frequency IN ('daily', 'weekly', 'monthly', 'quarterly')),
+    recurring_frequency       TEXT        CHECK (recurring_frequency IN ('daily', 'weekly', 'monthly', 'quarterly', 'semi_annually', 'annually')),
     due_date                  DATE,
-    completed_on              DATE,
+    completed_at              TIMESTAMPTZ,
     fixer_id                  TEXT        REFERENCES hr_employee(id),
     fixer_description         TEXT,
 
@@ -33,4 +33,4 @@ CREATE INDEX idx_maint_request_due     ON maint_request (org_id, due_date);
 COMMENT ON COLUMN maint_request.site_id IS 'Any org_site regardless of category; nullable if request is equipment-only';
 COMMENT ON COLUMN maint_request.equipment_id IS 'The equipment needing maintenance; nullable if request is site-only';
 COMMENT ON COLUMN maint_request.status IS 'new, pending, priority, done';
-COMMENT ON COLUMN maint_request.recurring_frequency IS 'daily, weekly, monthly, quarterly; null means not recurring; non-null implies preventive maintenance; auto-creates a new request after status is marked done';
+COMMENT ON COLUMN maint_request.recurring_frequency IS 'daily, weekly, monthly, quarterly, semi_annually, annually; null means not recurring; non-null implies preventive maintenance; auto-creates a new request after status is marked done';

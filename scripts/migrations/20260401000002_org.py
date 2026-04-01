@@ -15,7 +15,7 @@ Sources:
 Source spreadsheet: https://docs.google.com/spreadsheets/d/1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA
 
 Usage:
-    python scripts/migrations/20260330000002_org.py
+    python scripts/migrations/20260401000002_org.py
 
 Rerunnable: clears and reinserts all data on each run.
 """
@@ -135,6 +135,7 @@ def migrate_org_site_category(supabase):
         ("storage", "warehouse"),
         ("storage", "chemical_storage"),
         ("storage", "cold_storage"),
+        ("other", None),
     ]
 
     rows = []

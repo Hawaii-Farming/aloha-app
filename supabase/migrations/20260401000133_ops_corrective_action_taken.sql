@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     other_action        TEXT,
     assigned_to         TEXT        REFERENCES hr_employee(id),
     due_date            DATE,
-    completed_on        DATE,
+    completed_at        TIMESTAMPTZ,
     is_resolved         BOOLEAN     NOT NULL DEFAULT false,
     notes               TEXT,
 
