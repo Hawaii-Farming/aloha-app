@@ -123,9 +123,10 @@ def migrate_org_site_category(supabase):
         ("growing", "greenhouse"),
         ("growing", "nursery"),
         ("growing", "pond"),
-        ("growing", "grow_row"),
+        ("growing", "row"),
+        ("growing", "room"),
         ("packing", None),
-        ("packing", "packroom"),
+        ("packing", "room"),
         ("housing", None),
         ("housing", "room"),
         ("food_safety", None),
@@ -138,7 +139,12 @@ def migrate_org_site_category(supabase):
 
     rows = []
     for cat, sub in categories:
-        cat_id = sub if sub else cat
+        if sub == "room" and cat != "housing":
+            cat_id = f"{cat}_{sub}"
+        elif sub:
+            cat_id = sub
+        else:
+            cat_id = cat
         rows.append(audit({
             "id": to_id_safe(cat_id),
             "org_id": ORG_ID,
