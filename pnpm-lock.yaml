@@ -87,9 +87,6 @@ importers:
       '@aloha/auth':
         specifier: workspace:*
         version: link:../../packages/features/auth
-      '@aloha/csrf':
-        specifier: workspace:*
-        version: link:../../packages/utils/csrf
       '@aloha/database-webhooks':
         specifier: workspace:*
         version: link:../../packages/database-webhooks
@@ -530,43 +527,6 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
-      zod:
-        specifier: 3.25.76
-        version: 3.25.76
-
-  packages/utils/csrf:
-    dependencies:
-      '@edge-csrf/core':
-        specifier: 2.5.3-cloudflare-rc1
-        version: 2.5.3-cloudflare-rc1
-      react-router:
-        specifier: ^7.12.0
-        version: 7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-    devDependencies:
-      '@aloha/eslint-config':
-        specifier: workspace:*
-        version: link:../../../tooling/eslint
-      '@aloha/prettier-config':
-        specifier: workspace:*
-        version: link:../../../tooling/prettier
-      '@aloha/tailwind-config':
-        specifier: workspace:*
-        version: link:../../../tooling/tailwind
-      '@aloha/tsconfig':
-        specifier: workspace:*
-        version: link:../../../tooling/typescript
-      '@react-router/node':
-        specifier: ^7.12.0
-        version: 7.12.0(react-router@7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.7
-      react:
-        specifier: 'catalog:'
-        version: 19.2.3
-      react-hook-form:
-        specifier: ^7.69.0
-        version: 7.69.0(react@19.2.3)
       zod:
         specifier: 3.25.76
         version: 3.25.76

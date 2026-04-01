@@ -9,8 +9,8 @@ import {
 
 import { z } from 'zod';
 
-import { CsrfTokenMeta } from '@aloha/csrf/client';
-import { createCsrfProtect } from '@aloha/csrf/server';
+import { CsrfTokenMeta } from '~/lib/csrf/client';
+import { createCsrfProtect } from '~/lib/csrf/server';
 import { cn } from '@aloha/ui/utils';
 
 import { RootErrorBoundary } from '~/components/root-error-boundary';
