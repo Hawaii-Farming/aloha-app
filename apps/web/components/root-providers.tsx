@@ -3,7 +3,6 @@ import { Suspense, useMemo } from 'react';
 import { ThemeProvider } from 'next-themes';
 
 import { I18nProvider } from '@aloha/i18n/provider';
-import { AppEventsProvider } from '@aloha/shared/events';
 import { ClientOnly } from '@aloha/ui/client-only';
 import { GlobalLoader } from '@aloha/ui/global-loader';
 import { Toaster } from '@aloha/ui/sonner';
@@ -37,19 +36,17 @@ export function RootProviders(
         </ClientOnly>
 
         <ReactQueryProvider>
-          <AppEventsProvider>
-            <AuthProvider>
-              <ThemeProvider
-                attribute="class"
-                enableSystem
-                disableTransitionOnChange
-                defaultTheme={props.theme}
-                enableColorScheme={false}
-              >
-                {props.children}
-              </ThemeProvider>
-            </AuthProvider>
-          </AppEventsProvider>
+          <AuthProvider>
+            <ThemeProvider
+              attribute="class"
+              enableSystem
+              disableTransitionOnChange
+              defaultTheme={props.theme}
+              enableColorScheme={false}
+            >
+              {props.children}
+            </ThemeProvider>
+          </AuthProvider>
         </ReactQueryProvider>
       </I18nProvider>
     </Suspense>
