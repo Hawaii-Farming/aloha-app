@@ -21,16 +21,16 @@ import { PageBody, PageHeader } from '@aloha/ui/page';
 import { toast } from '@aloha/ui/sonner';
 import { Trans } from '@aloha/ui/trans';
 
-import { loadOrgWorkspace } from '../_lib/org-workspace-loader.server';
+import { crudCreateAction, crudUpdateAction } from '~/lib/crud/crud-action.server';
+import { loadDetailData } from '~/lib/crud/crud-helpers.server';
+import { getModuleConfig } from '~/lib/crud/registry';
+import { renderFormField } from '~/lib/crud/render-form-field';
+import { buildDefaultValues } from '~/lib/crud/workflow-helpers';
+import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import {
   requireModuleAccess,
   requireSubModuleAccess,
-} from '../_lib/require-module-access.server';
-import { getModuleConfig } from './_config/registry';
-import { crudCreateAction, crudUpdateAction } from './_lib/crud-action.server';
-import { loadDetailData } from './_lib/crud-helpers.server';
-import { renderFormField } from './_lib/render-form-field';
-import { buildDefaultValues } from './_lib/workflow-helpers';
+} from '~/lib/workspace/require-module-access.server';
 
 const fallbackSchema = z.object({
   id: z.string().min(1, 'ID is required'),

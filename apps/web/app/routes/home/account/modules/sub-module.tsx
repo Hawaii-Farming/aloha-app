@@ -17,9 +17,9 @@ import { Trans } from '@aloha/ui/trans';
 import {
   requireModuleAccess,
   requireSubModuleAccess,
-} from '../_lib/require-module-access.server';
-import { getModuleConfig } from './_config/registry';
-import { loadTableData } from './_lib/crud-helpers.server';
+} from '~/lib/workspace/require-module-access.server';
+import { loadTableData } from '~/lib/crud/crud-helpers.server';
+import { getModuleConfig } from '~/lib/crud/registry';
 
 type RowData = Record<string, unknown>;
 

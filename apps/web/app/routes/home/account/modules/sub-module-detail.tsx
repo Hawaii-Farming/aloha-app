@@ -28,18 +28,18 @@ import { WorkflowHistory } from '@aloha/ui/workflow-history';
 import { WorkflowStatusBadge } from '@aloha/ui/workflow-status-badge';
 import { WorkflowTransitionButtons } from '@aloha/ui/workflow-transition';
 
-import { loadOrgWorkspace } from '../_lib/org-workspace-loader.server';
-import {
-  requireModuleAccess,
-  requireSubModuleAccess,
-} from '../_lib/require-module-access.server';
-import { getModuleConfig } from './_config/registry';
 import {
   crudDeleteAction,
   crudTransitionAction,
-} from './_lib/crud-action.server';
-import { loadDetailData } from './_lib/crud-helpers.server';
-import { buildHistoryEntries } from './_lib/workflow-helpers';
+} from '~/lib/crud/crud-action.server';
+import { loadDetailData } from '~/lib/crud/crud-helpers.server';
+import { getModuleConfig } from '~/lib/crud/registry';
+import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
+import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
+import {
+  requireModuleAccess,
+  requireSubModuleAccess,
+} from '~/lib/workspace/require-module-access.server';
 
 export const loader = async (args: {
   request: Request;

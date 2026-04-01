@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 
-import { requireModuleAccess } from '../_lib/require-module-access.server';
+import { requireModuleAccess } from '~/lib/workspace/require-module-access.server';
 
 export const loader = async (args: {
   request: Request;
