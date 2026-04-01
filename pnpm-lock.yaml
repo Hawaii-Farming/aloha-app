@@ -108,9 +108,6 @@ importers:
       '@aloha/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
-      '@aloha/team-accounts':
-        specifier: workspace:*
-        version: link:../../packages/features/team-accounts
       '@aloha/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -388,85 +385,6 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
-
-  packages/features/team-accounts:
-    dependencies:
-      nanoid:
-        specifier: ^5.1.6
-        version: 5.1.6
-      react-router:
-        specifier: ^7.12.0
-        version: 7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-    devDependencies:
-      '@aloha/csrf':
-        specifier: workspace:*
-        version: link:../../utils/csrf
-      '@aloha/eslint-config':
-        specifier: workspace:*
-        version: link:../../../tooling/eslint
-      '@aloha/prettier-config':
-        specifier: workspace:*
-        version: link:../../../tooling/prettier
-      '@aloha/shared':
-        specifier: workspace:*
-        version: link:../../shared
-      '@aloha/supabase':
-        specifier: workspace:*
-        version: link:../../supabase
-      '@aloha/tailwind-config':
-        specifier: workspace:*
-        version: link:../../../tooling/tailwind
-      '@aloha/tsconfig':
-        specifier: workspace:*
-        version: link:../../../tooling/typescript
-      '@aloha/ui':
-        specifier: workspace:*
-        version: link:../../ui
-      '@hookform/resolvers':
-        specifier: ^5.2.2
-        version: 5.2.2(react-hook-form@7.69.0(react@19.2.3))
-      '@supabase/supabase-js':
-        specifier: 'catalog:'
-        version: 2.89.0
-      '@tanstack/react-query':
-        specifier: 'catalog:'
-        version: 5.90.12(react@19.2.3)
-      '@tanstack/react-table':
-        specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.7)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      date-fns:
-        specifier: ^4.1.0
-        version: 4.1.0
-      lucide-react:
-        specifier: ^0.562.0
-        version: 0.562.0(react@19.2.3)
-      react:
-        specifier: 'catalog:'
-        version: 19.2.3
-      react-dom:
-        specifier: 19.2.3
-        version: 19.2.3(react@19.2.3)
-      react-hook-form:
-        specifier: ^7.69.0
-        version: 7.69.0(react@19.2.3)
-      react-i18next:
-        specifier: ^16.5.0
-        version: 16.5.0(i18next@25.7.3(typescript@5.9.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      zod:
-        specifier: 3.25.76
-        version: 3.25.76
 
   packages/i18n:
     dependencies:
@@ -4347,11 +4265,6 @@ packages:
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-
-  nanoid@5.1.6:
-    resolution: {integrity: sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg==}
-    engines: {node: ^18 || >=20}
     hasBin: true
 
   napi-postinstall@0.3.3:
@@ -9558,8 +9471,6 @@ snapshots:
   mute-stream@0.0.8: {}
 
   nanoid@3.3.11: {}
-
-  nanoid@5.1.6: {}
 
   napi-postinstall@0.3.3: {}
 

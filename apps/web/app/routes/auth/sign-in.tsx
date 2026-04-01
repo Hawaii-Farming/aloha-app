@@ -1,10 +1,9 @@
-import { Link, redirect } from 'react-router';
+import { redirect } from 'react-router';
 
 import { SignInMethodsContainer } from '@aloha/auth/sign-in';
 import { getSafeRedirectPath } from '@aloha/shared/utils';
 import { requireUser } from '@aloha/supabase/require-user';
 import { getSupabaseServerClient } from '@aloha/supabase/server-client';
-import { Button } from '@aloha/ui/button';
 import { Heading } from '@aloha/ui/heading';
 import { Trans } from '@aloha/ui/trans';
 
@@ -59,14 +58,6 @@ export default function SignInPage(props: Route.ComponentProps) {
       </div>
 
       <SignInMethodsContainer paths={paths} providers={authConfig.providers} />
-
-      <div className={'flex justify-center'}>
-        <Button asChild variant={'link'} size={'sm'}>
-          <Link to={pathsConfig.auth.signUp} prefetch={'render'}>
-            <Trans i18nKey={'auth:doNotHaveAccountYet'} />
-          </Link>
-        </Button>
-      </div>
     </>
   );
 }

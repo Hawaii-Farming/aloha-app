@@ -39,7 +39,6 @@
     "@aloha/i18n": "workspace:*",
     "@aloha/shared": "workspace:*",
     "@aloha/supabase": "workspace:*",
-    "@aloha/team-accounts": "workspace:*",
     "@aloha/ui": "workspace:*",
     "@edge-csrf/core": "2.5.3-cloudflare-rc1",
     "@hookform/resolvers": "^5.2.2",

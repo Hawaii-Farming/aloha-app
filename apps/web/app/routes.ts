@@ -6,12 +6,10 @@ const rootRoutes = [
   route('healthcheck', 'routes/healthcheck.ts'),
   route('home', 'routes/home/index.tsx'),
   route('update-password', 'routes/update-password.tsx'),
-  route('identities', 'routes/identities.tsx'),
   route('no-access', 'routes/no-access.tsx'),
 ];
 
 const apiRoutes = [
-  route('api/accounts', 'routes/api/accounts.ts'),
   route('api/db/webhook', 'routes/api/db/webhook.ts'),
   route('api/ai/chat', 'routes/api/ai/chat.ts'),
   route('api/ai/form-assist', 'routes/api/ai/form-assist.ts'),
@@ -31,7 +29,6 @@ const teamAccountLayout = layout('routes/home/account/layout.tsx', [
   route('home/:account', 'routes/home/account/index.tsx'),
   // Static routes MUST come before dynamic catch-all
   route('home/:account/settings', 'routes/home/account/settings.tsx'),
-  route('home/:account/members', 'routes/home/account/members.tsx'),
   // Dynamic module routes — specific patterns before catch-all
   route('home/:account/:module', 'routes/home/account/modules/module.tsx'),
   route(

@@ -1,1 +1,0 @@
-// Team accounts types
