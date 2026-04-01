@@ -8,19 +8,11 @@
     "ANTHROPIC_API_KEY",
     "VITE_PRODUCT_NAME",
     "VITE_SITE_URL",
-    "EMAIL_SENDER",
-    "EMAIL_PORT",
-    "EMAIL_HOST",
-    "EMAIL_TLS",
-    "EMAIL_USER",
-    "EMAIL_PASSWORD",
     "LOGGER",
     "SUPABASE_DB_WEBHOOK_SECRET",
     "VITE_SUPABASE_URL",
     "VITE_SUPABASE_ANON_KEY",
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "MAILER_PROVIDER",
-    "RESEND_API_KEY"
+    "SUPABASE_SERVICE_ROLE_KEY"
   ],
   "tasks": {
     "topo": {
@@ -73,9 +65,6 @@
     },
     "//#clean": {
       "cache": false
-    },
-    "license#dev": {
-      "outputLogs": "errors-only"
     }
   }
 }
