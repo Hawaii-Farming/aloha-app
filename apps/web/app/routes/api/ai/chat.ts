@@ -1,8 +1,8 @@
 import { anthropic } from '@ai-sdk/anthropic';
 import { type UIMessage, convertToModelMessages, streamText } from 'ai';
 
-import type { AiPageContext } from '@aloha/ai/ai-context';
-import { buildSystemPrompt } from '@aloha/ai/build-system-prompt';
+import type { AiPageContext } from '~/lib/ai/ai-context';
+import { buildSystemPrompt } from '~/lib/ai/build-system-prompt.server';
 
 interface ChatRequest {
   messages: UIMessage[];

@@ -28,7 +28,6 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
     "@ai-sdk/react": "^3.0.143",
-    "@aloha/ai": "workspace:*",
     "@aloha/ui": "workspace:*",
     "@edge-csrf/core": "2.5.3-cloudflare-rc1",
     "@hookform/resolvers": "^5.2.2",

@@ -6,7 +6,7 @@ import { DefaultChatTransport } from 'ai';
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 
-import { useAiChat } from './ai-chat-provider';
+import { useAiChat } from '~/components/ai/ai-chat-provider';
 
 export function AiChatPanel() {
   const { open, setOpen, context } = useAiChat();

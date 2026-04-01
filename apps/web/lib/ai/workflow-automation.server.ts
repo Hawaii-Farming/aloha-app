@@ -11,7 +11,7 @@
  * - Suggest next workflow action based on record data
  *
  * Usage:
- *   import { createWorkflowAgent } from '@aloha/ai/workflow-automation';
+ *   import { createWorkflowAgent } from '~/lib/ai/workflow-automation.server';
  *   const agent = createWorkflowAgent({
  *     tools: { approveRecord, sendAlert },
  *     systemPrompt: 'You manage procurement approvals...',

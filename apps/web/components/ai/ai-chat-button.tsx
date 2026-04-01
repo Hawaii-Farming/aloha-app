@@ -2,7 +2,7 @@ import { MessageCircle, X } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 
-import { useAiChat } from './ai-chat-provider';
+import { useAiChat } from '~/components/ai/ai-chat-provider';
 
 export function AiChatButton() {
   const { open, setOpen } = useAiChat();

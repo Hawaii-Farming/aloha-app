@@ -2,7 +2,7 @@ import { createContext, use, useMemo, useState } from 'react';
 
 import { useLocation, useParams } from 'react-router';
 
-import type { AiPageContext } from '../lib/ai-context';
+import type { AiPageContext } from '~/lib/ai/ai-context';
 
 interface AiChatContextValue {
   open: boolean;

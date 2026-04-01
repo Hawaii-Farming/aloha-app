@@ -10,8 +10,6 @@ import { useForm } from 'react-hook-form';
 import type { ZodObject, ZodRawShape } from 'zod';
 import { z } from 'zod';
 
-import { AiFormAssist } from '@aloha/ai/ai-form-assist';
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
 import { Button } from '@aloha/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@aloha/ui/card';
@@ -21,6 +19,7 @@ import { PageBody, PageHeader } from '@aloha/ui/page';
 import { toast } from '@aloha/ui/sonner';
 import { Trans } from '@aloha/ui/trans';
 
+import { AiFormAssist } from '~/components/ai/ai-form-assist';
 import {
   crudCreateAction,
   crudUpdateAction,
@@ -29,6 +28,7 @@ import { loadDetailData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
 import { renderFormField } from '~/lib/crud/render-form-field';
 import { buildDefaultValues } from '~/lib/crud/workflow-helpers';
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import {
   requireModuleAccess,

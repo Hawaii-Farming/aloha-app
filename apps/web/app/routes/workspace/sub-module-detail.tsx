@@ -4,8 +4,6 @@ import { Link, redirect, useFetcher } from 'react-router';
 
 import { Pencil, Trash2 } from 'lucide-react';
 
-import { createWorkflowAgent } from '@aloha/ai/workflow-automation';
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +24,7 @@ import { WorkflowHistory } from '@aloha/ui/workflow-history';
 import { WorkflowStatusBadge } from '@aloha/ui/workflow-status-badge';
 import { WorkflowTransitionButtons } from '@aloha/ui/workflow-transition';
 
+import { createWorkflowAgent } from '~/lib/ai/workflow-automation.server';
 import {
   crudDeleteAction,
   crudTransitionAction,
@@ -33,6 +32,7 @@ import {
 import { loadDetailData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
 import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { AccessGate } from '~/lib/workspace/access-gate';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import {

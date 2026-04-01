@@ -2,10 +2,6 @@ import { Outlet } from 'react-router';
 
 import { z } from 'zod';
 
-import { AiChatButton } from '@aloha/ai/ai-chat-button';
-import { AiChatPanel } from '@aloha/ai/ai-chat-panel';
-import { AiChatProvider } from '@aloha/ai/ai-chat-provider';
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import {
   Page,
   PageLayoutStyle,
@@ -14,11 +10,15 @@ import {
 } from '@aloha/ui/page';
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
+import { AiChatButton } from '~/components/ai/ai-chat-button';
+import { AiChatPanel } from '~/components/ai/ai-chat-panel';
+import { AiChatProvider } from '~/components/ai/ai-chat-provider';
 import { AppLogo } from '~/components/app-logo';
 import { MobileNavigation } from '~/components/sidebar/mobile-navigation';
 import { WorkspaceNavigationMenu } from '~/components/sidebar/navigation-menu';
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import type { Route } from '~/types/app/routes/workspace/+types/layout';
 
