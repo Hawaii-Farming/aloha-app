@@ -105,8 +105,6 @@ export class DatabaseTool {
   static async getSchemaFiles(): Promise<SchemaFile[]> {
     const schemasPath = join(
       DatabaseTool.ROOT_PATH,
-      'apps',
-      'web',
       'supabase',
       'schemas',
     );
@@ -350,8 +348,6 @@ export class DatabaseTool {
   static async getSchemaContent(fileName: string): Promise<string> {
     const schemasPath = join(
       DatabaseTool.ROOT_PATH,
-      'apps',
-      'web',
       'supabase',
       'schemas',
     );

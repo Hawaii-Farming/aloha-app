@@ -3,11 +3,11 @@
  *
  * These interfaces document the expected column shapes for the SQL views
  * that bridge the template and consumer schema. When database.types.ts
- * is populated via `pnpm supabase:web:typegen`, prefer using
+ * is populated via `pnpm supabase:typegen`, prefer using
  * `Tables<'app_user_profile'>` etc. These interfaces serve as
  * documentation and fallback for consumers who haven't run typegen yet.
  *
- * See: apps/web/supabase/schemas/18-view-contracts.sql
+ * See: supabase/schemas/18-view-contracts.sql
  */
 
 /** Row shape from app_user_profile view */

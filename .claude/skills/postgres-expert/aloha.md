@@ -2,7 +2,7 @@
 
 ## Schema Location
 
-All schemas are in `apps/web/supabase/schemas/` with numbered prefixes for dependency ordering.
+All schemas are in `supabase/schemas/` with numbered prefixes for dependency ordering.
 
 ## Existing Helper Functions - DO NOT Recreate
 
@@ -102,16 +102,16 @@ create index ix_feature_account_id on public.feature(account_id);
 
 ```bash
 # New entity: copy schema to migration
-pnpm --filter web run supabase migrations new feature_name
+run supabase migrations new feature_name
 
 # Modify existing: generate diff
-pnpm --filter web run supabase:db:diff -f update_feature
+run supabase:db:diff -f update_feature
 
 # Apply
-pnpm --filter web supabase migrations up
+supabase migrations up
 
 # Generate types
-pnpm supabase:web:typegen
+pnpm supabase:typegen
 ```
 
 ## Security Definer Function Pattern

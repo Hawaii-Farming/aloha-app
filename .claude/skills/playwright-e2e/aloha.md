@@ -2,7 +2,7 @@
 
 ## Page Objects Location
 
-`apps/e2e/tests/*.po.ts`
+`e2e/tests/*.po.ts`
 
 ## Auth Page Object
 
@@ -135,7 +135,7 @@ await expect(async () => {
 ## Test Organization
 
 ```
-apps/e2e/
+e2e/
 ├── playwright.config.ts
 ├── tests/
 │   ├── auth.setup.ts

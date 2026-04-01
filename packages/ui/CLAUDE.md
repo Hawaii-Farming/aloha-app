@@ -94,7 +94,7 @@ const onSubmit = (data) => {
 
 ### Form Examples
 
-- Contact form: `apps/web/app/(marketing)/contact/_components/contact-form.tsx`
+- Contact form: `app/(marketing)/contact/_components/contact-form.tsx`
 - Verify OTP form: `packages/otp/src/components/verify-otp-form.tsx`
 
 ## Internationalization

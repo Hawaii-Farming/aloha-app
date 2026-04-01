@@ -4,7 +4,7 @@ Real examples from the codebase.
 
 ## Accounts Schema
 
-Location: `apps/web/supabase/schemas/03-accounts.sql`
+Location: `supabase/schemas/03-accounts.sql`
 
 ```sql
 create table if not exists public.accounts (
@@ -24,7 +24,7 @@ alter table "public"."accounts" enable row level security;
 
 ## Account Memberships
 
-Location: `apps/web/supabase/schemas/04-accounts-memberships.sql`
+Location: `supabase/schemas/04-accounts-memberships.sql`
 
 ```sql
 create table if not exists public.accounts_memberships (
@@ -48,7 +48,7 @@ create policy accounts_memberships_select on public.accounts_memberships
 
 ## Notifications
 
-Location: `apps/web/supabase/schemas/12-notifications.sql`
+Location: `supabase/schemas/12-notifications.sql`
 
 ```sql
 create table if not exists public.notifications (
@@ -70,7 +70,7 @@ create policy read_notifications on public.notifications
 
 ## Storage Bucket
 
-Location: `apps/web/supabase/schemas/16-storage.sql`
+Location: `supabase/schemas/16-storage.sql`
 
 ```sql
 insert into storage.buckets (id, name, public)

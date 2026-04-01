@@ -123,31 +123,31 @@ export class ScriptsTool {
         importance: 'high',
         healthcheck: true,
       },
-      'supabase:web:start': {
+      'supabase:start': {
         category: 'database',
         description: 'Start local Supabase instance for development',
         usage: 'Required for local development with database access.',
         importance: 'critical',
       },
-      'supabase:web:stop': {
+      'supabase:stop': {
         category: 'database',
         description: 'Stop the local Supabase instance',
         usage: 'Use when done developing to free up resources.',
         importance: 'medium',
       },
-      'supabase:web:reset': {
+      'supabase:reset': {
         category: 'database',
         description: 'Reset local database to latest schema and seed data',
         usage: 'Use when database state is corrupted or needs fresh start.',
         importance: 'high',
       },
-      'supabase:web:typegen': {
+      'supabase:typegen': {
         category: 'database',
         description: 'Generate TypeScript types from Supabase database schema',
         usage: 'Run after database schema changes to update types.',
         importance: 'high',
       },
-      'supabase:web:test': {
+      'supabase:test': {
         category: 'testing',
         description: 'Run Supabase-specific tests',
         usage: 'Test database functions, RLS policies, and migrations.',
@@ -196,11 +196,11 @@ export class ScriptsTool {
         usage: 'Automatically align package versions across workspaces.',
         importance: 'low',
       },
-      'supabase:cli': {
+      supabase: {
         category: 'database',
-        description: 'Access Supabase CLI commands via web project',
+        description: 'Access Supabase CLI commands',
         usage:
-          'Use with: pnpm --filter web supabase <command>. Examples: db diff, db push, gen types, etc.',
+          'Use with: pnpm supabase <command>. Examples: db diff, db push, gen types, etc.',
         importance: 'high',
       },
     };

@@ -189,7 +189,7 @@ No public sign-up page. An admin creates an `hr_employee` record with the user's
 
 ### Kept as-is
 
-- `apps/e2e/`
+- `e2e/`
 - `packages/supabase/`, `packages/ui/`, `packages/i18n/`
 - `packages/features/ai/`
 - `packages/database-webhooks/`, `packages/mcp-server/`

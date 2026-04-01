@@ -49,6 +49,12 @@ vite.config.ts.timestamp-*
 # cloudflare
 .wrangler
 
+# playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # local env files
 .env*
 .dev.vars.claude/worktrees/

@@ -121,8 +121,8 @@ type Product = Tables<'inv_product'>;
 ## Commands
 
 ```bash
-pnpm supabase:web:start     # Start Supabase locally
-pnpm supabase:web:reset     # Reset with latest schema
-pnpm supabase:web:typegen   # Generate TypeScript types
-pnpm --filter web supabase:db:diff -f migration-name  # Create migration
+pnpm supabase:start         # Start Supabase locally
+pnpm supabase:reset         # Reset with latest schema
+pnpm supabase:typegen       # Generate TypeScript types
+pnpm supabase db diff -f migration-name  # Create migration
 ```

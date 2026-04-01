@@ -33,7 +33,7 @@ Pricing is managed with three tiers of specificity -- default prices by product 
 | Dashboard | https://supabase.com/dashboard/project/kfwqtaazdankxmdlqdak |
 | Region | East US (North Virginia) |
 
-Environment variables are configured in `apps/web/.env`.
+Environment variables are configured in `.env`.
 
 ## Development
 
@@ -47,14 +47,14 @@ Environment variables are configured in `apps/web/.env`.
 
 ```bash
 pnpm install
-pnpm --filter web dev       # Start dev server at http://localhost:5173
+pnpm dev       # Start dev server at http://localhost:5173
 ```
 
 ### Essential Commands
 
 ```bash
 pnpm dev                    # Start all apps
-pnpm --filter web dev       # Main app only
+pnpm dev       # Main app only
 pnpm typecheck              # Type-check all packages
 pnpm format:fix             # Format code
 pnpm lint:fix               # Lint code
@@ -63,9 +63,9 @@ pnpm lint:fix               # Lint code
 ### Database Commands
 
 ```bash
-pnpm supabase:web:typegen   # Regenerate TypeScript types from Supabase schema
-pnpm supabase:web:start     # Start local Supabase (requires Docker)
-pnpm supabase:web:reset     # Reset local Supabase with latest schema
+pnpm supabase:typegen   # Regenerate TypeScript types from Supabase schema
+pnpm supabase:start     # Start local Supabase (requires Docker)
+pnpm supabase:reset     # Reset local Supabase with latest schema
 ```
 
 ### Test Users
@@ -86,7 +86,7 @@ Login with any of these users to see how the sidebar navigation adapts based on 
 
 | File | Purpose |
 |------|---------|
-| `package.json` | Root workspace package. Defines monorepo scripts (`dev`, `typecheck`, `lint:fix`, `format:fix`, `supabase:web:*`). |
+| `package.json` | Root workspace package. Defines monorepo scripts (`dev`, `typecheck`, `lint:fix`, `format:fix`, `supabase:*`). |
 | `pnpm-workspace.yaml` | Declares workspace packages: `apps/*`, `packages/*`, `packages/features/*`, `tooling/*`. |
 | `pnpm-lock.yaml` | Lockfile for deterministic installs across environments. |
 | `turbo.json` | Turborepo pipeline configuration. Defines task dependencies, caching, and `globalEnv` for env var invalidation. |
@@ -165,9 +165,9 @@ aloha-app/
 
 ### Apps
 
-**`apps/web/`** -- The main application. React Router 7 in SSR/framework mode. Routes are organized by section: `auth/` for login flows, `home/` for the authenticated app shell with org-scoped navigation, and `api/` for server endpoints (AI, webhooks, OTP). Configuration lives in `config/` (auth providers, paths, feature flags). The `supabase/` subdirectory contains SQL schema files (00-20) that define the view contracts and auth infrastructure used by local Supabase.
+**``** -- The main application. React Router 7 in SSR/framework mode. Routes are organized by section: `auth/` for login flows, `home/` for the authenticated app shell with org-scoped navigation, and `api/` for server endpoints (AI, webhooks, OTP). Configuration lives in `config/` (auth providers, paths, feature flags). The `supabase/` subdirectory contains SQL schema files (00-20) that define the view contracts and auth infrastructure used by local Supabase.
 
-**`apps/e2e/`** -- Playwright end-to-end test suite. Tests are organized by feature and run against the dev server. Configure browsers, base URL, and timeouts in `playwright.config.ts`.
+**`e2e/`** -- Playwright end-to-end test suite. Tests are organized by feature and run against the dev server. Configure browsers, base URL, and timeouts in `playwright.config.ts`.
 
 ### Feature Packages (`packages/features/`)
 
@@ -185,13 +185,13 @@ Each feature package encapsulates domain logic, UI components, and server action
 
 ### Infrastructure Packages (`packages/`)
 
-**`supabase/`** -- The database layer. Contains `getSupabaseServerClient(request)` for request-scoped Supabase clients with SSR cookie handling, and `database.types.ts` (7,980 lines generated from the live schema via `pnpm supabase:web:typegen`). All database access flows through this package.
+**`supabase/`** -- The database layer. Contains `getSupabaseServerClient(request)` for request-scoped Supabase clients with SSR cookie handling, and `database.types.ts` (7,980 lines generated from the live schema via `pnpm supabase:typegen`). All database access flows through this package.
 
 **`ui/`** -- Component library built on Radix UI primitives. Shadcn UI components in `shadcn/`, custom components in `kit/` (data tables, forms, sidebar navigation, profile avatars), and the `cn()` utility for Tailwind class merging.
 
 **`shared/`** -- Cross-cutting utilities. `createRegistry()` for dependency injection without direct coupling. Pino logger (console in dev, structured JSON in prod). Shared React hooks.
 
-**`i18n/`** -- Internationalization via i18next. Lazy locale loading with `i18next-resources-to-backend`. Language detection via `i18next-browser-languagedetector`. Locale JSON files live in `apps/web/public/locales/`.
+**`i18n/`** -- Internationalization via i18next. Lazy locale loading with `i18next-resources-to-backend`. Language detection via `i18next-browser-languagedetector`. Locale JSON files live in `public/locales/`.
 
 **`mailers/`** -- Email provider abstraction. Common interface with swappable backends: Nodemailer for local development, Resend for production. Configured via `MAILER_PROVIDER` env var.
 
@@ -280,7 +280,7 @@ Five database views bridge the schema to the application UI. These views are sec
 | `app_nav_modules` | Modules the user can access in an org (pre-filtered by `hr_module_access`) |
 | `app_nav_sub_modules` | Sub-modules filtered by `sys_access_level` comparison |
 
-The view SQL is defined in `apps/web/supabase/schemas/19-view-contracts.sql` and `20-nav-view-contracts.sql`. To deploy to a new Supabase project, run `scripts/sql/deploy-views-and-seed.sql` in the SQL Editor.
+The view SQL is defined in `supabase/schemas/19-view-contracts.sql` and `20-nav-view-contracts.sql`. To deploy to a new Supabase project, run `scripts/sql/deploy-views-and-seed.sql` in the SQL Editor.
 
 ## ERP Modules
 

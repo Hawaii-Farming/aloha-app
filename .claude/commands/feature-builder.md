@@ -18,14 +18,14 @@ You MUST use the specialized skills for each phase while building the feature.
 
 Use `postgres-supabase-expert` skill.
 
-1. Create schema file in `apps/web/supabase/schemas/`
+1. Create schema file in `supabase/schemas/`
 2. Enable RLS and create policies using helper functions
-3. Generate migration: `pnpm --filter web supabase:db:diff -f feature_name`
-4. Apply: `pnpm --filter web supabase migrations up`
-5. Generate types: `pnpm supabase:web:typegen`
+3. Generate migration: `supabase:db:diff -f feature_name`
+4. Apply: `supabase migrations up`
+5. Generate types: `pnpm supabase:typegen`
 
 ```sql
--- Example: apps/web/supabase/schemas/20-projects.sql
+-- Example: supabase/schemas/20-projects.sql
 create table if not exists public.projects (
   id uuid unique not null default extensions.uuid_generate_v4(),
   account_id uuid references public.accounts(id) on delete cascade not null,
@@ -79,10 +79,10 @@ Create in route's `_components/` directory:
 ### Phase 4: Page Integration
 
 Create page in appropriate route group:
-- Team: `apps/web/app/routes/home/account/feature/`
+- Team: `app/routes/home/account/feature/`
 
 ```typescript
-// apps/web/app/routes/home/account/projects.tsx
+// app/routes/home/account/projects.tsx
 import { data } from 'react-router';
 
 import { getSupabaseServerClient } from '@aloha/supabase/server-client';
@@ -117,12 +117,12 @@ export default function ProjectsPage({ loaderData }: { loaderData: { projects: P
 
 ### Phase 5: Navigation
 
-Add routes to sidebar navigation in `apps/web/config/team-account-navigation.config.tsx`.
+Add routes to sidebar navigation in `config/team-account-navigation.config.tsx`.
 
 ## File Structure
 
 ```
-apps/web/app/routes/home/account/projects/
+app/routes/home/account/projects/
 ├── route.tsx                  # Page with loader + action exports
 ├── [projectId]/
 │   └── route.tsx              # Detail page
@@ -141,7 +141,7 @@ apps/web/app/routes/home/account/projects/
 
 ### Database Layer
 
-- [ ] Schema file created in `apps/web/supabase/schemas/`
+- [ ] Schema file created in `supabase/schemas/`
 - [ ] RLS enabled on table
 - [ ] Default permissions revoked
 - [ ] Specific permissions granted to `authenticated`

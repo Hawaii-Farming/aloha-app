@@ -4,7 +4,7 @@ export function checkPendingMigrations() {
   try {
     console.info('\x1b[34m%s\x1b[0m', 'Checking for pending migrations...');
 
-    const output = execSync('pnpm --filter web supabase migration list', {
+    const output = execSync('pnpm supabase migration list', {
       encoding: 'utf-8',
       stdio: 'pipe',
     });
@@ -34,7 +34,7 @@ export function checkPendingMigrations() {
       );
 
       console.log(
-        '\nAfter testing the migrations in your local environment and ideally in a staging environment, please run "pnpm --filter web supabase db push" to apply them to your database. If you have any questions, please open a support ticket.',
+        '\nAfter testing the migrations in your local environment and ideally in a staging environment, please run "pnpm supabase db push" to apply them to your database. If you have any questions, please open a support ticket.',
       );
     } else {
       console.log('\x1b[32m%s\x1b[0m', '✅ All migrations are up to date.');

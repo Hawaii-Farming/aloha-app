@@ -15,7 +15,7 @@
 ## File Structure (After)
 
 ```
-apps/web/
+
   app/
     routes/
       auth/sign-in.tsx
@@ -100,7 +100,7 @@ These packages have no dependents within the remaining keep-list.
 - Delete: `packages/mailers/` (entire directory — core, shared, resend, nodemailer)
 - Delete: `packages/otp/` (entire directory)
 - Delete: `packages/policies/` (entire directory)
-- Modify: `apps/web/package.json` — remove `@aloha/mailers`, `@aloha/otp` dependencies
+- Modify: `package.json` — remove `@aloha/mailers`, `@aloha/otp` dependencies
 - Modify: `pnpm-workspace.yaml` — no change needed (glob covers all packages/**)
 
 - [ ] **Step 1: Delete mailers, otp, policies directories**
@@ -109,7 +109,7 @@ These packages have no dependents within the remaining keep-list.
 rm -rf packages/mailers packages/otp packages/policies
 ```
 
-- [ ] **Step 2: Remove dependencies from apps/web/package.json**
+- [ ] **Step 2: Remove dependencies from package.json**
 
 Remove these lines from `dependencies`:
 ```
@@ -120,12 +120,12 @@ Remove these lines from `dependencies`:
 - [ ] **Step 3: Delete the OTP API route**
 
 ```bash
-rm -rf apps/web/app/routes/api/otp
+rm -rf app/routes/api/otp
 ```
 
 - [ ] **Step 4: Remove OTP route from routes.ts**
 
-In `apps/web/app/routes.ts`, remove:
+In `app/routes.ts`, remove:
 ```ts
 route('api/otp/send', 'routes/api/otp/send.ts'),
 ```
@@ -156,12 +156,12 @@ git add -A && git commit -m "chore: delete mailers, otp, policies packages"
 
 **Files:**
 - Delete: `packages/features/team-accounts/` (entire directory)
-- Delete: `apps/web/app/routes/home/account/members.tsx`
-- Delete: `apps/web/app/routes/home/account/_lib/members-page-loader.ts`
-- Delete: `apps/web/app/routes/api/accounts.ts`
-- Delete: `apps/web/app/routes/identities.tsx`
-- Modify: `apps/web/package.json` — remove `@aloha/team-accounts`
-- Modify: `apps/web/app/routes.ts` — remove members route, accounts API route, identities route
+- Delete: `app/routes/home/account/members.tsx`
+- Delete: `app/routes/home/account/_lib/members-page-loader.ts`
+- Delete: `app/routes/api/accounts.ts`
+- Delete: `app/routes/identities.tsx`
+- Modify: `package.json` — remove `@aloha/team-accounts`
+- Modify: `app/routes.ts` — remove members route, accounts API route, identities route
 
 - [ ] **Step 1: Delete team-accounts package**
 
@@ -172,13 +172,13 @@ rm -rf packages/features/team-accounts
 - [ ] **Step 2: Delete related route files**
 
 ```bash
-rm apps/web/app/routes/home/account/members.tsx
-rm apps/web/app/routes/home/account/_lib/members-page-loader.ts
-rm apps/web/app/routes/api/accounts.ts
-rm apps/web/app/routes/identities.tsx
+rm app/routes/home/account/members.tsx
+rm app/routes/home/account/_lib/members-page-loader.ts
+rm app/routes/api/accounts.ts
+rm app/routes/identities.tsx
 ```
 
-- [ ] **Step 3: Remove @aloha/team-accounts from apps/web/package.json**
+- [ ] **Step 3: Remove @aloha/team-accounts from package.json**
 
 Remove from `dependencies`:
 ```
@@ -187,7 +187,7 @@ Remove from `dependencies`:
 
 - [ ] **Step 4: Update routes.ts — remove deleted routes**
 
-In `apps/web/app/routes.ts`:
+In `app/routes.ts`:
 
 Remove from `rootRoutes`:
 ```ts
@@ -206,7 +206,7 @@ route('home/:account/members', 'routes/home/account/members.tsx'),
 
 - [ ] **Step 5: Update paths.config.ts — remove members path**
 
-In `apps/web/config/paths.config.ts`:
+In `config/paths.config.ts`:
 
 Remove from `PathsSchema.app`:
 ```ts
@@ -257,23 +257,23 @@ git add -A && git commit -m "chore: delete team-accounts package and related rou
 ## Task 3: Delete auth routes for sign-up, verify, confirm
 
 **Files:**
-- Delete: `apps/web/app/routes/auth/sign-up.tsx`
-- Delete: `apps/web/app/routes/auth/verify.tsx`
-- Delete: `apps/web/app/routes/auth/confirm.tsx`
-- Modify: `apps/web/app/routes.ts` — remove these auth routes
-- Modify: `apps/web/app/routes/auth/sign-in.tsx` — remove link to sign-up page
+- Delete: `app/routes/auth/sign-up.tsx`
+- Delete: `app/routes/auth/verify.tsx`
+- Delete: `app/routes/auth/confirm.tsx`
+- Modify: `app/routes.ts` — remove these auth routes
+- Modify: `app/routes/auth/sign-in.tsx` — remove link to sign-up page
 
 - [ ] **Step 1: Delete route files**
 
 ```bash
-rm apps/web/app/routes/auth/sign-up.tsx
-rm apps/web/app/routes/auth/verify.tsx
-rm apps/web/app/routes/auth/confirm.tsx
+rm app/routes/auth/sign-up.tsx
+rm app/routes/auth/verify.tsx
+rm app/routes/auth/confirm.tsx
 ```
 
 - [ ] **Step 2: Remove routes from routes.ts**
 
-In `apps/web/app/routes.ts`, remove from `authLayout`:
+In `app/routes.ts`, remove from `authLayout`:
 ```ts
 route('auth/sign-up', 'routes/auth/sign-up.tsx'),
 route('auth/verify', 'routes/auth/verify.tsx'),
@@ -282,7 +282,7 @@ route('auth/confirm', 'routes/auth/confirm.tsx'),
 
 - [ ] **Step 3: Update sign-in.tsx — remove sign-up link**
 
-In `apps/web/app/routes/auth/sign-in.tsx`, remove the entire sign-up link block at the bottom:
+In `app/routes/auth/sign-in.tsx`, remove the entire sign-up link block at the bottom:
 ```tsx
 <div className={'flex justify-center'}>
   <Button asChild variant={'link'} size={'sm'}>
@@ -316,7 +316,7 @@ Check `packages/features/auth/package.json` for exports that reference deleted f
 
 - [ ] **Step 6: Strip auth.config.ts — remove magicLink**
 
-In `apps/web/config/auth.config.ts`, remove `magicLink` from the schema and config:
+In `config/auth.config.ts`, remove `magicLink` from the schema and config:
 ```ts
 // Remove from AuthConfigSchema.providers:
 magicLink: z.boolean({ description: 'Enable magic link authentication.' }),
@@ -387,17 +387,17 @@ git add -A && git commit -m "chore: remove registry and event bus from @aloha/sh
 ## Task 5: Inline access-control and crud types into app/lib
 
 **Files:**
-- Create: `apps/web/lib/workspace/types.ts` — from `packages/features/access-control/src/view-contracts.ts`
-- Create: `apps/web/lib/workspace/access-gate.tsx` — from `packages/features/access-control/src/components/access-gate.tsx`
-- Create: `apps/web/lib/workspace/use-module-access.ts` — from `packages/features/access-control/src/hooks/use-module-access.ts`
-- Create: `apps/web/lib/crud/types.ts` — from `packages/features/crud/src/types.ts`
+- Create: `lib/workspace/types.ts` — from `packages/features/access-control/src/view-contracts.ts`
+- Create: `lib/workspace/access-gate.tsx` — from `packages/features/access-control/src/components/access-gate.tsx`
+- Create: `lib/workspace/use-module-access.ts` — from `packages/features/access-control/src/hooks/use-module-access.ts`
+- Create: `lib/crud/types.ts` — from `packages/features/crud/src/types.ts`
 - Delete: `packages/features/access-control/` (entire directory)
 - Delete: `packages/features/crud/` (entire directory)
-- Modify: `apps/web/package.json` — remove `@aloha/access-control`, `@aloha/crud`
+- Modify: `package.json` — remove `@aloha/access-control`, `@aloha/crud`
 
 - [ ] **Step 1: Create workspace types file**
 
-Create `apps/web/lib/workspace/types.ts`:
+Create `lib/workspace/types.ts`:
 ```ts
 /** Row shape from app_nav_modules view */
 export interface AppNavModule {
@@ -432,7 +432,7 @@ export interface ModulePermissions {
 
 - [ ] **Step 2: Create access-gate component**
 
-Create `apps/web/lib/workspace/access-gate.tsx`:
+Create `lib/workspace/access-gate.tsx`:
 ```tsx
 'use client';
 
@@ -459,7 +459,7 @@ export function AccessGate(props: AccessGateProps) {
 
 - [ ] **Step 3: Create use-module-access hook**
 
-Create `apps/web/lib/workspace/use-module-access.ts`. This will need route ID updates after Task 7 (route flattening), but for now copy it with current route IDs:
+Create `lib/workspace/use-module-access.ts`. This will need route ID updates after Task 7 (route flattening), but for now copy it with current route IDs:
 ```ts
 'use client';
 
@@ -509,7 +509,7 @@ export function useHasPermission(
 
 - [ ] **Step 4: Create crud types file**
 
-Create `apps/web/lib/crud/types.ts` — copy the full content from `packages/features/crud/src/types.ts` (all interfaces: `ColumnConfig`, `FilterConfig`, `SearchConfig`, `FormFieldConfig`, `WorkflowStateConfig`, `WorkflowTransitionFields`, `WorkflowConfig`, `CrudModuleConfig`).
+Create `lib/crud/types.ts` — copy the full content from `packages/features/crud/src/types.ts` (all interfaces: `ColumnConfig`, `FilterConfig`, `SearchConfig`, `FormFieldConfig`, `WorkflowStateConfig`, `WorkflowTransitionFields`, `WorkflowConfig`, `CrudModuleConfig`).
 
 - [ ] **Step 5: Delete the packages**
 
@@ -517,7 +517,7 @@ Create `apps/web/lib/crud/types.ts` — copy the full content from `packages/fea
 rm -rf packages/features/access-control packages/features/crud
 ```
 
-- [ ] **Step 6: Remove from apps/web/package.json**
+- [ ] **Step 6: Remove from package.json**
 
 Remove:
 ```
@@ -534,12 +534,12 @@ Replace all occurrences of:
 - `@aloha/crud/types` → `~/lib/crud/types`
 
 Files to update:
-- `apps/web/app/routes/home/account/_lib/org-workspace-loader.server.ts`
-- `apps/web/app/routes/home/account/_lib/require-module-access.server.ts`
-- `apps/web/app/routes/home/account/modules/_config/registry.ts`
-- `apps/web/app/routes/home/account/modules/_lib/render-form-field.tsx`
-- `apps/web/app/routes/home/account/modules/_lib/workflow-helpers.ts`
-- `apps/web/app/routes/home/account/modules/sub-module-detail.tsx`
+- `app/routes/home/account/_lib/org-workspace-loader.server.ts`
+- `app/routes/home/account/_lib/require-module-access.server.ts`
+- `app/routes/home/account/modules/_config/registry.ts`
+- `app/routes/home/account/modules/_lib/render-form-field.tsx`
+- `app/routes/home/account/modules/_lib/workflow-helpers.ts`
+- `app/routes/home/account/modules/sub-module-detail.tsx`
 
 - [ ] **Step 8: pnpm install and typecheck**
 
@@ -569,30 +569,30 @@ git add -A && git commit -m "chore: inline access-control and crud types into ap
 - [ ] **Step 1: Move config files**
 
 ```bash
-mv apps/web/app/routes/home/account/modules/_config/registry.ts apps/web/lib/crud/registry.ts
-mv apps/web/app/routes/home/account/modules/_config/hr-department.config.ts apps/web/lib/crud/hr-department.config.ts
-mv apps/web/app/routes/home/account/modules/_config/inv-product.config.ts apps/web/lib/crud/inv-product.config.ts
+mv app/routes/home/account/modules/_config/registry.ts lib/crud/registry.ts
+mv app/routes/home/account/modules/_config/hr-department.config.ts lib/crud/hr-department.config.ts
+mv app/routes/home/account/modules/_config/inv-product.config.ts lib/crud/inv-product.config.ts
 ```
 
 - [ ] **Step 2: Move lib files**
 
 ```bash
-mv apps/web/app/routes/home/account/modules/_lib/crud-action.server.ts apps/web/lib/crud/crud-action.server.ts
-mv apps/web/app/routes/home/account/modules/_lib/crud-helpers.server.ts apps/web/lib/crud/crud-helpers.server.ts
-mv apps/web/app/routes/home/account/modules/_lib/render-form-field.tsx apps/web/lib/crud/render-form-field.tsx
-mv apps/web/app/routes/home/account/modules/_lib/workflow-helpers.ts apps/web/lib/crud/workflow-helpers.ts
+mv app/routes/home/account/modules/_lib/crud-action.server.ts lib/crud/crud-action.server.ts
+mv app/routes/home/account/modules/_lib/crud-helpers.server.ts lib/crud/crud-helpers.server.ts
+mv app/routes/home/account/modules/_lib/render-form-field.tsx lib/crud/render-form-field.tsx
+mv app/routes/home/account/modules/_lib/workflow-helpers.ts lib/crud/workflow-helpers.ts
 ```
 
 - [ ] **Step 3: Delete empty config and lib dirs**
 
 ```bash
-rmdir apps/web/app/routes/home/account/modules/_config
-rmdir apps/web/app/routes/home/account/modules/_lib
+rmdir app/routes/home/account/modules/_config
+rmdir app/routes/home/account/modules/_lib
 ```
 
 - [ ] **Step 4: Update internal imports within moved files**
 
-In `apps/web/lib/crud/registry.ts`, update:
+In `lib/crud/registry.ts`, update:
 ```ts
 // OLD
 import type { CrudModuleConfig } from '@aloha/crud/types';
@@ -605,7 +605,7 @@ import { hrDepartmentConfig } from './hr-department.config';
 import { invProductConfig } from './inv-product.config';
 ```
 
-In `apps/web/lib/crud/render-form-field.tsx`, update:
+In `lib/crud/render-form-field.tsx`, update:
 ```ts
 // OLD
 import type { FormFieldConfig } from '@aloha/crud/types';
@@ -613,7 +613,7 @@ import type { FormFieldConfig } from '@aloha/crud/types';
 import type { FormFieldConfig } from './types';
 ```
 
-In `apps/web/lib/crud/workflow-helpers.ts`, update:
+In `lib/crud/workflow-helpers.ts`, update:
 ```ts
 // OLD
 import type { FormFieldConfig, WorkflowConfig } from '@aloha/crud/types';
@@ -633,7 +633,7 @@ import type { CrudModuleConfig } from './types';
 
 The route files still live at their old paths (will be moved in Task 7). For now, update their imports to point to `~/lib/crud/...`:
 
-In `apps/web/app/routes/home/account/modules/sub-module.tsx`:
+In `app/routes/home/account/modules/sub-module.tsx`:
 ```ts
 // OLD
 import { requireModuleAccess, requireSubModuleAccess } from '../_lib/require-module-access.server';
@@ -675,28 +675,28 @@ git add -A && git commit -m "refactor: move CRUD files from routes to lib/crud/"
 - [ ] **Step 1: Move workspace loaders**
 
 ```bash
-mv apps/web/app/routes/home/account/_lib/org-workspace-loader.server.ts apps/web/lib/workspace/org-workspace-loader.server.ts
-mv apps/web/app/routes/home/account/_lib/require-module-access.server.ts apps/web/lib/workspace/require-module-access.server.ts
-rmdir apps/web/app/routes/home/account/_lib
+mv app/routes/home/account/_lib/org-workspace-loader.server.ts lib/workspace/org-workspace-loader.server.ts
+mv app/routes/home/account/_lib/require-module-access.server.ts lib/workspace/require-module-access.server.ts
+rmdir app/routes/home/account/_lib
 ```
 
 - [ ] **Step 2: Create sidebar directory and move components**
 
 ```bash
-mkdir -p apps/web/components/sidebar
-mv apps/web/app/routes/home/account/_components/module-sidebar-navigation.tsx apps/web/components/sidebar/
-mv apps/web/app/routes/home/account/_components/team-account-layout-sidebar.tsx apps/web/components/sidebar/
-mv apps/web/app/routes/home/account/_components/team-account-accounts-selector.tsx apps/web/components/sidebar/
-mv apps/web/app/routes/home/account/_components/team-account-layout-mobile-navigation.tsx apps/web/components/sidebar/
-mv apps/web/app/routes/home/account/_components/team-account-layout-sidebar-navigation.tsx apps/web/components/sidebar/
-mv apps/web/app/routes/home/account/_components/team-account-layout-page-header.tsx apps/web/components/sidebar/
-mv apps/web/app/routes/home/account/_components/team-account-navigation-menu.tsx apps/web/components/sidebar/
-rmdir apps/web/app/routes/home/account/_components
+mkdir -p components/sidebar
+mv app/routes/home/account/_components/module-sidebar-navigation.tsx components/sidebar/
+mv app/routes/home/account/_components/team-account-layout-sidebar.tsx components/sidebar/
+mv app/routes/home/account/_components/team-account-accounts-selector.tsx components/sidebar/
+mv app/routes/home/account/_components/team-account-layout-mobile-navigation.tsx components/sidebar/
+mv app/routes/home/account/_components/team-account-layout-sidebar-navigation.tsx components/sidebar/
+mv app/routes/home/account/_components/team-account-layout-page-header.tsx components/sidebar/
+mv app/routes/home/account/_components/team-account-navigation-menu.tsx components/sidebar/
+rmdir app/routes/home/account/_components
 ```
 
 - [ ] **Step 3: Update imports in moved workspace files**
 
-In `apps/web/lib/workspace/org-workspace-loader.server.ts`, update:
+In `lib/workspace/org-workspace-loader.server.ts`, update:
 ```ts
 // OLD
 import type { AppNavModule, AppNavSubModule } from '@aloha/access-control/view-contracts';
@@ -706,7 +706,7 @@ import type { AppNavModule, AppNavSubModule } from './types';
 import type { AppOrgContext, AppUserOrgs } from '@aloha/auth/view-contracts';
 ```
 
-In `apps/web/lib/workspace/require-module-access.server.ts`, update:
+In `lib/workspace/require-module-access.server.ts`, update:
 ```ts
 // OLD
 import type { AppNavModule as NavModule, AppNavSubModule as NavSubModule } from '@aloha/access-control/view-contracts';
@@ -734,7 +734,7 @@ import { TeamAccountAccountsSelector } from '~/components/sidebar/team-account-a
 
 - [ ] **Step 5: Update imports in the layout file**
 
-In `apps/web/app/routes/home/account/layout.tsx`, update:
+In `app/routes/home/account/layout.tsx`, update:
 ```ts
 // OLD
 import { TeamAccountLayoutMobileNavigation } from './_components/team-account-layout-mobile-navigation';
@@ -779,38 +779,38 @@ git add -A && git commit -m "refactor: move workspace loaders and sidebar compon
 - [ ] **Step 1: Create workspace route directory**
 
 ```bash
-mkdir -p apps/web/app/routes/workspace
+mkdir -p app/routes/workspace
 ```
 
 - [ ] **Step 2: Move route files**
 
 ```bash
-mv apps/web/app/routes/home/account/layout.tsx apps/web/app/routes/workspace/layout.tsx
-mv apps/web/app/routes/home/account/index.tsx apps/web/app/routes/workspace/home.tsx
-mv apps/web/app/routes/home/account/settings.tsx apps/web/app/routes/workspace/settings.tsx
-mv apps/web/app/routes/home/account/modules/module.tsx apps/web/app/routes/workspace/module.tsx
-mv apps/web/app/routes/home/account/modules/sub-module.tsx apps/web/app/routes/workspace/sub-module.tsx
-mv apps/web/app/routes/home/account/modules/sub-module-create.tsx apps/web/app/routes/workspace/sub-module-create.tsx
-mv apps/web/app/routes/home/account/modules/sub-module-detail.tsx apps/web/app/routes/workspace/sub-module-detail.tsx
-mv apps/web/app/routes/update-password.tsx apps/web/app/routes/auth/update-password.tsx
+mv app/routes/home/account/layout.tsx app/routes/workspace/layout.tsx
+mv app/routes/home/account/index.tsx app/routes/workspace/home.tsx
+mv app/routes/home/account/settings.tsx app/routes/workspace/settings.tsx
+mv app/routes/home/account/modules/module.tsx app/routes/workspace/module.tsx
+mv app/routes/home/account/modules/sub-module.tsx app/routes/workspace/sub-module.tsx
+mv app/routes/home/account/modules/sub-module-create.tsx app/routes/workspace/sub-module-create.tsx
+mv app/routes/home/account/modules/sub-module-detail.tsx app/routes/workspace/sub-module-detail.tsx
+mv app/routes/update-password.tsx app/routes/auth/update-password.tsx
 ```
 
 - [ ] **Step 3: Move home redirect page**
 
 ```bash
-mv apps/web/app/routes/home/index.tsx apps/web/app/routes/workspace-redirect.tsx
-mv apps/web/app/routes/home/_lib/home-loader.server.ts apps/web/lib/workspace/home-loader.server.ts
+mv app/routes/home/index.tsx app/routes/workspace-redirect.tsx
+mv app/routes/home/_lib/home-loader.server.ts lib/workspace/home-loader.server.ts
 ```
 
 - [ ] **Step 4: Delete the old routes/home/ directory**
 
 ```bash
-rm -rf apps/web/app/routes/home
+rm -rf app/routes/home
 ```
 
 - [ ] **Step 5: Rewrite routes.ts**
 
-Replace the entire content of `apps/web/app/routes.ts`:
+Replace the entire content of `app/routes.ts`:
 
 ```ts
 import { type RouteConfig, layout, route } from '@react-router/dev/routes';
@@ -871,7 +871,7 @@ export default [
 
 - [ ] **Step 6: Update paths.config.ts**
 
-In `apps/web/config/paths.config.ts`, update the password update path:
+In `config/paths.config.ts`, update the password update path:
 ```ts
 // OLD
 passwordUpdate: '/update-password',
@@ -881,7 +881,7 @@ passwordUpdate: '/auth/update-password',
 
 - [ ] **Step 7: Update imports in moved route files**
 
-In `apps/web/app/routes/workspace/home.tsx`:
+In `app/routes/workspace/home.tsx`:
 ```ts
 // OLD
 import { homeLoader } from './_lib/home-loader.server';
@@ -889,7 +889,7 @@ import { homeLoader } from './_lib/home-loader.server';
 import { homeLoader } from '~/lib/workspace/home-loader.server';
 ```
 
-Update the `~/types/...` imports in each moved file. After running `pnpm --filter web react-router:typegen`, the type paths will regenerate. For now, temporarily comment out or fix the type imports based on the new route locations.
+Update the `~/types/...` imports in each moved file. After running `pnpm react-router:typegen`, the type paths will regenerate. For now, temporarily comment out or fix the type imports based on the new route locations.
 
 In route files that reference `~/routes/home/account/_components/...`, update to `~/components/sidebar/...` (should already be done from Task 7).
 
@@ -897,7 +897,7 @@ In `module.tsx`, update the hardcoded redirect path — it still uses `/home/...
 
 - [ ] **Step 8: Update workspace-redirect.tsx**
 
-In `apps/web/app/routes/workspace-redirect.tsx`, update:
+In `app/routes/workspace-redirect.tsx`, update:
 ```ts
 // OLD
 import { homeLoader } from './_lib/home-loader.server';
@@ -907,7 +907,7 @@ import { homeLoader } from '~/lib/workspace/home-loader.server';
 
 - [ ] **Step 9: Update use-module-access.ts route IDs**
 
-In `apps/web/lib/workspace/use-module-access.ts`, update the route loader data IDs to match the new routes.ts:
+In `lib/workspace/use-module-access.ts`, update the route loader data IDs to match the new routes.ts:
 ```ts
 // OLD
 const listData = useRouteLoaderData('routes/home/account/modules/sub-module') ...
@@ -937,16 +937,16 @@ git add -A && git commit -m "refactor: flatten routes — move to workspace/ and
 ## Task 9: Clean up Supabase schema files
 
 **Files:**
-- Delete: `apps/web/supabase/schemas/04-roles.sql`
-- Delete: `apps/web/supabase/schemas/05-memberships.sql`
-- Delete: `apps/web/supabase/schemas/06-roles-permissions.sql`
-- Delete: `apps/web/supabase/schemas/11-notifications.sql`
-- Delete: `apps/web/supabase/schemas/12-one-time-tokens.sql`
-- Delete: `apps/web/supabase/schemas/13-mfa.sql`
-- Delete: `apps/web/supabase/schemas/14-super-admin.sql`
-- Delete: `apps/web/supabase/schemas/15-account-views.sql`
-- Delete: `apps/web/supabase/schemas/16-storage.sql`
-- Delete: `apps/web/supabase/schemas/17-roles-seed.sql`
+- Delete: `supabase/schemas/04-roles.sql`
+- Delete: `supabase/schemas/05-memberships.sql`
+- Delete: `supabase/schemas/06-roles-permissions.sql`
+- Delete: `supabase/schemas/11-notifications.sql`
+- Delete: `supabase/schemas/12-one-time-tokens.sql`
+- Delete: `supabase/schemas/13-mfa.sql`
+- Delete: `supabase/schemas/14-super-admin.sql`
+- Delete: `supabase/schemas/15-account-views.sql`
+- Delete: `supabase/schemas/16-storage.sql`
+- Delete: `supabase/schemas/17-roles-seed.sql`
 - Rename: `18-consumer-dev-tables.sql` → `04-consumer-dev-tables.sql`
 - Rename: `19-view-contracts.sql` → `05-view-contracts.sql`
 - Rename: `20-nav-view-contracts.sql` → `06-nav-view-contracts.sql`
@@ -954,7 +954,7 @@ git add -A && git commit -m "refactor: flatten routes — move to workspace/ and
 - [ ] **Step 1: Delete unused schema files**
 
 ```bash
-cd apps/web/supabase/schemas
+cd supabase/schemas
 rm 04-roles.sql 05-memberships.sql 06-roles-permissions.sql
 rm 11-notifications.sql 12-one-time-tokens.sql 13-mfa.sql
 rm 14-super-admin.sql 15-account-views.sql 16-storage.sql 17-roles-seed.sql
@@ -971,18 +971,18 @@ cd ../../../..
 
 - [ ] **Step 3: Clean up 01-enums.sql**
 
-Edit `apps/web/supabase/schemas/01-enums.sql` to remove the template's `app_permissions` enum type if present. Keep only custom enums used by the app (`sys_access_level`, etc.).
+Edit `supabase/schemas/01-enums.sql` to remove the template's `app_permissions` enum type if present. Keep only custom enums used by the app (`sys_access_level`, etc.).
 
 - [ ] **Step 4: Clean up 03-accounts.sql**
 
-Edit `apps/web/supabase/schemas/03-accounts.sql` to remove personal/team account logic. Keep only what Supabase Auth needs — likely the `accounts` table with basic fields and the trigger that creates an account on `auth.users` insert. Remove any references to `account_type`, `is_personal_account`, `primary_owner_user_id` if those are template-only concepts not used by your org model.
+Edit `supabase/schemas/03-accounts.sql` to remove personal/team account logic. Keep only what Supabase Auth needs — likely the `accounts` table with basic fields and the trigger that creates an account on `auth.users` insert. Remove any references to `account_type`, `is_personal_account`, `primary_owner_user_id` if those are template-only concepts not used by your org model.
 
 Review carefully — some RLS policies in this file may reference functions defined in the deleted schema files (e.g., `is_super_admin()`, `has_permission()`). Remove those policies.
 
 - [ ] **Step 5: Verify schema loads cleanly**
 
 ```bash
-pnpm supabase:web:reset
+pnpm supabase:reset
 ```
 
 This will apply all schemas from scratch. Fix any SQL errors from missing references.
@@ -990,7 +990,7 @@ This will apply all schemas from scratch. Fix any SQL errors from missing refere
 - [ ] **Step 6: Regenerate TypeScript types**
 
 ```bash
-pnpm supabase:web:typegen
+pnpm supabase:typegen
 ```
 
 - [ ] **Step 7: Typecheck after type regen**
@@ -1034,7 +1034,7 @@ grep -rn "@aloha/team-accounts\|@aloha/access-control\|@aloha/crud\|@aloha/maile
 
 Also search for old route paths:
 ```bash
-grep -rn "routes/home/account" apps/web/app/ --include="*.ts" --include="*.tsx"
+grep -rn "routes/home/account" app/ --include="*.ts" --include="*.tsx"
 ```
 
 Fix any remaining references.
@@ -1042,7 +1042,7 @@ Fix any remaining references.
 - [ ] **Step 4: Verify dev server starts**
 
 ```bash
-pnpm --filter web dev
+pnpm dev
 ```
 
 Confirm the app loads at localhost:3000, sign-in page renders, and after login the workspace sidebar shows modules.

@@ -1,21 +1,28 @@
 {
+  "extends": "@aloha/tsconfig/base.json",
   "compilerOptions": {
-    "target": "es2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "checkJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "moduleResolution": "bundler",
+    "paths": {
+      "~/*": ["./app/*"],
+      "~/config/*": ["./config/*"],
+      "~/components/*": ["./components/*"],
+      "~/lib/*": ["./lib/*"],
+      "~/types/*": ["./.react-router/types/*"]
+    },
     "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "noUncheckedIndexedAccess": true
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "rootDirs": [".", "./.react-router/types"]
   },
+  "include": [
+    "*.ts",
+    "*.tsx",
+    "config/**/*.{ts|tsx}",
+    "components/**/*",
+    "lib/**/*.ts",
+    "app",
+    ".react-router/types/**/*"
+  ],
   "exclude": ["node_modules"]
 }

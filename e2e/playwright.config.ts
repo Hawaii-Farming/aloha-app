@@ -69,7 +69,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: process.env.PLAYWRIGHT_SERVER_COMMAND
     ? {
-        cwd: '../../',
+        cwd: '../',
         command: process.env.PLAYWRIGHT_SERVER_COMMAND,
         url: 'http://localhost:5173',
         reuseExistingServer: !process.env.CI,

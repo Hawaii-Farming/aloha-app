@@ -45,7 +45,7 @@ A correct implementation requires:
 
 | Criterion | Points | Grader Type | Pass Condition |
 |-----------|--------|-------------|----------------|
-| Schema file created in `apps/web/supabase/schemas/` | 3 | Code | File exists with `.sql` extension |
+| Schema file created in `supabase/schemas/` | 3 | Code | File exists with `.sql` extension |
 | Table has correct columns | 5 | Code | Contains: id, account_id, name, description, status, created_at |
 | RLS enabled | 5 | Code | Contains `enable row level security` |
 | Uses helper functions in policies | 5 | Code | Contains `has_role_on_account` OR `has_permission` |
@@ -138,7 +138,7 @@ async function gradeFeatureImplementation(): Promise<EvalResult> {
   const antiPatterns = [];
 
   // 1. Check schema file
-  const schemaFiles = glob('apps/web/supabase/schemas/*project*.sql');
+  const schemaFiles = glob('supabase/schemas/*project*.sql');
   const schemaContent = schemaFiles.length > 0 ? read(schemaFiles[0]) : '';
 
   details.push({
@@ -163,7 +163,7 @@ async function gradeFeatureImplementation(): Promise<EvalResult> {
   }
 
   // 2. Check route module
-  const routeFiles = glob('apps/web/app/routes/**/projects/**/route.tsx');
+  const routeFiles = glob('app/routes/**/projects/**/route.tsx');
   const routeContent = routeFiles.length > 0 ? read(routeFiles[0]) : '';
 
   details.push({
@@ -179,7 +179,7 @@ async function gradeFeatureImplementation(): Promise<EvalResult> {
   }
 
   // 3. Check UI files
-  const componentFiles = glob('apps/web/app/routes/**/projects/_components/*.tsx');
+  const componentFiles = glob('app/routes/**/projects/_components/*.tsx');
   const formContent = componentFiles.map(f => read(f)).join('\n');
 
   details.push({
@@ -272,7 +272,7 @@ metrics:
 
 Before each trial:
 1. Reset to clean git state: `git checkout -- .`
-2. Ensure Supabase types are current: `pnpm supabase:web:typegen`
+2. Ensure Supabase types are current: `pnpm supabase:typegen`
 3. Verify clean typecheck: `pnpm typecheck`
 
 After each trial:

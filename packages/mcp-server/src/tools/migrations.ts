@@ -7,23 +7,23 @@ import { z } from 'zod/v3';
 export class MigrationsTool {
   static GetMigrations() {
     return readdir(
-      join(process.cwd(), 'apps', 'web', 'supabase', 'migrations'),
+      join(process.cwd(), 'supabase', 'migrations'),
     );
   }
 
   static getMigrationContent(path: string) {
     return readFile(
-      join(process.cwd(), 'apps', 'web', 'supabase', 'migrations', path),
+      join(process.cwd(), 'supabase', 'migrations', path),
       'utf8',
     );
   }
 
   static CreateMigration(name: string) {
-    return execSync(`pnpm --filter web supabase migrations new ${name}`);
+    return execSync(`pnpm supabase migrations new ${name}`);
   }
 
   static Diff() {
-    return execSync(`pnpm --filter web supabase db diff`);
+    return execSync(`pnpm supabase db diff`);
   }
 }
 

@@ -11,10 +11,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Tailwind CSS 4** and Shadcn UI
 - **Turborepo**
 
-## Monorepo Structure
+## Project Structure
 
-- `apps/web` - Main React Router ERP template application
-- `apps/e2e` - Playwright end-to-end tests
+- Root - Main React Router ERP application (app/, lib/, components/, config/, supabase/)
+- `e2e/` - Playwright end-to-end tests
 - `packages/features/*` - Feature packages
 - `packages/` - Shared packages and utilities
 - `tooling/` - Build tools and development scripts
@@ -34,17 +34,17 @@ The long-term goal is to adapt the template's auth layer to use aloha-app's org/
 ### Development Workflow
 
 ```bash
-pnpm dev                    # Start all apps
-pnpm --filter web dev       # Main app (port 3000)
+pnpm dev                    # Start app (port 5173)
+pnpm dev:all                # Start all packages in parallel via turbo
 ```
 
 ### Database Operations
 
 ```bash
-pnpm supabase:web:start     # Start Supabase locally
-pnpm supabase:web:reset     # Reset with latest schema
-pnpm supabase:web:typegen   # Generate TypeScript types
-pnpm --filter web supabase:db:diff  # Create migration
+pnpm supabase:start         # Start Supabase locally
+pnpm supabase:reset         # Reset with latest schema
+pnpm supabase:typegen       # Generate TypeScript types
+pnpm supabase db diff       # Create migration diff
 ```
 
 ### Code Quality
@@ -83,7 +83,7 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 
 **Supabase project:** `kfwqtaazdankxmdlqdak` (hosted)
 **Schema docs:** `docs/schemas/` (per-module) and `docs/processes/` (workflows)
-**Migrations:** `apps/web/supabase/migrations/` (91 aloha-app tables + template base schema)
+**Migrations:** `supabase/migrations/` (91 aloha-app tables + template base schema)
 
 ### Constraints
 
@@ -99,7 +99,7 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 
 ## Languages
 - TypeScript 5.9.x - All application code, packages, and tooling
-- SQL (PostgreSQL) - Database schemas and migrations in `apps/web/supabase/schemas/`
+- SQL (PostgreSQL) - Database schemas and migrations in `supabase/schemas/`
 - CSS - Via Tailwind CSS v4 utility classes; no raw CSS files
 ## Runtime
 - Node.js >=20.x (root workspace requirement), >=18.x (web app)
@@ -123,7 +123,7 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 - `i18next-browser-languagedetector` - Auto language detection
 - `i18next-resources-to-backend` - Lazy locale loading
 - Recharts 2.15.x - Charting library
-- Playwright 1.57.x (`@playwright/test`) - E2E tests in `apps/e2e/`
+- Playwright 1.57.x (`@playwright/test`) - E2E tests in `e2e/`
 - Supabase pgTAP - Database unit tests via `supabase db test`
 - Turborepo 2.6.2 - Monorepo task orchestration; config at `turbo.json`
 - `cross-env` 10.1.x - Cross-platform env variable setting
@@ -142,7 +142,7 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 
 ## Configuration
 
-- Template at `apps/web/.env.template`
+- Template at `.env.template`
 - Public vars prefixed `VITE_` (bundled into client)
 - Server-only vars: `SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `SUPABASE_DB_WEBHOOK_SECRET`
 - All env vars declared in `turbo.json` `globalEnv` for Turborepo cache invalidation
@@ -150,7 +150,7 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 - `SUPABASE_SECRET_KEY` - Supabase service role key (server-only)
 - `VITE_SITE_URL`, `VITE_PRODUCT_NAME`, `VITE_SITE_TITLE`, `VITE_SITE_DESCRIPTION` - App metadata
 - `MAILER_PROVIDER` - `nodemailer` or `resend`
-- `vite.config.ts` at `apps/web/vite.config.ts`
+- `vite.config.ts` at `vite.config.ts`
 - `react-router.config.ts` - SSR enabled, Vercel preset available but commented out
 - `tsconfig.json` at root + per-package configs extending `@aloha/tsconfig`
 - Prettier config: `@aloha/prettier-config`
@@ -249,12 +249,12 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 - Policy engine in `packages/policies/src/` for business rule evaluation with ALL/ANY operators, stages, and LRU caching
 ## Layers
 - Purpose: React Router route modules — each file exports `loader`, `action`, and `default` component
-- Location: `apps/web/app/routes/`
+- Location: `app/routes/`
 - Contains: Page components, data loaders, form actions, layout wrappers
 - Depends on: Feature packages, lib utilities, config
 - Used by: React Router framework at runtime
 - Purpose: Shared page chrome (sidebar/header navigation) loaded once per section
-- Location: `apps/web/app/routes/*/layout.tsx`
+- Location: `app/routes/*/layout.tsx`
 - Contains: Workspace loaders, navigation components, layout style switching (sidebar vs header)
 - Depends on: Feature packages, cookies, workspace loaders
 - Purpose: Domain-specific components, server actions, and services isolated per feature
@@ -277,7 +277,7 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 - Contains: Shadcn components in `shadcn/`, custom components in `kit/`, `cn()` utility
 - Depends on: Tailwind CSS 4, Radix UI primitives
 - Purpose: Supabase PostgreSQL with Row Level Security
-- Location: `apps/web/supabase/schemas/` (SQL schemas numbered 00–20)
+- Location: `supabase/schemas/` (SQL schemas numbered 00–20)
 - Contains: Tables, RLS policies, helper functions, views
 - Accessed via: `getSupabaseServerClient(request)` (server) or `useSupabase()` hook (client)
 ## Data Flow
@@ -293,26 +293,26 @@ A multi-tenant agricultural ERP built on the aloha-react-supabase-template. Mana
 - Examples: `packages/policies/src/evaluator.ts`
 - Pattern: Declarative policy functions evaluated against immutable contexts; LRU caching for performance
 - Purpose: Centralized data fetching for the current user/team context needed by layouts
-- Examples: `apps/web/app/routes/home/account/_lib/team-account-workspace-loader.server.ts`
+- Examples: `app/routes/home/account/_lib/team-account-workspace-loader.server.ts`
 - Pattern: Server-only `.server.ts` files called from layout loaders; return typed workspace objects
 - Purpose: Request-scoped Supabase client that reads/writes session cookies
 - Examples: `packages/supabase/src/clients/server-client.server.ts`
 - Pattern: `getSupabaseServerClient(request)` creates a new client per request using `@supabase/ssr`'s `createServerClient`
 ## Entry Points
-- Location: `apps/web/app/entry.server.tsx`
+- Location: `app/entry.server.tsx`
 - Triggers: Every incoming HTTP request
 - Responsibilities: Bot detection, streaming HTML rendering via `renderToPipeableStream`, error logging
-- Location: `apps/web/app/root.tsx`
+- Location: `app/root.tsx`
 - Triggers: All page requests (wraps every route)
 - Responsibilities: CSRF token generation, theme resolution, i18n language detection, global providers (`RootProviders`), global error boundary
-- Location: `apps/web/app/routes.ts`
+- Location: `app/routes.ts`
 - Triggers: Build time and runtime routing
 - Responsibilities: Declares all routes organized into layout groups: `rootRoutes`, `apiRoutes`, `authLayout`, `teamAccountLayout`
-- Location: `apps/web/app/routes/api/`
+- Location: `app/routes/api/`
 - Triggers: POST requests from client or external webhooks
 - Responsibilities: AI endpoints (`/api/ai/chat`, `/api/ai/form-assist`), database webhooks (`/api/db/webhook`), OTP (`/api/otp/send`), account management (`/api/accounts`)
 ## Error Handling
-- Root error boundary: `apps/web/components/root-error-boundary.tsx` — catches all unhandled route errors
+- Root error boundary: `components/root-error-boundary.tsx` — catches all unhandled route errors
 - Server entry error handler: `handleError()` in `entry.server.tsx` logs error via server logger
 - API routes: try/catch returning `new Response(null, { status: 500 })` on failure
 - Auth errors: `requireUserLoader()` throws `redirect()` to sign-in path on auth failure

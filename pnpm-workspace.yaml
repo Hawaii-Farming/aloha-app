@@ -1,12 +1,12 @@
 packages:
-  - apps/*
+  - e2e
   - packages/**
   - tooling/*
 
 catalog:
   '@supabase/supabase-js': 2.89.0
   '@tanstack/react-query': 5.90.12
-  '@types/node': 25.0.1
+  '@types/node': 25.0.3
   '@types/react': 19.2.7
   react: 19.2.3
   supabase: 2.67.3
