@@ -12,11 +12,11 @@ interface ModulePermissions {
 }
 
 export function useModuleAccess(): ModulePermissions | null {
-  const listData = useRouteLoaderData(
-    'routes/home/account/modules/sub-module',
-  ) as { moduleAccess?: ModulePermissions } | undefined;
+  const listData = useRouteLoaderData('routes/workspace/sub-module') as
+    | { moduleAccess?: ModulePermissions }
+    | undefined;
   const detailData = useRouteLoaderData(
-    'routes/home/account/modules/sub-module-detail',
+    'routes/workspace/sub-module-detail',
   ) as { moduleAccess?: ModulePermissions } | undefined;
   const createData = useRouteLoaderData('sub-module-create') as
     | { moduleAccess?: ModulePermissions }

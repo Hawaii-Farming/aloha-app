@@ -4,8 +4,6 @@ import { Link, redirect, useFetcher } from 'react-router';
 
 import { Pencil, Trash2 } from 'lucide-react';
 
-import { AccessGate } from '~/lib/workspace/access-gate';
-import { useModuleAccess } from '~/lib/workspace/use-module-access';
 import { createWorkflowAgent } from '@aloha/ai/workflow-automation';
 import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import {
@@ -35,11 +33,13 @@ import {
 import { loadDetailData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
 import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
+import { AccessGate } from '~/lib/workspace/access-gate';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import {
   requireModuleAccess,
   requireSubModuleAccess,
 } from '~/lib/workspace/require-module-access.server';
+import { useModuleAccess } from '~/lib/workspace/use-module-access';
 
 export const loader = async (args: {
   request: Request;

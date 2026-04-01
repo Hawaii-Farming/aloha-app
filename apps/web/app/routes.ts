@@ -4,8 +4,7 @@ const rootRoutes = [
   route('', 'routes/index.ts'),
   route('version', 'routes/version.ts'),
   route('healthcheck', 'routes/healthcheck.ts'),
-  route('home', 'routes/home/index.tsx'),
-  route('update-password', 'routes/update-password.tsx'),
+  route('home', 'routes/workspace-redirect.tsx'),
   route('no-access', 'routes/no-access.tsx'),
 ];
 
@@ -18,33 +17,32 @@ const apiRoutes = [
 const authLayout = layout('routes/auth/layout.tsx', [
   route('auth/sign-in', 'routes/auth/sign-in.tsx'),
   route('auth/password-reset', 'routes/auth/password-reset.tsx'),
+  route('auth/update-password', 'routes/auth/update-password.tsx'),
   route('auth/callback', 'routes/auth/callback.tsx'),
   route('auth/callback/error', 'routes/auth/callback-error.tsx'),
 ]);
 
-const teamAccountLayout = layout('routes/home/account/layout.tsx', [
-  route('home/:account', 'routes/home/account/index.tsx'),
-  // Static routes MUST come before dynamic catch-all
-  route('home/:account/settings', 'routes/home/account/settings.tsx'),
-  // Dynamic module routes — specific patterns before catch-all
-  route('home/:account/:module', 'routes/home/account/modules/module.tsx'),
+const workspaceLayout = layout('routes/workspace/layout.tsx', [
+  route('home/:account', 'routes/workspace/home.tsx'),
+  route('home/:account/settings', 'routes/workspace/settings.tsx'),
+  route('home/:account/:module', 'routes/workspace/module.tsx'),
   route(
     'home/:account/:module/:subModule/create',
-    'routes/home/account/modules/sub-module-create.tsx',
+    'routes/workspace/sub-module-create.tsx',
     { id: 'sub-module-create' },
   ),
   route(
     'home/:account/:module/:subModule/:recordId/edit',
-    'routes/home/account/modules/sub-module-create.tsx',
+    'routes/workspace/sub-module-create.tsx',
     { id: 'sub-module-edit' },
   ),
   route(
     'home/:account/:module/:subModule/:recordId',
-    'routes/home/account/modules/sub-module-detail.tsx',
+    'routes/workspace/sub-module-detail.tsx',
   ),
   route(
     'home/:account/:module/:subModule',
-    'routes/home/account/modules/sub-module.tsx',
+    'routes/workspace/sub-module.tsx',
   ),
 ]);
 
@@ -52,5 +50,5 @@ export default [
   ...rootRoutes,
   ...apiRoutes,
   authLayout,
-  teamAccountLayout,
+  workspaceLayout,
 ] satisfies RouteConfig;

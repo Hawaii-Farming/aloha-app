@@ -8,7 +8,7 @@ import { AppLogo } from '~/components/app-logo';
 import pathsConfig from '~/config/paths.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { requireUserLoader } from '~/lib/require-user-loader';
-import type { Route } from '~/types/app/routes/+types/update-password';
+import type { Route } from '~/types/app/routes/auth/+types/update-password';
 
 export const loader = async (args: Route.LoaderArgs) => {
   const { t } = await createI18nServerInstance(args.request);

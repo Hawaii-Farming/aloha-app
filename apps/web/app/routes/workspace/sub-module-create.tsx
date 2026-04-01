@@ -21,7 +21,10 @@ import { PageBody, PageHeader } from '@aloha/ui/page';
 import { toast } from '@aloha/ui/sonner';
 import { Trans } from '@aloha/ui/trans';
 
-import { crudCreateAction, crudUpdateAction } from '~/lib/crud/crud-action.server';
+import {
+  crudCreateAction,
+  crudUpdateAction,
+} from '~/lib/crud/crud-action.server';
 import { loadDetailData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
 import { renderFormField } from '~/lib/crud/render-form-field';

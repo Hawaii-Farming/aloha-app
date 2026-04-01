@@ -14,12 +14,12 @@ import { DataTable } from '@aloha/ui/enhanced-data-table';
 import { PageBody, PageHeader } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 
+import { loadTableData } from '~/lib/crud/crud-helpers.server';
+import { getModuleConfig } from '~/lib/crud/registry';
 import {
   requireModuleAccess,
   requireSubModuleAccess,
 } from '~/lib/workspace/require-module-access.server';
-import { loadTableData } from '~/lib/crud/crud-helpers.server';
-import { getModuleConfig } from '~/lib/crud/registry';
 
 type RowData = Record<string, unknown>;
 

@@ -19,7 +19,7 @@ const pathsConfig = PathsSchema.parse({
     signIn: '/auth/sign-in',
     callback: '/auth/callback',
     passwordReset: '/auth/password-reset',
-    passwordUpdate: '/update-password',
+    passwordUpdate: '/auth/update-password',
   },
   app: {
     home: '/home',

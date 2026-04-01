@@ -20,7 +20,7 @@ import { TeamAccountLayoutSidebar } from '~/components/sidebar/team-account-layo
 import { TeamAccountNavigationMenu } from '~/components/sidebar/team-account-navigation-menu';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
-import type { Route } from '~/types/app/routes/home/account/+types/layout';
+import type { Route } from '~/types/app/routes/workspace/+types/layout';
 
 export const loader = async (args: Route.LoaderArgs) => {
   const accountSlug = args.params.account as string;
