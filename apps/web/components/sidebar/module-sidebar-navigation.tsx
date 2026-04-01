@@ -4,10 +4,6 @@ import { useLocation } from 'react-router';
 
 import { ChevronRight } from 'lucide-react';
 
-import type {
-  AppNavModule,
-  AppNavSubModule,
-} from '~/lib/workspace/types';
 import {
   Collapsible,
   CollapsibleContent,
@@ -24,6 +20,7 @@ import {
 } from '@aloha/ui/shadcn-sidebar';
 
 import { getModuleIcon } from '~/config/module-icons.config';
+import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 interface ModuleSidebarNavigationProps {
   account: string;

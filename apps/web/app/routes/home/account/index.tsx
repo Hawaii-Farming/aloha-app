@@ -2,10 +2,9 @@ import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
 import { PageBody } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 
+import { TeamAccountLayoutPageHeader } from '~/components/sidebar/team-account-layout-page-header';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import type { Route } from '~/types/app/routes/home/account/+types';
-
-import { TeamAccountLayoutPageHeader } from './_components/team-account-layout-page-header';
 
 export const loader = async (args: Route.LoaderArgs) => {
   const i18n = await createI18nServerInstance(args.request);

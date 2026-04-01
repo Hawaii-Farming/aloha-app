@@ -4,10 +4,6 @@ import type { JwtPayload } from '@supabase/supabase-js';
 
 import { Settings, Users } from 'lucide-react';
 
-import type {
-  AppNavModule,
-  AppNavSubModule,
-} from '~/lib/workspace/types';
 import {
   Sidebar,
   SidebarContent,
@@ -22,9 +18,9 @@ import {
 } from '@aloha/ui/shadcn-sidebar';
 
 import { ProfileAccountDropdownContainer } from '~/components/personal-account-dropdown-container';
-
-import { ModuleSidebarNavigation } from './module-sidebar-navigation';
-import { TeamAccountAccountsSelector } from './team-account-accounts-selector';
+import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
+import { TeamAccountAccountsSelector } from '~/components/sidebar/team-account-accounts-selector';
+import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 type AccountModel = {
   label: string | null;

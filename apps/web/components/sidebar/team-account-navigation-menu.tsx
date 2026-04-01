@@ -7,9 +7,9 @@ import {
 
 import { AppLogo } from '~/components/app-logo';
 import { ProfileAccountDropdownContainer } from '~/components/personal-account-dropdown-container';
+import { TeamAccountAccountsSelector } from '~/components/sidebar/team-account-accounts-selector';
 import pathsConfig from '~/config/paths.config';
 import { getTeamAccountSidebarConfig } from '~/config/team-account-navigation.config';
-import { TeamAccountAccountsSelector } from '~/routes/home/account/_components/team-account-accounts-selector';
 
 type AccountModel = {
   label: string | null;

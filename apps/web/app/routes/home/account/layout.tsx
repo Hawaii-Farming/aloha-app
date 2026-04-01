@@ -15,13 +15,12 @@ import {
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
 import { AppLogo } from '~/components/app-logo';
+import { TeamAccountLayoutMobileNavigation } from '~/components/sidebar/team-account-layout-mobile-navigation';
+import { TeamAccountLayoutSidebar } from '~/components/sidebar/team-account-layout-sidebar';
+import { TeamAccountNavigationMenu } from '~/components/sidebar/team-account-navigation-menu';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
+import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import type { Route } from '~/types/app/routes/home/account/+types/layout';
-
-import { TeamAccountLayoutMobileNavigation } from './_components/team-account-layout-mobile-navigation';
-import { TeamAccountLayoutSidebar } from './_components/team-account-layout-sidebar';
-import { TeamAccountNavigationMenu } from './_components/team-account-navigation-menu';
-import { loadOrgWorkspace } from './_lib/org-workspace-loader.server';
 
 export const loader = async (args: Route.LoaderArgs) => {
   const accountSlug = args.params.account as string;
