@@ -2,9 +2,8 @@ import { Trans } from '@aloha/ui/trans';
 
 import pathsConfig from '~/config/paths.config';
 import { getLastOrg, setLastOrg } from '~/lib/org-storage';
-import type { Route } from '~/types/app/routes/+types/workspace-redirect';
-
 import { homeLoader } from '~/lib/workspace/home-loader.server';
+import type { Route } from '~/types/app/routes/+types/workspace-redirect';
 
 export async function loader({ request }: Route.LoaderArgs) {
   return homeLoader(request);

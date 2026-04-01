@@ -40,10 +40,7 @@ const workspaceLayout = layout('routes/workspace/layout.tsx', [
     'home/:account/:module/:subModule/:recordId',
     'routes/workspace/sub-module-detail.tsx',
   ),
-  route(
-    'home/:account/:module/:subModule',
-    'routes/workspace/sub-module.tsx',
-  ),
+  route('home/:account/:module/:subModule', 'routes/workspace/sub-module.tsx'),
 ]);
 
 export default [
