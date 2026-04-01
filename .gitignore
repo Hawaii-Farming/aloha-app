@@ -59,12 +59,4 @@ playwright/.cache/
 .env*
 .dev.vars.claude/worktrees/
 
-# gsd
-.claude/agents/gsd*
-.claude/commands/gsd
-.claude/get-shit-done/
-.claude/hooks/gsd*
-.claude/gsd*
-.claude/package.json
-.claude/settings.json
 
