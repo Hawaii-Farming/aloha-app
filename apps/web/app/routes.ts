@@ -17,12 +17,9 @@ const apiRoutes = [
 
 const authLayout = layout('routes/auth/layout.tsx', [
   route('auth/sign-in', 'routes/auth/sign-in.tsx'),
-  route('auth/sign-up', 'routes/auth/sign-up.tsx'),
   route('auth/password-reset', 'routes/auth/password-reset.tsx'),
-  route('auth/verify', 'routes/auth/verify.tsx'),
   route('auth/callback', 'routes/auth/callback.tsx'),
   route('auth/callback/error', 'routes/auth/callback-error.tsx'),
-  route('auth/confirm', 'routes/auth/confirm.tsx'),
 ]);
 
 const teamAccountLayout = layout('routes/home/account/layout.tsx', [

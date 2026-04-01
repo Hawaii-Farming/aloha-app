@@ -10,11 +10,8 @@
   },
   "exports": {
     "./sign-in": "./src/sign-in.ts",
-    "./sign-up": "./src/sign-up.ts",
     "./password-reset": "./src/password-reset.ts",
     "./shared": "./src/shared.ts",
-    "./mfa": "./src/mfa.ts",
-    "./resend-email-link": "./src/components/resend-auth-link-form.tsx",
     "./view-contracts": "./src/view-contracts.ts"
   },
   "devDependencies": {

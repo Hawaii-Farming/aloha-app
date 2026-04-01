@@ -20,9 +20,6 @@ const AuthConfigSchema = z.object({
     password: z.boolean({
       description: 'Enable password authentication.',
     }),
-    magicLink: z.boolean({
-      description: 'Enable magic link authentication.',
-    }),
     oAuth: providers.array(),
   }),
 });
@@ -40,8 +37,7 @@ const authConfig = AuthConfigSchema.parse({
   // in your production project
   providers: {
     password: import.meta.env.VITE_AUTH_PASSWORD === 'true',
-    magicLink: import.meta.env.VITE_AUTH_MAGIC_LINK === 'true',
-    oAuth: ['google'],
+    oAuth: ['google', 'azure'],
   },
 } satisfies z.infer<typeof AuthConfigSchema>);
 
