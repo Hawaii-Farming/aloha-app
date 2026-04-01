@@ -1,6 +1,6 @@
 import { PageHeader } from '@aloha/ui/page';
 
-export function TeamAccountLayoutPageHeader(
+export function WorkspacePageHeader(
   props: React.PropsWithChildren<{
     title: string | React.ReactNode;
     description: string | React.ReactNode;

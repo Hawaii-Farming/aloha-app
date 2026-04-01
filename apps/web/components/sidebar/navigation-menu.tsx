@@ -6,10 +6,10 @@ import {
 } from '@aloha/ui/bordered-navigation-menu';
 
 import { AppLogo } from '~/components/app-logo';
-import { ProfileAccountDropdownContainer } from '~/components/personal-account-dropdown-container';
-import { TeamAccountAccountsSelector } from '~/components/sidebar/team-account-accounts-selector';
+import { OrgSelector } from '~/components/sidebar/org-selector';
+import { UserProfileDropdown } from '~/components/user-profile-dropdown';
 import pathsConfig from '~/config/paths.config';
-import { getTeamAccountSidebarConfig } from '~/config/team-account-navigation.config';
+import { getWorkspaceSidebarConfig } from '~/config/workspace-navigation.config';
 
 type AccountModel = {
   label: string | null;
@@ -17,7 +17,7 @@ type AccountModel = {
   image: string | null;
 };
 
-export function TeamAccountNavigationMenu(props: {
+export function WorkspaceNavigationMenu(props: {
   workspace: {
     currentOrg: { org_id: string; org_name: string };
     user: JwtPayload;
@@ -26,7 +26,7 @@ export function TeamAccountNavigationMenu(props: {
 }) {
   const { currentOrg, user } = props.workspace;
 
-  const routes = getTeamAccountSidebarConfig(currentOrg.org_id).routes.reduce<
+  const routes = getWorkspaceSidebarConfig(currentOrg.org_id).routes.reduce<
     Array<{
       path: string;
       label: string;
@@ -58,13 +58,13 @@ export function TeamAccountNavigationMenu(props: {
       </div>
 
       <div className={'flex justify-end space-x-2.5'}>
-        <TeamAccountAccountsSelector
+        <OrgSelector
           userId={user.id}
           selectedAccount={currentOrg.org_id}
           accounts={props.accounts}
         />
 
-        <ProfileAccountDropdownContainer user={user} />
+        <UserProfileDropdown user={user} />
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ import {
 import { Trans } from '@aloha/ui/trans';
 
 import pathsConfig from '~/config/paths.config';
-import { getTeamAccountSidebarConfig } from '~/config/team-account-navigation.config';
+import { getWorkspaceSidebarConfig } from '~/config/workspace-navigation.config';
 
 type Accounts = Array<{
   label: string | null;
@@ -28,7 +28,7 @@ type Accounts = Array<{
   image: string | null;
 }>;
 
-export const TeamAccountLayoutMobileNavigation = (
+export const MobileNavigation = (
   props: React.PropsWithChildren<{
     userId: string;
     account: string;
@@ -37,7 +37,7 @@ export const TeamAccountLayoutMobileNavigation = (
 ) => {
   const signOut = useSignOut();
 
-  const Links = getTeamAccountSidebarConfig(props.account).routes.map(
+  const Links = getWorkspaceSidebarConfig(props.account).routes.map(
     (item, index) => {
       if ('children' in item) {
         return item.children.map((child) => {

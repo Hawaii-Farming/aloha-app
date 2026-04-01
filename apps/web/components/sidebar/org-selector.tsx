@@ -9,7 +9,7 @@ import { SidebarContext } from '@aloha/ui/shadcn-sidebar';
 import pathsConfig from '~/config/paths.config';
 import { setLastOrg } from '~/lib/org-storage';
 
-export function TeamAccountAccountsSelector(params: {
+export function OrgSelector(params: {
   selectedAccount: string;
   userId: string;
 

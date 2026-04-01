@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { NavigationConfigSchema } from '@aloha/ui/navigation-schema';
 import { SidebarNavigation } from '@aloha/ui/shadcn-sidebar';
 
-export function TeamAccountLayoutSidebarNavigation({
+export function WorkspaceSidebarNavigation({
   config,
 }: React.PropsWithChildren<{
   config: z.infer<typeof NavigationConfigSchema>;

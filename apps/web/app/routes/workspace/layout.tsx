@@ -15,9 +15,9 @@ import {
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
 import { AppLogo } from '~/components/app-logo';
-import { TeamAccountLayoutMobileNavigation } from '~/components/sidebar/team-account-layout-mobile-navigation';
-import { TeamAccountLayoutSidebar } from '~/components/sidebar/team-account-layout-sidebar';
-import { TeamAccountNavigationMenu } from '~/components/sidebar/team-account-navigation-menu';
+import { MobileNavigation } from '~/components/sidebar/mobile-navigation';
+import { WorkspaceNavigationMenu } from '~/components/sidebar/navigation-menu';
+import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import type { Route } from '~/types/app/routes/workspace/+types/layout';
@@ -76,7 +76,7 @@ function SidebarLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
     <SidebarProvider defaultOpen={layoutState.open}>
       <Page style={'sidebar'}>
         <PageNavigation>
-          <TeamAccountLayoutSidebar
+          <WorkspaceSidebar
             account={accountSlug}
             accountId={workspace.currentOrg.org_id}
             accounts={accounts}
@@ -89,7 +89,7 @@ function SidebarLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
           <AppLogo />
 
           <div className={'flex space-x-4'}>
-            <TeamAccountLayoutMobileNavigation
+            <MobileNavigation
               userId={user.id}
               accounts={accounts}
               account={accountSlug}
@@ -115,14 +115,14 @@ function HeaderLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
   return (
     <Page style={'header'}>
       <PageNavigation>
-        <TeamAccountNavigationMenu workspace={workspace} accounts={accounts} />
+        <WorkspaceNavigationMenu workspace={workspace} accounts={accounts} />
       </PageNavigation>
 
       <PageMobileNavigation className={'flex items-center justify-between'}>
         <AppLogo />
 
         <div className={'group-data-[mobile:hidden]'}>
-          <TeamAccountLayoutMobileNavigation
+          <MobileNavigation
             userId={workspace.user.id}
             accounts={accounts}
             account={accountSlug}

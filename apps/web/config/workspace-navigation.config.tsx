@@ -23,7 +23,7 @@ const getRoutes = (account: string) => [
   },
 ];
 
-export function getTeamAccountSidebarConfig(account: string) {
+export function getWorkspaceSidebarConfig(account: string) {
   return NavigationConfigSchema.parse({
     routes: getRoutes(account),
     style: 'sidebar',

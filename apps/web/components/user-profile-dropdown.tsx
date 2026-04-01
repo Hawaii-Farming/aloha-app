@@ -20,7 +20,7 @@ import { Trans } from '@aloha/ui/trans';
 
 import featuresFlagConfig from '~/config/feature-flags.config';
 
-export function ProfileAccountDropdownContainer(props: {
+export function UserProfileDropdown(props: {
   user?: JwtPayload | null;
   account?: {
     id: string | null;

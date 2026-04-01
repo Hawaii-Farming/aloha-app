@@ -2,7 +2,7 @@ import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
 import { PageBody } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 
-import { TeamAccountLayoutPageHeader } from '~/components/sidebar/team-account-layout-page-header';
+import { WorkspacePageHeader } from '~/components/sidebar/page-header';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import type { Route } from '~/types/app/routes/workspace/+types/home';
 
@@ -31,7 +31,7 @@ export default function TeamAccountHomePage(props: Route.ComponentProps) {
 
   return (
     <>
-      <TeamAccountLayoutPageHeader
+      <WorkspacePageHeader
         account={data.account}
         title={<Trans i18nKey={'common:dashboardTabLabel'} />}
         description={<AppBreadcrumbs />}

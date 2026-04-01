@@ -17,9 +17,9 @@ import {
   SidebarSeparator,
 } from '@aloha/ui/shadcn-sidebar';
 
-import { ProfileAccountDropdownContainer } from '~/components/personal-account-dropdown-container';
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
-import { TeamAccountAccountsSelector } from '~/components/sidebar/team-account-accounts-selector';
+import { OrgSelector } from '~/components/sidebar/org-selector';
+import { UserProfileDropdown } from '~/components/user-profile-dropdown';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 type AccountModel = {
@@ -28,7 +28,7 @@ type AccountModel = {
   image: string | null;
 };
 
-export function TeamAccountLayoutSidebar(props: {
+export function WorkspaceSidebar(props: {
   account: string;
   accountId: string;
   accounts: AccountModel[];
@@ -66,7 +66,7 @@ function SidebarContainer(props: {
     <Sidebar collapsible={'icon'}>
       <SidebarHeader className={'h-16 justify-center'}>
         <div className={'flex items-center justify-between gap-x-3'}>
-          <TeamAccountAccountsSelector
+          <OrgSelector
             userId={userId}
             selectedAccount={account}
             accounts={accounts}
@@ -86,7 +86,7 @@ function SidebarContainer(props: {
 
       <SidebarFooter>
         <SidebarContent>
-          <ProfileAccountDropdownContainer user={props.user} />
+          <UserProfileDropdown user={props.user} />
         </SidebarContent>
       </SidebarFooter>
     </Sidebar>
