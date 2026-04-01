@@ -81,18 +81,12 @@ importers:
       '@ai-sdk/react':
         specifier: ^3.0.143
         version: 3.0.143(react@19.2.3)(zod@3.25.76)
-      '@aloha/access-control':
-        specifier: workspace:*
-        version: link:../../packages/features/access-control
       '@aloha/ai':
         specifier: workspace:*
         version: link:../../packages/features/ai
       '@aloha/auth':
         specifier: workspace:*
         version: link:../../packages/features/auth
-      '@aloha/crud':
-        specifier: workspace:*
-        version: link:../../packages/features/crud
       '@aloha/csrf':
         specifier: workspace:*
         version: link:../../packages/utils/csrf
@@ -260,22 +254,6 @@ importers:
         specifier: 3.25.76
         version: 3.25.76
 
-  packages/features/access-control:
-    dependencies:
-      react:
-        specifier: 'catalog:'
-        version: 19.2.3
-      react-router:
-        specifier: ^7.12.0
-        version: 7.12.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-    devDependencies:
-      '@aloha/tsconfig':
-        specifier: workspace:*
-        version: link:../../../tooling/typescript
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.7
-
   packages/features/ai:
     dependencies:
       '@ai-sdk/anthropic':
@@ -373,19 +351,6 @@ importers:
         specifier: 3.25.76
         version: 3.25.76
 
-  packages/features/crud:
-    dependencies:
-      zod:
-        specifier: 3.25.76
-        version: 3.25.76
-    devDependencies:
-      '@aloha/tsconfig':
-        specifier: workspace:*
-        version: link:../../../tooling/typescript
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
   packages/i18n:
     dependencies:
       i18next:
@@ -456,9 +421,6 @@ importers:
       '@aloha/prettier-config':
         specifier: workspace:*
         version: link:../../tooling/prettier
-      '@aloha/tailwind-config':
-        specifier: workspace:*
-        version: link:../../tooling/tailwind
       '@aloha/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript

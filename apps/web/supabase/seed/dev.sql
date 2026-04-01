@@ -1,7 +1,7 @@
--- Seed Data: Test data for local development
+-- Seed Data: Test data for LOCAL DEVELOPMENT ONLY
 --
--- Tables are created in schemas/18-consumer-dev-tables.sql.
--- This file only inserts test data.
+-- Tables are created in schemas/04-tables.sql.
+-- This file only inserts test data — do not run in production.
 
 -- ============================================================
 -- Test auth user (email: test@test.com / password: password123)

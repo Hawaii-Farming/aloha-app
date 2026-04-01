@@ -1,6 +1,6 @@
 # A string used to distinguish different Supabase projects on the same host. Defaults to the working
 # directory name when running `supabase init`.
-project_id = "rr-supabase-saas-kit-turbo"
+project_id = "aloha-app"
 
 [api]
 # Port to use for the API URL.
@@ -40,18 +40,18 @@ file_size_limit = "50MiB"
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://localhost:5173"
+site_url = "http://localhost:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://localhost:3000", "http://localhost:3000/auth/callback", "http://localhost:3000/update-password"]
+additional_redirect_urls = ["http://localhost:3000/auth/callback", "http://localhost:3000/auth/update-password"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
 # week).
 jwt_expiry = 3600
-# Allow/disallow new user signups to your project.
-enable_signup = true
+# Invite-only: admins create hr_employee records, users sign in with existing accounts.
+enable_signup = false
 
 [auth.email]
-# Allow/disallow new user signups via email to your project.
-enable_signup = true
+# Invite-only: no public email sign-up.
+enable_signup = false
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
@@ -75,16 +75,8 @@ url = ""
 email_sent = 1000
 
 [auth.mfa.totp]
-verify_enabled = true
-enroll_enabled = true
-
-[auth.email.template.invite]
-subject = "You are invited to Aloha"
-content_path = "./supabase/templates/invite-user.html"
-
-[auth.email.template.confirmation]
-subject = "Confirm your email"
-content_path = "./supabase/templates/confirm-email.html"
+verify_enabled = false
+enroll_enabled = false
 
 [auth.email.template.recovery]
 subject = "Reset your password"
@@ -94,12 +86,11 @@ content_path = "./supabase/templates/reset-password.html"
 subject = "Confirm your email change"
 content_path = "./supabase/templates/change-email-address.html"
 
-[auth.email.template.magic_link]
-subject = "Sign in to Aloha"
-content_path = "./supabase/templates/magic-link.html"
-
 [analytics]
 enabled = false
+
+[db.seed]
+sql_paths = ["./seed/dev.sql"]
 
 [db.migrations]
 schema_paths = [

@@ -10,7 +10,7 @@ Schemas are numbered files in `schemas/` — numbers set dependency order:
 | `01-enums.sql` | Custom enum types |
 | `02-config.sql` | Configuration tables |
 | `03-accounts.sql` | Auth accounts (Supabase Auth anchor) |
-| `04-consumer-dev-tables.sql` | All app tables: org, hr_employee, modules, access control |
+| `04-tables.sql` | All app tables: org, hr_employee, modules, access control |
 | `05-view-contracts.sql` | Auth views: `app_org_context`, `app_user_orgs` |
 | `06-nav-view-contracts.sql` | Sidebar views: `app_nav_modules`, `app_nav_sub_modules` |
 
