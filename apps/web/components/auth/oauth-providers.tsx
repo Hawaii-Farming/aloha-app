@@ -7,10 +7,11 @@ import type {
   SignInWithOAuthCredentials,
 } from '@supabase/supabase-js';
 
-import { useSignInWithProvider } from '@aloha/supabase/hooks/use-sign-in-with-provider';
 import { If } from '@aloha/ui/if';
 import { LoadingOverlay } from '@aloha/ui/loading-overlay';
 import { Trans } from '@aloha/ui/trans';
+
+import { useSignInWithProvider } from '~/lib/supabase/hooks/use-sign-in-with-provider';
 
 import { AuthErrorAlert } from './auth-error-alert';
 import { AuthProviderButton } from './auth-provider-button';

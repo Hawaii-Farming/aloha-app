@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { useSupabase } from '@aloha/supabase/hooks/use-supabase';
+import { useSupabase } from '~/lib/supabase/hooks/use-supabase';
 
 function AuthLinkRedirect(props: { redirectPath?: string }) {
   const [params] = useSearchParams();

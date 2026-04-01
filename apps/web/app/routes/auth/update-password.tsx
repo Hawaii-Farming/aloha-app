@@ -1,9 +1,8 @@
 import { redirect } from 'react-router';
 
-import { UpdatePasswordForm } from '@aloha/auth/password-reset';
-import { AuthLayoutShell } from '@aloha/auth/shared';
-
 import { AppLogo } from '~/components/app-logo';
+import { AuthLayoutShell } from '~/components/auth/auth-layout';
+import { UpdatePasswordForm } from '~/components/auth/update-password-form';
 import pathsConfig from '~/config/paths.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { requireUserLoader } from '~/lib/require-user-loader';

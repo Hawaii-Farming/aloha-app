@@ -4,9 +4,9 @@ import { useCallback } from 'react';
 
 import type { z } from 'zod';
 
-import { useSignInWithEmailPassword } from '@aloha/supabase/hooks/use-sign-in-with-email-password';
+import type { PasswordSignInSchema } from '~/lib/auth/schemas/password-sign-in.schema';
+import { useSignInWithEmailPassword } from '~/lib/supabase/hooks/use-sign-in-with-email-password';
 
-import type { PasswordSignInSchema } from '../schemas/password-sign-in.schema';
 import { AuthErrorAlert } from './auth-error-alert';
 import { PasswordSignInForm } from './password-sign-in-form';
 

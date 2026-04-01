@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { useRequestResetPassword } from '@aloha/supabase/hooks/use-request-reset-password';
 import { Alert, AlertDescription } from '@aloha/ui/alert';
 import { Button } from '@aloha/ui/button';
 import {
@@ -19,6 +18,8 @@ import {
 import { If } from '@aloha/ui/if';
 import { Input } from '@aloha/ui/input';
 import { Trans } from '@aloha/ui/trans';
+
+import { useRequestResetPassword } from '~/lib/supabase/hooks/use-request-reset-password';
 
 import { AuthErrorAlert } from './auth-error-alert';
 

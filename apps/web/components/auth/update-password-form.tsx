@@ -8,7 +8,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-import { useUpdateUser } from '@aloha/supabase/hooks/use-update-user-mutation';
 import { Alert, AlertDescription, AlertTitle } from '@aloha/ui/alert';
 import { Button } from '@aloha/ui/button';
 import {
@@ -22,7 +21,9 @@ import {
 import { Heading } from '@aloha/ui/heading';
 import { Trans } from '@aloha/ui/trans';
 
-import { PasswordResetSchema } from '../schemas/password-reset.schema';
+import { PasswordResetSchema } from '~/lib/auth/schemas/password-reset.schema';
+import { useUpdateUser } from '~/lib/supabase/hooks/use-update-user-mutation';
+
 import { PasswordInput } from './password-input';
 
 export function UpdatePasswordForm(params: {

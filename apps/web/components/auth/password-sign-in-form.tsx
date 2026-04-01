@@ -18,7 +18,8 @@ import {
 import { If } from '@aloha/ui/if';
 import { Trans } from '@aloha/ui/trans';
 
-import { PasswordSignInSchema } from '../schemas/password-sign-in.schema';
+import { PasswordSignInSchema } from '~/lib/auth/schemas/password-sign-in.schema';
+
 import { EmailInput } from './email-input';
 import { PasswordInput } from './password-input';
 

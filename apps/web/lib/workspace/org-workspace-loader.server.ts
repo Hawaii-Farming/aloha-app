@@ -2,8 +2,7 @@ import { redirect } from 'react-router';
 
 import type { JwtPayload, SupabaseClient } from '@supabase/supabase-js';
 
-import type { AppOrgContext, AppUserOrgs } from '@aloha/auth/view-contracts';
-
+import type { AppOrgContext, AppUserOrgs } from '~/lib/auth/view-contracts';
 import type { Database } from '~/lib/database.types';
 import { requireUserLoader } from '~/lib/require-user-loader';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';

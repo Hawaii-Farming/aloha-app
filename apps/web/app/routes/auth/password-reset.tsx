@@ -1,14 +1,14 @@
 import { Link, redirect } from 'react-router';
 
-import { PasswordResetRequestContainer } from '@aloha/auth/password-reset';
-import { requireUser } from '@aloha/supabase/require-user';
-import { getSupabaseServerClient } from '@aloha/supabase/server-client';
 import { Button } from '@aloha/ui/button';
 import { Heading } from '@aloha/ui/heading';
 import { Trans } from '@aloha/ui/trans';
 
+import { PasswordResetRequestContainer } from '~/components/auth/password-reset-request-container';
 import pathsConfig from '~/config/paths.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
+import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
+import { requireUser } from '~/lib/supabase/require-user';
 import type { Route } from '~/types/app/routes/auth/+types/password-reset';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {

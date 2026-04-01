@@ -1,8 +1,7 @@
 import { Outlet } from 'react-router';
 
-import { AuthLayoutShell } from '@aloha/auth/shared';
-
 import { AppLogo } from '~/components/app-logo';
+import { AuthLayoutShell } from '~/components/auth/auth-layout';
 
 export default function AuthLayout() {
   return (
