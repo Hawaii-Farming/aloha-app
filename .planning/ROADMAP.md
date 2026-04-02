@@ -27,9 +27,9 @@
   3. Cards and containers have visible borders and no box-shadow elevation — the page looks flat and border-defined
   4. The green accent color (`--supabase-green`) is applied to primary interactive elements and links
   5. Running WCAG contrast checks on all dark theme text/background pairs returns AA pass (4.5:1 normal, 3:1 large)
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 01-01-PLAN.md — Install Geist fonts and override dark palette with Supabase oklch tokens
+- [x] 01-01-PLAN.md — Install Geist fonts and override dark palette with Supabase oklch tokens
 - [ ] 01-02-PLAN.md — Shadow removal, hydration fix, WCAG verification, and visual checkpoint
 **UI hint**: yes
 
@@ -64,7 +64,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation + Dark Theme | 0/2 | Planned | - |
+| 1. Foundation + Dark Theme | 1/2 | In Progress|  |
 | 2. Light Theme + Component Theming | 0/0 | Not started | - |
 | 3. Enhancement + Verification | 0/0 | Not started | - |
 

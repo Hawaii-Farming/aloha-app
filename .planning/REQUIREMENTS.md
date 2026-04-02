@@ -7,14 +7,14 @@
 
 ### Foundation
 
-- [ ] **FOUND-01**: Geist font installed and applied as primary sans-serif via `--font-sans` CSS variable
-- [ ] **FOUND-02**: Geist Mono font installed and applied as monospace via `--font-mono` CSS variable
-- [ ] **FOUND-03**: All Shadcn semantic CSS tokens overridden with Supabase dark palette in oklch format
+- [x] **FOUND-01**: Geist font installed and applied as primary sans-serif via `--font-sans` CSS variable
+- [x] **FOUND-02**: Geist Mono font installed and applied as monospace via `--font-mono` CSS variable
+- [x] **FOUND-03**: All Shadcn semantic CSS tokens overridden with Supabase dark palette in oklch format
 - [ ] **FOUND-04**: All Shadcn semantic CSS tokens overridden with Supabase light palette in oklch format
 - [ ] **FOUND-05**: Light theme palette values defined in DESIGN.md (currently incomplete)
 - [ ] **FOUND-06**: `suppressHydrationWarning` added to `<html>` element in root.tsx
 - [ ] **FOUND-07**: Border-based depth system replacing box-shadows on cards and containers
-- [ ] **FOUND-08**: Supabase green accent tokens defined (`--supabase-green`, `--supabase-green-link`, `--supabase-green-border`)
+- [x] **FOUND-08**: Supabase green accent tokens defined (`--supabase-green`, `--supabase-green-link`, `--supabase-green-border`)
 - [ ] **FOUND-09**: WCAG AA contrast verified for dark theme (4.5:1 normal text, 3:1 large text)
 - [ ] **FOUND-10**: WCAG AA contrast verified for light theme (4.5:1 normal text, 3:1 large text)
 - [ ] **FOUND-11**: No theme flicker (FOUC) on page load in both dark and light modes
@@ -62,14 +62,14 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
+| FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 2 | Pending |
 | FOUND-05 | Phase 2 | Pending |
 | FOUND-06 | Phase 1 | Pending |
 | FOUND-07 | Phase 1 | Pending |
-| FOUND-08 | Phase 1 | Pending |
+| FOUND-08 | Phase 1 | Complete |
 | FOUND-09 | Phase 1 | Pending |
 | FOUND-10 | Phase 2 | Pending |
 | FOUND-11 | Phase 2 | Pending |
