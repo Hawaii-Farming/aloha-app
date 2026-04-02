@@ -34,12 +34,16 @@ Every screen in Aloha looks and feels like a premium Supabase-quality product �
 
 ### Active
 
-- [ ] HSL-with-alpha supplementary token layer for translucent surfaces
-- [ ] Typography weight restraint enforced (400 body, 500 nav/buttons)
-- [ ] Negative letter-spacing on card titles
-- [ ] Monospace technical label utility
-- [ ] Radix 12-step color scale for semantic states
-- [ ] Supabase neutral gray scale tokens
+None — all v1 requirements validated.
+
+### Recently Validated (Phase 3)
+
+- ✓ oklch-with-alpha translucent surface tokens for overlays — Validated in Phase 3: Enhancement + Verification
+- ✓ Typography weight restraint enforced (400 body, 500 nav/buttons) — Validated in Phase 3: Enhancement + Verification
+- ✓ Negative letter-spacing (-0.16px) on card titles — Validated in Phase 3: Enhancement + Verification
+- ✓ Monospace technical label utility (.tech-label) — Validated in Phase 3: Enhancement + Verification
+- ✓ Radix 12-step semantic color scale for alerts/badges — Validated in Phase 3: Enhancement + Verification
+- ✓ Supabase neutral gray scale tokens completed — Validated in Phase 3: Enhancement + Verification
 
 ### Out of Scope
 
@@ -94,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after Phase 2 completion*
+*Last updated: 2026-04-02 after Phase 3 completion — all v1 requirements validated*
