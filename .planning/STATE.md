@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-02T21:12:34.441Z"
+stopped_at: Completed 02-light-theme-component-theming-02-02-PLAN.md
+last_updated: "2026-04-02T21:12:47.589Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 3
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation-dark-theme P01 | 15 | 2 tasks | 4 files |
 | Phase 01-foundation-dark-theme P02 | 8 | 2 tasks | 2 files |
 | Phase 02-light-theme-component-theming P01 | 143 | 3 tasks | 4 files |
+| Phase 02-light-theme-component-theming P02 | 3 | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,8 @@ Recent decisions affecting current work:
 - [Phase 01-foundation-dark-theme]: Focus ring shadows preserved: ring-* utilities use --ring tokens (not --shadow tokens)
 - [Phase 02-01]: D-04 split green: :root uses oklch(47% 0.165 160) for contrast on white; .dark overrides restore oklch(71.2% 0.184 160) bright green
 - [Phase 02-01]: COMP-02 form input theming delivered via token inheritance (:root --input/--ring/--border) — no component file changes needed
+- [Phase 02-light-theme-component-theming]: Pill variant is additive to CVA — 7 variants total, backward compatible, no call-site changes needed
+- [Phase 02-light-theme-component-theming]: Tabs use global override (no variant) per D-06 — all tab instances get pill shape and green active state automatically
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T21:12:22.703Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-02T21:12:47.587Z
+Stopped at: Completed 02-light-theme-component-theming-02-02-PLAN.md
 Resume file: None

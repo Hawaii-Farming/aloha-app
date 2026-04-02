@@ -23,10 +23,10 @@
 
 - [x] **COMP-01**: Sidebar themed with dark background, green accents, and weight-500 nav links
 - [x] **COMP-02**: Form inputs themed (text input, select, checkbox, radio, textarea)
-- [ ] **COMP-03**: Data tables themed (headers, rows, borders, hover states)
-- [ ] **COMP-04**: Pill button variant (9999px radius) added to Shadcn Button via CVA
-- [ ] **COMP-05**: Pill tab indicator added to Shadcn Tabs component
-- [ ] **COMP-06**: Cards and containers use border-defined edges with no visible shadows
+- [x] **COMP-03**: Data tables themed (headers, rows, borders, hover states)
+- [x] **COMP-04**: Pill button variant (9999px radius) added to Shadcn Button via CVA
+- [x] **COMP-05**: Pill tab indicator added to Shadcn Tabs component
+- [x] **COMP-06**: Cards and containers use border-defined edges with no visible shadows
 - [x] **COMP-07**: Links styled per Supabase palette (green branded, primary light, secondary, muted)
 - [x] **COMP-08**: Toast notifications (Sonner) themed to match palette
 
@@ -75,10 +75,10 @@
 | FOUND-11 | Phase 2 | Pending |
 | COMP-01 | Phase 2 | Complete |
 | COMP-02 | Phase 2 | Complete |
-| COMP-03 | Phase 2 | Pending |
-| COMP-04 | Phase 2 | Pending |
-| COMP-05 | Phase 2 | Pending |
-| COMP-06 | Phase 2 | Pending |
+| COMP-03 | Phase 2 | Complete |
+| COMP-04 | Phase 2 | Complete |
+| COMP-05 | Phase 2 | Complete |
+| COMP-06 | Phase 2 | Complete |
 | COMP-07 | Phase 2 | Complete |
 | COMP-08 | Phase 2 | Complete |
 | ENHN-01 | Phase 3 | Pending |
