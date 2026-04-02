@@ -114,7 +114,7 @@ RULES = [
         "be reactivated individually.",
         "Prevents orphaned active config records from appearing in dropdowns while preserving historical data "
         "integrity. One-way cascade avoids unintended bulk reactivation.",
-        None,
+        '[]',
         6,
     ),
 

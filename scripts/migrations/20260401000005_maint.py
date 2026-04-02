@@ -624,6 +624,10 @@ def migrate_maint_request(supabase, client, site_map, equipment_map):
         if not farm_id and equipment_id:
             farm_id = equip_farm.get(equipment_id)
 
+        # Skip rows where neither site nor equipment is set (XOR constraint)
+        if not site_id and not equipment_id:
+            continue
+
         req = {
             "org_id": ORG_ID,
             "farm_id": farm_id,
