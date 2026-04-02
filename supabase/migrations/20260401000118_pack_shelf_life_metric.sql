@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS pack_shelf_life_metric (
     fail_maximum_value        NUMERIC,
 
     display_order   INTEGER NOT NULL DEFAULT 0,
+    is_active       BOOLEAN NOT NULL DEFAULT true,
 
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,

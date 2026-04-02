@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS invnt_po_received (
     invnt_lot_id           TEXT REFERENCES invnt_lot(id),
 
     -- Delivery acceptance
-    delivery_truck_clean   BOOLEAN,
-    delivery_acceptable    BOOLEAN,
+    fsafe_delivery_truck_clean   BOOLEAN,
+    fsafe_delivery_acceptable    BOOLEAN,
     notes                  TEXT,
     received_photos        JSONB NOT NULL DEFAULT '[]',
 

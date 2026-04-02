@@ -15,9 +15,9 @@ Rerunnable: clears and reinserts all data on each run.
 
 import os
 import re
-from supabase import create_client
 import gspread
 from google.oauth2.service_account import Credentials
+from supabase import create_client
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://kfwqtaazdankxmdlqdak.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
@@ -39,6 +39,13 @@ SHEET_ID = "1e7AuQAOpKAHpmvizIgBNyUk42GscXNpz96hFX8C8uio"
 def to_id(name: str) -> str:
     """Convert a display name to a TEXT PK."""
     return re.sub(r"[^a-z0-9_]+", "_", name.lower()).strip("_") if name else ""
+
+
+def proper_case(val):
+    """Normalize a string to title case, stripping extra whitespace."""
+    if not val or not str(val).strip():
+        return val
+    return str(val).strip().title()
 
 
 def insert_rows(supabase, table: str, rows: list):
@@ -80,12 +87,34 @@ def parse_timestamp(ts_str):
     return None
 
 
-def safe_float(val, default=0):
+def safe_numeric(val, default=0):
+    """Parse a numeric value, stripping commas and whitespace."""
     try:
         v = str(val).strip().replace(",", "")
         return float(v) if v else default
     except (ValueError, TypeError):
         return default
+
+
+def safe_int(val, default=None):
+    """Parse an integer value or return default."""
+    try:
+        v = str(val).strip().replace(",", "")
+        return int(float(v)) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def parse_bool(val):
+    """Parse a boolean value from sheet text."""
+    return str(val).strip().upper() in ("TRUE", "YES", "1")
+
+
+def audit(row: dict) -> dict:
+    """Add audit fields to a row."""
+    row["created_by"] = AUDIT_USER
+    row["updated_by"] = AUDIT_USER
+    return row
 
 
 def get_sheets():
@@ -490,7 +519,7 @@ def migrate_maint_sites(supabase):
             "org_id": ORG_ID,
             "farm_id": farm_id,
             "type": equip_type,
-            "name": equip_name,
+            "name": proper_case(equip_name),
             "created_by": AUDIT_USER,
             "updated_by": AUDIT_USER,
         })
@@ -656,7 +685,7 @@ def migrate_maint_request(supabase, client, site_map, equipment_map):
             item_name = str(r.get("InventoryItemName", "")).strip()
             item = item_by_name.get(item_name.lower()) if item_name else None
             if item:
-                qty = safe_float(r.get("QuantityUsed", ""))
+                qty = safe_numeric(r.get("QuantityUsed", ""))
                 invnt_item_rows.append((req_index, {
                     "org_id": ORG_ID,
                     "invnt_item_id": item["id"],
@@ -1013,7 +1042,7 @@ def migrate_house_inspections(supabase, client):
             }
 
             if q_text == "General cleanliness":
-                result_row["response_numeric"] = safe_float(val)
+                result_row["response_numeric"] = safe_numeric(val)
             else:
                 result_row["response_boolean"] = str(val).strip().upper() == "TRUE"
 

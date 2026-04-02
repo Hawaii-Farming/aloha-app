@@ -41,23 +41,24 @@ if not SUPABASE_KEY:
 AUDIT_USER = "data@hawaiifarming.com"
 ORG_ID = "hawaii_farming"
 
+SHEET_ID_GLOBAL = "1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA"
+SHEET_ID_VARIETY = "1VtEecYn-W1pbnIU1hRHfxIpkH2DtK7hj0CpcpiLoziM"
+
+
+# ---------------------------------------------------------------------------
+# Standard helpers
+# ---------------------------------------------------------------------------
 
 def to_id(name: str) -> str:
-    """Convert a display name to a TEXT PK (lowercase, underscores, trimmed)."""
-    return re.sub(r"[^a-z0-9]+", name.lower(), "_").strip("_") if name else ""
-
-
-def to_id_safe(name: str) -> str:
     """Convert a display name to a TEXT PK."""
     return re.sub(r"[^a-z0-9_]+", "_", name.lower()).strip("_") if name else ""
 
 
-def insert_rows(supabase, table: str, rows: list):
-    """Insert rows into a table. Prints progress."""
-    print(f"\n--- {table} ---")
-    if rows:
-        supabase.table(table).insert(rows).execute()
-        print(f"  Inserted {len(rows)} rows")
+def proper_case(val):
+    """Normalize a string to title case, stripping extra whitespace."""
+    if not val or not str(val).strip():
+        return val
+    return str(val).strip().title()
 
 
 def audit(row: dict) -> dict:
@@ -67,29 +68,73 @@ def audit(row: dict) -> dict:
     return row
 
 
-def migrate_org(supabase):
-    """Create the Hawaii Farming organization."""
-    rows = [
-        audit({
-            "id": ORG_ID,
-            "name": "Hawaii Farming",
-            "address": "66-1475 Pu'u Huluhulu Rd, Kamuela HI",
-            "currency": "USD",
-        }),
-    ]
-    insert_rows(supabase, "org", rows)
+def insert_rows(supabase, table: str, rows: list, upsert=False):
+    """Insert (or upsert) rows in batches of 100. Returns inserted data."""
+    print(f"\n--- {table} ---")
+    all_data = []
+    if rows:
+        for i in range(0, len(rows), 100):
+            batch = rows[i:i + 100]
+            if upsert:
+                result = supabase.table(table).upsert(batch).execute()
+            else:
+                result = supabase.table(table).insert(batch).execute()
+            all_data.extend(result.data)
+        action = "Upserted" if upsert else "Inserted"
+        print(f"  {action} {len(rows)} rows")
+    return all_data
 
 
-def migrate_org_farm(supabase):
-    """Migrate farms from legacy Google Sheet."""
-    import gspread
-    from google.oauth2.service_account import Credentials
+def parse_bool(val):
+    """Parse a boolean value from sheet text."""
+    return str(val).strip().upper() in ("TRUE", "YES", "1")
 
+
+def safe_numeric(val, default=0):
+    """Parse a numeric value, stripping commas and whitespace."""
+    try:
+        v = str(val).strip().replace(",", "")
+        return float(v) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def safe_int(val, default=None):
+    """Parse an integer value or return default."""
+    try:
+        v = str(val).strip().replace(",", "")
+        return int(float(v)) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def get_sheets():
+    """Connect to Google Sheets."""
     scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
     creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
-    client = gspread.authorize(creds)
+    return gspread.authorize(creds)
 
-    sheet = client.open_by_key("1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA")
+
+# ---------------------------------------------------------------------------
+# Migration functions
+# ---------------------------------------------------------------------------
+
+def migrate_org(supabase):
+    """Create the Hawaii Farming organization."""
+    row = audit({
+        "id": ORG_ID,
+        "name": "Hawaii Farming",
+        "address": "66-1475 Pu'u Huluhulu Rd, Kamuela HI",
+        "currency": "USD",
+    })
+    print("\n--- org ---")
+    supabase.table("org").upsert(row).execute()
+    print("  Upserted 1 row")
+
+
+def migrate_org_farm(supabase, gc):
+    """Migrate farms from legacy Google Sheet."""
+    sheet = gc.open_by_key(SHEET_ID_GLOBAL)
     ws = sheet.worksheet("global_farm")
     values = ws.col_values(1)[1:]  # skip header
 
@@ -103,16 +148,16 @@ def migrate_org_farm(supabase):
         farm_name = farm_name.strip()
         if not farm_name or farm_name == ORG_ID.upper() or farm_name == "HF":
             continue  # skip the org-level entry
-        farm_id = to_id_safe(farm_name)
+        farm_id = to_id(farm_name)
         defaults = farm_defaults.get(farm_id, {})
         rows.append(audit({
             "id": farm_id,
             "org_id": ORG_ID,
-            "name": farm_name,
+            "name": proper_case(farm_name),
             **defaults,
         }))
 
-    insert_rows(supabase, "org_farm", rows)
+    insert_rows(supabase, "org_farm", rows, upsert=True)
 
 
 def migrate_org_site_category(supabase):
@@ -154,14 +199,14 @@ def migrate_org_site_category(supabase):
             cat_id = cat
         cat_order[cat] = cat_order.get(cat, 0) + 1
         rows.append(audit({
-            "id": to_id_safe(cat_id),
+            "id": to_id(cat_id),
             "org_id": ORG_ID,
             "category_name": cat,
             "sub_category_name": sub,
             "display_order": cat_order[cat],
         }))
 
-    insert_rows(supabase, "org_site_category", rows)
+    insert_rows(supabase, "org_site_category", rows, upsert=True)
 
 
 def migrate_org_module(supabase):
@@ -180,7 +225,7 @@ def migrate_org_module(supabase):
             "display_order": mod["display_order"],
         }))
 
-    insert_rows(supabase, "org_module", rows)
+    insert_rows(supabase, "org_module", rows, upsert=True)
 
 
 def migrate_org_sub_module(supabase):
@@ -198,12 +243,12 @@ def migrate_org_sub_module(supabase):
             "sys_module_id": sub["sys_module_id"],
             "sys_sub_module_id": sub["id"],
             "sys_access_level_id": sub["sys_access_level_id"],
-            "display_name": sub["name"],
+            "display_name": proper_case(sub["name"]),
             "is_enabled": True,
             "display_order": sub["display_order"],
         }))
 
-    insert_rows(supabase, "org_sub_module", rows)
+    insert_rows(supabase, "org_sub_module", rows, upsert=True)
 
 
 def migrate_org_site(supabase):
@@ -357,7 +402,7 @@ def migrate_org_site(supabase):
     housing_rows = []
     for i, name in enumerate(housing_sites):
         housing_rows.append(audit({
-            "id": to_id_safe(name),
+            "id": to_id(name),
             "org_id": ORG_ID,
             "name": name,
             "org_site_category_id": "housing",
@@ -365,18 +410,15 @@ def migrate_org_site(supabase):
         }))
 
     # Insert parents first, then children, then housing
-    insert_rows(supabase, "org_site", cuke_parents + lettuce_parent + housing_rows)
-    print(f"  ({len(cuke_parents + lettuce_parent)} parent + {len(housing_rows)} housing sites inserted)")
-    supabase.table("org_site").insert(cuke_children + lettuce_children).execute()
-    print(f"  Inserted {len(cuke_children + lettuce_children)} child sites")
+    insert_rows(supabase, "org_site", cuke_parents + lettuce_parent + housing_rows, upsert=True)
+    print(f"  ({len(cuke_parents + lettuce_parent)} parent + {len(housing_rows)} housing sites)")
+    supabase.table("org_site").upsert(cuke_children + lettuce_children).execute()
+    print(f"  Upserted {len(cuke_children + lettuce_children)} child sites")
 
 
-def migrate_grow_variety(supabase):
+def migrate_grow_variety(supabase, gc):
     """Migrate grow varieties from legacy Google Sheet."""
-    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
-    client = gspread.authorize(creds)
-    ws = client.open_by_key("1VtEecYn-W1pbnIU1hRHfxIpkH2DtK7hj0CpcpiLoziM").worksheet("grow_variety")
+    ws = gc.open_by_key(SHEET_ID_VARIETY).worksheet("grow_variety")
     records = ws.get_all_records()
 
     rows = []
@@ -389,16 +431,16 @@ def migrate_grow_variety(supabase):
         rows.append(audit({
             "id": code.lower(),
             "org_id": ORG_ID,
-            "farm_id": to_id_safe(farm),
+            "farm_id": to_id(farm),
             "code": code,
-            "name": name,
+            "name": proper_case(name),
         }))
 
-    insert_rows(supabase, "grow_variety", rows)
+    insert_rows(supabase, "grow_variety", rows, upsert=True)
 
 
 def migrate_grow_grade(supabase):
-    """Migrate grow grades — hardcoded for Cuke farm."""
+    """Migrate grow grades -- hardcoded for Cuke farm."""
     rows = [
         audit({
             "id": "on_grade",
@@ -415,7 +457,37 @@ def migrate_grow_grade(supabase):
             "name": "Off Grade",
         }),
     ]
-    insert_rows(supabase, "grow_grade", rows)
+    insert_rows(supabase, "grow_grade", rows, upsert=True)
+
+
+def migrate_ops_task(supabase):
+    """Provision default ops_task records per org provisioning doc."""
+    default_tasks = [
+        ("seeding", "Seeding", "Planting seeds into growing media for germination"),
+        ("harvesting", "Harvesting", "Cutting and collecting mature crops from growing sites"),
+        ("scouting", "Scouting", "Inspecting crops for pests, disease, and growth issues"),
+        ("spraying", "Spraying", "Applying pesticides or treatments to crops"),
+        ("fertigation", "Fertigation", "Delivering fertilizer through the irrigation system"),
+        ("monitoring", "Monitoring", "Recording environmental readings at growing sites"),
+        ("packing", "Packing", "Processing harvested crops into packaged products"),
+        ("pest_trap_inspection", "Pest Trap Inspection", "Checking and recording pest trap counts at food safety sites"),
+    ]
+
+    rows = [
+        audit({
+            "id": task_id,
+            "org_id": ORG_ID,
+            "name": name,
+            "description": description,
+        })
+        for task_id, name, description in default_tasks
+    ]
+
+    # Upsert to handle reruns where tasks may already exist (referenced by trackers)
+    print("\n--- ops_task ---")
+    if rows:
+        supabase.table("ops_task").upsert(rows).execute()
+        print(f"  Upserted {len(rows)} rows")
 
 
 def migrate_grow_pest(supabase):
@@ -425,10 +497,10 @@ def migrate_grow_pest(supabase):
         "Fungus Gnat", "Shore Fly", "Caterpillar", "Leafminer",
     ]
     rows = [
-        audit({"id": to_id_safe(p), "name": p})
+        audit({"id": to_id(p), "name": p})
         for p in pests
     ]
-    insert_rows(supabase, "grow_pest", rows)
+    insert_rows(supabase, "grow_pest", rows, upsert=True)
 
 
 def migrate_grow_disease(supabase):
@@ -438,10 +510,10 @@ def migrate_grow_disease(supabase):
         "Pythium", "Root Rot", "Bacterial Leaf Spot", "Tipburn",
     ]
     rows = [
-        audit({"id": to_id_safe(d), "name": d})
+        audit({"id": to_id(d), "name": d})
         for d in diseases
     ]
-    insert_rows(supabase, "grow_disease", rows)
+    insert_rows(supabase, "grow_disease", rows, upsert=True)
 
 
 def main():
@@ -450,40 +522,53 @@ def main():
         return
 
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    gc = get_sheets()
 
-    # Clear in reverse FK order
+    print("=" * 60)
+    print("ORG DATA MIGRATION")
+    print("=" * 60)
+
+    # Clear in reverse FK order (try/except for tables that may be referenced by downstream modules)
     print("Clearing tables in FK dependency order...")
-    supabase.table("grow_disease").delete().neq("id", "___never___").execute()
-    supabase.table("grow_pest").delete().neq("id", "___never___").execute()
-    supabase.table("grow_grade").delete().neq("id", "___never___").execute()
-    supabase.table("grow_variety").delete().neq("id", "___never___").execute()
-    # Clear HR tables that reference org tables
-    for t in ["hr_time_off_request", "hr_module_access", "hr_employee",
-              "hr_title", "hr_work_authorization", "hr_department"]:
+    for t in ["grow_disease", "grow_pest", "grow_grade", "grow_variety"]:
         try:
-            supabase.table(t).delete().neq("org_id" if t != "hr_time_off_request" else "org_id", "___never___").execute()
+            supabase.table(t).delete().neq("id", "___never___").execute()
         except Exception:
-            pass
-    supabase.table("org_sub_module").delete().neq("id", "___never___").execute()
-    supabase.table("org_module").delete().neq("id", "___never___").execute()
-    supabase.table("org_site").delete().neq("id", "___never___").execute()
-    supabase.table("org_site_category").delete().neq("id", "___never___").execute()
-    supabase.table("org_farm").delete().neq("id", "___never___").execute()
-    supabase.table("org").delete().neq("id", "___never___").execute()
+            pass  # May fail if referenced by invnt_item etc; will be upserted
+    # Clear tables — try/except for tables that may be referenced by downstream modules
+    for t in ["hr_time_off_request", "hr_module_access", "hr_employee",
+              "hr_title", "hr_work_authorization", "hr_department",
+              "org_sub_module", "org_module", "org_site", "org_site_category",
+              "org_farm", "org"]:
+        try:
+            supabase.table(t).delete().neq("id" if t in ("org_sub_module", "org_module", "org_site",
+                "org_site_category", "org_farm", "org") else "org_id", "___never___").execute()
+        except Exception:
+            pass  # May fail if referenced by downstream modules; data will be upserted
+    # Clear default ops_tasks (exclude house_inspection which is managed by maint.py)
+    default_task_ids = ["seeding", "harvesting", "scouting", "spraying",
+                        "fertigation", "monitoring", "packing", "pest_trap_inspection"]
+    try:
+        supabase.table("ops_task").delete().in_("id", default_task_ids).execute()
+    except Exception:
+        pass
     print("  All cleared")
 
     migrate_org(supabase)
-    migrate_org_farm(supabase)
+    migrate_org_farm(supabase, gc)
     migrate_org_site_category(supabase)
     migrate_org_site(supabase)
     migrate_org_module(supabase)
     migrate_org_sub_module(supabase)
-    migrate_grow_variety(supabase)
+    migrate_ops_task(supabase)
+    migrate_grow_variety(supabase, gc)
     migrate_grow_grade(supabase)
     migrate_grow_pest(supabase)
     migrate_grow_disease(supabase)
 
-    print("\nOrg data migrated successfully")
+    print("\n" + "=" * 60)
+    print("DONE")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

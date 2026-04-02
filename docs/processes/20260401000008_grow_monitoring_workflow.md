@@ -47,7 +47,7 @@ Before monitoring can begin, an admin creates `grow_monitoring_metric` records s
 | Low pH | direct | pH | — | — |
 | Water EC | direct | ppm | — | — |
 | Water pH | direct | pH | — | — |
-| Crop Height | direct | inches | — | — |
+| Crop Height | direct | inch | — | — |
 | Substrate | direct | — | — | — |
 
 ### Example: Lettuce Farm — Pond
@@ -58,7 +58,7 @@ Before monitoring can begin, an admin creates `grow_monitoring_metric` records s
 | Pond pH | direct | pH | 5.8 | 6.2 |
 | Dissolved Oxygen | direct | ppm | 5.0 | — |
 | Temperature | direct | °C | 18 | 28 |
-| Water Level Gap | direct | inches | — | 2.0 |
+| Water Level Gap | direct | inch | — | 2.0 |
 
 ### Calculated Points
 

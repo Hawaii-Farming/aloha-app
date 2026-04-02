@@ -122,7 +122,7 @@ aloha-app/
 - **grow_monitoring_result** — Individual measurement per monitoring event per point per station.
 - **grow_spray_restriction** (view) — Derived daily NE (No Entry) and NH (No Harvest) restriction calendar per site from spray events
 
-## Pack Module (9 tables) — [Docs](docs/schemas/20260401000007_pack.md)
+## Pack Module (10 tables) — [Docs](docs/schemas/20260401000007_pack.md)
 
 - **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
 - **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
@@ -130,6 +130,7 @@ aloha-app/
 - **pack_shelf_life** — Shelf life trial header linking product, lot, packaging type, target vs actual shelf life, and trial status
 - **pack_shelf_life_result** — Individual observation responses per check per date per trial with typed responses
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
+- **pack_dryer_result** — Environmental and moisture readings during packing; tracks temperature and moisture conditions before and after the dryer
 - **pack_productivity_fail_category** — Lookup for pack line fail categories (e.g. film, tray, printer, leaves, ridges)
 - **pack_productivity_hour** — Hourly pack line snapshot with crew counts by role and metal detection flag
 - **pack_productivity_hour_fail** — Fail counts per category per hour

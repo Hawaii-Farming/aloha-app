@@ -41,6 +41,13 @@ def to_id(name: str) -> str:
     return re.sub(r"[^a-z0-9_]+", "_", name.lower()).strip("_") if name else ""
 
 
+def proper_case(val):
+    """Normalize a string to title case, stripping extra whitespace."""
+    if not val or not str(val).strip():
+        return val
+    return str(val).strip().title()
+
+
 def audit(row: dict) -> dict:
     """Add audit fields to a row."""
     row["created_by"] = AUDIT_USER
@@ -49,14 +56,16 @@ def audit(row: dict) -> dict:
 
 
 def insert_rows(supabase, table: str, rows: list):
-    """Insert rows into a table."""
+    """Insert rows in batches of 100. Returns inserted data."""
     print(f"\n--- {table} ---")
+    all_data = []
     if rows:
-        # Batch in groups of 100 to avoid payload limits
         for i in range(0, len(rows), 100):
             batch = rows[i:i + 100]
-            supabase.table(table).insert(batch).execute()
+            result = supabase.table(table).insert(batch).execute()
+            all_data.extend(result.data)
         print(f"  Inserted {len(rows)} rows")
+    return all_data
 
 
 def get_sheets():
@@ -66,9 +75,58 @@ def get_sheets():
     return gspread.authorize(creds)
 
 
-def migrate_invnt_vendor(supabase, client):
+def parse_date(date_str):
+    """Parse date string to YYYY-MM-DD or None."""
+    if not date_str or not str(date_str).strip():
+        return None
+    from datetime import datetime
+    for fmt in ("%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(str(date_str).strip(), fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
+
+
+def parse_timestamp(ts_str):
+    """Parse timestamp to ISO format or None."""
+    if not ts_str or not str(ts_str).strip():
+        return None
+    from datetime import datetime
+    for fmt in ("%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(str(ts_str).strip(), fmt).isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def safe_numeric(val, default=0):
+    """Parse a numeric value, stripping commas and whitespace."""
+    try:
+        v = str(val).strip().replace(",", "")
+        return float(v) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def safe_int(val, default=None):
+    """Parse an integer value or return default."""
+    try:
+        v = str(val).strip().replace(",", "")
+        return int(float(v)) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def parse_bool(val):
+    """Parse boolean from various formats."""
+    return str(val).strip().upper() in ("TRUE", "YES", "1", "ACCEPTABLE")
+
+
+def migrate_invnt_vendor(supabase, gc):
     """Migrate unique vendor names from invnt_item_po SupplierName column."""
-    ws = client.open_by_key(SHEET_ID).worksheet("invnt_item_po")
+    ws = gc.open_by_key(SHEET_ID).worksheet("invnt_item_po")
     records = ws.get_all_records()
 
     vendors = sorted(set(
@@ -81,7 +139,7 @@ def migrate_invnt_vendor(supabase, client):
         audit({
             "id": to_id(v),
             "org_id": ORG_ID,
-            "name": v,
+            "name": proper_case(v),
         })
         for v in vendors
     ]
@@ -89,9 +147,9 @@ def migrate_invnt_vendor(supabase, client):
     return {v: to_id(v) for v in vendors}
 
 
-def migrate_invnt_category(supabase, client):
+def migrate_invnt_category(supabase, gc):
     """Provision standard inventory categories + legacy subcategories from invnt_item."""
-    sheet = client.open_by_key(SHEET_ID)
+    sheet = gc.open_by_key(SHEET_ID)
 
     # Standard provisioned categories (from org_provisioning process doc)
     provisioned = [
@@ -141,7 +199,7 @@ def migrate_invnt_category(supabase, client):
                 "id": row_id,
                 "org_id": ORG_ID,
                 "category_name": cat,
-                "sub_category_name": sub,
+                "sub_category_name": proper_case(sub) if sub else sub,
             }))
 
     # Legacy subcategories mapped to new category names
@@ -154,13 +212,13 @@ def migrate_invnt_category(supabase, client):
                     "id": row_id,
                     "org_id": ORG_ID,
                     "category_name": cat,
-                    "sub_category_name": sub,
+                    "sub_category_name": proper_case(sub),
                 }))
 
     insert_rows(supabase, "invnt_category", rows)
 
 
-def migrate_storage_sites(supabase, client):
+def migrate_storage_sites(supabase, gc):
     """Create maintenance_storage subcategory and storage sites from ItemLocation."""
 
     # Add maintenance_storage subcategory to org_site_category
@@ -175,7 +233,7 @@ def migrate_storage_sites(supabase, client):
     print("  Added maintenance_storage subcategory")
 
     # Get unique ItemLocation values
-    ws = client.open_by_key(SHEET_ID).worksheet("invnt_item")
+    ws = gc.open_by_key(SHEET_ID).worksheet("invnt_item")
     records = ws.get_all_records()
 
     locations = set()
@@ -196,7 +254,7 @@ def migrate_storage_sites(supabase, client):
         rows.append(audit({
             "id": site_id,
             "org_id": ORG_ID,
-            "name": loc,
+            "name": proper_case(loc),
             "org_site_category_id": "storage",
             "org_site_subcategory_id": "maintenance_storage",
         }))
@@ -204,9 +262,9 @@ def migrate_storage_sites(supabase, client):
     insert_rows(supabase, "org_site", rows)
 
 
-def migrate_invnt_item(supabase, client):
+def migrate_invnt_item(supabase, gc):
     """Migrate inventory items from invnt_item sheet."""
-    ws = client.open_by_key(SHEET_ID).worksheet("invnt_item")
+    ws = gc.open_by_key(SHEET_ID).worksheet("invnt_item")
     records = ws.get_all_records()
 
     # Legacy category -> new category mapping
@@ -251,16 +309,6 @@ def migrate_invnt_item(supabase, client):
         "cubes": "cubes",
     }
 
-    def safe_float(val, default=0):
-        try:
-            v = str(val).strip().replace(",", "")
-            return float(v) if v else default
-        except (ValueError, TypeError):
-            return default
-
-    def parse_bool(val):
-        return str(val).strip().upper() in ("TRUE", "YES", "1")
-
     def map_uom(val):
         v = str(val).strip().lower()
         return UOM_MAP.get(v, v) if v else None
@@ -300,15 +348,15 @@ def migrate_invnt_item(supabase, client):
         onhand_uom = burn_uom  # Set onhand_uom same as burn_uom
 
         # Burn per order — use legacy value; default to 1 only when zero/empty AND burn_uom == order_uom
-        burn_per_order = safe_float(r.get("BurnPerOrderUnit", ""))
+        burn_per_order = safe_numeric(r.get("BurnPerOrderUnit", ""))
         if burn_per_order == 0 and burn_uom and order_uom and burn_uom == order_uom:
             burn_per_order = 1
         burn_per_onhand = 1  # Since onhand_uom = burn_uom, 1:1 ratio
 
         # Burn rates
-        burn_per_week = safe_float(r.get("EstimatedBurnPerWeek", ""))
-        cushion_raw = safe_float(r.get("CushionWeeks", ""))
-        lead_time = safe_float(r.get("EstimatedLeadTimeWeeks", ""))
+        burn_per_week = safe_numeric(r.get("EstimatedBurnPerWeek", ""))
+        cushion_raw = safe_numeric(r.get("CushionWeeks", ""))
+        lead_time = safe_numeric(r.get("EstimatedLeadTimeWeeks", ""))
         cushion_weeks = cushion_raw + lead_time
 
         # Calculate reorder point and quantity
@@ -317,8 +365,8 @@ def migrate_invnt_item(supabase, client):
 
         # Pallet
         is_palletized = parse_bool(r.get("Pallet", ""))
-        order_per_pallet = safe_float(r.get("OrderUnitsPerPallet", ""))
-        pallet_per_truckload = safe_float(r.get("PalletsPerTruckload", ""))
+        order_per_pallet = safe_numeric(r.get("OrderUnitsPerPallet", ""))
+        pallet_per_truckload = safe_numeric(r.get("PalletsPerTruckload", ""))
 
         # Site (storage location)
         location = str(r.get("ItemLocation", "")).strip()
@@ -348,14 +396,14 @@ def migrate_invnt_item(supabase, client):
         qb = str(r.get("QuickBooksAccount", "")).strip()
 
         # Manufacturer from SeedMaker
-        manufacturer = str(r.get("SeedMaker", "")).strip() or None
+        manufacturer = proper_case(r.get("SeedMaker", "")) or None
 
         # Maintenance part number from ModelSerialNumber
         maint_part_number = str(r.get("ModelSerialNumber", "")).strip() or None
 
         # Subcategory as maint_part_type for maintenance items
         maint_sub = str(r.get("ItemSubCategory", "")).strip()
-        maint_part_type = maint_sub if legacy_cat == "Maint Parts" and maint_sub else None
+        maint_part_type = proper_case(maint_sub) if legacy_cat == "Maint Parts" and maint_sub else None
 
         row = {
             "id": item_id,
@@ -363,7 +411,7 @@ def migrate_invnt_item(supabase, client):
             "farm_id": farm_id,
             "invnt_category_id": cat_id,
             "invnt_subcategory_id": sub_id,
-            "name": name,
+            "name": proper_case(name),
             "qb_account": qb or None,
             "burn_uom": burn_uom,
             "onhand_uom": onhand_uom,
@@ -394,46 +442,7 @@ def migrate_invnt_item(supabase, client):
     return records  # Return for downstream use
 
 
-def parse_date(date_str):
-    """Parse date string to YYYY-MM-DD or None."""
-    if not date_str or not str(date_str).strip():
-        return None
-    from datetime import datetime
-    for fmt in ("%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"):
-        try:
-            return datetime.strptime(str(date_str).strip(), fmt).strftime("%Y-%m-%d")
-        except ValueError:
-            continue
-    return None
-
-
-def parse_timestamp(ts_str):
-    """Parse timestamp to ISO format or None."""
-    if not ts_str or not str(ts_str).strip():
-        return None
-    from datetime import datetime
-    for fmt in ("%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M", "%m/%d/%Y"):
-        try:
-            return datetime.strptime(str(ts_str).strip(), fmt).isoformat()
-        except ValueError:
-            continue
-    return None
-
-
-def parse_bool(val):
-    """Parse boolean from various formats."""
-    return str(val).strip().upper() in ("TRUE", "YES", "1", "ACCEPTABLE")
-
-
-def safe_float(val, default=0):
-    try:
-        v = str(val).strip().replace(",", "")
-        return float(v) if v else default
-    except (ValueError, TypeError):
-        return default
-
-
-def migrate_invnt_po(supabase, client):
+def migrate_invnt_po(supabase, gc):
     """Migrate POs from both invnt_item_po (historical) and proc_requests (active)."""
 
     # Build employee email -> id lookup from Supabase
@@ -488,7 +497,7 @@ def migrate_invnt_po(supabase, client):
     # ========================================
     # PART 1: Historical POs from invnt_item_po
     # ========================================
-    sheet = client.open_by_key(SHEET_ID)
+    sheet = gc.open_by_key(SHEET_ID)
     ws_po = sheet.worksheet("invnt_item_po")
     po_records = ws_po.get_all_records()
 
@@ -506,7 +515,7 @@ def migrate_invnt_po(supabase, client):
     for r_raw in po_records:
         r = {str(k).strip(): v for k, v in r_raw.items()}
 
-        item_name = str(r.get("ItemName", "")).strip()
+        item_name = proper_case(r.get("ItemName", ""))
         if not item_name:
             continue
 
@@ -543,9 +552,9 @@ def migrate_invnt_po(supabase, client):
             "item_name": item_name,
             "burn_uom": burn_uom or item.get("burn_uom") or order_uom or "unit",
             "order_uom": order_uom or item.get("order_uom") or burn_uom or "unit",
-            "order_quantity": safe_float(r.get("OrderedQuantity", "")),
-            "burn_per_order": safe_float(r.get("BurnPerReceivedUnits", "")) or item.get("burn_per_order", 0),
-            "total_cost": safe_float(r.get("TotalCost", "")) or None,
+            "order_quantity": safe_numeric(r.get("OrderedQuantity", "")),
+            "burn_per_order": safe_numeric(r.get("BurnPerReceivedUnits", "")) or item.get("burn_per_order", 0),
+            "total_cost": safe_numeric(r.get("TotalCost", "")) or None,
             "is_freight_included": parse_bool(r.get("PriceIncludesFreight", "")),
             "invnt_vendor_id": vendor_id,
             "expected_delivery_date": parse_date(r.get("ExpectedArrivalDate", "")),
@@ -597,11 +606,11 @@ def migrate_invnt_po(supabase, client):
                     "farm_id": item.get("farm_id"),
                     "received_date": arrival,
                     "received_uom": received_uom or order_uom,
-                    "received_quantity": safe_float(r.get("ReceivedQuantity", "")),
-                    "burn_per_received": safe_float(r.get("BurnPerReceivedUnits", "")),
+                    "received_quantity": safe_numeric(r.get("ReceivedQuantity", "")),
+                    "burn_per_received": safe_numeric(r.get("BurnPerReceivedUnits", "")),
                     "invnt_lot_id": lot_id,
-                    "delivery_truck_clean": parse_bool(r.get("TruckCleanIntactAndPestFree", "")),
-                    "delivery_acceptable": str(r.get("ItemCondition", "")).strip().lower() == "acceptable",
+                    "fsafe_delivery_truck_clean": parse_bool(r.get("TruckCleanIntactAndPestFree", "")),
+                    "fsafe_delivery_acceptable": str(r.get("ItemCondition", "")).strip().lower() == "acceptable",
                     "received_photos": [photo] if photo else [],
                     "received_at": parse_timestamp(r.get("LastUpdateDateTime", "")),
                     "received_by": received_by,
@@ -614,7 +623,7 @@ def migrate_invnt_po(supabase, client):
     # ========================================
     # PART 2: Active requests from proc_requests
     # ========================================
-    proc_ws = client.open_by_key("1EFgT0XyBlUe10ENVkm4-_bb4uSPyd9hPbCIzD-RKNRA").worksheet("proc_requests")
+    proc_ws = gc.open_by_key("1EFgT0XyBlUe10ENVkm4-_bb4uSPyd9hPbCIzD-RKNRA").worksheet("proc_requests")
     proc_records = proc_ws.get_all_records()
 
     URGENCY_MAP = {
@@ -638,7 +647,7 @@ def migrate_invnt_po(supabase, client):
             mapped_type = "non_inventory_item"
 
         # Item name
-        item_name = str(r.get("item_name", "")).strip() or str(r.get("general_item_name", "")).strip()
+        item_name = proper_case(r.get("item_name", "")) or proper_case(r.get("general_item_name", ""))
         if not item_name:
             continue
 
@@ -688,7 +697,7 @@ def migrate_invnt_po(supabase, client):
             "item_name": item_name,
             "burn_uom": po_burn_uom,
             "order_uom": po_order_uom,
-            "order_quantity": safe_float(r.get("request_quantity", "")),
+            "order_quantity": safe_numeric(r.get("request_quantity", "")),
             "burn_per_order": po_burn_per_order,
             "invnt_vendor_id": vendor_id,
             "expected_delivery_date": parse_date(r.get("expected_delivery_date", "")),
@@ -735,9 +744,9 @@ def migrate_invnt_po(supabase, client):
         insert_rows(supabase, "invnt_po_received", recv_to_insert)
 
 
-def migrate_invnt_onhand(supabase, client):
+def migrate_invnt_onhand(supabase, gc):
     """Migrate on-hand inventory snapshots from invnt_item_onhand sheet."""
-    ws = client.open_by_key(SHEET_ID).worksheet("invnt_item_onhand")
+    ws = gc.open_by_key(SHEET_ID).worksheet("invnt_item_onhand")
     records = ws.get_all_records()
 
     # Build item name -> record lookup from Supabase
@@ -807,10 +816,10 @@ def migrate_invnt_onhand(supabase, client):
         onhand_uom = map_uom(r.get("OnhandUnits", "")) or item.get("onhand_uom")
 
         # Quantity
-        onhand_quantity = safe_float(r.get("OnhandQuantity", ""))
+        onhand_quantity = safe_numeric(r.get("OnhandQuantity", ""))
 
         # Burn per onhand
-        burn_per_onhand = safe_float(r.get("BurnPerOnhandUnit", ""))
+        burn_per_onhand = safe_numeric(r.get("BurnPerOnhandUnit", ""))
 
         # Lot
         lot_number = str(r.get("ItemLot", "")).strip()
@@ -847,9 +856,9 @@ def migrate_invnt_onhand(supabase, client):
         print(f"  Skipped {skipped} rows (unknown item or missing date)")
 
 
-def migrate_grow_spray_compliance(supabase, client):
+def migrate_grow_spray_compliance(supabase, gc):
     """Migrate chemical/fertilizer compliance data from invnt_item_details sheet."""
-    ws = client.open_by_key(SHEET_ID).worksheet("invnt_item_details")
+    ws = gc.open_by_key(SHEET_ID).worksheet("invnt_item_details")
     records = ws.get_all_records()
 
     # Build item name -> record lookup
@@ -912,22 +921,22 @@ def migrate_grow_spray_compliance(supabase, client):
             continue
 
         # Application method -> JSONB array
-        app_method = str(r.get("ApplicationMethod", "")).strip()
+        app_method = proper_case(r.get("ApplicationMethod", ""))
         application_method = [app_method] if app_method else []
 
         # Target -> JSONB array
-        target = str(r.get("Target", "")).strip()
+        target = proper_case(r.get("Target", ""))
         target_pest_disease = [target] if target else []
 
         # UOM and quantity
         app_uom = map_uom(r.get("PerAcreUnits", "")) or "ounce"
-        max_qty = safe_float(r.get("QuantityPerAcre", ""))
+        max_qty = safe_numeric(r.get("QuantityPerAcre", ""))
 
         # Burn UOM from item
         burn_uom = item.get("burn_uom") or app_uom
 
         # Application per burn
-        app_per_burn = safe_float(r.get("MaximumUsagePerSeason", ""))
+        app_per_burn = safe_numeric(r.get("MaximumUsagePerSeason", ""))
 
         # Dates
         label_date = parse_date(r.get("LabelDate", ""))
@@ -939,8 +948,8 @@ def migrate_grow_spray_compliance(supabase, client):
         label_url = str(r.get("LabelLink", "")).strip() or ""
 
         # PHI / REI
-        phi_days = int(safe_float(r.get("PHIDays", "")))
-        rei_hours = int(safe_float(r.get("REIHours", "")))
+        phi_days = int(safe_numeric(r.get("PHIDays", "")))
+        rei_hours = int(safe_numeric(r.get("REIHours", "")))
 
         # Audit
         updated_by_email = str(r.get("LastUpdateBy", "")).strip().lower()
@@ -974,17 +983,100 @@ def migrate_grow_spray_compliance(supabase, client):
         print(f"  Skipped {skipped} rows (unknown item, missing date, or missing registration)")
 
 
+def migrate_grow_seed_mix(supabase, gc):
+    """Migrate seed mix recipes from invt_mix_seed_ratio sheet.
+
+    Each unique item_name becomes a grow_seed_mix row.
+    Each seed within that mix becomes a grow_seed_mix_item row.
+    """
+    ws = gc.open_by_key(SHEET_ID).worksheet("invt_mix_seed_ratio")
+    records = ws.get_all_records()
+
+    print(f"\nProcessing {len(records)} seed mix ratio rows...")
+
+    # Build invnt_item lookup
+    item_result = supabase.table("invnt_item").select("id, name").execute()
+    item_by_name = {it["name"].lower(): it["id"] for it in item_result.data}
+
+    # Group by mix name
+    mixes = {}
+    for r in records:
+        mix_name = str(r.get("item_name", "")).strip()
+        if not mix_name:
+            continue
+        if mix_name not in mixes:
+            mixes[mix_name] = {
+                "created_by": str(r.get("created_by", "")).strip().lower() or AUDIT_USER,
+                "items": [],
+            }
+        seed_name = str(r.get("seed_name", "")).strip()
+        ratio_str = str(r.get("ratio", "")).strip().replace("%", "")
+        ratio = safe_numeric(ratio_str) / 100 if ratio_str else 0
+
+        item_id = item_by_name.get(seed_name.lower())
+        if not item_id:
+            print(f"  SKIP: Unknown seed item '{seed_name}' in mix '{mix_name}'")
+            continue
+
+        mixes[mix_name]["items"].append({
+            "invnt_item_id": item_id,
+            "percentage": round(ratio, 4),
+            "created_by": str(r.get("created_by", "")).strip().lower() or AUDIT_USER,
+        })
+
+    print(f"  Found {len(mixes)} unique mixes")
+
+    # Insert mix headers
+    mix_rows = []
+    for mix_name in sorted(mixes.keys()):
+        info = mixes[mix_name]
+        mix_rows.append({
+            "id": to_id(mix_name),
+            "org_id": ORG_ID,
+            "farm_id": "lettuce",
+            "name": proper_case(mix_name),
+            "created_by": info["created_by"],
+            "updated_by": info["created_by"],
+        })
+
+    inserted_mixes = insert_rows(supabase, "grow_seed_mix", mix_rows)
+
+    # Insert mix items
+    item_rows = []
+    for mix_name in sorted(mixes.keys()):
+        mix_id = to_id(mix_name)
+        info = mixes[mix_name]
+        for item in info["items"]:
+            item_rows.append({
+                "org_id": ORG_ID,
+                "farm_id": "lettuce",
+                "grow_seed_mix_id": mix_id,
+                "invnt_item_id": item["invnt_item_id"],
+                "percentage": item["percentage"],
+                "created_by": item["created_by"],
+                "updated_by": item["created_by"],
+            })
+
+    insert_rows(supabase, "grow_seed_mix_item", item_rows)
+
+
 def main():
     if not SUPABASE_KEY:
         print("ERROR: Set SUPABASE_SERVICE_KEY in .env or environment")
         return
 
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    client = get_sheets()
+    gc = get_sheets()
+
+    print("=" * 60)
+    print("INVENTORY MIGRATION")
+    print("=" * 60)
 
     # Clear in reverse FK order
     print("Clearing tables...")
     for t in ["grow_spray_compliance", "invnt_onhand", "invnt_po_received", "invnt_lot", "invnt_po",
+              "grow_seed_mix_item", "grow_seed_mix",
+              "maint_request_invnt_item", "pack_dryer_result",
               "invnt_item", "invnt_category", "invnt_vendor"]:
         try:
             supabase.table(t).delete().neq("org_id", "___never___").execute()
@@ -1002,15 +1094,18 @@ def main():
         pass
     print("  All cleared")
 
-    migrate_invnt_vendor(supabase, client)
-    migrate_invnt_category(supabase, client)
-    migrate_storage_sites(supabase, client)
-    migrate_invnt_item(supabase, client)
-    migrate_invnt_po(supabase, client)
-    migrate_invnt_onhand(supabase, client)
-    migrate_grow_spray_compliance(supabase, client)
+    migrate_invnt_vendor(supabase, gc)
+    migrate_invnt_category(supabase, gc)
+    migrate_storage_sites(supabase, gc)
+    migrate_invnt_item(supabase, gc)
+    migrate_invnt_po(supabase, gc)
+    migrate_invnt_onhand(supabase, gc)
+    migrate_grow_spray_compliance(supabase, gc)
+    migrate_grow_seed_mix(supabase, gc)
 
-    print("\nInventory data migrated successfully")
+    print("\n" + "=" * 60)
+    print("DONE")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

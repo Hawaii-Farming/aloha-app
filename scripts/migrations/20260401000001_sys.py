@@ -1,7 +1,7 @@
 """
 Migrate System Data
 ====================
-Migrates sys_access_level, sys_module, and sys_sub_module from legacy
+Migrates sys_access_level, sys_module, sys_sub_module, and sys_uom from legacy
 Google Sheets to Supabase.
 
 Source: https://docs.google.com/spreadsheets/d/1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA
@@ -22,13 +22,13 @@ Rerunnable: clears and reinserts all data on each run.
 
 import os
 import re
+import gspread
+from google.oauth2.service_account import Credentials
 from supabase import create_client
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://kfwqtaazdankxmdlqdak.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
-AUDIT_USER = "data@hawaiifarming.com"
 
-# If no service key in env, try reading from .env file
 if not SUPABASE_KEY:
     try:
         with open(".env") as f:
@@ -38,80 +38,92 @@ if not SUPABASE_KEY:
     except FileNotFoundError:
         pass
 
+AUDIT_USER = "data@hawaiifarming.com"
+
+SHEET_ID = "1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA"
+
 
 def to_id(name: str) -> str:
-    """Convert a display name to a TEXT PK (lowercase, underscores, trimmed)."""
-    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    """Convert a display name to a TEXT PK."""
+    return re.sub(r"[^a-z0-9_]+", "_", name.lower()).strip("_") if name else ""
+
+
+def proper_case(val):
+    """Normalize a string to title case, stripping extra whitespace."""
+    if not val or not str(val).strip():
+        return val
+    return str(val).strip().title()
+
+
+def audit(row: dict) -> dict:
+    """Add audit fields to a row."""
+    row["created_by"] = AUDIT_USER
+    row["updated_by"] = AUDIT_USER
+    return row
+
+
+def parse_bool(val):
+    """Parse a boolean value from sheet text."""
+    return str(val).strip().upper() in ("TRUE", "YES", "1")
 
 
 def insert_rows(supabase, table: str, rows: list):
-    """Insert rows into a table. Prints progress."""
+    """Insert rows in batches of 100. Returns inserted data."""
     print(f"\n--- {table} ---")
+    all_data = []
     if rows:
-        supabase.table(table).insert(rows).execute()
+        for i in range(0, len(rows), 100):
+            batch = rows[i:i + 100]
+            result = supabase.table(table).insert(batch).execute()
+            all_data.extend(result.data)
         print(f"  Inserted {len(rows)} rows")
+    return all_data
+
+
+def get_sheets():
+    """Connect to Google Sheets."""
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
+    return gspread.authorize(creds)
 
 
 def seed_access_levels(supabase):
     """Seed the 5 access levels."""
     rows = [
-        {"id": "employee",  "name": "Employee",  "level": 1, "display_order": 1, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "team_lead", "name": "Team Lead", "level": 2, "display_order": 2, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "manager",   "name": "Manager",   "level": 3, "display_order": 3, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "admin",     "name": "Admin",     "level": 4, "display_order": 4, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "owner",     "name": "Owner",     "level": 5, "display_order": 5, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
+        audit({"id": "employee",  "name": "Employee",  "level": 1, "display_order": 1}),
+        audit({"id": "team_lead", "name": "Team Lead", "level": 2, "display_order": 2}),
+        audit({"id": "manager",   "name": "Manager",   "level": 3, "display_order": 3}),
+        audit({"id": "admin",     "name": "Admin",     "level": 4, "display_order": 4}),
+        audit({"id": "owner",     "name": "Owner",     "level": 5, "display_order": 5}),
     ]
     insert_rows(supabase, "sys_access_level", rows)
 
 
 def seed_modules(supabase):
     """Seed the application modules."""
-    modules = [
-        ("grow",            "Grow"),
-        ("pack",            "Pack"),
-        ("food_safety",     "Food Safety"),
-        ("maintenance",     "Maintenance"),
-        ("inventory",       "Inventory"),
-        ("human_resources", "Human Resources"),
-        ("sales",           "Sales"),
-        ("operations",      "Operations"),
-    ]
     rows = [
-        {"id": to_id(name), "name": name, "display_order": i}
-        for i, (mid, name) in enumerate(modules)
-    ]
-    # Use the explicit IDs for consistency
-    rows = [
-        {"id": "operations",      "name": "Operations",      "display_order": 1, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "grow",            "name": "Grow",            "display_order": 2, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "pack",            "name": "Pack",            "display_order": 3, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "food_safety",     "name": "Food Safety",     "display_order": 4, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "maintenance",     "name": "Maintenance",     "display_order": 5, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "inventory",       "name": "Inventory",       "display_order": 6, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "sales",           "name": "Sales",           "display_order": 7, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
-        {"id": "human_resources", "name": "Human Resources", "display_order": 8, "created_by": AUDIT_USER, "updated_by": AUDIT_USER},
+        audit({"id": "operations",      "name": "Operations",      "display_order": 1}),
+        audit({"id": "grow",            "name": "Grow",            "display_order": 2}),
+        audit({"id": "pack",            "name": "Pack",            "display_order": 3}),
+        audit({"id": "food_safety",     "name": "Food Safety",     "display_order": 4}),
+        audit({"id": "maintenance",     "name": "Maintenance",     "display_order": 5}),
+        audit({"id": "inventory",       "name": "Inventory",       "display_order": 6}),
+        audit({"id": "sales",           "name": "Sales",           "display_order": 7}),
+        audit({"id": "human_resources", "name": "Human Resources", "display_order": 8}),
     ]
     insert_rows(supabase, "sys_module", rows)
 
 
-def seed_sub_modules(supabase):
+def seed_sub_modules(supabase, gc):
     """
     Seed sub-modules from the legacy Google Sheet global_menu_icons_sub.
 
     Legacy level mapping:
-      Level 1 → employee (sys_access_level_id = 'employee')
-      Level 2 → manager  (sys_access_level_id = 'manager')
-      Level 3 → admin    (sys_access_level_id = 'admin')
+      Level 1 -> employee (sys_access_level_id = 'employee')
+      Level 2 -> manager  (sys_access_level_id = 'manager')
+      Level 3 -> admin    (sys_access_level_id = 'admin')
     """
-    import gspread
-    from google.oauth2.service_account import Credentials
-
-    # Connect to Google Sheets
-    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
-    client = gspread.authorize(creds)
-
-    sheet = client.open_by_key("1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA")
+    sheet = gc.open_by_key(SHEET_ID)
     ws = sheet.worksheet("global_menu_icons_sub")
     records = ws.get_all_records()
 
@@ -142,7 +154,7 @@ def seed_sub_modules(supabase):
     seen = set()
 
     for i, record in enumerate(records):
-        sub_name = record.get("SubMenuName", "").strip()
+        sub_name = proper_case(record.get("SubMenuName", ""))
         main_name = record.get("MainMenuName", "").strip()
         level = record.get("Level", "1")
 
@@ -162,15 +174,13 @@ def seed_sub_modules(supabase):
             continue
         seen.add(sub_id)
 
-        rows.append({
+        rows.append(audit({
             "id": sub_id,
             "sys_module_id": sys_module_id,
             "name": sub_name,
             "sys_access_level_id": sys_access_level_id,
             "display_order": len(rows) + 1,
-            "created_by": AUDIT_USER,
-            "updated_by": AUDIT_USER,
-        })
+        }))
 
     insert_rows(supabase, "sys_sub_module", rows)
 
@@ -223,7 +233,7 @@ def migrate_uom(supabase):
         {"code": "head",         "name": "head",         "category": "quantity"},
         {"code": "piece",        "name": "piece",        "category": "quantity"},
         {"code": "acre",         "name": "acre",         "category": "area"},
-        {"code": "inches",       "name": "in",           "category": "length"},
+        {"code": "inch",         "name": "in",           "category": "length"},
         {"code": "centimeter",   "name": "cm",           "category": "length"},
         {"code": "celsius",      "name": "C",            "category": "temperature"},
         {"code": "fahrenheit",   "name": "F",            "category": "temperature"},
@@ -236,10 +246,8 @@ def migrate_uom(supabase):
         {"code": "day",          "name": "day",          "category": "time"},
     ]
 
-    # Add audit fields
     for row in rows:
-        row["created_by"] = AUDIT_USER
-        row["updated_by"] = AUDIT_USER
+        audit(row)
 
     insert_rows(supabase, "sys_uom", rows)
 
@@ -251,6 +259,11 @@ def main():
         return
 
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    gc = get_sheets()
+
+    print("=" * 60)
+    print("SYSTEM DATA MIGRATION")
+    print("=" * 60)
 
     # Clear ALL dependent tables in reverse migration order (leaf tables first)
     print("Clearing all dependent tables...")
@@ -324,9 +337,11 @@ def main():
     migrate_uom(supabase)
     seed_access_levels(supabase)
     seed_modules(supabase)
-    seed_sub_modules(supabase)
+    seed_sub_modules(supabase, gc)
 
-    print("\nSystem data migrated successfully")
+    print("\n" + "=" * 60)
+    print("DONE")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

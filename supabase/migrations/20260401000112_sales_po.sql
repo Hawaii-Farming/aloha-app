@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS sales_po (
 
     approved_at                     TIMESTAMPTZ,
     approved_by                     TEXT REFERENCES hr_employee(id),
-    uploaded_at                     TIMESTAMPTZ,
-    uploaded_by                     TEXT REFERENCES hr_employee(id),
+    qb_uploaded_at                  TIMESTAMPTZ,
+    qb_uploaded_by                  TEXT REFERENCES hr_employee(id),
     created_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                      TEXT,
     updated_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),

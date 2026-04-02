@@ -43,6 +43,13 @@ def to_id(name: str) -> str:
     return re.sub(r"[^a-z0-9_]+", "_", name.lower()).strip("_") if name else ""
 
 
+def proper_case(val):
+    """Normalize a string to title case, stripping extra whitespace."""
+    if not val or not str(val).strip():
+        return val
+    return str(val).strip().title()
+
+
 def audit(row: dict) -> dict:
     """Add audit fields to a row."""
     row["created_by"] = AUDIT_USER
@@ -51,19 +58,83 @@ def audit(row: dict) -> dict:
 
 
 def insert_rows(supabase, table: str, rows: list):
-    """Insert rows into a table."""
+    """Insert rows in batches of 100. Returns inserted data."""
     print(f"\n--- {table} ---")
+    all_data = []
     if rows:
-        supabase.table(table).insert(rows).execute()
+        for i in range(0, len(rows), 100):
+            batch = rows[i:i + 100]
+            result = supabase.table(table).insert(batch).execute()
+            all_data.extend(result.data)
         print(f"  Inserted {len(rows)} rows")
+    return all_data
 
 
-def get_sheet_records():
-    """Connect to Google Sheets and return hr_ee_register records."""
+def parse_date(date_str):
+    """Parse date string to YYYY-MM-DD or None."""
+    if not date_str or not str(date_str).strip():
+        return None
+    from datetime import datetime
+    for fmt in ("%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(str(date_str).strip(), fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
+
+
+def parse_timestamp(ts_str):
+    """Parse timestamp to ISO format or None."""
+    if not ts_str or not str(ts_str).strip():
+        return None
+    from datetime import datetime
+    for fmt in ("%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(str(ts_str).strip(), fmt).isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def parse_bool(val):
+    """Parse a boolean value from sheet text."""
+    return str(val).strip().upper() in ("TRUE", "YES", "1")
+
+
+def safe_numeric(val, default=0):
+    """Parse a numeric value, stripping commas and whitespace."""
+    try:
+        v = str(val).strip().replace(",", "")
+        return float(v) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def safe_int(val, default=None):
+    """Parse an integer value or return default."""
+    try:
+        v = str(val).strip().replace(",", "")
+        return int(float(v)) if v else default
+    except (ValueError, TypeError):
+        return default
+
+
+def get_sheets():
+    """Connect to Google Sheets."""
     scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
     creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
-    client = gspread.authorize(creds)
-    ws = client.open_by_key(SHEET_ID).worksheet("hr_ee_register")
+    return gspread.authorize(creds)
+
+
+def get_sheet_records(gc):
+    """Return hr_ee_register records from Google Sheets."""
+    ws = gc.open_by_key(SHEET_ID).worksheet("hr_ee_register")
+    return ws.get_all_records()
+
+
+def get_app_users(gc):
+    """Get global_app_users_list from the global spreadsheet."""
+    ws = gc.open_by_key("1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA").worksheet("global_app_users_list")
     return ws.get_all_records()
 
 
@@ -117,36 +188,11 @@ def migrate_hr_title(supabase, records):
         audit({
             "id": to_id(t),
             "org_id": ORG_ID,
-            "name": t,
+            "name": proper_case(t),
         })
         for i, t in enumerate(titles)
     ]
     insert_rows(supabase, "hr_title", rows)
-
-
-def get_app_users():
-    """Get global_app_users_list from the global spreadsheet."""
-    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
-    client = gspread.authorize(creds)
-    ws = client.open_by_key("1VOVyYt_Mk7QJkjZFRyq3iLf6xkBrZUWarobv7tf8yZA").worksheet("global_app_users_list")
-    return ws.get_all_records()
-
-
-def parse_date(date_str):
-    """Parse MM/DD/YYYY date string to YYYY-MM-DD or None."""
-    if not date_str or not str(date_str).strip():
-        return None
-    from datetime import datetime
-    try:
-        return datetime.strptime(str(date_str).strip(), "%m/%d/%Y").strftime("%Y-%m-%d")
-    except ValueError:
-        return None
-
-
-def parse_bool(val):
-    """Parse boolean from various formats."""
-    return str(val).strip().upper() in ("TRUE", "YES", "1")
 
 
 def migrate_hr_employee(supabase, records, app_users):
@@ -181,15 +227,15 @@ def migrate_hr_employee(supabase, records, app_users):
     name_to_id = {}  # ShortName/FirstName -> employee_id for resolving team_lead/comp_manager
 
     for r in records:
-        first = str(r.get("FirstName", "")).strip()
-        last = str(r.get("LastName", "")).strip()
+        first = proper_case(r.get("FirstName", ""))
+        last = proper_case(r.get("LastName", ""))
         full = str(r.get("FullName", "")).strip()
         if not first or not last:
             continue
 
         emp_id = to_id(full)
         email = str(r.get("Email", "")).strip().lower()
-        short = str(r.get("ShortName", "")).strip()
+        short = proper_case(r.get("ShortName", ""))
 
         # Map name for team_lead/compensation_manager resolution
         if short:
@@ -255,7 +301,7 @@ def migrate_hr_employee(supabase, records, app_users):
             "overtime_threshold": ot_val,
             "wc": wc,
             "payroll_processor": str(r.get("Source", "")).strip() or None,
-            "pay_delivery_method": str(r.get("Check", "")).strip() or None,
+            "pay_delivery_method": proper_case(r.get("Check", "")) or None,
             "site_id": site_id,
             "is_deleted": not parse_bool(r.get("IsActive", True)),
         }
@@ -325,25 +371,9 @@ def migrate_hr_module_access(supabase, employees, app_users_lookup, module_map):
     insert_rows(supabase, "hr_module_access", rows)
 
 
-def parse_timestamp(ts_str):
-    """Parse M/D/YYYY H:MM:SS timestamp to ISO format or None."""
-    if not ts_str or not str(ts_str).strip():
-        return None
-    from datetime import datetime
-    for fmt in ("%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M", "%m/%d/%Y"):
-        try:
-            return datetime.strptime(str(ts_str).strip(), fmt).isoformat()
-        except ValueError:
-            continue
-    return None
-
-
-def migrate_hr_time_off_request(supabase, emp_records):
+def migrate_hr_time_off_request(supabase, gc, emp_records):
     """Migrate time off requests from hr_ee_time_off_request sheet."""
-    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
-    client = gspread.authorize(creds)
-    ws = client.open_by_key(SHEET_ID).worksheet("hr_ee_time_off_request")
+    ws = gc.open_by_key(SHEET_ID).worksheet("hr_ee_time_off_request")
     records = ws.get_all_records()
 
     # Build employee lookups: full_name -> id, email -> id
@@ -426,12 +456,9 @@ def migrate_hr_time_off_request(supabase, emp_records):
     insert_rows(supabase, "hr_time_off_request", rows)
 
 
-def migrate_hr_travel_request(supabase, emp_records):
+def migrate_hr_travel_request(supabase, gc, emp_records):
     """Migrate travel requests from proc_requests sheet (request_type = Travel)."""
-    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-    creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
-    client = gspread.authorize(creds)
-    ws = client.open_by_key("1EFgT0XyBlUe10ENVkm4-_bb4uSPyd9hPbCIzD-RKNRA").worksheet("proc_requests")
+    ws = gc.open_by_key("1EFgT0XyBlUe10ENVkm4-_bb4uSPyd9hPbCIzD-RKNRA").worksheet("proc_requests")
     records = ws.get_all_records()
 
     # Build email -> employee ID lookup
@@ -473,9 +500,9 @@ def migrate_hr_travel_request(supabase, emp_records):
         row = {
             "org_id": ORG_ID,
             "hr_employee_id": emp_id,
-            "request_type": str(r.get("travel_type", "")).strip() or None,
-            "travel_from": str(r.get("flight_from", "")).strip() or None,
-            "travel_to": str(r.get("flight_to", "")).strip() or None,
+            "request_type": proper_case(r.get("travel_type", "")) or None,
+            "travel_from": proper_case(r.get("flight_from", "")) or None,
+            "travel_to": proper_case(r.get("flight_to", "")) or None,
             "travel_start_date": parse_date(r.get("departure_date", "")),
             "travel_return_date": parse_date(r.get("return_date", "")),
             "notes": str(r.get("request_notes", "")).strip() or None,
@@ -496,13 +523,14 @@ def main():
         return
 
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    gc = get_sheets()
 
     print("Reading hr_ee_register from Google Sheets...")
-    records = get_sheet_records()
+    records = get_sheet_records(gc)
     print(f"  {len(records)} records loaded")
 
     print("Reading global_app_users_list from Google Sheets...")
-    app_users = get_app_users()
+    app_users = get_app_users(gc)
     print(f"  {len(app_users)} app users loaded")
 
     # Clear in reverse FK order
@@ -522,8 +550,8 @@ def main():
 
     employees, user_lookup, module_map = migrate_hr_employee(supabase, records, app_users)
     migrate_hr_module_access(supabase, employees, user_lookup, module_map)
-    migrate_hr_time_off_request(supabase, records)
-    migrate_hr_travel_request(supabase, records)
+    migrate_hr_time_off_request(supabase, gc, records)
+    migrate_hr_travel_request(supabase, gc, records)
 
     print("\nHR data migrated successfully")
 

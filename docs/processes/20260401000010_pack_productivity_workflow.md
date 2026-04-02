@@ -73,7 +73,7 @@ flowchart TD
     D --> E[Enter cases_packed delta]
     E --> F[Optionally enter leftover_pounds]
     F --> G[For each fail:\nselect category + enter count]
-    G --> H[Toggle is_metal_detected if needed]
+    G --> H[Record fsafe_metal_detected_at if applicable]
     H --> I[Add notes]
     I --> J{More hours?}
     J -->|Yes| C

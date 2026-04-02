@@ -216,12 +216,12 @@ RULES = [
     rule(
         "invnt_receiving_quality_checks", "business_rule", "inventory",
         "Receiving quality checks recorded per delivery, not via checklist",
-        "delivery_truck_clean and delivery_acceptable live on invnt_po_received rather than in an "
+        "fsafe_delivery_truck_clean and fsafe_delivery_acceptable live on invnt_po_received rather than in an "
         "ops_template checklist because they must be recorded per delivery event. A single PO can have "
         "multiple partial deliveries, each requiring its own quality assessment. The ops_template system "
         "ties responses to a single ops_task_tracker activity session, not to individual receiving events.",
         "Keeps per-delivery quality checks co-located with the delivery data they are captured alongside.",
-        '["invnt_po_received.delivery_truck_clean", "invnt_po_received.delivery_acceptable"]',
+        '["invnt_po_received.fsafe_delivery_truck_clean", "invnt_po_received.fsafe_delivery_acceptable"]',
         15,
     ),
 
@@ -419,11 +419,15 @@ RULES = [
         "pack_productivity_workflow", "workflow", "pack",
         "Packing productivity data entry workflow",
         "A packing supervisor creates one ops_task_tracker activity per product being packed (product is "
-        "identified by ops_task_tracker.sales_product_id). At the end of each clock hour, the supervisor "
-        "records a pack_productivity_hour snapshot with crew counts, cases packed, and fail counts.",
+        "identified by ops_task_tracker.sales_product_id, site_id defaults to the farm's packing site). "
+        "At the end of each clock hour, the supervisor records a pack_productivity_hour snapshot with "
+        "crew counts, cases packed, and fail counts. Multiple products can be packed in the same clock "
+        "hour under different activities — the unique constraint is (ops_task_tracker_id, pack_end_hour). "
+        "When a product is finished, the activity's stop_time is set and a new activity is created for "
+        "the next product.",
         "Hourly snapshots enable real-time productivity tracking and derived metrics per product per shift.",
-        '["ops_task_tracker.sales_product_id", "pack_productivity_hour.ops_task_tracker_id", '
-        '"pack_productivity_hour.pack_end_hour"]',
+        '["ops_task_tracker.sales_product_id", "ops_task_tracker.site_id", '
+        '"pack_productivity_hour.ops_task_tracker_id", "pack_productivity_hour.pack_end_hour"]',
         32,
     ),
     rule(
@@ -445,13 +449,67 @@ RULES = [
     ),
     rule(
         "pack_metal_detection_hourly", "business_rule", "pack",
-        "Metal detection recorded per hour, not via checklist",
-        "is_metal_detected lives on pack_productivity_hour rather than in an ops_template checklist because "
-        "it must be recorded every hour alongside the productivity snapshot. The ops_template system ties "
-        "responses to a single ops_task_tracker activity session, not to individual hours within that session.",
-        "Keeps the hourly quality check co-located with the hourly data it is captured alongside.",
-        '["pack_productivity_hour.is_metal_detected"]',
+        "Food safety metal detection recorded per packing hour",
+        "fsafe_metal_detected_at on pack_productivity_hour records the timestamp of the metal detection check "
+        "during each packing hour. A non-null value means detection was performed; null means it was not. "
+        "This lives on the hourly snapshot rather than in an ops_template checklist because it must be "
+        "recorded every hour alongside the productivity data.",
+        "Keeps the hourly food safety check co-located with the hourly data it is captured alongside.",
+        '["pack_productivity_hour.fsafe_metal_detected_at"]',
         35,
+    ),
+    rule(
+        "pack_invnt_item_filter_rules", "business_rule", "pack",
+        "Inventory item filter rules by table context",
+        "Each pack table that references invnt_item_id filters the inventory list by category: "
+        "sales_product.invnt_item_id is filtered to invnt_category where category_name = 'Packing' (the packaging material for the product). "
+        "pack_shelf_life.invnt_item_id is pre-filled from sales_product.invnt_item_id; editable, also filtered to Packing. "
+        "pack_dryer_result.invnt_item_id is filtered to invnt_category where category_name = 'Seeds' (the seed variety being dried and packed).",
+        "The same column name invnt_item_id is used across tables but the filter context differs based on the table's purpose.",
+        '["sales_product.invnt_item_id", "pack_shelf_life.invnt_item_id", "pack_dryer_result.invnt_item_id"]',
+        36,
+    ),
+    rule(
+        "pack_dryer_result_uom", "business_rule", "pack",
+        "Dryer result UOM defaults",
+        "temperature_uom defaults to the farm's standard temperature unit (fahrenheit). "
+        "moisture_uom defaults to percent. A single temperature_uom covers all temperature "
+        "fields (dryer, greenhouse, packhouse, leaf) since they share the same unit.",
+        "Consistent units across all readings in a single check simplify data entry and reporting.",
+        '["pack_dryer_result.temperature_uom", "pack_dryer_result.moisture_uom"]',
+        37,
+    ),
+    rule(
+        "pack_dryer_result_recheck", "workflow", "pack",
+        "Dryer result re-check workflow",
+        "When a sample needs to be re-checked, a new pack_dryer_result row is created with "
+        "pack_dryer_result_id_original pointing to the original check. The tracking_code is "
+        "a human-readable identifier assigned to the original check so that re-checks can "
+        "reference it. Re-checks inherit the same grow_seed_batch_id and site_id from the original.",
+        "Maintains full traceability between original checks and re-checks without modifying the original record.",
+        '["pack_dryer_result.pack_dryer_result_id_original", "pack_dryer_result.tracking_code"]',
+        38,
+    ),
+    rule(
+        "pack_shelf_life_trial_types", "business_rule", "pack",
+        "Shelf life trials support experimental products",
+        "sales_product_id on pack_shelf_life is nullable. When null, the trial is experimental "
+        "(e.g. testing a new variety or packaging format that does not yet have a sales_product). "
+        "trial_purpose captures the intent of the experiment.",
+        "Allows shelf life testing of experimental products before they are added to the sales catalog.",
+        '["pack_shelf_life.sales_product_id", "pack_shelf_life.trial_purpose"]',
+        39,
+    ),
+    rule(
+        "pack_fail_category_lifecycle", "business_rule", "pack",
+        "Fail category active/inactive lifecycle",
+        "pack_productivity_fail_category has an is_active flag. Inactive categories are hidden from "
+        "new data entry but preserved for historical reporting. Currently only 'total' is active — "
+        "the granular categories (film, tray, printer, leaves, ridges, unexplained) were retired in "
+        "favor of recording a single total fail count per hour.",
+        "Simplifies data entry while preserving historical granularity for older records.",
+        '["pack_productivity_fail_category.is_active"]',
+        40,
     ),
 
     # =====================================================================

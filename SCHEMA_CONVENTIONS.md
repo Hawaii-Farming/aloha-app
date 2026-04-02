@@ -16,10 +16,10 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 | `hr_`     | Human Resources | 017–025 | 04 |
 | `invnt_`  | Inventory       | 026–033 | 03 |
 | `sales_`  | Sales           | 035, 108–113, 115, 117 | 08 |
-| `ops_`    | Operations      | 034, 036–047, 134 | 05 |
-| `pack_`   | Pack            | 114, 116, 118–124 | 07 |
-| `maint_`  | Maintenance     | 125–127 | 09 |
-| `fsafe_`  | Food Safety     | 128–133 | 10 |
+| `ops_`    | Operations      | 034, 036–047, 135 | 05 |
+| `pack_`   | Pack            | 114, 116, 118–125 | 07 |
+| `maint_`  | Maintenance     | 126–128 | 09 |
+| `fsafe_`  | Food Safety     | 129–134 | 10 |
 
 Migration ranges are interleaved in some areas due to cross-module FK dependencies (e.g. sales_product at 035 precedes ops tables, pack_lot at 114 precedes sales_po_fulfillment at 117).
 
@@ -47,7 +47,7 @@ Workflow fields capture a named person performing a step in a record's lifecycle
 
 | Type | Column examples | Datatype | FK? | Purpose |
 |------|-----------------|----------|-----|---------|
-| Workflow | `verified_by`, `reviewed_by`, `requested_by`, `sampled_by`, `ordered_by`, `approved_by`, `uploaded_by`, `assigned_to`, `fixer_id`, `reported_by` | TEXT | FK → `hr_employee(id)` | Identifies a specific employee in a business process |
+| Workflow | `verified_by`, `reviewed_by`, `requested_by`, `sampled_by`, `ordered_by`, `approved_by`, `qb_uploaded_by`, `assigned_to`, `fixer_id`, `reported_by` | TEXT | FK → `hr_employee(id)` | Identifies a specific employee in a business process |
 | Audit | `created_by`, `updated_by` | TEXT | No FK | Logs the Supabase Auth email of who made the change |
 
 Workflow field rules:
