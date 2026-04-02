@@ -49,9 +49,9 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
 
-  --font-sans: var(--font-sans);
-  --font-heading: var(--font-heading);
-  --font-mono: var(--font-mono);
+  --font-sans: 'Geist Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-heading: 'Geist Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Source Code Pro', Menlo, monospace;
 
   --color-sidebar: var(--sidebar-background);
   --color-sidebar-foreground: var(--sidebar-foreground);

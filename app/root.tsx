@@ -89,7 +89,7 @@ function getClassName(theme?: string) {
   const dark = theme === 'dark';
   const light = !dark;
 
-  return cn('bg-background min-h-screen antialiased md:overscroll-none', {
+  return cn('font-sans bg-background min-h-screen antialiased md:overscroll-none', {
     dark,
     light,
   });
