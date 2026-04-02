@@ -17,16 +17,16 @@ Every screen in Aloha looks and feels like a premium Supabase-quality product �
 - ✓ next-themes dark/light/system theme toggle — existing
 - ✓ Existing app layout: sidebar navigation, workspace chrome — existing
 - ✓ DESIGN.md dark theme specification — existing
+- ✓ Override Shadcn CSS variables with Supabase dark palette — Validated in Phase 1: Foundation + Dark Theme
+- ✓ Install and configure Geist + Geist Mono fonts — Validated in Phase 1: Foundation + Dark Theme
+- ✓ Implement border-based depth system (no box-shadows) — Validated in Phase 1: Foundation + Dark Theme
+- ✓ Add Supabase color tokens as custom CSS variables (oklch-based) — Validated in Phase 1: Foundation + Dark Theme
 
 ### Active
 
 - [ ] Complete light theme values in DESIGN.md
-- [ ] Override Shadcn CSS variables with Supabase dark palette
 - [ ] Override Shadcn CSS variables with Supabase light palette
-- [ ] Install and configure Geist + Geist Mono fonts
 - [ ] Add pill button variant (9999px radius) to Shadcn Button
-- [ ] Implement border-based depth system (no box-shadows)
-- [ ] Add Supabase color tokens as custom CSS variables (HSL-based with alpha)
 - [ ] Theme sidebar navigation (dark background, green accents, weight 500 nav links)
 - [ ] Theme cards and containers (border-defined edges, no shadows)
 - [ ] Theme tabs (pill shape, green active state)
@@ -87,4 +87,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after initialization*
+*Last updated: 2026-04-02 after Phase 1 completion*
