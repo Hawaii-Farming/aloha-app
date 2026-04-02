@@ -45,5 +45,5 @@ COMMENT ON COLUMN org_site.monitoring_stations IS 'JSON array of station names f
 COMMENT ON COLUMN org_site.org_site_category_id IS 'References org_site_category rows where sub_category_name IS NULL';
 COMMENT ON COLUMN org_site.org_site_subcategory_id IS 'References org_site_category rows where sub_category_name IS NOT NULL';
 COMMENT ON COLUMN org_site.site_id_parent IS 'Null for top-level sites; set for child locations within a parent site (e.g. food safety surfaces, pest traps, housing rooms)';
-COMMENT ON COLUMN org_site.acres IS 'Only for growing sites; null for all other categories';
-COMMENT ON COLUMN org_site.zone IS 'zone_1 (food contact surface), zone_2, zone_3, zone_4, water; only for food safety child sites';
+COMMENT ON COLUMN org_site.acres IS 'Only for growing sites with no subcategory, or subcategory greenhouse, pond, nursery; null for all other site types';
+COMMENT ON COLUMN org_site.zone IS 'zone_1 (food contact surface), zone_2, zone_3, zone_4, water; available on all sites regardless of category';

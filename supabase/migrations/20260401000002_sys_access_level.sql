@@ -13,3 +13,4 @@ CREATE TABLE IF NOT EXISTS sys_access_level (
 );
 
 COMMENT ON TABLE sys_access_level IS 'System-level lookup defining the access levels available for employee roles. The level integer is used to compare against sys_sub_module.sys_access_level_id for visibility control.';
+COMMENT ON COLUMN sys_access_level.id IS 'Human-readable identifier (e.g. employee, team_lead, manager, admin, owner)';

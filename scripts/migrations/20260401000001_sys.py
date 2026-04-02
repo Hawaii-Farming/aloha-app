@@ -252,16 +252,58 @@ def main():
 
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    # Clear org tables that reference sys tables first
-    # Clear ALL dependent tables in reverse FK order
+    # Clear ALL dependent tables in reverse migration order (leaf tables first)
     print("Clearing all dependent tables...")
-    for t in ["invnt_onhand", "invnt_po_received", "invnt_lot", "invnt_po", "invnt_item",
-              "invnt_category", "invnt_vendor",
-              "hr_time_off_request", "hr_module_access", "hr_employee",
+    for t in [
+              # fsafe
+              "ops_corrective_action_taken",
+              "fsafe_pest_result", "fsafe_result", "fsafe_test_hold_po",
+              "fsafe_test_hold", "fsafe_lab_test", "fsafe_lab",
+              # maint
+              "maint_request_photo", "maint_request_invnt_item", "maint_request",
+              # pack
+              "pack_productivity_hour_fail", "pack_productivity_hour",
+              "pack_productivity_fail_category",
+              "pack_shelf_life_photo", "pack_shelf_life_result",
+              "pack_shelf_life", "pack_shelf_life_metric",
+              # sales
+              "sales_po_fulfillment", "pack_lot_item", "pack_lot",
+              "sales_po_line", "sales_po",
+              "sales_product_price", "sales_customer",
+              "sales_customer_group", "sales_fob",
+              # grow (higher)
+              "grow_task_photo", "grow_task_seed_batch",
+              "grow_monitoring_result", "grow_monitoring_metric",
+              "grow_fertigation", "grow_fertigation_recipe_site",
+              "grow_fertigation_recipe_item", "grow_fertigation_recipe",
+              # grow (spray/scout/harvest/seed)
+              "grow_spray_equipment", "grow_spray_input",
+              "grow_spray_compliance", "grow_scout_result",
+              "grow_harvest_weight", "grow_harvest_container",
+              "grow_seed_batch", "grow_seed_mix_item", "grow_seed_mix",
+              "grow_trial_type", "grow_cycle_pattern",
+              # ops
+              "ops_template_result_photo", "ops_template_result",
+              "ops_template_question", "ops_corrective_action_choice",
+              "ops_task_template", "ops_template",
+              "ops_training_attendee", "ops_training", "ops_training_type",
+              "ops_task_schedule", "ops_task_tracker",
+              "sales_product", "ops_task",
+              # invnt
+              "invnt_onhand", "invnt_po_received", "invnt_lot",
+              "invnt_po", "invnt_item", "invnt_category", "invnt_vendor",
+              # hr
+              "hr_payroll", "hr_disciplinary_warning",
+              "hr_travel_request", "hr_time_off_request",
+              "hr_module_access", "hr_employee",
               "hr_title", "hr_work_authorization", "hr_department",
+              # grow (base)
               "grow_disease", "grow_pest", "grow_grade", "grow_variety",
-              "org_sub_module", "org_module", "org_site", "org_site_category",
-              "org_equipment", "org_business_rule", "org_farm", "org"]:
+              # org
+              "org_business_rule", "org_equipment", "org_site",
+              "org_site_category", "org_sub_module", "org_module",
+              "org_farm", "org",
+              ]:
         try:
             supabase.table(t).delete().neq("org_id", "___never___").execute()
         except Exception:
