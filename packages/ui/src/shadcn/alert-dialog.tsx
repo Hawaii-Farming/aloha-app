@@ -71,7 +71,7 @@ const AlertDialogTitle: React.FC<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title>
 > = ({ className, ...props }) => (
   <AlertDialogPrimitive.Title
-    className={cn('text-lg font-semibold', className)}
+    className={cn('text-lg font-medium', className)}
     {...props}
   />
 );

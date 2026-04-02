@@ -104,7 +104,7 @@ const SheetTitle: React.FC<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 > = ({ className, ...props }) => (
   <SheetPrimitive.Title
-    className={cn('text-foreground text-lg font-semibold', className)}
+    className={cn('text-foreground text-lg font-medium', className)}
     {...props}
   />
 );
