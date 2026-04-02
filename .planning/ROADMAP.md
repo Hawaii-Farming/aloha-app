@@ -43,7 +43,11 @@ Plans:
   3. The sidebar shows a dark background with green-highlighted active nav links and weight-500 typography in both themes
   4. Form inputs, selects, checkboxes, and textareas visually match the Supabase input style (correct border, ring, and focus states)
   5. The pill button variant and pill tab variant are available and render with fully rounded corners at all sizes
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Define light palette in DESIGN.md and override :root CSS tokens with Supabase light palette
+- [ ] 02-02-PLAN.md — Remove shadow-xs from all components, add pill button variant, convert tabs to pill shape
+- [ ] 02-03-PLAN.md — WCAG AA contrast verification and visual checkpoint for both themes
 **UI hint**: yes
 
 ### Phase 3: Enhancement + Verification
@@ -65,10 +69,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation + Dark Theme | 2/2 | Complete   | 2026-04-02 |
-| 2. Light Theme + Component Theming | 0/0 | Not started | - |
+| 2. Light Theme + Component Theming | 0/3 | Planned | - |
 | 3. Enhancement + Verification | 0/0 | Not started | - |
 
 ---
 
 *Created: 2026-04-02*
-*Last updated: 2026-04-02 after Phase 1 planning — 2 plans created*
+*Last updated: 2026-04-02 after Phase 2 planning — 3 plans created*
