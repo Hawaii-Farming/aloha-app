@@ -59,6 +59,9 @@
   --color-semantic-blue-fg: var(--semantic-blue-fg);
   --color-semantic-blue-border: var(--semantic-blue-border);
 
+  --color-glass-surface: var(--glass-surface);
+  --color-slate-alpha-wash: var(--slate-alpha-wash);
+
   --radius-radius: var(--radius);
 
   --radius-sm: calc(var(--radius) - 4px);
