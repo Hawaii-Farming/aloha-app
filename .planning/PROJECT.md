@@ -22,17 +22,24 @@ Every screen in Aloha looks and feels like a premium Supabase-quality product �
 - ✓ Implement border-based depth system (no box-shadows) — Validated in Phase 1: Foundation + Dark Theme
 - ✓ Add Supabase color tokens as custom CSS variables (oklch-based) — Validated in Phase 1: Foundation + Dark Theme
 
+- ✓ Complete light theme values in DESIGN.md — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Override Shadcn CSS variables with Supabase light palette — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Add pill button variant (9999px radius) to Shadcn Button — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Theme sidebar navigation (green accents, weight 500 nav links) — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Theme cards and containers (border-defined edges, no shadows) — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Theme tabs (pill shape, green active state) — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Theme form inputs and controls — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Theme data tables — Validated in Phase 2: Light Theme + Component Theming
+- ✓ Ensure theme toggle works correctly between dark/light/system — Validated in Phase 2 (human testing pending for FOUC)
+
 ### Active
 
-- [ ] Complete light theme values in DESIGN.md
-- [ ] Override Shadcn CSS variables with Supabase light palette
-- [ ] Add pill button variant (9999px radius) to Shadcn Button
-- [ ] Theme sidebar navigation (dark background, green accents, weight 500 nav links)
-- [ ] Theme cards and containers (border-defined edges, no shadows)
-- [ ] Theme tabs (pill shape, green active state)
-- [ ] Theme form inputs and controls
-- [ ] Theme data tables
-- [ ] Ensure theme toggle works correctly between dark/light/system
+- [ ] HSL-with-alpha supplementary token layer for translucent surfaces
+- [ ] Typography weight restraint enforced (400 body, 500 nav/buttons)
+- [ ] Negative letter-spacing on card titles
+- [ ] Monospace technical label utility
+- [ ] Radix 12-step color scale for semantic states
+- [ ] Supabase neutral gray scale tokens
 
 ### Out of Scope
 
@@ -87,4 +94,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after Phase 1 completion*
+*Last updated: 2026-04-02 after Phase 2 completion*
