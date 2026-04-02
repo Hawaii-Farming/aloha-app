@@ -43,6 +43,22 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
+  --color-semantic-red-bg: var(--semantic-red-bg);
+  --color-semantic-red-fg: var(--semantic-red-fg);
+  --color-semantic-red-border: var(--semantic-red-border);
+
+  --color-semantic-amber-bg: var(--semantic-amber-bg);
+  --color-semantic-amber-fg: var(--semantic-amber-fg);
+  --color-semantic-amber-border: var(--semantic-amber-border);
+
+  --color-semantic-green-bg: var(--semantic-green-bg);
+  --color-semantic-green-fg: var(--semantic-green-fg);
+  --color-semantic-green-border: var(--semantic-green-border);
+
+  --color-semantic-blue-bg: var(--semantic-blue-bg);
+  --color-semantic-blue-fg: var(--semantic-blue-fg);
+  --color-semantic-blue-border: var(--semantic-blue-border);
+
   --radius-radius: var(--radius);
 
   --radius-sm: calc(var(--radius) - 4px);
