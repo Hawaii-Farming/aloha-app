@@ -65,7 +65,7 @@ export default function App(props: Route.ComponentProps) {
   const { language, className, theme, csrfToken } = props.loaderData ?? {};
 
   return (
-    <html lang={language} className={className}>
+    <html lang={language} className={className} suppressHydrationWarning>
       <head>
         <RootHead />
         <Meta />
