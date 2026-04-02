@@ -32,12 +32,12 @@
 
 ### Enhancement
 
-- [ ] **ENHN-01**: HSL-with-alpha supplementary token layer for translucent surfaces (glass overlays, subtle washes)
+- [x] **ENHN-01**: HSL-with-alpha supplementary token layer for translucent surfaces (glass overlays, subtle washes)
 - [ ] **ENHN-02**: Typography weight restraint enforced (400 body, 500 nav/buttons only — no bold 700)
 - [ ] **ENHN-03**: Negative letter-spacing (-0.16px) on card titles
-- [ ] **ENHN-04**: Monospace technical label utility (Geist Mono, uppercase, 1.2px letter-spacing)
-- [ ] **ENHN-05**: Radix 12-step color scale integration for semantic states (alerts, badges, status indicators)
-- [ ] **ENHN-06**: Supabase neutral gray scale tokens defined (`#171717` through `#fafafa` equivalents in oklch)
+- [x] **ENHN-04**: Monospace technical label utility (Geist Mono, uppercase, 1.2px letter-spacing)
+- [x] **ENHN-05**: Radix 12-step color scale integration for semantic states (alerts, badges, status indicators)
+- [x] **ENHN-06**: Supabase neutral gray scale tokens defined (`#171717` through `#fafafa` equivalents in oklch)
 
 ## v2 Requirements
 
@@ -81,12 +81,12 @@
 | COMP-06 | Phase 2 | Complete |
 | COMP-07 | Phase 2 | Complete |
 | COMP-08 | Phase 2 | Complete |
-| ENHN-01 | Phase 3 | Pending |
+| ENHN-01 | Phase 3 | Complete |
 | ENHN-02 | Phase 3 | Pending |
 | ENHN-03 | Phase 3 | Pending |
-| ENHN-04 | Phase 3 | Pending |
-| ENHN-05 | Phase 3 | Pending |
-| ENHN-06 | Phase 3 | Pending |
+| ENHN-04 | Phase 3 | Complete |
+| ENHN-05 | Phase 3 | Complete |
+| ENHN-06 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total
