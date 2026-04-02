@@ -46,6 +46,15 @@
     color: theme(--color-muted-foreground);
   }
 
+  :root {
+    --shadow: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-2xl: none;
+  }
+
   .dark {
     --shadow: none;
     --shadow-sm: none;
