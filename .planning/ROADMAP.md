@@ -47,7 +47,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Define light palette in DESIGN.md and override :root CSS tokens with Supabase light palette
 - [x] 02-02-PLAN.md — Remove shadow-xs from all components, add pill button variant, convert tabs to pill shape
-- [ ] 02-03-PLAN.md — WCAG AA contrast verification and visual checkpoint for both themes
+- [x] 02-03-PLAN.md — WCAG AA contrast verification and visual checkpoint for both themes
 **UI hint**: yes
 
 ### Phase 3: Enhancement + Verification

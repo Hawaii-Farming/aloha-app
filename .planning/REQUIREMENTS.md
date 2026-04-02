@@ -16,8 +16,8 @@
 - [x] **FOUND-07**: Border-based depth system replacing box-shadows on cards and containers
 - [x] **FOUND-08**: Supabase green accent tokens defined (`--supabase-green`, `--supabase-green-link`, `--supabase-green-border`)
 - [x] **FOUND-09**: WCAG AA contrast verified for dark theme (4.5:1 normal text, 3:1 large text)
-- [ ] **FOUND-10**: WCAG AA contrast verified for light theme (4.5:1 normal text, 3:1 large text)
-- [ ] **FOUND-11**: No theme flicker (FOUC) on page load in both dark and light modes
+- [x] **FOUND-10**: WCAG AA contrast verified for light theme (4.5:1 normal text, 3:1 large text)
+- [x] **FOUND-11**: No theme flicker (FOUC) on page load in both dark and light modes
 
 ### Components
 
@@ -71,8 +71,8 @@
 | FOUND-07 | Phase 1 | Complete |
 | FOUND-08 | Phase 1 | Complete |
 | FOUND-09 | Phase 1 | Complete |
-| FOUND-10 | Phase 2 | Pending |
-| FOUND-11 | Phase 2 | Pending |
+| FOUND-10 | Phase 2 | Complete |
+| FOUND-11 | Phase 2 | Complete |
 | COMP-01 | Phase 2 | Complete |
 | COMP-02 | Phase 2 | Complete |
 | COMP-03 | Phase 2 | Complete |
