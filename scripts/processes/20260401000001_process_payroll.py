@@ -106,8 +106,8 @@ def load_sheets(input_path: str) -> dict:
 def build_employee_register(supabase, org_id: str) -> dict:
     """Fetch hr_employee records for the org, keyed by payroll_id."""
     resp = supabase.table("hr_employee").select(
-        "id, first_name, last_name, hr_department_id, wc, pay_structure, "
-        "overtime_threshold, payroll_id"
+        "id, first_name, last_name, hr_department_id, hr_work_authorization_id, "
+        "wc, pay_structure, overtime_threshold, payroll_id"
     ).eq("org_id", org_id).eq("is_deleted", False).execute()
 
     register = {}
@@ -266,6 +266,7 @@ def process_payroll(org_id: str, processor: str, input_path: str):
             # Employee snapshot
             "employee_name": d.get("Full Name", "ADJUSTMENT"),
             "hr_department_id": reg.get("hr_department_id"),
+            "hr_work_authorization_id": reg.get("hr_work_authorization_id"),
             "wc": reg.get("wc"),
             "pay_structure": reg.get("pay_structure"),
             "hourly_rate": get_net("Hourly Rate"),

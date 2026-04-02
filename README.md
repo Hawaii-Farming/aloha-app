@@ -26,7 +26,7 @@ Pricing is managed with three tiers of specificity — default prices by product
 ```
 aloha-app/
   supabase/
-    migrations/          # Sequential SQL migration files (001-093, source of truth)
+    migrations/          # Sequential SQL migration files (001-134, source of truth)
   docs/
     schemas/             # Schema documentation per module (01_sys through 10_fsafe)
     processes/           # Business process and workflow documentation (01-10)
@@ -54,7 +54,7 @@ aloha-app/
 - **org_farm** — Crop/product lines within an org with weighing and growing UOM defaults
 - **org_site_category** — Two-level site category hierarchy (e.g. growing/greenhouse, packing/room, housing/room)
 - **org_site** — Unified site register with parent-child hierarchy for all locations; category and subcategory are FK references to org_site_category
-- **org_equipment** — Equipment register for physical assets; farm-level or shared
+- **org_equipment** — Equipment register for physical assets; farm-level or shared, site-level or mobile
 - **org_business_rule** — Org-scoped registry for business rules, workflows, calculations, requirements, and definitions
 
 ## Inventory Module (8 tables, includes 1 view) — [Docs](docs/schemas/20260401000003_invnt.md)
@@ -93,7 +93,7 @@ aloha-app/
 - **ops_task_template** — Many-to-many link between tasks and templates; app loads linked templates when creating an activity
 - **ops_corrective_action_choice** — Org-defined reusable corrective action options selectable from a dropdown
 - **ops_template_question** — Questions within a template with display order, response type (boolean, numeric, enum), pass criteria, and warning message
-- **ops_template_result** — Employee responses per question per task tracker session; `ops_task_tracker` acts as the checklist completion header
+- **ops_template_result** — Employee responses per question per task tracker session targeting either a site or equipment; `ops_task_tracker` acts as the checklist completion header
 - **ops_template_result_photo** — Photos attached to a checklist response; one row per photo, only used when ops_template_question.include_photo = true
 - **ops_corrective_action_taken** — Corrective actions raised against failing checklist responses or EMP test results with assignment, due date, result tracking, and verification
 
@@ -122,7 +122,7 @@ aloha-app/
 - **grow_monitoring_result** — Individual measurement per monitoring event per point per station.
 - **grow_spray_restriction** (view) — Derived daily NE (No Entry) and NH (No Harvest) restriction calendar per site from spray events
 
-## Pack Module (10 tables) — [Docs](docs/schemas/20260401000007_pack.md)
+## Pack Module (9 tables) — [Docs](docs/schemas/20260401000007_pack.md)
 
 - **pack_lot** — Production lot header with lot number, harvest date, and pack date; lot numbers are system-generated from the pack date and shared across all products packed on the same day
 - **pack_lot_item** — Individual products packed within a lot with best-by date, quantity packed, and UOM
@@ -132,10 +132,9 @@ aloha-app/
 - **pack_shelf_life_photo** — Photos taken per observation date per trial, one row per photo with optional caption
 - **pack_productivity_fail_category** — Lookup for pack line fail categories (e.g. film, tray, printer, leaves, ridges)
 - **pack_productivity_hour** — Hourly pack line snapshot with crew counts by role and metal detection flag
-- **pack_productivity_hour_product** — Cases packed per product per hour (delta, not cumulative)
 - **pack_productivity_hour_fail** — Fail counts per category per hour
 
-## Sales Module (8 tables) — [Docs](docs/schemas/20260401000008_sales.md)
+## Sales Module (9 tables) — [Docs](docs/schemas/20260401000008_sales.md)
 
 - **sales_fob** — Org-specific FOB (Freight On Board) delivery points (TEXT PK)
 - **sales_customer_group** — Org-specific customer classifications for reporting and group pricing (TEXT PK)
@@ -144,12 +143,14 @@ aloha-app/
 - **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 - **sales_po** — Customer order header with customer, FOB, dates, approval workflow, accounting upload tracking, and optional recurring frequency for standing orders
 - **sales_po_line** — Individual products within an order with snapshot pricing at time of order
-- **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, supporting partial fulfillment across multiple lots
+- **sales_container_type** — Lookup table for shipping container types per farm with maximum pallet space capacity
+- **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, with shipping traceability (container_id, booking_id, pallet_number, container_space) bulk-set during containerization
 
-## Maintenance Module (2 tables) — [Docs](docs/schemas/20260401000009_maint.md)
+## Maintenance Module (3 tables) — [Docs](docs/schemas/20260401000009_maint.md)
 
-- **maint_request** — Standalone maintenance work order with site, priority, status, fixer assignment, completion details, and recurring frequency
+- **maint_request** — Standalone maintenance work order targeting either a site or equipment (never both), with priority, status, fixer assignment, completion details, and recurring frequency
 - **maint_request_invnt_item** — Inventory items consumed during a maintenance request with quantity used
+- **maint_request_photo** — Photos attached to a maintenance request with before/after classification
 
 ## Food Safety Module (6 tables) — [Docs](docs/schemas/20260401000010_fsafe.md)
 

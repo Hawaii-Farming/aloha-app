@@ -10,9 +10,8 @@ This document describes how pack line productivity is tracked hourly, including 
 
 | Table | Purpose |
 |-------|---------|
-| `ops_task_tracker` | Activity header — task = "Packing", captures the pack date and farm |
-| `pack_productivity_hour` | One row per clock hour with crew counts by role and metal detection flag |
-| `pack_productivity_hour_product` | Cases packed per product per hour (delta) with leftover pounds |
+| `ops_task_tracker` | Activity header — task = "Packing", one per product being packed (product identified by sales_product_id) |
+| `pack_productivity_hour` | One row per clock hour per activity with crew counts by role, cases packed, leftover pounds, and metal detection flag |
 | `pack_productivity_hour_fail` | Fail counts per category per hour |
 | `pack_productivity_fail_category` | Lookup — defines available fail categories |
 | `sales_product` | Referenced for derived metrics (pack_per_case, case_net_weight) |
@@ -26,13 +25,13 @@ This document describes how pack line productivity is tracked hourly, including 
 
 ## Flow
 
-1. **Create the activity** — user creates an `ops_task_tracker` with task = "Packing", selects the farm and start time
+1. **Create one activity per product** — user creates an `ops_task_tracker` per product being packed, with task = "Packing", selects the farm, product (`sales_product_id`), and start time
 2. **Assign employees** working on this packing session via `ops_task_schedule` (one row per employee)
 3. **Complete linked templates** — if templates are linked to the "Packing" task via `ops_task_template`, they are presented for completion (e.g. foreign material inspection, pre-pack safety check). See [09_ops_template_workflow.md](20260401000009_ops_template_workflow.md) for template details.
-4. **Log each hour** — for every clock hour during the packing session:
+4. **Log each hour** — at the end of each clock hour during the packing session:
    - Enter crew counts: catchers, packers, mixers, boxers
-   - For each product packed that hour, enter the number of cases packed (delta — just this hour, not cumulative)
-   - For each product, optionally enter leftover pounds
+   - Enter cases packed (delta — just this hour, not cumulative)
+   - Optionally enter leftover pounds
    - For each fail that occurred, select the fail category and enter the count
    - Toggle metal detected if applicable
    - Add notes (e.g. "Start LW at 10:20", "Fixing Proseal at 2:20-2:30")
@@ -46,9 +45,9 @@ These values are calculated on-the-fly from the stored data, not stored in the d
 
 | Metric | Formula | Source |
 |--------|---------|--------|
-| Total trays (per hour) | SUM(cases_packed × sales_product.pack_per_case) | pack_productivity_hour_product + sales_product |
+| Total trays (per hour) | cases_packed × sales_product.pack_per_case | pack_productivity_hour + sales_product (via ops_task_tracker.sales_product_id) |
 | Trays per packer per minute | total_trays / (packers × 60) | Derived from above + pack_productivity_hour.packers |
-| Packed pounds (per hour) | SUM(cases_packed × sales_product.case_net_weight) | pack_productivity_hour_product + sales_product |
+| Packed pounds (per hour) | cases_packed × sales_product.case_net_weight | pack_productivity_hour + sales_product (via ops_task_tracker.sales_product_id) |
 | Total fails (per hour) | SUM(fail_count) | pack_productivity_hour_fail |
 | Shift totals | SUM across all hours for the ops_task_tracker | Aggregation of hourly rows |
 
@@ -64,15 +63,15 @@ The "Packing" task and fail categories (e.g. film, tray, printer, leaves, ridges
 
 ```mermaid
 flowchart TD
-    A[Create ops_task_tracker\nTask = Packing] --> A1[Assign employees\nvia ops_task_schedule]
+    A[Create ops_task_tracker per product\nTask = Packing, select sales_product_id] --> A1[Assign employees\nvia ops_task_schedule]
     A1 --> A2{Linked templates?}
     A2 -->|Yes| A3[Complete checklists\ne.g. foreign material inspection]
     A2 -->|No| B
     A3 --> B[Start packing session]
     B --> C[New clock hour]
     C --> D[Enter crew counts\ncatchers, packers, mixers, boxers]
-    D --> E[For each product packed:\nenter cases_packed delta]
-    E --> F[For each product:\noptionally enter leftover_pounds]
+    D --> E[Enter cases_packed delta]
+    E --> F[Optionally enter leftover_pounds]
     F --> G[For each fail:\nselect category + enter count]
     G --> H[Toggle is_metal_detected if needed]
     H --> I[Add notes]

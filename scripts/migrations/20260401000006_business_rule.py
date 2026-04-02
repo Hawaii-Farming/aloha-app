@@ -102,6 +102,21 @@ RULES = [
         '["org_site.monitoring_stations"]',
         5,
     ),
+    rule(
+        "system_cascade_deactivation", "business_rule", "operations",
+        "Parent deactivation cascades to child records",
+        "When a parent record is marked as inactive (is_active = false) or soft-deleted (is_deleted = true), "
+        "only configuration and lookup children are cascaded — not transactional or historical records. "
+        "Examples: deactivating an org_site deactivates its child sites and equipment; deactivating a "
+        "sales_product deactivates its prices. However, historical records such as sales POs, fulfillments, "
+        "payroll, checklist results, and other transactional data are never cascaded — they remain intact for "
+        "reporting and audit. Reactivating a parent does not automatically reactivate children — children must "
+        "be reactivated individually.",
+        "Prevents orphaned active config records from appearing in dropdowns while preserving historical data "
+        "integrity. One-way cascade avoids unintended bulk reactivation.",
+        None,
+        6,
+    ),
 
     # =====================================================================
     # 2. HR — employees needed before anything else
@@ -113,7 +128,35 @@ RULES = [
         "Compensation manager dropdown filtered to sys_access_level_id = 'manager' or higher.",
         "Prevents assigning supervisory roles to employees without the required access level.",
         '["hr_employee.team_lead_id", "hr_employee.compensation_manager_id"]',
-        6,
+        7,
+    ),
+    rule(
+        "hr_payroll_import_process", "workflow", "human_resources",
+        "Payroll import from external processor",
+        "Payroll data is received from the payroll processing company as an Excel file with tabs: "
+        "$data (invoice summary), Hours (hours/pay breakdown), NetPay (earnings/deductions), "
+        "PTOBank (YTD PTO accrual), WC (workers compensation), and TDI (temporary disability insurance). "
+        "The import script merges all tabs, matches employees by payroll_id, and snapshots hr_department_id, "
+        "hr_work_authorization_id, wc, pay_structure, and overtime_threshold from hr_employee at import time. "
+        "is_standard is auto-set based on whether the invoice total hours exceed 5000.",
+        "Employee fields are snapshotted so payroll records remain historically accurate even if the employee "
+        "record changes later.",
+        '["hr_payroll"]',
+        8,
+    ),
+    rule(
+        "hr_payroll_cost_allocation", "calculation", "human_resources",
+        "Payroll cost allocation by scheduled task",
+        "Actual payroll costs are distributed across tasks based on the ratio of planned schedule hours. "
+        "For each employee per pay period: scheduled hours are matched by employee and date range, each task "
+        "is mapped to its accounting category, and scheduled hours are scaled proportionally so they sum to "
+        "the actual payroll total hours. Payroll costs (regular pay, overtime pay, total cost) are then split "
+        "across tasks using the scaled ratio. If no schedule exists for the employee, the full cost is "
+        "bucketed to their department. The report shows scheduled hours vs actual hours side by side.",
+        "Enables labor cost reporting by task/account without requiring employees to clock in per task. "
+        "The schedule serves as the allocation key for distributing actual payroll costs.",
+        '["hr_payroll", "ops_task_schedule", "ops_task"]',
+        9,
     ),
     # =====================================================================
     # 3. INVENTORY — items, POs, lots
@@ -124,7 +167,26 @@ RULES = [
         "Unique constraint on (org_id, invnt_item_id, lot_number) prevents duplicate lot numbers for the same item.",
         "Ensures unambiguous lot traceability for inventory and food safety.",
         '["invnt_lot.lot_number", "invnt_lot.invnt_item_id"]',
-        7,
+        10,
+    ),
+    rule(
+        "invnt_lot_auto_deactivate", "workflow", "inventory",
+        "Lot auto-deactivation on zero onhand",
+        "When the latest invnt_onhand record for a lot has onhand_quantity = 0, the lot's is_active flag is "
+        "auto-set to false. Inactive lots are excluded from dropdowns where users select lot numbers "
+        "(e.g. grow_spray_input, invnt_onhand). Users can manually reactivate a lot if needed.",
+        "Prevents users from selecting depleted lots, reducing data entry errors.",
+        '["invnt_lot.is_active", "invnt_onhand.onhand_quantity"]',
+        11,
+    ),
+    rule(
+        "invnt_auto_reorder", "workflow", "inventory",
+        "Auto-create purchase order on low stock",
+        "When the latest invnt_onhand record for an item falls below the item's reorder_point, a new "
+        "invnt_po is automatically created with request_type = 'inventory_item' for that item.",
+        "Ensures critical supplies are reordered before they run out without relying on manual monitoring.",
+        '["invnt_onhand.onhand_quantity", "invnt_item.reorder_point", "invnt_po"]',
+        12,
     ),
     rule(
         "invnt_po_request_types", "business_rule", "inventory",
@@ -140,16 +202,7 @@ RULES = [
         "to order_uom since there is no separate burn/order unit distinction for one-off purchases.",
         '["invnt_po.request_type", "invnt_po.invnt_item_id", "invnt_po.burn_uom", "invnt_po.order_uom", '
         '"invnt_po.burn_per_order", "invnt_po.urgency_level"]',
-        8,
-    ),
-    rule(
-        "invnt_po_status_workflow", "workflow", "inventory",
-        "Purchase order status workflow",
-        "Status progression: requested → approved/rejected → ordered → partial/received/cancelled. "
-        "Each transition requires the appropriate reviewer/orderer fields to be set.",
-        None,
-        '["invnt_po.status"]',
-        9,
+        13,
     ),
     rule(
         "invnt_po_snapshot_at_order", "business_rule", "inventory",
@@ -158,7 +211,18 @@ RULES = [
         "captured when a PO is ordered. These snapshots are immutable and used for historical reporting.",
         "Prevents PO history from changing if the underlying item record is later modified.",
         '["invnt_po.item_name_snapshot", "invnt_po.uom_snapshot", "invnt_po.unit_cost_snapshot"]',
-        10,
+        14,
+    ),
+    rule(
+        "invnt_receiving_quality_checks", "business_rule", "inventory",
+        "Receiving quality checks recorded per delivery, not via checklist",
+        "delivery_truck_clean and delivery_acceptable live on invnt_po_received rather than in an "
+        "ops_template checklist because they must be recorded per delivery event. A single PO can have "
+        "multiple partial deliveries, each requiring its own quality assessment. The ops_template system "
+        "ties responses to a single ops_task_tracker activity session, not to individual receiving events.",
+        "Keeps per-delivery quality checks co-located with the delivery data they are captured alongside.",
+        '["invnt_po_received.delivery_truck_clean", "invnt_po_received.delivery_acceptable"]',
+        15,
     ),
 
     # =====================================================================
@@ -171,7 +235,7 @@ RULES = [
         "enum (selection from predefined options with designated pass values).",
         None,
         '["ops_template_question.response_type"]',
-        11,
+        16,
     ),
     rule(
         "ops_question_immutable_after_use", "business_rule", "operations",
@@ -185,7 +249,7 @@ RULES = [
         '"ops_template_question.boolean_pass_value", "ops_template_question.minimum_value", '
         '"ops_template_question.maximum_value", "ops_template_question.enum_options", '
         '"ops_template_question.enum_pass_options"]',
-        12,
+        17,
     ),
     rule(
         "ops_template_auto_load", "workflow", "operations",
@@ -195,7 +259,7 @@ RULES = [
         "Ensures required checklists are never skipped. The link table allows one task to require multiple "
         "checklists (e.g. spraying requires pre-spray safety + PPE checklist).",
         '["ops_task_template.ops_task_id", "ops_task_template.ops_template_id"]',
-        13,
+        18,
     ),
     rule(
         "ops_corrective_action_auto_create", "workflow", "operations",
@@ -207,7 +271,7 @@ RULES = [
         "while allowing informational metrics to be recorded without enforcement.",
         '["ops_template_result.response_boolean", "ops_template_result.response_numeric", '
         '"ops_template_result.response_enum", "ops_corrective_action_taken"]',
-        14,
+        19,
     ),
     rule(
         "ops_quick_fill_implicit_activity", "workflow", "operations",
@@ -216,7 +280,33 @@ RULES = [
         "start_time = stop_time = now, is_completed = true.",
         "Allows rapid checklist completion without requiring a separate activity creation step.",
         '["ops_task_tracker.start_time", "ops_task_tracker.stop_time"]',
-        15,
+        20,
+    ),
+    rule(
+        "ops_schedule_dual_mode", "definition", "operations",
+        "Schedule dual mode: real-time vs planned",
+        "ops_task_schedule supports two modes. Real-time: ops_task_tracker_id is set, linking the schedule "
+        "entry to an ongoing activity — start/stop times, task, and farm are inherited from the tracker. "
+        "Planned: ops_task_tracker_id is null, meaning the entry is a forward-looking assignment where a "
+        "manager assigns employees to tasks with planned start/stop times without an active activity.",
+        "Allows both real-time labor tracking and advance scheduling in the same table. "
+        "The ops_task_weekly_schedule view shows only planned entries for printing.",
+        '["ops_task_schedule.ops_task_tracker_id"]',
+        21,
+    ),
+    rule(
+        "ops_planned_schedule_workflow", "workflow", "operations",
+        "Planned schedule generation, editing, and printing",
+        "A manager can generate next week's planned schedule by copying the current week's entries as a "
+        "starting point. From there, employees can be moved between tasks, reassigned to different time slots, "
+        "or soft-deleted from the schedule — enabling fast bulk editing without recreating entries from scratch. "
+        "The frontend renders a printable schedule for the selected week using the ops_task_weekly_schedule view, "
+        "which pivots planned entries into one row per employee per task with Sun–Sat time columns, total hours, "
+        "and OT threshold flag.",
+        "Copying the prior week and editing in place is significantly faster than building a schedule from "
+        "scratch each week. Soft-delete preserves the record for audit while removing the employee from the view.",
+        '["ops_task_schedule", "ops_task_weekly_schedule"]',
+        22,
     ),
 
     # =====================================================================
@@ -226,12 +316,13 @@ RULES = [
         "site_growing_activity_scope", "business_rule", "grow",
         "Growing activities reference only greenhouse, pond, and nursery sites",
         "When selecting a site for growing activities (seeding, scouting, spraying, fertigation, monitoring, "
-        "harvesting), only sites with org_site_subcategory_id IN ('greenhouse', 'pond', 'nursery') are shown. "
+        "harvesting), sites are first filtered by the selected farm_id, then only sites with "
+        "org_site_subcategory_id IN ('greenhouse', 'pond', 'nursery') are shown. "
         "Parent growing sites, growing_room, and growing_other are excluded from activity dropdowns.",
         "Growing activities occur in specific growing structures, not in support rooms or general growing areas.",
         '["grow_seed_batch", "grow_scout_result.site_id", "grow_spray_compliance", "grow_fertigation", '
         '"grow_monitoring_result", "grow_harvest_weight"]',
-        16,
+        23,
     ),
     rule(
         "grow_seed_source_exclusivity", "business_rule", "grow",
@@ -240,17 +331,32 @@ RULES = [
         "(grow_seed_mix_id), never both. The CHECK constraint enforces this at the database level.",
         "Prevents ambiguous seed provenance which would compromise traceability.",
         '["grow_seed_batch.grow_variety_id", "grow_seed_batch.grow_seed_mix_id"]',
-        17,
+        24,
     ),
     rule(
         "grow_seed_batch_lifecycle", "workflow", "grow",
         "Seed batch status lifecycle",
         "Status progression: planned → seeded → transplanted → harvesting → harvested. "
-        "Only batches with status 'transplanted' or 'harvesting' are available for scouting, spraying, "
-        "fertigation, and monitoring activities.",
-        "Ensures activities are only recorded against active, in-ground batches.",
+        "For nursery sites, batches with status 'seeded' are available for scouting, spraying, fertigation, "
+        "and monitoring activities. For greenhouse and pond sites, only batches with status 'transplanted' or "
+        "'harvesting' are available.",
+        "Nursery cycles occur before transplant; greenhouse/pond activities occur after transplant.",
         '["grow_seed_batch.status"]',
-        18,
+        25,
+    ),
+    rule(
+        "grow_seeding_label_format", "business_rule", "grow",
+        "Seeding label generation and printing",
+        "Labels are generated from the frontend by querying seed batches filtered by seeding date and farm. "
+        "Each label shows: site name + side, seeds per board (S#), board count (B#), three dates in MMdd "
+        "format (S: seeding, P: pond/transplant, H: expected harvest), and variety:seed name. "
+        "If boards per site > 90, the total is split into balanced chunks across multiple labels "
+        "(e.g. 200 boards → 3 labels of 67, 67, 66). Labels are color-coded by seeding day of week: "
+        "blue for Friday/Sunday, yellow for Saturday/Monday, no color for other days.",
+        "Balanced splitting prevents label overcrowding while ensuring all boards are accounted for. "
+        "Color coding lets workers visually identify seeding batches by day on the growing floor.",
+        '["grow_seed_batch"]',
+        26,
     ),
     rule(
         "grow_scout_type_enforcement", "business_rule", "grow",
@@ -259,18 +365,20 @@ RULES = [
         "The observation_type field must match: 'pest' requires grow_pest_id, 'disease' requires grow_disease_id.",
         "Ensures clean categorization of field observations for accurate pest/disease tracking.",
         '["grow_scout_result.observation_type", "grow_scout_result.grow_pest_id", "grow_scout_result.grow_disease_id"]',
-        19,
+        27,
     ),
     rule(
         "grow_spray_compliance_filter", "business_rule", "grow",
         "Spray compliance product filtering",
-        "Only compliant products are available for spraying: effective_date <= today AND "
-        "(expiration_date IS NULL OR expiration_date >= today). Application quantity cannot exceed "
-        "the compliance record's maximum_quantity_per_acre.",
-        "Ensures legal compliance with pesticide registration and label rate limits.",
+        "When adding compliance records, only inventory items with invnt_category_id = 'chemicals_pesticides' "
+        "are shown. Only compliant products are available for spraying: effective_date <= today AND "
+        "(expiration_date IS NULL OR expiration_date >= today). When recording a spray input, the user is "
+        "prevented from saving if (quantity × site acres) > maximum_quantity_per_acre from the compliance record.",
+        "Ensures legal compliance with pesticide registration and label rate limits. The per-acre validation "
+        "enforces label rate limits at data entry time.",
         '["grow_spray_compliance.effective_date", "grow_spray_compliance.expiration_date", '
         '"grow_spray_compliance.maximum_quantity_per_acre"]',
-        20,
+        28,
     ),
     rule(
         "grow_safety_interval_calculation", "calculation", "grow",
@@ -279,7 +387,7 @@ RULES = [
         "PHI determines earliest harvest date; REI determines earliest re-entry time.",
         "Worker safety and food safety compliance require the most restrictive interval to apply.",
         '["grow_spray_input.phi_days", "grow_spray_input.rei_hours"]',
-        21,
+        29,
     ),
     rule(
         "grow_harvest_tare_calculation", "calculation", "grow",
@@ -288,7 +396,7 @@ RULES = [
         "Tare weight is sourced from grow_harvest_container.",
         None,
         '["grow_harvest_weight.gross_weight", "grow_harvest_weight.net_weight", "grow_harvest_container.tare_weight"]',
-        22,
+        30,
     ),
     rule(
         "grow_monitoring_out_of_range", "business_rule", "grow",
@@ -301,19 +409,22 @@ RULES = [
         "The is_required flag lets farms track optional readings without enforcement overhead.",
         '["grow_monitoring_result.response_numeric", "grow_monitoring_metric.minimum_value", '
         '"grow_monitoring_metric.maximum_value", "grow_monitoring_metric.is_required"]',
-        23,
+        31,
     ),
 
     # =====================================================================
     # 6. PACK — productivity, shelf life
     # =====================================================================
     rule(
-        "pack_lot_uniqueness", "requirement", "pack",
-        "Pack lot number uniqueness",
-        "Unique constraint on (org_id, lot_number) ensures no duplicate lot numbers per org.",
-        None,
-        '["pack_lot.lot_number"]',
-        24,
+        "pack_productivity_workflow", "workflow", "pack",
+        "Packing productivity data entry workflow",
+        "A packing supervisor creates one ops_task_tracker activity per product being packed (product is "
+        "identified by ops_task_tracker.sales_product_id). At the end of each clock hour, the supervisor "
+        "records a pack_productivity_hour snapshot with crew counts, cases packed, and fail counts.",
+        "Hourly snapshots enable real-time productivity tracking and derived metrics per product per shift.",
+        '["ops_task_tracker.sales_product_id", "pack_productivity_hour.ops_task_tracker_id", '
+        '"pack_productivity_hour.pack_end_hour"]',
+        32,
     ),
     rule(
         "pack_best_by_calculation", "calculation", "pack",
@@ -321,7 +432,7 @@ RULES = [
         "best_by_date = pack_lot.pack_date + sales_product.shelf_life_days.",
         None,
         '["pack_lot_item.best_by_date", "pack_lot.pack_date", "sales_product.shelf_life_days"]',
-        25,
+        33,
     ),
     rule(
         "pack_productivity_derived_metrics", "calculation", "pack",
@@ -330,21 +441,22 @@ RULES = [
         "and total fails are calculated on-the-fly from hourly snapshot data.",
         None,
         '["pack_productivity_hour.cases_packed", "pack_productivity_hour.packers"]',
-        26,
+        34,
+    ),
+    rule(
+        "pack_metal_detection_hourly", "business_rule", "pack",
+        "Metal detection recorded per hour, not via checklist",
+        "is_metal_detected lives on pack_productivity_hour rather than in an ops_template checklist because "
+        "it must be recorded every hour alongside the productivity snapshot. The ops_template system ties "
+        "responses to a single ops_task_tracker activity session, not to individual hours within that session.",
+        "Keeps the hourly quality check co-located with the hourly data it is captured alongside.",
+        '["pack_productivity_hour.is_metal_detected"]',
+        35,
     ),
 
     # =====================================================================
     # 7. SALES — POs, fulfillment
     # =====================================================================
-    rule(
-        "sales_po_status_workflow", "workflow", "sales",
-        "Sales PO status workflow",
-        "Status progression: draft → approved → fulfilled. Auto-set to past_due when order_date passes "
-        "without fulfillment. Recurring orders (weekly, biweekly, monthly) auto-create a new order after fulfillment.",
-        None,
-        '["sales_po.status", "sales_po.recurring_frequency"]',
-        27,
-    ),
     rule(
         "sales_po_snapshot_pricing", "business_rule", "sales",
         "Sales PO snapshot pricing",
@@ -352,7 +464,7 @@ RULES = [
         "then customer group price (by customer_group_id), then default FOB price.",
         "Locks in agreed pricing regardless of future price list changes.",
         '["sales_po_line.unit_price_snapshot"]',
-        28,
+        36,
     ),
     rule(
         "sales_fulfillment_partial", "workflow", "sales",
@@ -360,7 +472,51 @@ RULES = [
         "One fulfillment row per lot per order line. Supports partial fulfillment across multiple pack lots.",
         None,
         '["sales_po_fulfillment.pack_lot_id", "sales_po_fulfillment.sales_po_line_id"]',
-        29,
+        37,
+    ),
+    rule(
+        "sales_palletization_workflow", "workflow", "sales",
+        "Palletization capacity-aware expansion",
+        "Order line quantities are expanded into pallets based on product capacity. Full pallet capacity is "
+        "derived from pallet_ti × pallet_hi; maximum is maximum_case_per_pallet. Orders are split across "
+        "multiple pallets when quantity exceeds maximum_case_per_pallet. "
+        "Pallet types: Full (reached full_pallet threshold), Stackable (partial pallet for Costco/Sam's — can be "
+        "stacked with other partials), Shareable (partial pallet for other customers — grouped by customer). "
+        "Off-island orders only (FOB != Farm/Local Delivery). Box truck FOBs (HNL, Kawaihae) and specific "
+        "customers are auto-assigned to box containers.",
+        "Capacity-aware splitting prevents overfilling pallets while maximizing utilization. "
+        "Pallet type determines how partials are combined during stacking.",
+        '["sales_po_line", "sales_product.pallet_ti", "sales_product.pallet_hi", '
+        '"sales_product.maximum_case_per_pallet"]',
+        38,
+    ),
+    rule(
+        "sales_containerization_workflow", "workflow", "sales",
+        "Container space assignment with spillover",
+        "Pallets are assigned to container spaces by type. Max spaces per type are defined in "
+        "sales_container_type. Full pallets get one space each. Stackable/shareable pallets are grouped "
+        "into shared spaces during the stacking step. Container type is inferred from product farm. When one "
+        "container type exceeds its maximum_spaces, overflow pallets spill into available spaces in other container "
+        "types. Spillover pallets are visually flagged. Once containerized, container_id, booking_id, "
+        "pallet_number, and container_space are bulk-written to all matching sales_po_fulfillment rows via a "
+        "form filtered by invoice date and farm.",
+        "Container capacity limits match physical shipping container dimensions. Spillover logic ensures all "
+        "pallets are containerized even when one container type is full. Traceability fields cascade from the "
+        "form to avoid per-row data entry.",
+        '["sales_po_fulfillment", "sales_container_type"]',
+        39,
+    ),
+    rule(
+        "sales_pallet_print_documents", "business_rule", "sales",
+        "Pallet and shipping print documents",
+        "Three printable documents are generated from palletized data: (1) Customer envelopes showing PO number "
+        "and product quantities per customer. (2) Pallet papers showing shipping destination, dock, PO number, "
+        "pallet X of Y, and container/pallet reference (e.g. C01/P01). (3) ASN labels with product UPC and "
+        "pallet details. Pallets are sorted by container type (cucumber → box → lettuce), then by container "
+        "space, with spillover pallets appearing last within each container.",
+        "Physical documents accompany pallets through the cold chain to the shipping container.",
+        '["sales_po_line"]',
+        40,
     ),
 
     # =====================================================================
@@ -374,7 +530,7 @@ RULES = [
         "Standardizes pass/fail determination across all food safety test types.",
         '["fsafe_lab_test.enum_pass_options", "fsafe_lab_test.minimum_value", '
         '"fsafe_lab_test.maximum_value", "fsafe_lab_test.atp_site_count"]',
-        30,
+        41,
     ),
     rule(
         "fsafe_retest_auto_create", "workflow", "food_safety",
@@ -383,7 +539,7 @@ RULES = [
         "in fsafe_result based on the lab test configuration.",
         "Ensures failed tests are always followed up with required retesting.",
         '["fsafe_result.result_type", "fsafe_lab_test.requires_retest", "fsafe_lab_test.requires_vector_test"]',
-        31,
+        42,
     ),
     rule(
         "fsafe_result_type_derivation", "definition", "food_safety",
@@ -392,15 +548,7 @@ RULES = [
         "Test-and-Hold (fsafe_test_hold_id set), Water (zone = 'water').",
         None,
         '["fsafe_result.site_id", "fsafe_result.fsafe_test_hold_id"]',
-        32,
-    ),
-    rule(
-        "fsafe_status_workflow", "workflow", "food_safety",
-        "Food safety result status workflow",
-        "Status progression: pending → in_progress → completed.",
-        None,
-        '["fsafe_result.status"]',
-        33,
+        43,
     ),
 
     # =====================================================================
@@ -412,7 +560,7 @@ RULES = [
         "Status progression: new → pending → priority → done.",
         None,
         '["maint_request.status"]',
-        34,
+        44,
     ),
     rule(
         "maint_preventive_recurrence", "workflow", "maintenance",
@@ -421,16 +569,16 @@ RULES = [
         "a new request is automatically created after the current one is marked done.",
         "Ensures preventive maintenance schedules are never missed.",
         '["maint_request.recurring_frequency", "maint_request.status"]',
-        35,
+        45,
     ),
     rule(
         "maint_request_scope", "definition", "maintenance",
-        "Maintenance request flexible scope",
-        "A request can be site-only (site_id set, equipment_id null), equipment-only (equipment_id set, "
-        "site_id null), or both. At least one should be set.",
-        None,
+        "Maintenance request exclusive scope",
+        "A request targets either a site (site_id set, equipment_id null) or equipment (equipment_id set, "
+        "site_id null), never both. Equipment location is derived from org_equipment.site_id.",
+        "Avoids ambiguity; the equipment record already knows its site.",
         '["maint_request.site_id", "maint_request.equipment_id"]',
-        36,
+        46,
     ),
 ]
 

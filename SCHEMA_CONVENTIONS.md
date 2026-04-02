@@ -10,18 +10,18 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| `sys_`    | System          | 001–006 | 01 |
+| `sys_`    | System          | 001–004 | 01 |
 | `org_`    | Org             | 007–014 | 02 |
-| `grow_`   | Grow            | 015–016, 048–067 | 06 |
+| `grow_`   | Grow            | 005–006, 015–016, 048–059, 100–107 | 06 |
 | `hr_`     | Human Resources | 017–025 | 04 |
 | `invnt_`  | Inventory       | 026–033 | 03 |
-| `sales_`  | Sales           | 035, 068–074 | 08 |
-| `ops_`    | Operations      | 034, 036–047, 093 | 05 |
-| `pack_`   | Pack            | 075–076, 078–083 | 07 |
-| `maint_`  | Maintenance     | 084–086 | 09 |
-| `fsafe_`  | Food Safety     | 087–092 | 10 |
+| `sales_`  | Sales           | 035, 108–113, 115, 117 | 08 |
+| `ops_`    | Operations      | 034, 036–047, 134 | 05 |
+| `pack_`   | Pack            | 114, 116, 118–124 | 07 |
+| `maint_`  | Maintenance     | 125–127 | 09 |
+| `fsafe_`  | Food Safety     | 128–133 | 10 |
 
-Sales & Pack migration ranges are interleaved (067–084) due to cross-module FK dependencies.
+Migration ranges are interleaved in some areas due to cross-module FK dependencies (e.g. sales_product at 035 precedes ops tables, pack_lot at 114 precedes sales_po_fulfillment at 117).
 
 ---
 

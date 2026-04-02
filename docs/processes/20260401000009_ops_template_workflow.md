@@ -17,7 +17,7 @@ This document describes how checklist templates are filled out during any task a
 | `ops_template` | Checklist template definition with module assignment |
 | `fsafe_lab_test` | Test definitions including ATP configuration (atp_site_count, RLU thresholds) |
 | `ops_template_question` | Individual checklist questions within a template |
-| `ops_template_result` | All responses for an activity — both checklist answers and ATP readings |
+| `ops_template_result` | All responses for an activity — checklist answers, ATP readings, and equipment inspections; targets either a site or equipment |
 | `ops_corrective_action_choice` | Predefined corrective action options |
 | `ops_corrective_action_taken` | Corrective actions raised against any failing response |
 
@@ -73,7 +73,7 @@ When an ATP test is linked to the activity, the system randomly selects `atp_sit
 
 Pass/fail is evaluated against the `fsafe_lab_test` thresholds. Results are stored in `fsafe_result` linked to the `ops_task_tracker`.
 
-> **Note:** ATP readings are stored in `ops_template_result` with `site_id` populated and `ops_template_question_id = null`. Standard checklist rows are the inverse — `ops_template_question_id` populated, `site_id` null.
+> **Note:** Each `ops_template_result` targets either a site (`site_id`) or equipment (`equipment_id`), never both. ATP readings have `site_id` populated and `ops_template_question_id = null`. Equipment inspections have `equipment_id` populated. Standard checklist rows have `ops_template_question_id` populated with both `site_id` and `equipment_id` null.
 
 ### 6. Submit the Activity
 
