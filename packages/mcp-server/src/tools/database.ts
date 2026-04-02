@@ -103,11 +103,7 @@ export class DatabaseTool {
   }
 
   static async getSchemaFiles(): Promise<SchemaFile[]> {
-    const schemasPath = join(
-      DatabaseTool.ROOT_PATH,
-      'supabase',
-      'schemas',
-    );
+    const schemasPath = join(DatabaseTool.ROOT_PATH, 'supabase', 'schemas');
 
     const files = await readdir(schemasPath);
 
@@ -346,11 +342,7 @@ export class DatabaseTool {
   }
 
   static async getSchemaContent(fileName: string): Promise<string> {
-    const schemasPath = join(
-      DatabaseTool.ROOT_PATH,
-      'supabase',
-      'schemas',
-    );
+    const schemasPath = join(DatabaseTool.ROOT_PATH, 'supabase', 'schemas');
 
     const filePath = join(schemasPath, fileName);
 

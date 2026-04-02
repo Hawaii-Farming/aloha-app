@@ -6,9 +6,7 @@ import { z } from 'zod/v3';
 
 export class MigrationsTool {
   static GetMigrations() {
-    return readdir(
-      join(process.cwd(), 'supabase', 'migrations'),
-    );
+    return readdir(join(process.cwd(), 'supabase', 'migrations'));
   }
 
   static getMigrationContent(path: string) {
