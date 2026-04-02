@@ -87,8 +87,8 @@ Mirrors Supabase Studio's dashboard light theme (D-01). All semantic tokens are 
 | --accent-foreground | oklch(12% 0 none) | ~#171717 | Dark text |
 | --destructive | var(--color-red-500) | - | Keep Tailwind red |
 | --destructive-foreground | var(--color-white) | - | White on red |
-| --border | oklch(89% 0 none) | ~#e2e2e2 | Light gray border |
-| --input | oklch(85% 0 none) | ~#d4d4d4 | Slightly darker input border |
+| --border | oklch(65% 0 none) | ~#9a9a9a | Mid-gray border (WCAG AA 3:1 on white) |
+| --input | oklch(60% 0 none) | ~#8a8a8a | Darker input border (WCAG AA on white) |
 | --ring | oklch(47% 0.165 160) | ~#1d9e65 | Darker green focus ring (D-04) |
 
 #### Light Mode Sidebar Tokens (D-02: light sidebar)
@@ -101,7 +101,7 @@ Mirrors Supabase Studio's dashboard light theme (D-01). All semantic tokens are 
 | --sidebar-primary-foreground | oklch(99% 0 none) | White text on green |
 | --sidebar-accent | oklch(95% 0.01 160) | Very subtle green wash for hover/active bg |
 | --sidebar-accent-foreground | oklch(30% 0 none) | Dark text on accent |
-| --sidebar-border | oklch(89% 0 none) | Same as --border |
+| --sidebar-border | oklch(65% 0 none) | Same as --border (adjusted for WCAG AA) |
 | --sidebar-ring | oklch(47% 0.165 160) | Green focus ring |
 
 #### Light Mode Green Accent Note
