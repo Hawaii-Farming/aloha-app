@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 01-foundation-dark-theme-01-01-PLAN.md
-last_updated: "2026-04-02T19:28:30.605Z"
+status: verifying
+stopped_at: Completed 01-foundation-dark-theme-01-02-PLAN.md
+last_updated: "2026-04-02T19:33:36.770Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 
 Phase: 01 (foundation-dark-theme) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01-foundation-dark-theme P01 | 15 | 2 tasks | 4 files |
+| Phase 01-foundation-dark-theme P02 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - [Phase 01-foundation-dark-theme]: Use @fontsource-variable/geist (NOT geist npm package) — Vite compatible variable font distribution
 - [Phase 01-foundation-dark-theme]: D-08: --primary stays neutral off-white in dark mode, not green; --sidebar-primary gets Supabase green (D-09)
 - [Phase 01-foundation-dark-theme]: D-01: All custom dark tokens use oklch(); only Tailwind var(--color-*) refs kept for destructive/charts
+- [Phase 01-foundation-dark-theme]: Shadow removal via CSS token overrides in @layer base — no .tsx component changes required
+- [Phase 01-foundation-dark-theme]: Focus ring shadows preserved: ring-* utilities use --ring tokens (not --shadow tokens)
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T19:28:30.602Z
-Stopped at: Completed 01-foundation-dark-theme-01-01-PLAN.md
+Last session: 2026-04-02T19:33:36.768Z
+Stopped at: Completed 01-foundation-dark-theme-01-02-PLAN.md
 Resume file: None

@@ -9,7 +9,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Foundation + Dark Theme** - Install fonts, establish CSS token architecture, implement Supabase dark palette with WCAG verification
+- [x] **Phase 1: Foundation + Dark Theme** - Install fonts, establish CSS token architecture, implement Supabase dark palette with WCAG verification (completed 2026-04-02)
 - [ ] **Phase 2: Light Theme + Component Theming** - Complete light palette, add pill variants, theme all structural components
 - [ ] **Phase 3: Enhancement + Verification** - Supplementary token layers, typography refinements, end-to-end verification
 
@@ -27,10 +27,10 @@
   3. Cards and containers have visible borders and no box-shadow elevation — the page looks flat and border-defined
   4. The green accent color (`--supabase-green`) is applied to primary interactive elements and links
   5. Running WCAG contrast checks on all dark theme text/background pairs returns AA pass (4.5:1 normal, 3:1 large)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 01-01-PLAN.md — Install Geist fonts and override dark palette with Supabase oklch tokens
-- [ ] 01-02-PLAN.md — Shadow removal, hydration fix, WCAG verification, and visual checkpoint
+- [x] 01-02-PLAN.md — Shadow removal, hydration fix, WCAG verification, and visual checkpoint
 **UI hint**: yes
 
 ### Phase 2: Light Theme + Component Theming
@@ -64,7 +64,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation + Dark Theme | 1/2 | In Progress|  |
+| 1. Foundation + Dark Theme | 2/2 | Complete   | 2026-04-02 |
 | 2. Light Theme + Component Theming | 0/0 | Not started | - |
 | 3. Enhancement + Verification | 0/0 | Not started | - |
 
