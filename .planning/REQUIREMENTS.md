@@ -62,37 +62,37 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase ? | Pending |
-| FOUND-02 | Phase ? | Pending |
-| FOUND-03 | Phase ? | Pending |
-| FOUND-04 | Phase ? | Pending |
-| FOUND-05 | Phase ? | Pending |
-| FOUND-06 | Phase ? | Pending |
-| FOUND-07 | Phase ? | Pending |
-| FOUND-08 | Phase ? | Pending |
-| FOUND-09 | Phase ? | Pending |
-| FOUND-10 | Phase ? | Pending |
-| FOUND-11 | Phase ? | Pending |
-| COMP-01 | Phase ? | Pending |
-| COMP-02 | Phase ? | Pending |
-| COMP-03 | Phase ? | Pending |
-| COMP-04 | Phase ? | Pending |
-| COMP-05 | Phase ? | Pending |
-| COMP-06 | Phase ? | Pending |
-| COMP-07 | Phase ? | Pending |
-| COMP-08 | Phase ? | Pending |
-| ENHN-01 | Phase ? | Pending |
-| ENHN-02 | Phase ? | Pending |
-| ENHN-03 | Phase ? | Pending |
-| ENHN-04 | Phase ? | Pending |
-| ENHN-05 | Phase ? | Pending |
-| ENHN-06 | Phase ? | Pending |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 2 | Pending |
+| FOUND-05 | Phase 2 | Pending |
+| FOUND-06 | Phase 1 | Pending |
+| FOUND-07 | Phase 1 | Pending |
+| FOUND-08 | Phase 1 | Pending |
+| FOUND-09 | Phase 1 | Pending |
+| FOUND-10 | Phase 2 | Pending |
+| FOUND-11 | Phase 2 | Pending |
+| COMP-01 | Phase 2 | Pending |
+| COMP-02 | Phase 2 | Pending |
+| COMP-03 | Phase 2 | Pending |
+| COMP-04 | Phase 2 | Pending |
+| COMP-05 | Phase 2 | Pending |
+| COMP-06 | Phase 2 | Pending |
+| COMP-07 | Phase 2 | Pending |
+| COMP-08 | Phase 2 | Pending |
+| ENHN-01 | Phase 3 | Pending |
+| ENHN-02 | Phase 3 | Pending |
+| ENHN-03 | Phase 3 | Pending |
+| ENHN-04 | Phase 3 | Pending |
+| ENHN-05 | Phase 3 | Pending |
+| ENHN-06 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25 ⚠️
+- Mapped to phases: 25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after initial definition*
+*Last updated: 2026-04-02 after roadmap creation — all 25 requirements mapped*
