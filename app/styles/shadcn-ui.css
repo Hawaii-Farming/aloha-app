@@ -8,7 +8,8 @@
 
 @layer base {
     :root {
-        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        --font-sans: 'Geist Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        --font-mono: 'Geist Mono Variable', 'Source Code Pro', Menlo, monospace;
         --font-heading: var(--font-sans);
 
         --background: var(--color-white);

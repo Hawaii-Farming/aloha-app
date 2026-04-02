@@ -4,6 +4,9 @@
 * Global styles for the entire application
  */
 
+@import '@fontsource-variable/geist/wght.css';
+@import '@fontsource-variable/geist-mono/wght.css';
+
 /* Tailwind CSS */
 @import 'tailwindcss';
 
