@@ -29,6 +29,31 @@
         --sb-light-gray: oklch(74.9% 0 none);
         --sb-near-white: oklch(94.51% 0 none);
 
+        /* Neutral gray gap fills (per D-13, D-14) */
+        --sb-dark-gray: oklch(42% 0 none);
+        --sb-off-white: oklch(98.51% 0 none);
+
+        /* Translucent surface tokens (per D-01, D-02, D-03) */
+        --glass-surface: oklch(100% 0 none / 0.84);
+        --slate-alpha-wash: oklch(95.3% 0.026 229 / 0.109);
+
+        /* Semantic color tokens — light theme (per D-09, D-10, D-11, D-12) */
+        --semantic-red-bg: oklch(96.9% 0.015 17.0);
+        --semantic-red-fg: oklch(55.4% 0.197 24.9);
+        --semantic-red-border: oklch(79.3% 0.084 18.1);
+
+        --semantic-amber-bg: oklch(98.3% 0.019 87.6);
+        --semantic-amber-fg: oklch(57.8% 0.128 66.9);
+        --semantic-amber-border: oklch(82.4% 0.128 87.4);
+
+        --semantic-green-bg: oklch(98.0% 0.017 154.0);
+        --semantic-green-fg: oklch(50.6% 0.141 146.5);
+        --semantic-green-border: oklch(84.8% 0.076 151.1);
+
+        --semantic-blue-bg: oklch(97.3% 0.013 251.6);
+        --semantic-blue-fg: oklch(50.7% 0.167 254.9);
+        --semantic-blue-border: oklch(80.1% 0.082 255.5);
+
         --background: oklch(99% 0 none);
         --foreground: oklch(12% 0 none);
 
@@ -122,5 +147,26 @@
         /* Restore bright green for dark mode (overrides :root darker green) */
         --supabase-green-link: oklch(71.2% 0.184 160);
         --supabase-green-border: oklch(73.5% 0.158 162 / 0.3);
+
+        /* Translucent surface tokens — dark overrides */
+        --glass-surface: oklch(28.1% 0 none / 0.84);
+        --slate-alpha-wash: oklch(27.9% 0.077 253 / 0.031);
+
+        /* Semantic color tokens — dark theme */
+        --semantic-red-bg: oklch(25.3% 0.065 20.0);
+        --semantic-red-fg: oklch(78.0% 0.128 22.1);
+        --semantic-red-border: oklch(35.3% 0.104 21.2);
+
+        --semantic-amber-bg: oklch(32.9% 0.073 65.9);
+        --semantic-amber-fg: oklch(85.4% 0.157 84.1);
+        --semantic-amber-border: oklch(42.0% 0.089 70.6);
+
+        --semantic-green-bg: oklch(25.6% 0.053 148.5);
+        --semantic-green-fg: oklch(78.0% 0.142 148.5);
+        --semantic-green-border: oklch(36.3% 0.090 146.6);
+
+        --semantic-blue-bg: oklch(26.3% 0.077 255.9);
+        --semantic-blue-fg: oklch(76.4% 0.126 249.5);
+        --semantic-blue-border: oklch(37.5% 0.116 254.7);
     }
 }

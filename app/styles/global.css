@@ -31,6 +31,7 @@
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
+    font-weight: 400;
   }
 
   *,
@@ -62,5 +63,15 @@
     --shadow-lg: none;
     --shadow-xl: none;
     --shadow-2xl: none;
+  }
+}
+
+@layer utilities {
+  .tech-label {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 0.75rem;
+    line-height: 1.33;
   }
 }
