@@ -10,7 +10,7 @@
 ## Phases
 
 - [x] **Phase 1: Foundation + Dark Theme** - Install fonts, establish CSS token architecture, implement Supabase dark palette with WCAG verification (completed 2026-04-02)
-- [ ] **Phase 2: Light Theme + Component Theming** - Complete light palette, add pill variants, theme all structural components
+- [x] **Phase 2: Light Theme + Component Theming** - Complete light palette, add pill variants, theme all structural components (completed 2026-04-02)
 - [ ] **Phase 3: Enhancement + Verification** - Supplementary token layers, typography refinements, end-to-end verification
 
 ---
@@ -43,7 +43,7 @@ Plans:
   3. The sidebar shows a dark background with green-highlighted active nav links and weight-500 typography in both themes
   4. Form inputs, selects, checkboxes, and textareas visually match the Supabase input style (correct border, ring, and focus states)
   5. The pill button variant and pill tab variant are available and render with fully rounded corners at all sizes
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 02-01-PLAN.md — Define light palette in DESIGN.md and override :root CSS tokens with Supabase light palette
 - [x] 02-02-PLAN.md — Remove shadow-xs from all components, add pill button variant, convert tabs to pill shape
@@ -55,11 +55,14 @@ Plans:
 **Depends on**: Phase 2
 **Requirements**: ENHN-01, ENHN-02, ENHN-03, ENHN-04, ENHN-05, ENHN-06
 **Success Criteria** (what must be TRUE):
-  1. Translucent surface overlays (modals, popovers, dropdowns) use HSL-with-alpha tokens and render correctly in both themes
+  1. Translucent surface overlays (modals, popovers, dropdowns) use oklch-with-alpha tokens and render correctly in both themes
   2. Body text uses weight 400; nav links and buttons use weight 500; no element uses bold 700 typography
   3. Code and technical labels render in Geist Mono with uppercase and 1.2px letter-spacing via a reusable utility
   4. Alert, badge, and status indicator colors come from the Radix 12-step scale and are semantically consistent (error = red, warning = amber, success = green)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — Add translucent surface tokens, semantic color scale, neutral gray gaps, tech-label utility, and wire alert/badge components
+- [ ] 03-02-PLAN.md — Font-weight restraint audit across all shadcn components and visual verification checkpoint
 **UI hint**: yes
 
 ---
@@ -69,10 +72,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation + Dark Theme | 2/2 | Complete   | 2026-04-02 |
-| 2. Light Theme + Component Theming | 2/3 | In Progress|  |
-| 3. Enhancement + Verification | 0/0 | Not started | - |
+| 2. Light Theme + Component Theming | 3/3 | Complete   | 2026-04-02 |
+| 3. Enhancement + Verification | 0/2 | In Progress | - |
 
 ---
 
 *Created: 2026-04-02*
-*Last updated: 2026-04-02 after Phase 2 planning — 3 plans created*
+*Last updated: 2026-04-02 after Phase 3 planning — 2 plans created*
