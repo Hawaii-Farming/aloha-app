@@ -57,15 +57,12 @@ export function UserProfileDropdown(props: {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="w-full">
-        <div className="flex items-center gap-2">
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Avatar className="h-8 w-8">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
-          <span className="text-sm group-data-[minimized=true]:hidden">
-            {displayName}
-          </span>
-        </div>
+        </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">

@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@aloha/ui/alert-dialog';
-import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
+
 import { Button } from '@aloha/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@aloha/ui/card';
 import { PageBody, PageHeader } from '@aloha/ui/page';
@@ -244,12 +244,6 @@ export default function SubModuleDetailPage(props: {
   const recordName =
     (record.name as string) ?? (record.id as string) ?? recordId;
 
-  const breadcrumbValues: Record<string, string> = {
-    [accountSlug]: accountSlug,
-    [moduleAccess.module_slug]: moduleAccess.display_name,
-    [subModuleAccess.sub_module_slug]: subModuleAccess.display_name,
-  };
-
   const displayFields = Object.entries(record).filter(
     ([key]) => !hiddenFields.has(key),
   );
@@ -260,7 +254,6 @@ export default function SubModuleDetailPage(props: {
         title={recordName}
         description={`${moduleAccess.display_name} > ${subModuleAccess.display_name}`}
       >
-        <AppBreadcrumbs values={breadcrumbValues} />
       </PageHeader>
 
       <PageBody>

@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 
-import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
+
 import { Button } from '@aloha/ui/button';
 import { DataTableColumnHeader } from '@aloha/ui/data-table-column-header';
 import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
@@ -131,12 +131,6 @@ export default function SubModulePage(props: {
     [searchParams, navigate],
   );
 
-  const breadcrumbValues: Record<string, string> = {
-    [accountSlug]: accountSlug,
-    [moduleAccess.module_slug]: moduleAccess.display_name,
-    [subModuleAccess.sub_module_slug]: subModuleAccess.display_name,
-  };
-
   const columns = buildColumns(config);
   const pkColumn = config?.pkColumn ?? 'id';
 
@@ -146,7 +140,6 @@ export default function SubModulePage(props: {
         title={subModuleAccess.display_name}
         description={`${moduleAccess.display_name} > ${subModuleAccess.display_name}`}
       >
-        <AppBreadcrumbs values={breadcrumbValues} />
       </PageHeader>
 
       <PageBody>

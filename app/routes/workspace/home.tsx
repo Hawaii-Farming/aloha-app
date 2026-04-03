@@ -1,4 +1,4 @@
-import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
+
 import { PageBody } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 
@@ -34,7 +34,7 @@ export default function TeamAccountHomePage(props: Route.ComponentProps) {
       <WorkspacePageHeader
         account={data.account}
         title={<Trans i18nKey={'common:dashboardTabLabel'} />}
-        description={<AppBreadcrumbs />}
+        description={''}
       />
 
       <PageBody>

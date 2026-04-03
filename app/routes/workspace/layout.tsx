@@ -83,31 +83,16 @@ function SidebarLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
           user={user}
           accessLevelId={workspace.currentOrg.access_level_id}
         />
-        <div className="flex min-h-0 flex-1">
-          <Page style={'sidebar'}>
-            <PageNavigation>
-              <WorkspaceSidebar
-                account={accountSlug}
-                navigation={workspace.navigation}
-              />
-            </PageNavigation>
 
-            <PageMobileNavigation
-              className={'flex items-center justify-between'}
-            >
-              <AppLogo />
+        <div className="flex min-h-0 flex-1 overflow-hidden">
+          <WorkspaceSidebar
+            account={accountSlug}
+            navigation={workspace.navigation}
+          />
 
-              <div className={'flex space-x-4'}>
-                <MobileNavigation
-                  userId={user.id}
-                  accounts={accounts}
-                  account={accountSlug}
-                />
-              </div>
-            </PageMobileNavigation>
-
+          <main className="flex-1 overflow-y-auto">
             {props.children}
-          </Page>
+          </main>
         </div>
       </div>
     </SidebarProvider>

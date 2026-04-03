@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 import type { ZodObject, ZodRawShape } from 'zod';
 import { z } from 'zod';
 
-import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
+
 import { Button } from '@aloha/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@aloha/ui/card';
 import { Form } from '@aloha/ui/form';
@@ -218,12 +218,6 @@ export default function SubModuleCreatePage(props: {
     toast.error(fetcherData.error ?? 'Validation failed');
   }
 
-  const breadcrumbValues: Record<string, string> = {
-    [accountSlug]: accountSlug,
-    [moduleAccess.module_slug]: moduleAccess.display_name,
-    [subModuleAccess.sub_module_slug]: subModuleAccess.display_name,
-  };
-
   const title =
     mode === 'edit'
       ? `Edit ${subModuleAccess.display_name}`
@@ -235,7 +229,6 @@ export default function SubModuleCreatePage(props: {
         title={title}
         description={`${moduleAccess.display_name} > ${subModuleAccess.display_name}`}
       >
-        <AppBreadcrumbs values={breadcrumbValues} />
       </PageHeader>
 
       <PageBody>

@@ -1,6 +1,6 @@
 import { getI18n } from 'react-i18next';
 
-import { AppBreadcrumbs } from '@aloha/ui/app-breadcrumbs';
+
 import { PageBody } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 
@@ -42,7 +42,7 @@ export default function TeamAccountSettingsPage({
       <WorkspacePageHeader
         account={params.account}
         title={<Trans i18nKey={'teams:settings.pageTitle'} />}
-        description={<AppBreadcrumbs />}
+        description={''}
       />
 
       <PageBody>
