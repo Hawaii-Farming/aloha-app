@@ -5,11 +5,6 @@ import { useLocation } from 'react-router';
 
 import { cn } from '@aloha/ui/utils';
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@aloha/ui/collapsible';
 
 import {
   SidebarGroup,
@@ -114,27 +109,19 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
 
             {/* Expanded mode — hidden when sidebar is icon mode */}
             <div className="group-data-[collapsible=icon]:hidden">
-              <Collapsible
-                defaultOpen
-                className="group/collapsible"
-              >
-                <SidebarGroup>
-                  <SidebarGroupLabel asChild>
-                    <CollapsibleTrigger
-                      className={cn(
-                        'flex w-full items-center gap-2',
-                        !isModuleActive && 'text-muted-foreground',
-                      )}
-                    >
-                      {createElement(IconComponent, {
-                        className: 'h-4 w-4 shrink-0',
-                      })}
-                      <span className="flex-1 truncate text-left uppercase">{mod.display_name}</span>
-                    </CollapsibleTrigger>
-                  </SidebarGroupLabel>
-                  <CollapsibleContent>
-                    <SidebarGroupContent>
-                      <SidebarMenu>
+              <SidebarGroup>
+                <SidebarGroupLabel
+                  className={cn(
+                    !isModuleActive && 'text-muted-foreground',
+                  )}
+                >
+                  {createElement(IconComponent, {
+                    className: 'h-4 w-4 shrink-0',
+                  })}
+                  <span className="flex-1 truncate text-left uppercase">{mod.display_name}</span>
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
                         {children.map((sm) => {
                           const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
                           const isActive =
@@ -165,10 +152,8 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                           );
                         })}
                       </SidebarMenu>
-                    </SidebarGroupContent>
-                  </CollapsibleContent>
-                </SidebarGroup>
-              </Collapsible>
+                </SidebarGroupContent>
+              </SidebarGroup>
             </div>
           </div>
         );
