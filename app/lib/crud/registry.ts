@@ -1,5 +1,7 @@
 import type { CrudModuleConfig } from '~/lib/crud/types';
 
+import { growHarvestWeightConfig } from './grow-harvest-weight.config';
+import { growSeedBatchConfig } from './grow-seed-batch.config';
 import { hrDepartmentConfig } from './hr-department.config';
 import { hrEmployeeConfig } from './hr-employee.config';
 import { hrPayrollConfig } from './hr-payroll.config';
@@ -23,6 +25,8 @@ const registry = new Map<string, CrudModuleConfig>([
   ['products', invntItemConfig],
   ['stock_counts', invntOnhandConfig],
   ['warehouses', orgSiteConfig],
+  ['seed_batches', growSeedBatchConfig],
+  ['harvests', growHarvestWeightConfig],
 ]);
 
 export function getModuleConfig(
