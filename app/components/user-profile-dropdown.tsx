@@ -2,7 +2,7 @@
 
 import { JwtPayload } from '@supabase/supabase-js';
 
-import { LogOut, Palette } from 'lucide-react';
+import { Building2, LogOut, Palette } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
@@ -20,6 +20,8 @@ import featuresFlagConfig from '~/config/feature-flags.config';
 import { useSignOut } from '~/lib/supabase/hooks/use-sign-out';
 import { useUser } from '~/lib/supabase/hooks/use-user';
 
+const ADMIN_ACCESS_LEVEL_IDS = ['admin', 'owner'];
+
 export function UserProfileDropdown(props: {
   user?: JwtPayload | null;
   account?: {
@@ -27,11 +29,16 @@ export function UserProfileDropdown(props: {
     name: string | null;
     picture_url: string | null;
   };
+  accountSlug?: string;
+  accessLevelId?: string;
 }) {
   const signOut = useSignOut();
   const user = useUser(props.user);
   const userData = user.data ?? props.user ?? null;
   const { setTheme, theme } = useTheme();
+  const isAdmin =
+    !!props.accessLevelId &&
+    ADMIN_ACCESS_LEVEL_IDS.includes(props.accessLevelId);
 
   if (!userData) {
     return null;
@@ -73,7 +80,17 @@ export function UserProfileDropdown(props: {
           </DropdownMenuItem>
         ) : null}
 
-        <DropdownMenuSeparator />
+        {isAdmin && props.accountSlug ? (
+          <>
+            <DropdownMenuItem asChild>
+              <a href={`/home/${props.accountSlug}/settings`}>
+                <Building2 className="mr-2 h-4 w-4" />
+                <Trans i18nKey={'common:organisation'}>Organisation</Trans>
+              </a>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
 
         <DropdownMenuItem onClick={() => signOut.mutateAsync()}>
           <LogOut className="mr-2 h-4 w-4" />

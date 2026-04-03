@@ -82,6 +82,7 @@ function SidebarLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
             accounts={accounts}
             user={user}
             navigation={workspace.navigation}
+            accessLevelId={workspace.currentOrg.access_level_id}
           />
         </PageNavigation>
 

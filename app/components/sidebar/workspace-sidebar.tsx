@@ -37,6 +37,7 @@ export function WorkspaceSidebar(props: {
     modules: AppNavModule[];
     subModules: AppNavSubModule[];
   };
+  accessLevelId: string;
 }) {
   return (
     <SidebarContainer
@@ -45,6 +46,7 @@ export function WorkspaceSidebar(props: {
       accounts={props.accounts}
       user={props.user}
       navigation={props.navigation}
+      accessLevelId={props.accessLevelId}
     />
   );
 }
@@ -58,6 +60,7 @@ function SidebarContainer(props: {
     modules: AppNavModule[];
     subModules: AppNavSubModule[];
   };
+  accessLevelId: string;
 }) {
   const { account, accounts, user, navigation } = props;
   const userId = user.id;
@@ -86,7 +89,11 @@ function SidebarContainer(props: {
 
       <SidebarFooter>
         <SidebarContent>
-          <UserProfileDropdown user={props.user} />
+          <UserProfileDropdown
+            user={props.user}
+            accountSlug={account}
+            accessLevelId={props.accessLevelId}
+          />
         </SidebarContent>
       </SidebarFooter>
     </Sidebar>
