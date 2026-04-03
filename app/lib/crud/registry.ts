@@ -10,6 +10,8 @@ import { hrPayrollConfig } from './hr-payroll.config';
 import { hrTimeOffConfig } from './hr-time-off.config';
 import { invntItemConfig } from './invnt-item.config';
 import { invntOnhandConfig } from './invnt-onhand.config';
+import { opsTaskTrackerConfig } from './ops-task-tracker.config';
+import { opsTemplateConfig } from './ops-template.config';
 import { orgSiteConfig } from './org-site.config';
 
 /**
@@ -31,6 +33,8 @@ const registry = new Map<string, CrudModuleConfig>([
   ['harvests', growHarvestWeightConfig],
   ['inspections', fsafeResultConfig],
   ['incidents', fsafeTestHoldConfig],
+  ['task_tracking', opsTaskTrackerConfig],
+  ['checklists', opsTemplateConfig],
 ]);
 
 export function getModuleConfig(
