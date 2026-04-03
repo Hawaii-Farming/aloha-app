@@ -45,12 +45,12 @@ export function OrgSelector(params: {
 
   if (isPill) {
     return (
-      <label className="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300">
+      <span className="-mr-1 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300">
         <Building2 className="h-3.5 w-3.5 shrink-0" />
         <select
           value={params.selectedAccount}
           onChange={(e) => handleChange(e.target.value)}
-          className="cursor-pointer appearance-none bg-transparent p-0 text-sm font-medium text-inherit focus:outline-none"
+          className="-mr-2 cursor-pointer appearance-none bg-transparent p-0 text-sm font-medium text-inherit focus:outline-none"
         >
           {params.accounts.map((account) => (
             <option key={account.value} value={account.value ?? ''}>
@@ -58,7 +58,7 @@ export function OrgSelector(params: {
             </option>
           ))}
         </select>
-      </label>
+      </span>
     );
   }
 
