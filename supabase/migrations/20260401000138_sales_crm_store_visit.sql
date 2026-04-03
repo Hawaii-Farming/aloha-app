@@ -4,9 +4,6 @@ CREATE TABLE IF NOT EXISTS sales_crm_store_visit (
     sales_crm_store_id      TEXT NOT NULL REFERENCES sales_crm_store(id),
     visit_date              DATE NOT NULL,
     notes                   TEXT,
-    customer_notes          TEXT,
-    is_action_required      BOOLEAN NOT NULL DEFAULT false,
-    photos                  JSONB NOT NULL DEFAULT '[]',
     visited_by              TEXT REFERENCES hr_employee(id),
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by              TEXT,
@@ -15,10 +12,8 @@ CREATE TABLE IF NOT EXISTS sales_crm_store_visit (
     is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE sales_crm_store_visit IS 'Store visit records capturing field observations, notes from store managers, and action items. Photos are stored as a JSONB array of URLs.';
+COMMENT ON TABLE sales_crm_store_visit IS 'Store visit records capturing field observations, notes from store managers, and action items.';
 
-COMMENT ON COLUMN sales_crm_store_visit.customer_notes IS 'Notes from conversations with the store manager or produce buyer';
-COMMENT ON COLUMN sales_crm_store_visit.is_action_required IS 'Flags visits that need follow-up action';
 
 CREATE INDEX idx_sales_crm_store_visit_org ON sales_crm_store_visit (org_id);
 CREATE INDEX idx_sales_crm_store_visit_store ON sales_crm_store_visit (sales_crm_store_id);
