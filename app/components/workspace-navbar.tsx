@@ -1,5 +1,3 @@
-'use client';
-
 import type { JwtPayload } from '@supabase/supabase-js';
 
 import { Separator } from '@aloha/ui/separator';
