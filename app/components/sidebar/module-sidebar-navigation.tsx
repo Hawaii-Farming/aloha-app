@@ -116,7 +116,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                   {createElement(SubModuleIcon, {
                                     className: 'h-4 w-4',
                                   })}
-                                  <span className="uppercase">{sm.display_name}</span>
+                                  <span className="capitalize">{sm.display_name}</span>
                                 </a>
                               </DropdownMenuItem>
                             );
@@ -172,7 +172,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                 {createElement(SubModuleIcon, {
                                   className: 'h-4 w-4',
                                 })}
-                                <span className="uppercase">{sm.display_name}</span>
+                                <span className="capitalize">{sm.display_name}</span>
                               </a>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
