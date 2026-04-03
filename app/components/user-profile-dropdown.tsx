@@ -62,7 +62,6 @@ export function UserProfileDropdown(props: {
 
         {props.accountSlug ? (
           <>
-            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <a href={`/home/${props.accountSlug}/settings`}>
                 <Settings className="mr-2 h-4 w-4" />
