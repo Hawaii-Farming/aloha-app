@@ -69,13 +69,18 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
             <div key={mod.module_id}>
               {index > 0 && <SidebarSeparator className="mx-0" />}
               <SidebarGroup>
-                <SidebarGroupLabel className="flex justify-center" title={mod.display_name}>
-                  {createElement(IconComponent, {
-                    className: 'h-4 w-4 text-muted-foreground',
-                  })}
-                </SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip={mod.display_name}
+                        className="pointer-events-none text-muted-foreground opacity-60"
+                      >
+                        {createElement(IconComponent, {
+                          className: 'h-4 w-4 shrink-0',
+                        })}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
                     {children.map((sm) => {
                       const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
                       const isActive =
