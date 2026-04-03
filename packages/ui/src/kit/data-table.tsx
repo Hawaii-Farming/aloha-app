@@ -155,7 +155,7 @@ export function DataTable<T extends object>({
   });
 
   return (
-    <div className={'rounded-lg border'}>
+    <div className={'overflow-hidden rounded-lg border'}>
       <Table {...tableProps}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
