@@ -3,6 +3,7 @@ import type { JwtPayload } from '@supabase/supabase-js';
 import { Separator } from '@aloha/ui/separator';
 import { SidebarTrigger } from '@aloha/ui/shadcn-sidebar';
 
+import { AiChatButton } from '~/components/ai/ai-chat-button';
 import { NavbarBreadcrumbs } from '~/components/navbar-breadcrumbs';
 import { UserProfileDropdown } from '~/components/user-profile-dropdown';
 
@@ -36,7 +37,8 @@ export function WorkspaceNavbar(props: WorkspaceNavbarProps) {
         />
       </div>
 
-      <div className="flex shrink-0 items-center">
+      <div className="flex shrink-0 items-center gap-1">
+        <AiChatButton />
         <UserProfileDropdown
           user={user}
           accountSlug={account}

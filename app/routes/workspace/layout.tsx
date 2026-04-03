@@ -10,7 +10,6 @@ import {
 } from '@aloha/ui/page';
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
-import { AiChatButton } from '~/components/ai/ai-chat-button';
 import { AiChatPanel } from '~/components/ai/ai-chat-panel';
 import { AiChatProvider } from '~/components/ai/ai-chat-provider';
 import { AppLogo } from '~/components/app-logo';
@@ -57,7 +56,6 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
         </HeaderLayout>
       )}
       <AiChatPanel />
-      <AiChatButton />
     </AiChatProvider>
   );
 }
