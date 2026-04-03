@@ -116,10 +116,10 @@ export function CreatePanel({
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side="right"
-        className="flex h-full w-3/4 flex-col sm:max-w-lg"
+        className="flex h-full w-3/4 flex-col gap-0 p-0 sm:max-w-lg"
         data-test="create-panel"
       >
-        <SheetHeader>
+        <SheetHeader className="px-6 pt-6">
           <SheetTitle>
             <Trans i18nKey="common:create" /> {subModuleDisplayName}
           </SheetTitle>
@@ -153,7 +153,7 @@ export function CreatePanel({
               </div>
             </div>
 
-            <div className="-mx-6 -mb-6 flex flex-1 items-center border-t px-6">
+            <div className="flex shrink-0 items-center border-t px-6 py-4">
               <div className="flex items-center gap-3">
                 <Button
                   type="submit"
