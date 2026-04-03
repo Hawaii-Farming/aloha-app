@@ -10,7 +10,7 @@ import { Button } from '@aloha/ui/button';
 import { DataTableColumnHeader } from '@aloha/ui/data-table-column-header';
 import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
 import { DataTable } from '@aloha/ui/enhanced-data-table';
-import { PageBody, PageHeader } from '@aloha/ui/page';
+import { PageBody } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 
 import { loadTableData } from '~/lib/crud/crud-helpers.server';
@@ -136,12 +136,6 @@ export default function SubModulePage(props: {
 
   return (
     <>
-      <PageHeader
-        title={subModuleAccess.display_name}
-        description={`${moduleAccess.display_name} > ${subModuleAccess.display_name}`}
-      >
-      </PageHeader>
-
       <PageBody>
         <div className="flex flex-col gap-4" data-test="sub-module-list">
           <DataTableToolbar
