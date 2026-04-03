@@ -135,7 +135,7 @@ aloha-app/
 - **pack_productivity_hour** — Hourly pack line snapshot with crew counts by role and metal detection flag
 - **pack_productivity_hour_fail** — Fail counts per category per hour
 
-## Sales Module (9 tables) — [Docs](docs/schemas/20260401000008_sales.md)
+## Sales Module (13 tables) — [Docs](docs/schemas/20260401000008_sales.md)
 
 - **sales_fob** — Org-specific FOB (Freight On Board) delivery points (TEXT PK)
 - **sales_customer_group** — Org-specific customer classifications for reporting and group pricing (TEXT PK)
@@ -146,6 +146,10 @@ aloha-app/
 - **sales_po_line** — Individual products within an order with snapshot pricing at time of order
 - **sales_container_type** — Lookup table for shipping container types with maximum pallet space capacity
 - **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, with shipping traceability (container_id, booking_id, pallet_number, container_space) bulk-set during containerization
+- **sales_crm_external_product** — Competitor products observed during store visits with farm/brand, variety, size, and packaging
+- **sales_crm_store** — Physical retail locations linked to customers, with chain, location, island, and contact info
+- **sales_crm_store_visit** — Store visit records with notes, customer feedback, action flags, and photos
+- **sales_crm_store_visit_result** — Per-product observations (price, best-by, stock level, velocity) for own and competitor products
 
 ## Maintenance Module (3 tables) — [Docs](docs/schemas/20260401000009_maint.md)
 

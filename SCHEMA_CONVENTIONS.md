@@ -15,7 +15,7 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 | `grow_`   | Grow            | 005–006, 015–016, 048–059, 100–107 | 06 |
 | `hr_`     | Human Resources | 017–025 | 04 |
 | `invnt_`  | Inventory       | 026–033 | 03 |
-| `sales_`  | Sales           | 035, 108–113, 115, 117 | 08 |
+| `sales_`  | Sales           | 035, 108–113, 115, 117, 136–139 | 08 |
 | `ops_`    | Operations      | 034, 036–047, 135 | 05 |
 | `pack_`   | Pack            | 114, 116, 118–125 | 07 |
 | `maint_`  | Maintenance     | 126–128 | 09 |
