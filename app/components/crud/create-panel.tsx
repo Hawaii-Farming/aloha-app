@@ -119,7 +119,7 @@ export function CreatePanel({
         className="flex h-full w-3/4 flex-col gap-0 p-0 sm:max-w-lg"
         data-test="create-panel"
       >
-        <SheetHeader className="px-6 pt-6">
+        <SheetHeader className="px-6 pt-6 pb-4 border-b">
           <SheetTitle>
             <Trans i18nKey="common:create" /> {subModuleDisplayName}
           </SheetTitle>
