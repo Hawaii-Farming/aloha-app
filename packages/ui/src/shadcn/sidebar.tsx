@@ -523,7 +523,7 @@ const SidebarMenuItem: React.FC<React.ComponentProps<'li'>> = ({
   <li
     data-sidebar="menu-item"
     className={cn(
-      'group/menu-item relative group-data-[collapsible=icon]:justify-center',
+      'group/menu-item relative',
       className,
     )}
     {...props}
