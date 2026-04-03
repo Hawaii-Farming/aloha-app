@@ -24,7 +24,7 @@ export function WorkspaceNavbar(props: WorkspaceNavbarProps) {
   return (
     <header className="bg-background fixed top-0 z-20 flex h-12 w-full shrink-0 items-center border-b px-3">
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="text-muted-foreground h-5! w-5!" />
+        <SidebarTrigger className="text-muted-foreground h-4! w-4!" />
         <Separator orientation="vertical" className="h-4" />
       </div>
 
