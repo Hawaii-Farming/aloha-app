@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-03 - Completed quick task 260402-kaa: add Supabase-style top navbar
+Last activity: 2026-04-02 - Completed quick task 260402-uvc: create all HR submodule CRUD configs
 
 Progress: [██████████] 100%
 
@@ -57,6 +57,7 @@ None — milestone shipped.
 | 260402-jtc | add Organisation link to profile menu for admin users | 2026-04-03 | 83f4c0b | [260402-jtc-add-organisation-link-to-sidebar-profile](./quick/260402-jtc-add-organisation-link-to-sidebar-profile/) |
 | 260402-k1p | move OrgSelector from sidebar header to profile dropdown | 2026-04-03 | 2770ba3 | [260402-k1p-move-orgselector-from-sidebar-header-to-](./quick/260402-k1p-move-orgselector-from-sidebar-header-to-/) |
 | 260402-kaa | add Supabase-style top navbar | 2026-04-03 | a623004 | [260402-kaa-add-supabase-style-top-navbar-with-org-s](./quick/260402-kaa-add-supabase-style-top-navbar-with-org-s/) |
+| 260402-uvc | create all HR submodule CRUD configs | 2026-04-02 | 6667d11 | [260402-uvc-in-human-resources-create-all-submodules](./quick/260402-uvc-in-human-resources-create-all-submodules/) |
 
 ## Session Continuity
 
