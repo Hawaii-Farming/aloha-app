@@ -2,7 +2,7 @@
 
 import { JwtPayload } from '@supabase/supabase-js';
 
-import { LogOut, Settings, Users } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
 import {
@@ -68,12 +68,7 @@ export function UserProfileDropdown(props: {
                 <Trans i18nKey={'teams:settings.pageTitle'}>Settings</Trans>
               </a>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a href={`/home/${props.accountSlug}/members`}>
-                <Users className="mr-2 h-4 w-4" />
-                <Trans i18nKey={'teams:members.pageTitle'}>Members</Trans>
-              </a>
-            </DropdownMenuItem>
+
           </>
         ) : null}
 
