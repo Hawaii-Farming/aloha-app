@@ -37,7 +37,7 @@ export function WorkspaceNavbar(props: WorkspaceNavbarProps) {
         />
       </div>
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="flex shrink-0 items-center gap-3">
         <AiChatButton />
         <UserProfileDropdown
           user={user}

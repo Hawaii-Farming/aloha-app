@@ -1,4 +1,4 @@
-import { Sparkles, X } from 'lucide-react';
+import { Lightbulb, X } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 
@@ -10,13 +10,13 @@ export function AiChatButton() {
   return (
     <Button
       size="icon"
-      variant="ghost"
-      className="size-8 rounded-full"
+      variant="outline"
+      className="size-8 rounded-full text-muted-foreground"
       onClick={() => setOpen(!open)}
       aria-label={open ? 'Close AI assistant' : 'Open AI assistant'}
       data-test="ai-chat-button"
     >
-      {open ? <X className="size-4" /> : <Sparkles className="size-4" />}
+      {open ? <X className="size-4" /> : <Lightbulb className="size-4" />}
     </Button>
   );
 }
