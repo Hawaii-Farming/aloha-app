@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-03 - Completed quick task 260402-w5k: move AI button to navbar with Sparkles icon
+Last activity: 2026-04-03 - Completed quick task 260402-wds: add search bar supabase style to nav bar right
 
 Progress: [██████████] 100%
 
@@ -64,6 +64,7 @@ None — milestone shipped.
 | 260402-vul | create all operations submodule CRUD configs | 2026-04-03 | 8ed4cb9 | [260402-vul-create-all-operations-submodule-crud-con](./quick/260402-vul-create-all-operations-submodule-crud-con/) |
 | 260402-w0c | green Supabase-style Create button | 2026-04-03 | 6c6aadc | [260402-w0c-make-the-create-button-green-supabase-st](./quick/260402-w0c-make-the-create-button-green-supabase-st/) |
 | 260402-w5k | move AI button to navbar with Sparkles icon | 2026-04-03 | 4e4d8bc | [260402-w5k-move-ai-sticky-button-from-bottom-right-](./quick/260402-w5k-move-ai-sticky-button-from-bottom-right-/) |
+| 260402-wds | add search bar supabase style to nav bar right | 2026-04-03 | 74904d9 | [260402-wds-add-search-bar-supabase-style-to-nav-bar](./quick/260402-wds-add-search-bar-supabase-style-to-nav-bar/) |
 
 ## Session Continuity
 
