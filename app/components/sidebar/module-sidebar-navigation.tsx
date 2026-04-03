@@ -20,7 +20,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
-  useSidebar,
 } from '@aloha/ui/shadcn-sidebar';
 
 import {
@@ -39,7 +38,6 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
   const { account, modules, subModules } = props;
   const location = useLocation();
   const currentPath = location.pathname;
-  const { open } = useSidebar();
 
   const subModulesByModule = new Map<string, AppNavSubModule[]>();
 
@@ -63,10 +61,12 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
         const isModuleActive = currentPath.startsWith(modulePath);
         const IconComponent = getModuleIcon(mod.module_slug);
 
-        if (!open) {
-          return (
-            <div key={mod.module_id}>
-              {index > 0 && <SidebarSeparator className="mx-0" />}
+        return (
+          <div key={mod.module_id}>
+            {index > 0 && <SidebarSeparator className="mx-0" />}
+
+            {/* Collapsed mode — shown via CSS only when sidebar is icon mode */}
+            <div className="hidden group-data-[collapsible=icon]:block">
               <SidebarGroup>
                 <SidebarGroupContent>
                   <SidebarMenu>
@@ -112,68 +112,66 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                 </SidebarGroupContent>
               </SidebarGroup>
             </div>
-          );
-        }
 
-        return (
-          <div key={mod.module_id}>
-            {index > 0 && <SidebarSeparator className="mx-0" />}
-            <Collapsible
-              defaultOpen
-              className="group/collapsible"
-            >
-              <SidebarGroup>
-                <SidebarGroupLabel asChild>
-                  <CollapsibleTrigger
-                    className={cn(
-                      'flex w-full items-center gap-2',
-                      !isModuleActive && 'text-muted-foreground',
-                    )}
-                  >
-                    {createElement(IconComponent, {
-                      className: 'h-4 w-4 shrink-0',
-                    })}
-                    <span className="flex-1 truncate text-left uppercase">{mod.display_name}</span>
-                    <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                  </CollapsibleTrigger>
-                </SidebarGroupLabel>
-                <CollapsibleContent>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {children.map((sm) => {
-                        const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
-                        const isActive =
-                          currentPath === subModulePath ||
-                          currentPath.startsWith(subModulePath + '/');
-                        const SubModuleIcon = getSubModuleIcon(
-                          sm.sub_module_slug,
-                        );
-
-                        return (
-                          <SidebarMenuItem key={sm.sub_module_id}>
-                            <SidebarMenuButton
-                              asChild
-                              isActive={isActive}
-                              tooltip={sm.display_name}
-                              className={cn(
-                                !isActive && 'text-muted-foreground',
-                              )}
-                            >
-                              <a href={subModulePath}>
-                                {createElement(SubModuleIcon, {
-                                  className: 'h-4 w-4 shrink-0',
-                                })}
-                                <span className="truncate capitalize">{sm.display_name}</span>
-                              </a>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        );
+            {/* Expanded mode — hidden when sidebar is icon mode */}
+            <div className="group-data-[collapsible=icon]:hidden">
+              <Collapsible
+                defaultOpen
+                className="group/collapsible"
+              >
+                <SidebarGroup>
+                  <SidebarGroupLabel asChild>
+                    <CollapsibleTrigger
+                      className={cn(
+                        'flex w-full items-center gap-2',
+                        !isModuleActive && 'text-muted-foreground',
+                      )}
+                    >
+                      {createElement(IconComponent, {
+                        className: 'h-4 w-4 shrink-0',
                       })}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </CollapsibleContent>
-              </SidebarGroup>
-            </Collapsible>
+                      <span className="flex-1 truncate text-left uppercase">{mod.display_name}</span>
+                      <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                    </CollapsibleTrigger>
+                  </SidebarGroupLabel>
+                  <CollapsibleContent>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {children.map((sm) => {
+                          const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
+                          const isActive =
+                            currentPath === subModulePath ||
+                            currentPath.startsWith(subModulePath + '/');
+                          const SubModuleIcon = getSubModuleIcon(
+                            sm.sub_module_slug,
+                          );
+
+                          return (
+                            <SidebarMenuItem key={sm.sub_module_id}>
+                              <SidebarMenuButton
+                                asChild
+                                isActive={isActive}
+                                tooltip={sm.display_name}
+                                className={cn(
+                                  !isActive && 'text-muted-foreground',
+                                )}
+                              >
+                                <a href={subModulePath}>
+                                  {createElement(SubModuleIcon, {
+                                    className: 'h-4 w-4 shrink-0',
+                                  })}
+                                  <span className="truncate capitalize">{sm.display_name}</span>
+                                </a>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          );
+                        })}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </CollapsibleContent>
+                </SidebarGroup>
+              </Collapsible>
+            </div>
           </div>
         );
       })}
