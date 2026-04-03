@@ -1,10 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
+
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { ColumnDef } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
-
 
 import { Button } from '@aloha/ui/button';
 import { DataTableColumnHeader } from '@aloha/ui/data-table-column-header';
@@ -13,6 +14,7 @@ import { DataTable } from '@aloha/ui/enhanced-data-table';
 import { PageBody } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 
+import { CreatePanel } from '~/components/crud/create-panel';
 import { loadTableData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
@@ -91,20 +93,51 @@ export const loader = async (args: {
     pageSize: 25,
   });
 
+  const fkFields = (config?.formFields ?? []).filter((f) => f.type === 'fk');
+  const fkOptions: Record<string, Array<{ value: string; label: string }>> = {};
+  const untypedClient = client as unknown as SupabaseClient;
+
+  for (const field of fkFields) {
+    if (field.fkTable && field.fkLabelColumn) {
+      const { data } = await untypedClient
+        .from(field.fkTable)
+        .select(`id, ${field.fkLabelColumn}`)
+        .eq('org_id', accountSlug)
+        .eq('is_deleted', false)
+        .order(field.fkLabelColumn)
+        .limit(200);
+
+      const rows = (data ?? []) as unknown as Record<string, unknown>[];
+      fkOptions[field.key] = rows.map((row) => ({
+        value: String(row['id']),
+        label: String(row[field.fkLabelColumn!]),
+      }));
+    }
+  }
+
   return {
     config,
     moduleAccess,
     subModuleAccess,
     accountSlug,
     tableData,
+    fkOptions,
   };
 };
 
 export default function SubModulePage(props: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { config, moduleAccess, subModuleAccess, accountSlug, tableData } =
-    props.loaderData;
+  const {
+    config,
+    moduleAccess: _moduleAccess,
+    subModuleAccess,
+    accountSlug: _accountSlug,
+    tableData,
+    fkOptions,
+  } = props.loaderData;
+
+  const [createOpen, setCreateOpen] = useState(false);
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -150,11 +183,13 @@ export default function SubModulePage(props: {
               updateParams({ deleted: value ? 'true' : 'false', page: 1 })
             }
             actionSlot={
-              <Button asChild size="sm" variant="brand">
-                <Link to="create">
-                  <Plus className="mr-2 h-4 w-4" />
-                  <Trans i18nKey="common:create" />
-                </Link>
+              <Button
+                size="sm"
+                variant="brand"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                <Trans i18nKey="common:create" />
               </Button>
             }
           />
@@ -194,6 +229,14 @@ export default function SubModulePage(props: {
           />
         </div>
       </PageBody>
+
+      <CreatePanel
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        config={config}
+        fkOptions={fkOptions}
+        subModuleDisplayName={subModuleAccess.display_name}
+      />
     </>
   );
 }
