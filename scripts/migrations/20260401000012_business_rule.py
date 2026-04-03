@@ -5,7 +5,7 @@ Seeds org_business_rule with business rules, workflows, calculations,
 requirements, and definitions derived from the schema and process docs.
 
 Usage:
-    python scripts/migrations/20260401000010_business_rule.py
+    python scripts/migrations/20260401000012_business_rule.py
 
 Rerunnable: clears and reinserts all data on each run.
 """

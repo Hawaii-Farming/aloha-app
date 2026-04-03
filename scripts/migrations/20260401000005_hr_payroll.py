@@ -9,7 +9,7 @@ Source: https://docs.google.com/spreadsheets/d/13DUQTQyZf0CW07xv4FJ4ukP2x3Yoz8Py
   - hr_ee_payroll: 11513 rows → hr_payroll
 
 Usage:
-    python scripts/migrations/20260401000004c_hr_payroll.py
+    python scripts/migrations/20260401000005_hr_payroll.py
 
 Rerunnable: clears and reinserts all data on each run.
 """

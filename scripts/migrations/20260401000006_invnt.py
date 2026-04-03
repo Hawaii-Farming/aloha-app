@@ -8,7 +8,7 @@ Source: https://docs.google.com/spreadsheets/d/15ppDoDWLR1TIXCO5Gy3LIvEQ9KpJmtSq
   - invnt_category: from invnt_item_category sheet + unique ItemSubCategory from invnt_item sheet
 
 Usage:
-    python scripts/migrations/20260401000004_invnt.py
+    python scripts/migrations/20260401000006_invnt.py
 
 Rerunnable: clears and reinserts all data on each run.
 """

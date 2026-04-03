@@ -8,7 +8,7 @@ Source: https://docs.google.com/spreadsheets/d/1e7AuQAOpKAHpmvizIgBNyUk42GscXNpz
   - maint_req: 8344 maintenance requests → maint_request, maint_request_invnt_item, maint_request_photo
 
 Usage:
-    python scripts/migrations/20260401000005_maint.py
+    python scripts/migrations/20260401000007_maint.py
 
 Rerunnable: clears and reinserts all data on each run.
 """
