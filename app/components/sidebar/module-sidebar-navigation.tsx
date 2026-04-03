@@ -112,6 +112,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
               <SidebarGroup>
                 <SidebarGroupLabel
                   className={cn(
+                    'gap-2',
                     !isModuleActive && 'text-muted-foreground',
                   )}
                 >
