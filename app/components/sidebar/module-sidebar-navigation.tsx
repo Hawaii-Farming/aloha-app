@@ -69,6 +69,11 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
             <div key={mod.module_id}>
               {index > 0 && <SidebarSeparator className="mx-0" />}
               <SidebarGroup>
+                <SidebarGroupLabel className="flex justify-center" title={mod.display_name}>
+                  {createElement(IconComponent, {
+                    className: 'h-4 w-4 text-muted-foreground',
+                  })}
+                </SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {children.map((sm) => {
