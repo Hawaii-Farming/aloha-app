@@ -57,16 +57,20 @@ def audit(row: dict) -> dict:
     return row
 
 
-def insert_rows(supabase, table: str, rows: list):
-    """Insert rows in batches of 100. Returns inserted data."""
+def insert_rows(supabase, table: str, rows: list, upsert=False):
+    """Insert (or upsert) rows in batches of 100. Returns inserted data."""
     print(f"\n--- {table} ---")
     all_data = []
     if rows:
         for i in range(0, len(rows), 100):
             batch = rows[i:i + 100]
-            result = supabase.table(table).insert(batch).execute()
+            if upsert:
+                result = supabase.table(table).upsert(batch).execute()
+            else:
+                result = supabase.table(table).insert(batch).execute()
             all_data.extend(result.data)
-        print(f"  Inserted {len(rows)} rows")
+        action = "Upserted" if upsert else "Inserted"
+        print(f"  {action} {len(rows)} rows")
     return all_data
 
 
@@ -154,7 +158,7 @@ def migrate_hr_department(supabase, records):
         })
         for i, d in enumerate(departments)
     ]
-    insert_rows(supabase, "hr_department", rows)
+    insert_rows(supabase, "hr_department", rows, upsert=True)
 
 
 def migrate_hr_work_authorization(supabase, records):
@@ -173,7 +177,7 @@ def migrate_hr_work_authorization(supabase, records):
         })
         for i, s in enumerate(statuses)
     ]
-    insert_rows(supabase, "hr_work_authorization", rows)
+    insert_rows(supabase, "hr_work_authorization", rows, upsert=True)
 
 
 def migrate_hr_title(supabase, records):
@@ -192,7 +196,7 @@ def migrate_hr_title(supabase, records):
         })
         for i, t in enumerate(titles)
     ]
-    insert_rows(supabase, "hr_title", rows)
+    insert_rows(supabase, "hr_title", rows, upsert=True)
 
 
 def migrate_hr_employee(supabase, records, app_users):
@@ -308,7 +312,7 @@ def migrate_hr_employee(supabase, records, app_users):
         employees.append(audit(emp))
 
     # Insert employees (without team_lead/comp_manager — self-referencing)
-    insert_rows(supabase, "hr_employee", employees)
+    insert_rows(supabase, "hr_employee", employees, upsert=True)
 
     # Second pass: update team_lead_id and compensation_manager_id
     print("  Resolving team_lead_id and compensation_manager_id...")
@@ -533,16 +537,16 @@ def main():
     app_users = get_app_users(gc)
     print(f"  {len(app_users)} app users loaded")
 
-    # Clear in reverse FK order
+    # Clear in reverse FK order — try/except for tables referenced by downstream modules
     print("\nClearing tables...")
-    supabase.table("hr_travel_request").delete().neq("org_id", "___never___").execute()
-    supabase.table("hr_time_off_request").delete().neq("org_id", "___never___").execute()
-    supabase.table("hr_module_access").delete().neq("org_id", "___never___").execute()
-    supabase.table("hr_employee").delete().neq("id", "___never___").execute()
-    supabase.table("hr_title").delete().neq("id", "___never___").execute()
-    supabase.table("hr_work_authorization").delete().neq("id", "___never___").execute()
-    supabase.table("hr_department").delete().neq("id", "___never___").execute()
-    print("  All cleared")
+    for t in ["hr_travel_request", "hr_time_off_request", "hr_module_access",
+              "hr_employee", "hr_title", "hr_work_authorization", "hr_department"]:
+        try:
+            supabase.table(t).delete().neq("id" if t in ("hr_employee", "hr_title",
+                "hr_work_authorization", "hr_department") else "org_id", "___never___").execute()
+        except Exception:
+            pass  # May fail if referenced by downstream modules; will be upserted
+    print("  Cleared")
 
     migrate_hr_department(supabase, records)
     migrate_hr_work_authorization(supabase, records)
