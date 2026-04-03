@@ -4,7 +4,6 @@ import { Separator } from '@aloha/ui/separator';
 import { SidebarTrigger } from '@aloha/ui/shadcn-sidebar';
 
 import { NavbarBreadcrumbs } from '~/components/navbar-breadcrumbs';
-import { OrgSelector } from '~/components/sidebar/org-selector';
 import { UserProfileDropdown } from '~/components/user-profile-dropdown';
 
 interface WorkspaceNavbarProps {
@@ -30,18 +29,14 @@ export function WorkspaceNavbar(props: WorkspaceNavbarProps) {
       </div>
 
       <div className="ml-2 flex flex-1 items-center">
-        <NavbarBreadcrumbs />
+        <NavbarBreadcrumbs
+          accounts={accounts}
+          userId={user.id ?? ''}
+          selectedAccount={account}
+        />
       </div>
 
-      <div className="flex shrink-0 items-center gap-3">
-        {accounts.length > 1 ? (
-          <OrgSelector
-            selectedAccount={account}
-            userId={user.id ?? ''}
-            accounts={accounts}
-            variant="pill"
-          />
-        ) : null}
+      <div className="flex shrink-0 items-center">
         <UserProfileDropdown
           user={user}
           accountSlug={account}
