@@ -87,7 +87,10 @@ export function UserProfileDropdown(props: {
           </DropdownMenuItem>
         ) : null}
 
-        {isAdmin && props.accounts && props.userId && props.accountSlug ? (
+        {props.accounts &&
+        props.accounts.length > 1 &&
+        props.userId &&
+        props.accountSlug ? (
           <>
             <DropdownMenuLabel>
               <Trans i18nKey={'common:organisation'}>Organisation</Trans>
