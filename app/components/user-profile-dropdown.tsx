@@ -88,19 +88,14 @@ export function UserProfileDropdown(props: {
         props.accounts.length > 1 &&
         props.userId &&
         props.accountSlug ? (
-          <>
-            <DropdownMenuLabel>
-              <Trans i18nKey={'common:organisation'}>Organisation</Trans>
-            </DropdownMenuLabel>
-            <div className="px-2 pb-1">
-              <OrgSelector
-                selectedAccount={props.accountSlug}
-                userId={props.userId}
-                accounts={props.accounts}
-              />
-            </div>
-            <DropdownMenuSeparator />
-          </>
+          <div className="px-2 py-1.5">
+            <OrgSelector
+              selectedAccount={props.accountSlug}
+              userId={props.userId}
+              accounts={props.accounts}
+              variant="pill"
+            />
+          </div>
         ) : null}
 
         {props.accountSlug ? (

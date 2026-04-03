@@ -12,6 +12,7 @@ import { setLastOrg } from '~/lib/org-storage';
 export function OrgSelector(params: {
   selectedAccount: string;
   userId: string;
+  variant?: 'default' | 'pill';
 
   accounts: Array<{
     label: string | null;
@@ -22,6 +23,7 @@ export function OrgSelector(params: {
   const navigate = useNavigate();
   const ctx = useContext(SidebarContext);
   const collapsed = !ctx?.open;
+  const isPill = params.variant === 'pill';
 
   const selectedLabel =
     params.accounts.find((a) => a.value === params.selectedAccount)?.label ??
@@ -45,9 +47,11 @@ export function OrgSelector(params: {
           navigate(path, { replace: true });
         }}
         className={
-          collapsed
+          collapsed && !isPill
             ? 'hidden'
-            : 'bg-background text-foreground border-input rounded-md border px-2 py-1 text-sm'
+            : isPill
+              ? 'bg-emerald-600 text-white hover:bg-emerald-500 w-full cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50'
+              : 'bg-background text-foreground border-input rounded-md border px-2 py-1 text-sm'
         }
       >
         {params.accounts.map((account) => (
@@ -57,7 +61,7 @@ export function OrgSelector(params: {
         ))}
       </select>
 
-      {collapsed ? (
+      {collapsed && !isPill ? (
         <span className="text-xs font-medium">{selectedLabel?.charAt(0)}</span>
       ) : null}
     </div>
