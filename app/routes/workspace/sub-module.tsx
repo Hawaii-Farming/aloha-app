@@ -156,7 +156,7 @@ export default function SubModulePage(props: {
               updateParams({ deleted: value ? 'true' : 'false', page: 1 })
             }
             actionSlot={
-              <Button asChild size="sm">
+              <Button asChild size="sm" variant="brand">
                 <Link to="create">
                   <Plus className="mr-2 h-4 w-4" />
                   <Trans i18nKey="common:create" />
