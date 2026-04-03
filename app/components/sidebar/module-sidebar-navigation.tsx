@@ -4,6 +4,8 @@ import { useLocation } from 'react-router';
 
 import { ChevronRight } from 'lucide-react';
 
+import { cn } from '@aloha/ui/utils';
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -89,6 +91,10 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                           <SidebarMenuButton
                             isActive={isModuleActive || isAnySubModuleActive}
                             tooltip={mod.display_name}
+                            className={cn(
+                              !(isModuleActive || isAnySubModuleActive) &&
+                                'text-muted-foreground',
+                            )}
                           >
                             {createElement(IconComponent, {
                               className: 'h-4 w-4',
@@ -111,7 +117,10 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                 <a
                                   href={subModulePath}
                                   data-active={isActive}
-                                  className="flex items-center gap-2"
+                                  className={cn(
+                                    'flex items-center gap-2',
+                                    !isActive && 'text-muted-foreground',
+                                  )}
                                 >
                                   {createElement(SubModuleIcon, {
                                     className: 'h-4 w-4',
@@ -141,7 +150,12 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
             >
               <SidebarGroup>
                 <SidebarGroupLabel asChild>
-                  <CollapsibleTrigger className="flex w-full items-center gap-2">
+                  <CollapsibleTrigger
+                    className={cn(
+                      'flex w-full items-center gap-2',
+                      !isModuleActive && 'text-muted-foreground',
+                    )}
+                  >
                     {createElement(IconComponent, {
                       className: 'h-4 w-4',
                     })}
@@ -167,6 +181,9 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                               asChild
                               isActive={isActive}
                               tooltip={sm.display_name}
+                              className={cn(
+                                !isActive && 'text-muted-foreground',
+                              )}
                             >
                               <a href={subModulePath}>
                                 {createElement(SubModuleIcon, {
