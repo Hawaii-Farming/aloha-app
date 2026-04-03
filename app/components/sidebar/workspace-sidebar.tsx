@@ -10,7 +10,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -18,7 +17,6 @@ import {
 } from '@aloha/ui/shadcn-sidebar';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
-import { OrgSelector } from '~/components/sidebar/org-selector';
 import { UserProfileDropdown } from '~/components/user-profile-dropdown';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
@@ -67,17 +65,7 @@ function SidebarContainer(props: {
 
   return (
     <Sidebar collapsible={'icon'}>
-      <SidebarHeader className={'h-16 justify-center'}>
-        <div className={'flex items-center justify-between gap-x-3'}>
-          <OrgSelector
-            userId={userId}
-            selectedAccount={account}
-            accounts={accounts}
-          />
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent className={`mt-5 h-[calc(100%-160px)] overflow-y-auto`}>
+      <SidebarContent className={`mt-5 h-[calc(100%-80px)] overflow-y-auto`}>
         <ModuleSidebarNavigation
           account={account}
           modules={navigation.modules}
@@ -93,6 +81,8 @@ function SidebarContainer(props: {
             user={props.user}
             accountSlug={account}
             accessLevelId={props.accessLevelId}
+            accounts={accounts}
+            userId={userId}
           />
         </SidebarContent>
       </SidebarFooter>

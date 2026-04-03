@@ -2,7 +2,7 @@
 
 import { JwtPayload } from '@supabase/supabase-js';
 
-import { Building2, LogOut, Palette } from 'lucide-react';
+import { LogOut, Palette } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
@@ -16,6 +16,7 @@ import {
 } from '@aloha/ui/dropdown-menu';
 import { Trans } from '@aloha/ui/trans';
 
+import { OrgSelector } from '~/components/sidebar/org-selector';
 import featuresFlagConfig from '~/config/feature-flags.config';
 import { useSignOut } from '~/lib/supabase/hooks/use-sign-out';
 import { useUser } from '~/lib/supabase/hooks/use-user';
@@ -31,6 +32,12 @@ export function UserProfileDropdown(props: {
   };
   accountSlug?: string;
   accessLevelId?: string;
+  accounts?: Array<{
+    label: string | null;
+    value: string | null;
+    image: string | null;
+  }>;
+  userId?: string;
 }) {
   const signOut = useSignOut();
   const user = useUser(props.user);
@@ -80,14 +87,18 @@ export function UserProfileDropdown(props: {
           </DropdownMenuItem>
         ) : null}
 
-        {isAdmin && props.accountSlug ? (
+        {isAdmin && props.accounts && props.userId && props.accountSlug ? (
           <>
-            <DropdownMenuItem asChild>
-              <a href={`/home/${props.accountSlug}/settings`}>
-                <Building2 className="mr-2 h-4 w-4" />
-                <Trans i18nKey={'common:organisation'}>Organisation</Trans>
-              </a>
-            </DropdownMenuItem>
+            <DropdownMenuLabel>
+              <Trans i18nKey={'common:organisation'}>Organisation</Trans>
+            </DropdownMenuLabel>
+            <div className="px-2 pb-1">
+              <OrgSelector
+                selectedAccount={props.accountSlug}
+                userId={props.userId}
+                accounts={props.accounts}
+              />
+            </div>
             <DropdownMenuSeparator />
           </>
         ) : null}
