@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-03 - Completed quick task 260403-a68: add theme button and flash AI icon
+Last activity: 2026-04-03 - Completed quick task 260403-a9j: remove theme toggle from profile dropdown
 
 Progress: [██████████] 100%
 
@@ -66,6 +66,7 @@ None — milestone shipped.
 | 260402-w5k | move AI button to navbar with Sparkles icon | 2026-04-03 | 4e4d8bc | [260402-w5k-move-ai-sticky-button-from-bottom-right-](./quick/260402-w5k-move-ai-sticky-button-from-bottom-right-/) |
 | 260402-wds | add search bar supabase style to nav bar right | 2026-04-03 | 74904d9 | [260402-wds-add-search-bar-supabase-style-to-nav-bar](./quick/260402-wds-add-search-bar-supabase-style-to-nav-bar/) |
 | 260403-a68 | add theme button next to AI button with bulb icon, replace AI button icon with flash icon | 2026-04-03 | b3ca3ed | [260403-a68-add-theme-button-next-to-ai-button-with-](./quick/260403-a68-add-theme-button-next-to-ai-button-with-/) |
+| 260403-a9j | remove theme toggle from avatar/profile dropdown button | 2026-04-03 | d5baade | [260403-a9j-remove-theme-toggle-from-avatar-profile-](./quick/260403-a9j-remove-theme-toggle-from-avatar-profile-/) |
 
 ## Session Continuity
 
