@@ -20,7 +20,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
-  useSidebar,
 } from '@aloha/ui/shadcn-sidebar';
 
 import {
@@ -39,7 +38,6 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
   const { account, modules, subModules } = props;
   const location = useLocation();
   const currentPath = location.pathname;
-  const { open } = useSidebar();
 
   const subModulesByModule = new Map<string, AppNavSubModule[]>();
 
@@ -63,60 +61,6 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
         const isModuleActive = currentPath.startsWith(modulePath);
         const IconComponent = getModuleIcon(mod.module_slug);
 
-        // Icon mode (sidebar collapsed): show submodule icons directly
-        if (!open) {
-          return (
-            <div key={mod.module_id}>
-              {index > 0 && <SidebarSeparator className="mx-0" />}
-              <SidebarGroup>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        tooltip={mod.display_name}
-                        className="pointer-events-none text-muted-foreground opacity-60"
-                      >
-                        {createElement(IconComponent, {
-                          className: 'h-4 w-4 shrink-0',
-                        })}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    {children.map((sm) => {
-                      const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
-                      const isActive =
-                        currentPath === subModulePath ||
-                        currentPath.startsWith(subModulePath + '/');
-                      const SubModuleIcon = getSubModuleIcon(
-                        sm.sub_module_slug,
-                      );
-
-                      return (
-                        <SidebarMenuItem key={sm.sub_module_id}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={isActive}
-                            tooltip={sm.display_name}
-                            className={cn(
-                              !isActive && 'text-muted-foreground',
-                            )}
-                          >
-                            <a href={subModulePath}>
-                              {createElement(SubModuleIcon, {
-                                className: 'h-4 w-4 shrink-0',
-                              })}
-                            </a>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      );
-                    })}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            </div>
-          );
-        }
-
-        // Expanded mode: collapsible accordion with submodule items.
         return (
           <div key={mod.module_id}>
             {index > 0 && <SidebarSeparator className="mx-0" />}
