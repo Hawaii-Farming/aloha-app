@@ -153,7 +153,7 @@ export function CreatePanel({
               </div>
             </div>
 
-            <div className="border-t p-4">
+            <div className="-mx-6 border-t px-6 py-4">
               <div className="flex items-center gap-3">
                 <Button
                   type="submit"
