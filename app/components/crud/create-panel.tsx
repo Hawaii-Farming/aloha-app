@@ -3,7 +3,6 @@ import { useCallback, useRef } from 'react';
 import { useFetcher, useRevalidator } from 'react-router';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Path } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import type { ZodObject, ZodRawShape } from 'zod';
 import { z } from 'zod';
@@ -15,7 +14,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 import { toast } from '@aloha/ui/sonner';
 import { Trans } from '@aloha/ui/trans';
 
-import { AiFormAssist } from '~/components/ai/ai-form-assist';
 import { renderFormField } from '~/lib/crud/render-form-field';
 import type { CrudModuleConfig } from '~/lib/crud/types';
 import { buildDefaultValues } from '~/lib/crud/workflow-helpers';
@@ -133,14 +131,6 @@ export function CreatePanel({
           >
             <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-6">
-                <AiFormAssist
-                  schema={schema}
-                  setValue={form.setValue}
-                  fieldNames={formFields.map(
-                    (f) => f.key as Path<Record<string, unknown>>,
-                  )}
-                />
-
                 {formFields.map((field) =>
                   renderFormField({
                     field,
