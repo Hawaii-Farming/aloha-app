@@ -2,8 +2,7 @@
 
 import { JwtPayload } from '@supabase/supabase-js';
 
-import { LogOut, Palette, Settings, Users } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { LogOut, Settings, Users } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
 import {
@@ -16,7 +15,6 @@ import {
 } from '@aloha/ui/dropdown-menu';
 import { Trans } from '@aloha/ui/trans';
 
-import featuresFlagConfig from '~/config/feature-flags.config';
 import { useSignOut } from '~/lib/supabase/hooks/use-sign-out';
 import { useUser } from '~/lib/supabase/hooks/use-user';
 
@@ -34,7 +32,6 @@ export function UserProfileDropdown(props: {
   const signOut = useSignOut();
   const user = useUser(props.user);
   const userData = user.data ?? props.user ?? null;
-  const { setTheme, theme } = useTheme();
   if (!userData) {
     return null;
   }
@@ -62,15 +59,6 @@ export function UserProfileDropdown(props: {
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
-
-        {featuresFlagConfig.enableThemeToggle ? (
-          <DropdownMenuItem
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          >
-            <Palette className="mr-2 h-4 w-4" />
-            <Trans i18nKey={'common:theme'} />
-          </DropdownMenuItem>
-        ) : null}
 
         {props.accountSlug ? (
           <>
