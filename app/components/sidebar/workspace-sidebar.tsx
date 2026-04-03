@@ -45,7 +45,7 @@ function SidebarContainer(props: {
           modules={navigation.modules}
           subModules={navigation.subModules}
         />
-        <SidebarSeparator />
+        <SidebarSeparator className="mx-0" />
         <StaticNavigationItems account={account} />
       </SidebarContent>
     </Sidebar>
