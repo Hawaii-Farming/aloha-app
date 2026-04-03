@@ -1,0 +1,6 @@
+{
+  "hooks": {},
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false
+  }
+}

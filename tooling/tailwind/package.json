@@ -1,0 +1,26 @@
+{
+  "name": "@aloha/tailwind-config",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "vite.js"
+  ],
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "format": "prettier --check \"**/*.{js,ts,json}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.1.18",
+    "tailwindcss": "4.1.18"
+  },
+  "devDependencies": {
+    "@aloha/prettier-config": "workspace:*",
+    "@aloha/tsconfig": "workspace:*",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
+  },
+  "prettier": "@aloha/prettier-config"
+}

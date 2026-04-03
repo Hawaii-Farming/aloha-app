@@ -1,0 +1,19 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  VITE_SITE_URL: string;
+  VITE_SUPABASE_URL: string;
+  VITE_SUPABASE_ANON_KEY: string;
+  VITE_SITE_DESCRIPTION: string;
+  VITE_SITE_TITLE: string;
+  VITE_THEME_COLOR: string;
+  VITE_THEME_COLOR_DARK: string;
+  VITE_AUTH_PASSWORD: string;
+  VITE_AUTH_MAGIC_LINK: string;
+  VITE_LOCALES_PATH: string;
+  VITE_ENABLE_THEME_TOGGLE: string;
+  VITE_ENABLE_TEAM_ACCOUNTS_DELETION: string;
+  VITE_ENABLE_TEAM_ACCOUNTS: string;
+  VITE_ENABLE_TEAM_ACCOUNTS_CREATION: string;
+  VITE_LANGUAGE_PRIORITY: string;
+}

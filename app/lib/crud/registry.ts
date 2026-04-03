@@ -1,0 +1,44 @@
+import type { CrudModuleConfig } from '~/lib/crud/types';
+
+import { fsafeResultConfig } from './fsafe-result.config';
+import { fsafeTestHoldConfig } from './fsafe-test-hold.config';
+import { growHarvestWeightConfig } from './grow-harvest-weight.config';
+import { growSeedBatchConfig } from './grow-seed-batch.config';
+import { hrDepartmentConfig } from './hr-department.config';
+import { hrEmployeeConfig } from './hr-employee.config';
+import { hrPayrollConfig } from './hr-payroll.config';
+import { hrTimeOffConfig } from './hr-time-off.config';
+import { invntItemConfig } from './invnt-item.config';
+import { invntOnhandConfig } from './invnt-onhand.config';
+import { opsTaskTrackerConfig } from './ops-task-tracker.config';
+import { opsTemplateConfig } from './ops-template.config';
+import { orgSiteConfig } from './org-site.config';
+
+/**
+ * Maps sub-module slugs (from URL params) to their CRUD configs.
+ *
+ * Each entry maps the sys_sub_module_id (used in URL routing)
+ * to the CrudModuleConfig that tells the factory which Supabase
+ * table/view to query and how to render columns/forms.
+ */
+const registry = new Map<string, CrudModuleConfig>([
+  ['departments', hrDepartmentConfig],
+  ['employees', hrEmployeeConfig],
+  ['time_off', hrTimeOffConfig],
+  ['payroll', hrPayrollConfig],
+  ['products', invntItemConfig],
+  ['stock_counts', invntOnhandConfig],
+  ['warehouses', orgSiteConfig],
+  ['seed_batches', growSeedBatchConfig],
+  ['harvests', growHarvestWeightConfig],
+  ['inspections', fsafeResultConfig],
+  ['incidents', fsafeTestHoldConfig],
+  ['task_tracking', opsTaskTrackerConfig],
+  ['checklists', opsTemplateConfig],
+]);
+
+export function getModuleConfig(
+  subModuleSlug: string,
+): CrudModuleConfig | undefined {
+  return registry.get(subModuleSlug);
+}
