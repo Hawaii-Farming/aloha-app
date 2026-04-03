@@ -54,26 +54,26 @@
         --semantic-blue-fg: oklch(50.7% 0.167 254.9);
         --semantic-blue-border: oklch(80.1% 0.082 255.5);
 
-        --background: oklch(99% 0 none);
-        --foreground: oklch(12% 0 none);
+        --background: oklch(96.5% 0 none);
+        --foreground: oklch(20% 0 none);
 
-        --card: oklch(100% 0 none);
-        --card-foreground: oklch(12% 0 none);
+        --card: oklch(98% 0 none);
+        --card-foreground: oklch(20% 0 none);
 
-        --popover: oklch(100% 0 none);
-        --popover-foreground: oklch(12% 0 none);
+        --popover: oklch(98% 0 none);
+        --popover-foreground: oklch(20% 0 none);
 
-        --primary: oklch(12% 0 none);
-        --primary-foreground: oklch(99% 0 none);
+        --primary: oklch(20% 0 none);
+        --primary-foreground: oklch(96.5% 0 none);
 
-        --secondary: oklch(96% 0 none);
-        --secondary-foreground: oklch(12% 0 none);
+        --secondary: oklch(93% 0 none);
+        --secondary-foreground: oklch(20% 0 none);
 
-        --muted: oklch(96% 0 none);
+        --muted: oklch(93% 0 none);
         --muted-foreground: oklch(45% 0 none);
 
-        --accent: oklch(96% 0 none);
-        --accent-foreground: oklch(12% 0 none);
+        --accent: oklch(93% 0 none);
+        --accent-foreground: oklch(20% 0 none);
 
         --destructive: var(--color-red-500);
         --destructive-foreground: var(--color-white);
@@ -90,11 +90,11 @@
         --chart-4: var(--color-yellow-200);
         --chart-5: var(--color-orange-200);
 
-        --sidebar-background: oklch(99% 0 none);
+        --sidebar-background: oklch(95% 0 none);
         --sidebar-foreground: oklch(35% 0 none);
         --sidebar-primary: oklch(47% 0.165 160);
-        --sidebar-primary-foreground: oklch(99% 0 none);
-        --sidebar-accent: oklch(95% 0.01 160);
+        --sidebar-primary-foreground: oklch(95% 0 none);
+        --sidebar-accent: oklch(91% 0.01 160);
         --sidebar-accent-foreground: oklch(30% 0 none);
         --sidebar-border: oklch(87% 0 none);
         --sidebar-ring: oklch(47% 0.165 160);
