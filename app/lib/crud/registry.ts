@@ -1,5 +1,7 @@
 import type { CrudModuleConfig } from '~/lib/crud/types';
 
+import { fsafeResultConfig } from './fsafe-result.config';
+import { fsafeTestHoldConfig } from './fsafe-test-hold.config';
 import { growHarvestWeightConfig } from './grow-harvest-weight.config';
 import { growSeedBatchConfig } from './grow-seed-batch.config';
 import { hrDepartmentConfig } from './hr-department.config';
@@ -27,6 +29,8 @@ const registry = new Map<string, CrudModuleConfig>([
   ['warehouses', orgSiteConfig],
   ['seed_batches', growSeedBatchConfig],
   ['harvests', growHarvestWeightConfig],
+  ['inspections', fsafeResultConfig],
+  ['incidents', fsafeTestHoldConfig],
 ]);
 
 export function getModuleConfig(
