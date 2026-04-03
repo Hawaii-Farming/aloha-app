@@ -187,6 +187,7 @@ export default function SubModulePage(props: {
                 size="sm"
                 variant="brand"
                 onClick={() => setCreateOpen(true)}
+                data-test="sub-module-create-button"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 <Trans i18nKey="common:create" />

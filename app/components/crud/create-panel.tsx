@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useFetcher, useRevalidator } from 'react-router';
 
@@ -47,6 +47,7 @@ export function CreatePanel({
 }: CreatePanelProps) {
   const fetcher = useFetcher();
   const revalidator = useRevalidator();
+  const hasHandledSuccess = useRef(false);
 
   const formFields = config?.formFields ?? fallbackFormFields;
   const pkColumn = config?.pkColumn ?? 'id';
@@ -58,43 +59,40 @@ export function CreatePanel({
   });
 
   const fetcherData = fetcher.data as
-    | { success: false; error?: string; errors?: unknown }
+    | { success: boolean; error?: string; errors?: unknown }
     | undefined;
 
   const isSubmitting = fetcher.state !== 'idle';
 
-  useEffect(() => {
-    if (fetcher.state === 'idle' && fetcherData !== undefined) {
-      if (fetcherData && !fetcherData.success) {
-        toast.error(fetcherData.error ?? 'Validation failed');
-      } else if (!fetcherData) {
-        // redirect response — action returned redirect, which means success
-        onOpenChange(false);
-        form.reset(buildDefaultValues(formFields, null));
-        revalidator.revalidate();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetcher.state, fetcherData]);
-
-  // Handle success when action returns non-error data
-  useEffect(() => {
-    if (
+  // Handle fetcher response inline (no useEffect)
+  // The create action returns redirect() on success, which useFetcher swallows
+  // (fetcherData stays undefined). On error, it returns { success: false, error }.
+  if (fetcher.state === 'idle' && !hasHandledSuccess.current) {
+    if (fetcherData !== undefined && !fetcherData.success) {
+      toast.error(fetcherData.error ?? 'Validation failed');
+      hasHandledSuccess.current = true;
+    } else if (
+      fetcher.data === undefined &&
       fetcher.state === 'idle' &&
-      fetcher.data !== undefined &&
-      typeof fetcher.data === 'object' &&
-      'success' in fetcher.data &&
-      (fetcher.data as { success: boolean }).success === true
+      form.formState.submitCount > 0 &&
+      form.formState.isSubmitSuccessful
     ) {
+      // Redirect was swallowed — treat as success
+      hasHandledSuccess.current = true;
       onOpenChange(false);
       form.reset(buildDefaultValues(formFields, null));
       revalidator.revalidate();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetcher.state, fetcher.data]);
+  }
+
+  // Reset tracking ref when panel reopens
+  if (open && hasHandledSuccess.current && fetcher.state === 'idle') {
+    hasHandledSuccess.current = false;
+  }
 
   const onSubmit = useCallback(
     (data: Record<string, unknown>) => {
+      hasHandledSuccess.current = false;
       fetcher.submit(data as unknown as Record<string, string>, {
         method: 'POST',
         action: 'create',
@@ -122,62 +120,66 @@ export function CreatePanel({
         data-test="create-panel"
       >
         <SheetHeader>
-          <SheetTitle>Create {subModuleDisplayName}</SheetTitle>
+          <SheetTitle>
+            <Trans i18nKey="common:create" /> {subModuleDisplayName}
+          </SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto p-6">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6"
-              data-test="create-panel-form"
-            >
-              <AiFormAssist
-                schema={schema}
-                setValue={form.setValue}
-                fieldNames={formFields.map(
-                  (f) => f.key as Path<Record<string, unknown>>,
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-1 flex-col overflow-hidden"
+            data-test="create-panel-form"
+          >
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-6">
+                <AiFormAssist
+                  schema={schema}
+                  setValue={form.setValue}
+                  fieldNames={formFields.map(
+                    (f) => f.key as Path<Record<string, unknown>>,
+                  )}
+                />
+
+                {formFields.map((field) =>
+                  renderFormField({
+                    field,
+                    control: form.control,
+                    mode: 'create',
+                    pkColumn,
+                    fkOptions,
+                  }),
                 )}
-              />
+              </div>
+            </div>
 
-              {formFields.map((field) =>
-                renderFormField({
-                  field,
-                  control: form.control,
-                  mode: 'create',
-                  pkColumn,
-                  fkOptions,
-                }),
-              )}
-            </form>
-          </Form>
-        </div>
+            <div className="border-t p-4">
+              <div className="flex items-center gap-3">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  data-test="create-panel-submit"
+                >
+                  <If condition={isSubmitting}>
+                    <Trans i18nKey="common:loading" />
+                  </If>
+                  <If condition={!isSubmitting}>
+                    <Trans i18nKey="common:create" />
+                  </If>
+                </Button>
 
-        <div className="border-t p-4">
-          <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              disabled={isSubmitting}
-              onClick={form.handleSubmit(onSubmit)}
-            >
-              <If condition={isSubmitting}>
-                <Trans i18nKey="common:loading" />
-              </If>
-              <If condition={!isSubmitting}>
-                <Trans i18nKey="common:create" />
-              </If>
-            </Button>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              <Trans i18nKey="common:cancel" />
-            </Button>
-          </div>
-        </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleOpenChange(false)}
+                  disabled={isSubmitting}
+                >
+                  <Trans i18nKey="common:cancel" />
+                </Button>
+              </div>
+            </div>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );
