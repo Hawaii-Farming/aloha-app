@@ -16,12 +16,10 @@ import {
 } from '@aloha/ui/dropdown-menu';
 import { Trans } from '@aloha/ui/trans';
 
-import { OrgSelector } from '~/components/sidebar/org-selector';
 import featuresFlagConfig from '~/config/feature-flags.config';
 import { useSignOut } from '~/lib/supabase/hooks/use-sign-out';
 import { useUser } from '~/lib/supabase/hooks/use-user';
 
-const ADMIN_ACCESS_LEVEL_IDS = ['admin', 'owner'];
 
 export function UserProfileDropdown(props: {
   user?: JwtPayload | null;
@@ -32,21 +30,11 @@ export function UserProfileDropdown(props: {
   };
   accountSlug?: string;
   accessLevelId?: string;
-  accounts?: Array<{
-    label: string | null;
-    value: string | null;
-    image: string | null;
-  }>;
-  userId?: string;
 }) {
   const signOut = useSignOut();
   const user = useUser(props.user);
   const userData = user.data ?? props.user ?? null;
   const { setTheme, theme } = useTheme();
-  const isAdmin =
-    !!props.accessLevelId &&
-    ADMIN_ACCESS_LEVEL_IDS.includes(props.accessLevelId);
-
   if (!userData) {
     return null;
   }
@@ -82,20 +70,6 @@ export function UserProfileDropdown(props: {
             <Palette className="mr-2 h-4 w-4" />
             <Trans i18nKey={'common:theme'} />
           </DropdownMenuItem>
-        ) : null}
-
-        {props.accounts &&
-        props.accounts.length > 1 &&
-        props.userId &&
-        props.accountSlug ? (
-          <div className="px-2 py-1.5">
-            <OrgSelector
-              selectedAccount={props.accountSlug}
-              userId={props.userId}
-              accounts={props.accounts}
-              variant="pill"
-            />
-          </div>
         ) : null}
 
         {props.accountSlug ? (
