@@ -153,10 +153,11 @@ export function CreatePanel({
               </div>
             </div>
 
-            <div className="-mx-6 border-t px-6 py-4">
+            <div className="-mx-6 -mb-6 flex flex-1 items-center border-t px-6">
               <div className="flex items-center gap-3">
                 <Button
                   type="submit"
+                  variant="brand"
                   disabled={isSubmitting}
                   data-test="create-panel-submit"
                 >
