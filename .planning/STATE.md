@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-03 - Completed quick task 260403-adh: fix avatar dropdown separator and reorder navbar
+Last activity: 2026-04-03 - Completed quick task 260403-ajc: remove members from avatar dropdown
 
 Progress: [██████████] 100%
 
@@ -68,6 +68,7 @@ None — milestone shipped.
 | 260403-a68 | add theme button next to AI button with bulb icon, replace AI button icon with flash icon | 2026-04-03 | b3ca3ed | [260403-a68-add-theme-button-next-to-ai-button-with-](./quick/260403-a68-add-theme-button-next-to-ai-button-with-/) |
 | 260403-a9j | remove theme toggle from avatar/profile dropdown button | 2026-04-03 | d5baade | [260403-a9j-remove-theme-toggle-from-avatar-profile-](./quick/260403-a9j-remove-theme-toggle-from-avatar-profile-/) |
 | 260403-adh | fix double separator in avatar dropdown; move theme toggle between AI and avatar with divider | 2026-04-03 | 5d3f5e4 | [260403-adh-fix-double-separator-in-avatar-dropdown-](./quick/260403-adh-fix-double-separator-in-avatar-dropdown-/) |
+| 260403-ajc | remove members link from avatar profile dropdown | 2026-04-03 | 7f987dc | [260403-ajc-remove-members-link-from-avatar-profile-](./quick/260403-ajc-remove-members-link-from-avatar-profile-/) |
 
 ## Session Continuity
 
