@@ -1,0 +1,172 @@
+/*
+* shadcn-ui.css
+*
+* Update the below to customize your Shadcn UI CSS Colors.
+* Refer to https://ui.shadcn.com/themes for applying new colors.
+* NB: apply the hsl function to the colors copied from the theme.
+ */
+
+@layer base {
+    :root {
+        --font-sans: 'Geist Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        --font-mono: 'Geist Mono Variable', 'Source Code Pro', Menlo, monospace;
+        --font-heading: var(--font-sans);
+
+        /* Supabase brand tokens (per D-07) — light-mode values; .dark overrides restore bright green */
+        --supabase-green: oklch(73.5% 0.158 162);
+        --supabase-green-link: oklch(47% 0.165 160);
+        --supabase-green-border: oklch(47% 0.165 160 / 0.3);
+
+        /* Supabase neutral scale (per D-14) */
+        --sb-near-black: oklch(7.84% 0 none);
+        --sb-dark: oklch(12.55% 0 none);
+        --sb-dark-border: oklch(18.84% 0 none);
+        --sb-border-dark: oklch(23.53% 0 none);
+        --sb-border-mid: oklch(27.45% 0 none);
+        --sb-border-light: oklch(28.63% 0 none);
+        --sb-charcoal: oklch(33.33% 0 none);
+        --sb-mid-gray: oklch(60% 0 none);
+        --sb-light-gray: oklch(74.9% 0 none);
+        --sb-near-white: oklch(94.51% 0 none);
+
+        /* Neutral gray gap fills (per D-13, D-14) */
+        --sb-dark-gray: oklch(42% 0 none);
+        --sb-off-white: oklch(98.51% 0 none);
+
+        /* Translucent surface tokens (per D-01, D-02, D-03) */
+        --glass-surface: oklch(100% 0 none / 0.84);
+        --slate-alpha-wash: oklch(95.3% 0.026 229 / 0.109);
+
+        /* Semantic color tokens — light theme (per D-09, D-10, D-11, D-12) */
+        --semantic-red-bg: oklch(96.9% 0.015 17.0);
+        --semantic-red-fg: oklch(55.4% 0.197 24.9);
+        --semantic-red-border: oklch(79.3% 0.084 18.1);
+
+        --semantic-amber-bg: oklch(98.3% 0.019 87.6);
+        --semantic-amber-fg: oklch(57.8% 0.128 66.9);
+        --semantic-amber-border: oklch(82.4% 0.128 87.4);
+
+        --semantic-green-bg: oklch(98.0% 0.017 154.0);
+        --semantic-green-fg: oklch(50.6% 0.141 146.5);
+        --semantic-green-border: oklch(84.8% 0.076 151.1);
+
+        --semantic-blue-bg: oklch(97.3% 0.013 251.6);
+        --semantic-blue-fg: oklch(50.7% 0.167 254.9);
+        --semantic-blue-border: oklch(80.1% 0.082 255.5);
+
+        --background: oklch(96.5% 0 none);
+        --foreground: oklch(20% 0 none);
+
+        --card: oklch(98% 0 none);
+        --card-foreground: oklch(20% 0 none);
+
+        --popover: oklch(98% 0 none);
+        --popover-foreground: oklch(20% 0 none);
+
+        --primary: oklch(20% 0 none);
+        --primary-foreground: oklch(96.5% 0 none);
+
+        --secondary: oklch(93% 0 none);
+        --secondary-foreground: oklch(20% 0 none);
+
+        --muted: oklch(93% 0 none);
+        --muted-foreground: oklch(45% 0 none);
+
+        --accent: oklch(93% 0 none);
+        --accent-foreground: oklch(20% 0 none);
+
+        --destructive: var(--color-red-500);
+        --destructive-foreground: var(--color-white);
+
+        --border: oklch(87% 0 none);
+        --input: oklch(82% 0 none);
+        --ring: oklch(47% 0.165 160);
+
+        --radius: 0.5rem;
+
+        --chart-1: var(--color-orange-400);
+        --chart-2: var(--color-teal-600);
+        --chart-3: var(--color-green-800);
+        --chart-4: var(--color-yellow-200);
+        --chart-5: var(--color-orange-200);
+
+        --sidebar-background: oklch(95% 0 none);
+        --sidebar-foreground: oklch(35% 0 none);
+        --sidebar-primary: oklch(47% 0.165 160);
+        --sidebar-primary-foreground: oklch(95% 0 none);
+        --sidebar-accent: oklch(91% 0.01 160);
+        --sidebar-accent-foreground: oklch(30% 0 none);
+        --sidebar-border: oklch(87% 0 none);
+        --sidebar-ring: oklch(47% 0.165 160);
+    }
+
+    .dark {
+        --background: oklch(18% 0 none);
+        --foreground: oklch(95% 0 none);
+
+        --card: oklch(20% 0 none);
+        --card-foreground: oklch(95% 0 none);
+
+        --popover: oklch(20% 0 none);
+        --popover-foreground: oklch(95% 0 none);
+
+        --primary: oklch(95% 0 none);
+        --primary-foreground: oklch(18% 0 none);
+
+        --secondary: oklch(25% 0 none);
+        --secondary-foreground: oklch(95% 0 none);
+
+        --muted: oklch(25% 0 none);
+        --muted-foreground: oklch(63% 0 none);
+
+        --accent: oklch(25% 0 none);
+        --accent-foreground: oklch(95% 0 none);
+
+        --destructive: var(--color-red-700);
+        --destructive-foreground: var(--color-white);
+
+        --border: oklch(27% 0 none);
+        --input: oklch(30% 0 none);
+        --ring: oklch(73.5% 0.158 162);
+
+        --chart-1: var(--color-blue-600);
+        --chart-2: var(--color-emerald-400);
+        --chart-3: var(--color-orange-400);
+        --chart-4: var(--color-purple-500);
+        --chart-5: var(--color-pink-500);
+
+        --sidebar-background: oklch(16% 0 none);
+        --sidebar-foreground: oklch(63% 0 none);
+        --sidebar-primary: oklch(73.5% 0.158 162);
+        --sidebar-primary-foreground: oklch(16% 0 none);
+        --sidebar-accent: oklch(25% 0 none);
+        --sidebar-accent-foreground: oklch(73.5% 0.158 162);
+        --sidebar-border: var(--border);
+        --sidebar-ring: oklch(73.5% 0.158 162);
+
+        /* Restore bright green for dark mode (overrides :root darker green) */
+        --supabase-green-link: oklch(71.2% 0.184 160);
+        --supabase-green-border: oklch(73.5% 0.158 162 / 0.3);
+
+        /* Translucent surface tokens — dark overrides */
+        --glass-surface: oklch(28.1% 0 none / 0.84);
+        --slate-alpha-wash: oklch(27.9% 0.077 253 / 0.031);
+
+        /* Semantic color tokens — dark theme */
+        --semantic-red-bg: oklch(25.3% 0.065 20.0);
+        --semantic-red-fg: oklch(78.0% 0.128 22.1);
+        --semantic-red-border: oklch(35.3% 0.104 21.2);
+
+        --semantic-amber-bg: oklch(32.9% 0.073 65.9);
+        --semantic-amber-fg: oklch(85.4% 0.157 84.1);
+        --semantic-amber-border: oklch(42.0% 0.089 70.6);
+
+        --semantic-green-bg: oklch(25.6% 0.053 148.5);
+        --semantic-green-fg: oklch(78.0% 0.142 148.5);
+        --semantic-green-border: oklch(36.3% 0.090 146.6);
+
+        --semantic-blue-bg: oklch(26.3% 0.077 255.9);
+        --semantic-blue-fg: oklch(76.4% 0.126 249.5);
+        --semantic-blue-border: oklch(37.5% 0.116 254.7);
+    }
+}

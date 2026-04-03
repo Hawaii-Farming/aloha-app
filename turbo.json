@@ -1,0 +1,70 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "globalDependencies": [
+    "**/.env"
+  ],
+  "ui": "stream",
+  "globalEnv": [
+    "ANTHROPIC_API_KEY",
+    "VITE_PRODUCT_NAME",
+    "VITE_SITE_URL",
+    "LOGGER",
+    "SUPABASE_DB_WEBHOOK_SECRET",
+    "VITE_SUPABASE_URL",
+    "VITE_SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY"
+  ],
+  "tasks": {
+    "topo": {
+      "dependsOn": [
+        "^topo"
+      ]
+    },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "build/**",
+        "dist/**"
+      ]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "format": {
+      "outputs": [
+        "node_modules/.cache/.prettiercache"
+      ],
+      "outputLogs": "new-only"
+    },
+    "lint": {
+      "dependsOn": [
+        "^topo"
+      ],
+      "outputs": [
+        "node_modules/.cache/.eslintcache"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^topo"
+      ],
+      "outputs": [
+        "node_modules/.cache/tsbuildinfo.json"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "^topo"
+      ]
+    },
+    "clean": {
+      "cache": false
+    },
+    "//#clean": {
+      "cache": false
+    }
+  }
+}

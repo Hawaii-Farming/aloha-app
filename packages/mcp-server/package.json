@@ -1,0 +1,32 @@
+{
+  "name": "@aloha/mcp-server",
+  "private": true,
+  "version": "0.1.0",
+  "main": "./build/index.js",
+  "bin": {
+    "aloha-mcp-server": "./build/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
+    "build": "tsc",
+    "mcp": "node build/index.js"
+  },
+  "devDependencies": {
+    "@aloha/eslint-config": "workspace:*",
+    "@aloha/prettier-config": "workspace:*",
+    "@aloha/tsconfig": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.24.3",
+    "@types/node": "catalog:",
+    "postgres": "3.4.7",
+    "zod": "catalog:"
+  },
+  "prettier": "@aloha/prettier-config"
+}
