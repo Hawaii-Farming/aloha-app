@@ -69,6 +69,11 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
               className="group/collapsible"
             >
               <SidebarGroup>
+                <div className="hidden items-center justify-center py-1 group-data-[collapsible=icon]:flex">
+                  {createElement(IconComponent, {
+                    className: 'h-4 w-4 text-muted-foreground opacity-60',
+                  })}
+                </div>
                 <SidebarGroupLabel asChild>
                   <CollapsibleTrigger
                     className={cn(
