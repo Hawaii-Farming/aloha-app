@@ -400,6 +400,31 @@ RULES = [
     ),
 
     # =====================================================================
+    # 7b. SALES CRM — store visits, market intelligence
+    # =====================================================================
+    rule(
+        "sales_crm_store_customer_link", "business_rule", "sales",
+        "Store links to customer but many stores can share one customer",
+        "sales_crm_store.sales_customer_id is nullable. Multiple stores can reference the same "
+        "customer (e.g. all Costco locations link to the Costco customer for that island). "
+        "Stores without a customer link are tracked for competitive intelligence only.",
+        None,
+        '["sales_crm_store.sales_customer_id"]',
+        37,
+    ),
+    rule(
+        "sales_crm_visit_result_product_exclusivity", "business_rule", "sales",
+        "Visit observation: own product or competitor, never both",
+        "Each sales_crm_store_visit_result row references either sales_product_id (own product) "
+        "or sales_crm_external_product_id (competitor), enforced by CHECK constraint. "
+        "This allows comparing own vs competitor shelf presence, pricing, and stock in the same query.",
+        None,
+        '["sales_crm_store_visit_result.sales_product_id", '
+        '"sales_crm_store_visit_result.sales_crm_external_product_id"]',
+        38,
+    ),
+
+    # =====================================================================
     # 8. FOOD SAFETY — testing, results
     # =====================================================================
     rule(
@@ -409,7 +434,7 @@ RULES = [
         "ATP: randomly select atp_site_count zone_1 sites.",
         None,
         '["fsafe_lab_test.enum_pass_options", "fsafe_lab_test.minimum_value", "fsafe_lab_test.maximum_value"]',
-        37,
+        39,
     ),
     rule(
         "fsafe_retest_auto_create", "workflow", "food_safety",
@@ -417,7 +442,7 @@ RULES = [
         "Failed initial test auto-creates retest and vector results based on lab test config.",
         None,
         '["fsafe_result", "fsafe_lab_test.requires_retest", "fsafe_lab_test.requires_vector_test"]',
-        38,
+        40,
     ),
 
     # =====================================================================
@@ -429,7 +454,7 @@ RULES = [
         "When recurring_frequency is set and status = done, a new request is auto-created.",
         None,
         '["maint_request.recurring_frequency", "maint_request.status"]',
-        39,
+        41,
     ),
 ]
 
