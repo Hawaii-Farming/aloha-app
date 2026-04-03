@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-03 - Completed quick task 260402-jiy: sidebar modules names should be upper letters
+Last activity: 2026-04-03 - Completed quick task 260402-jk5: sidebar submodules capitalize, modules uppercase
 
 Progress: [██████████] 100%
 
@@ -52,6 +52,7 @@ None — milestone shipped.
 |---|-------------|------|--------|-----------|
 | 260402-jf6 | sidebar modules names should be capitalized | 2026-04-02 | 5c95a1c | [260402-jf6-sidebar-modules-names-should-be-capitali](./quick/260402-jf6-sidebar-modules-names-should-be-capitali/) |
 | 260402-jiy | sidebar modules names should be upper letters | 2026-04-03 | c7a38a7 | [260402-jiy-sidebar-modules-names-should-be-upper-le](./quick/260402-jiy-sidebar-modules-names-should-be-upper-le/) |
+| 260402-jk5 | sidebar submodules capitalize, modules uppercase | 2026-04-03 | 7dac5d3 | [260402-jk5-sidebar-submodules-capitalize-modules-up](./quick/260402-jk5-sidebar-submodules-capitalize-modules-up/) |
 
 ## Session Continuity
 
