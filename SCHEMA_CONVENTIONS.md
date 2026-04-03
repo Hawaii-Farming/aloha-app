@@ -10,18 +10,18 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 
 | Prefix    | Module          | Migration range | Doc # |
 |-----------|-----------------|-----------------|-------|
-| `sys_`    | System          | 001–006 | 01 |
+| `sys_`    | System          | 001–004 | 01 |
 | `org_`    | Org             | 007–014 | 02 |
-| `grow_`   | Grow            | 015–016, 048–067 | 06 |
+| `grow_`   | Grow            | 005–006, 015–016, 048–059, 100–107 | 06 |
 | `hr_`     | Human Resources | 017–025 | 04 |
 | `invnt_`  | Inventory       | 026–033 | 03 |
-| `sales_`  | Sales           | 035, 068–074 | 08 |
-| `ops_`    | Operations      | 034, 036–047, 093 | 05 |
-| `pack_`   | Pack            | 075–076, 078–083 | 07 |
-| `maint_`  | Maintenance     | 084–086 | 09 |
-| `fsafe_`  | Food Safety     | 087–092 | 10 |
+| `sales_`  | Sales           | 035, 108–113, 115, 117, 136–140 | 08 |
+| `ops_`    | Operations      | 034, 036–047, 135 | 05 |
+| `pack_`   | Pack            | 114, 116, 118–125 | 07 |
+| `maint_`  | Maintenance     | 126–128 | 09 |
+| `fsafe_`  | Food Safety     | 129–134 | 10 |
 
-Sales & Pack migration ranges are interleaved (067–084) due to cross-module FK dependencies.
+Migration ranges are interleaved in some areas due to cross-module FK dependencies (e.g. sales_product at 035 precedes ops tables, pack_lot at 114 precedes sales_po_fulfillment at 117).
 
 ---
 
@@ -47,7 +47,7 @@ Workflow fields capture a named person performing a step in a record's lifecycle
 
 | Type | Column examples | Datatype | FK? | Purpose |
 |------|-----------------|----------|-----|---------|
-| Workflow | `verified_by`, `reviewed_by`, `requested_by`, `sampled_by`, `ordered_by`, `approved_by`, `uploaded_by`, `assigned_to`, `fixer_id`, `reported_by` | TEXT | FK → `hr_employee(id)` | Identifies a specific employee in a business process |
+| Workflow | `verified_by`, `reviewed_by`, `requested_by`, `sampled_by`, `ordered_by`, `approved_by`, `qb_uploaded_by`, `assigned_to`, `fixer_id`, `reported_by` | TEXT | FK → `hr_employee(id)` | Identifies a specific employee in a business process |
 | Audit | `created_by`, `updated_by` | TEXT | No FK | Logs the Supabase Auth email of who made the change |
 
 Workflow field rules:
@@ -188,7 +188,7 @@ scripts/migrations/YYYYMMDDHHMMSS_module.py
 scripts/processes/YYYYMMDDHHMMSS_process_name.py
 ```
 
-The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260330000001_sys.md`, `20260330000001_sys_uom.sql`, `20260330000001_seed_system_data.py`).
+The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260401000001_sys.md`, `20260401000001_sys_uom.sql`, `20260401000001_seed_system_data.py`).
 
 ---
 
