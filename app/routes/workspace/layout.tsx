@@ -17,6 +17,7 @@ import { AppLogo } from '~/components/app-logo';
 import { MobileNavigation } from '~/components/sidebar/mobile-navigation';
 import { WorkspaceNavigationMenu } from '~/components/sidebar/navigation-menu';
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
+import { WorkspaceNavbar } from '~/components/workspace-navbar';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
@@ -74,32 +75,41 @@ function SidebarLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
 
   return (
     <SidebarProvider defaultOpen={layoutState.open}>
-      <Page style={'sidebar'}>
-        <PageNavigation>
-          <WorkspaceSidebar
-            account={accountSlug}
-            accountId={workspace.currentOrg.org_id}
-            accounts={accounts}
-            user={user}
-            navigation={workspace.navigation}
-            accessLevelId={workspace.currentOrg.access_level_id}
-          />
-        </PageNavigation>
+      <div className="flex h-screen w-full flex-col">
+        <WorkspaceNavbar
+          account={accountSlug}
+          accountId={workspace.currentOrg.org_id}
+          accounts={accounts}
+          user={user}
+          accessLevelId={workspace.currentOrg.access_level_id}
+        />
+        <div className="flex min-h-0 flex-1">
+          <Page style={'sidebar'}>
+            <PageNavigation>
+              <WorkspaceSidebar
+                account={accountSlug}
+                navigation={workspace.navigation}
+              />
+            </PageNavigation>
 
-        <PageMobileNavigation className={'flex items-center justify-between'}>
-          <AppLogo />
+            <PageMobileNavigation
+              className={'flex items-center justify-between'}
+            >
+              <AppLogo />
 
-          <div className={'flex space-x-4'}>
-            <MobileNavigation
-              userId={user.id}
-              accounts={accounts}
-              account={accountSlug}
-            />
-          </div>
-        </PageMobileNavigation>
+              <div className={'flex space-x-4'}>
+                <MobileNavigation
+                  userId={user.id}
+                  accounts={accounts}
+                  account={accountSlug}
+                />
+              </div>
+            </PageMobileNavigation>
 
-        {props.children}
-      </Page>
+            {props.children}
+          </Page>
+        </div>
+      </div>
     </SidebarProvider>
   );
 }

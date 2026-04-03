@@ -1,13 +1,10 @@
 import { useLocation } from 'react-router';
 
-import type { JwtPayload } from '@supabase/supabase-js';
-
 import { Settings, Users } from 'lucide-react';
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
@@ -17,55 +14,32 @@ import {
 } from '@aloha/ui/shadcn-sidebar';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
-import { UserProfileDropdown } from '~/components/user-profile-dropdown';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
-
-type AccountModel = {
-  label: string | null;
-  value: string | null;
-  image: string | null;
-};
 
 export function WorkspaceSidebar(props: {
   account: string;
-  accountId: string;
-  accounts: AccountModel[];
-  user: JwtPayload;
   navigation: {
     modules: AppNavModule[];
     subModules: AppNavSubModule[];
   };
-  accessLevelId: string;
 }) {
   return (
-    <SidebarContainer
-      account={props.account}
-      accountId={props.accountId}
-      accounts={props.accounts}
-      user={props.user}
-      navigation={props.navigation}
-      accessLevelId={props.accessLevelId}
-    />
+    <SidebarContainer account={props.account} navigation={props.navigation} />
   );
 }
 
 function SidebarContainer(props: {
   account: string;
-  accountId: string;
-  accounts: AccountModel[];
-  user: JwtPayload;
   navigation: {
     modules: AppNavModule[];
     subModules: AppNavSubModule[];
   };
-  accessLevelId: string;
 }) {
-  const { account, accounts, user, navigation } = props;
-  const userId = user.id;
+  const { account, navigation } = props;
 
   return (
     <Sidebar collapsible={'icon'}>
-      <SidebarContent className={`mt-5 h-[calc(100%-80px)] overflow-y-auto`}>
+      <SidebarContent className="mt-2 flex-1 overflow-y-auto">
         <ModuleSidebarNavigation
           account={account}
           modules={navigation.modules}
@@ -74,18 +48,6 @@ function SidebarContainer(props: {
         <SidebarSeparator />
         <StaticNavigationItems account={account} />
       </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarContent>
-          <UserProfileDropdown
-            user={props.user}
-            accountSlug={account}
-            accessLevelId={props.accessLevelId}
-            accounts={accounts}
-            userId={userId}
-          />
-        </SidebarContent>
-      </SidebarFooter>
     </Sidebar>
   );
 }
