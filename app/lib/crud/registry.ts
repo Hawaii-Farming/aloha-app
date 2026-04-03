@@ -1,6 +1,9 @@
 import type { CrudModuleConfig } from '~/lib/crud/types';
 
 import { hrDepartmentConfig } from './hr-department.config';
+import { hrEmployeeConfig } from './hr-employee.config';
+import { hrPayrollConfig } from './hr-payroll.config';
+import { hrTimeOffConfig } from './hr-time-off.config';
 import { invntItemConfig } from './invnt-item.config';
 
 /**
@@ -12,6 +15,9 @@ import { invntItemConfig } from './invnt-item.config';
  */
 const registry = new Map<string, CrudModuleConfig>([
   ['departments', hrDepartmentConfig],
+  ['employees', hrEmployeeConfig],
+  ['time_off', hrTimeOffConfig],
+  ['payroll', hrPayrollConfig],
   ['products', invntItemConfig],
 ]);
 
