@@ -125,7 +125,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                   {createElement(SubModuleIcon, {
                                     className: 'h-4 w-4',
                                   })}
-                                  <span className="capitalize">{sm.display_name}</span>
+                                  <span className="truncate capitalize">{sm.display_name}</span>
                                 </a>
                               </DropdownMenuItem>
                             );
@@ -159,7 +159,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                     {createElement(IconComponent, {
                       className: 'h-4 w-4',
                     })}
-                    <span className="flex-1 text-left uppercase">{mod.display_name}</span>
+                    <span className="flex-1 truncate text-left uppercase">{mod.display_name}</span>
                     <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
                   </CollapsibleTrigger>
                 </SidebarGroupLabel>
@@ -189,7 +189,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                 {createElement(SubModuleIcon, {
                                   className: 'h-4 w-4',
                                 })}
-                                <span className="capitalize">{sm.display_name}</span>
+                                <span className="truncate capitalize">{sm.display_name}</span>
                               </a>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
