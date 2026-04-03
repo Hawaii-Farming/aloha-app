@@ -87,7 +87,7 @@ function SidebarLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
           navigation={workspace.navigation}
         />
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto pt-4">
           {props.children}
         </main>
       </div>
