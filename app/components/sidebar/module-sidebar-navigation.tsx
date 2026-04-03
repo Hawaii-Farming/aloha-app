@@ -203,6 +203,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
           </div>
         );
       })}
+      <SidebarSeparator className="mx-0" />
     </>
   );
 }
