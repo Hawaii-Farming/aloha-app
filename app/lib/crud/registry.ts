@@ -5,6 +5,8 @@ import { hrEmployeeConfig } from './hr-employee.config';
 import { hrPayrollConfig } from './hr-payroll.config';
 import { hrTimeOffConfig } from './hr-time-off.config';
 import { invntItemConfig } from './invnt-item.config';
+import { invntOnhandConfig } from './invnt-onhand.config';
+import { orgSiteConfig } from './org-site.config';
 
 /**
  * Maps sub-module slugs (from URL params) to their CRUD configs.
@@ -19,6 +21,8 @@ const registry = new Map<string, CrudModuleConfig>([
   ['time_off', hrTimeOffConfig],
   ['payroll', hrPayrollConfig],
   ['products', invntItemConfig],
+  ['stock_counts', invntOnhandConfig],
+  ['warehouses', orgSiteConfig],
 ]);
 
 export function getModuleConfig(
