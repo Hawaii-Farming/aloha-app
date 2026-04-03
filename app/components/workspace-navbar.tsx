@@ -5,6 +5,7 @@ import { SidebarTrigger } from '@aloha/ui/shadcn-sidebar';
 
 import { AiChatButton } from '~/components/ai/ai-chat-button';
 import { NavbarBreadcrumbs } from '~/components/navbar-breadcrumbs';
+import { NavbarSearch } from '~/components/navbar-search';
 import { UserProfileDropdown } from '~/components/user-profile-dropdown';
 
 interface WorkspaceNavbarProps {
@@ -38,6 +39,7 @@ export function WorkspaceNavbar(props: WorkspaceNavbarProps) {
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
+        <NavbarSearch />
         <AiChatButton />
         <UserProfileDropdown
           user={user}
