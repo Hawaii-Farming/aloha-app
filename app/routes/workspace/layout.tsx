@@ -75,25 +75,23 @@ function SidebarLayout(props: React.PropsWithChildren<Route.ComponentProps>) {
 
   return (
     <SidebarProvider defaultOpen={layoutState.open}>
-      <div className="flex h-screen w-full flex-col">
-        <WorkspaceNavbar
+      <WorkspaceNavbar
+        account={accountSlug}
+        accountId={workspace.currentOrg.org_id}
+        accounts={accounts}
+        user={user}
+        accessLevelId={workspace.currentOrg.access_level_id}
+      />
+
+      <div className="mt-12 flex w-full [&_.peer>div:first-child]:h-[calc(100svh-3rem)] [&_.peer>div:nth-child(2)]:top-12 [&_.peer>div:nth-child(2)]:h-[calc(100svh-3rem)]">
+        <WorkspaceSidebar
           account={accountSlug}
-          accountId={workspace.currentOrg.org_id}
-          accounts={accounts}
-          user={user}
-          accessLevelId={workspace.currentOrg.access_level_id}
+          navigation={workspace.navigation}
         />
 
-        <div className="flex min-h-0 flex-1 overflow-hidden">
-          <WorkspaceSidebar
-            account={accountSlug}
-            navigation={workspace.navigation}
-          />
-
-          <main className="flex-1 overflow-y-auto">
-            {props.children}
-          </main>
-        </div>
+        <main className="flex-1 overflow-y-auto">
+          {props.children}
+        </main>
       </div>
     </SidebarProvider>
   );
