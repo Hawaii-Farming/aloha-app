@@ -9,7 +9,7 @@ Source: https://docs.google.com/spreadsheets/d/1lSWWLxyD0l83HfuiNI_iud6F9hopY4ho
   - sales_customer: 66 rows → sales_customer_group (unique groups) + sales_customer
 
 Usage:
-    python scripts/migrations/20260401000005d_sales.py
+    python scripts/migrations/20260401000008_sales.py
 
 Rerunnable: clears and reinserts all data on each run.
 """

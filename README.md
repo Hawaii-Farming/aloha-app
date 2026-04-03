@@ -26,7 +26,7 @@ Pricing is managed with three tiers of specificity — default prices by product
 ```
 aloha-app/
   supabase/
-    migrations/          # Sequential SQL migration files (001-134, source of truth)
+    migrations/          # Sequential SQL migration files (001-135, source of truth)
   docs/
     schemas/             # Schema documentation per module (01_sys through 10_fsafe)
     processes/           # Business process and workflow documentation (01-10)
@@ -144,7 +144,7 @@ aloha-app/
 - **sales_product_price** — Tiered pricing (customer → group → default) with effective date ranges
 - **sales_po** — Customer order header with customer, FOB, dates, approval workflow, accounting upload tracking, and optional recurring frequency for standing orders
 - **sales_po_line** — Individual products within an order with snapshot pricing at time of order
-- **sales_container_type** — Lookup table for shipping container types per farm with maximum pallet space capacity
+- **sales_container_type** — Lookup table for shipping container types with maximum pallet space capacity
 - **sales_po_fulfillment** — Fulfillment records linking order lines to pack lots, with shipping traceability (container_id, booking_id, pallet_number, container_space) bulk-set during containerization
 
 ## Maintenance Module (3 tables) — [Docs](docs/schemas/20260401000009_maint.md)
@@ -170,7 +170,7 @@ See [SCHEMA_CONVENTIONS.md](SCHEMA_CONVENTIONS.md) for the full set of schema de
 
 Detailed table documentation with column definitions, constraints, and relationships is maintained in `docs/schemas/`:
 
-- [System Schema](docs/schemas/20260401000001_sys.md) — 4 system-level tables
+- [System Schema](docs/schemas/20260401000001_sys.md) — 6 system-level tables
 - [Org Schema](docs/schemas/20260401000002_org.md) — 8 organization structure tables
 - [Inventory Schema](docs/schemas/20260401000003_invnt.md) — Items, orders, transactions, and views
 - [Human Resources Schema](docs/schemas/20260401000004_hr.md) — Employee records and Human Resources lookups
