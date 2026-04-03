@@ -302,6 +302,14 @@ supabase.table("table").delete().neq("id", "00000000-0000-0000-0000-000000000000
 supabase.table("table").delete().neq("id", "__none__").execute()
 ```
 
+### Schema changes during migration
+
+When adding or reordering columns on a table during the migration process, **drop and recreate** the table (and all its child tables) in Supabase so that the column order matches the `.sql` file exactly. Do not use `ALTER TABLE ADD COLUMN` — it appends the column at the end, breaking the intended column order.
+
+1. Drop child tables first (FK order), then the parent
+2. Recreate from the `.sql` migration files in order
+3. Rerun the migration script to repopulate data
+
 ### Farm-scoped clearing
 
 When a script only migrates data for a specific farm, clear only that farm's rows:

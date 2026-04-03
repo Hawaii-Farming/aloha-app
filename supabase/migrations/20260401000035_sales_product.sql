@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS sales_product (
 
     photos                     JSONB NOT NULL DEFAULT '[]',
     display_order              INTEGER NOT NULL DEFAULT 0,
+    is_active                  BOOLEAN NOT NULL DEFAULT true,
 
     created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                 TEXT,

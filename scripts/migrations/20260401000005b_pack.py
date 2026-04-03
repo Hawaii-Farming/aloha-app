@@ -599,7 +599,7 @@ def migrate_shelf_life_metrics(supabase):
 
     rows = []
     for m in SHELF_LIFE_METRICS:
-        row = {
+        rows.append(audit({
             "id": m["id"],
             "org_id": ORG_ID,
             "farm_id": "lettuce",
@@ -608,10 +608,8 @@ def migrate_shelf_life_metrics(supabase):
             "enum_options": m["enum_options"],
             "fail_enum_values": m["fail_enum_values"],
             "display_order": m["display_order"],
-        }
-        if "is_active" in m:
-            row["is_active"] = m["is_active"]
-        rows.append(audit(row))
+            "is_active": m.get("is_active", True),
+        }))
 
     insert_rows(supabase, "pack_shelf_life_metric", rows)
 

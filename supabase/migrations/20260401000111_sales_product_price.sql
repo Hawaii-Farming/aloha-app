@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS sales_product_price (
     sales_fob_id         TEXT NOT NULL REFERENCES sales_fob(id),
     sales_customer_group_id  TEXT REFERENCES sales_customer_group(id),
     sales_customer_id        TEXT REFERENCES sales_customer(id),
-    price          NUMERIC NOT NULL,
+    price_per_case NUMERIC NOT NULL,
     effective_from DATE NOT NULL,
     effective_to   DATE,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),

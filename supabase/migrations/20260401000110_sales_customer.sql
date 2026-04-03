@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS sales_customer (
     email           TEXT,
     cc_emails       JSONB NOT NULL DEFAULT '[]',
     billing_address TEXT,
+    is_active       BOOLEAN NOT NULL DEFAULT true,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
