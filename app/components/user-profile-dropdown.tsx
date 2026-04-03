@@ -2,7 +2,7 @@
 
 import { JwtPayload } from '@supabase/supabase-js';
 
-import { LogOut, Palette } from 'lucide-react';
+import { LogOut, Palette, Settings, Users } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
@@ -102,6 +102,26 @@ export function UserProfileDropdown(props: {
             <DropdownMenuSeparator />
           </>
         ) : null}
+
+        {props.accountSlug ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <a href={`/home/${props.accountSlug}/settings`}>
+                <Settings className="mr-2 h-4 w-4" />
+                <Trans i18nKey={'teams:settings.pageTitle'}>Settings</Trans>
+              </a>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <a href={`/home/${props.accountSlug}/members`}>
+                <Users className="mr-2 h-4 w-4" />
+                <Trans i18nKey={'teams:members.pageTitle'}>Members</Trans>
+              </a>
+            </DropdownMenuItem>
+          </>
+        ) : null}
+
+        <DropdownMenuSeparator />
 
         <DropdownMenuItem onClick={() => signOut.mutateAsync()}>
           <LogOut className="mr-2 h-4 w-4" />
