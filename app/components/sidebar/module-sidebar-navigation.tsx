@@ -145,7 +145,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
           <div key={mod.module_id}>
             {index > 0 && <SidebarSeparator className="mx-0" />}
             <Collapsible
-              defaultOpen={isModuleActive}
+              defaultOpen
               className="group/collapsible"
             >
               <SidebarGroup>
