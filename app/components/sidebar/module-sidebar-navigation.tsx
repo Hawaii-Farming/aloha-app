@@ -2,7 +2,6 @@ import { createElement } from 'react';
 
 import { useLocation } from 'react-router';
 
-import { ChevronRight } from 'lucide-react';
 
 import { cn } from '@aloha/ui/utils';
 
@@ -131,7 +130,6 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                         className: 'h-4 w-4 shrink-0',
                       })}
                       <span className="flex-1 truncate text-left uppercase">{mod.display_name}</span>
-                      <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
                     </CollapsibleTrigger>
                   </SidebarGroupLabel>
                   <CollapsibleContent>
