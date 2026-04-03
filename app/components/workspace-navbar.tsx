@@ -42,8 +42,7 @@ export function WorkspaceNavbar(props: WorkspaceNavbarProps) {
       <div className="flex shrink-0 items-center gap-3">
         <NavbarSearch />
         <AiChatButton />
-        <ModeToggle className="size-8 rounded-full text-muted-foreground" />
-        <Separator orientation="vertical" className="h-4" />
+        <ModeToggle className="size-8 rounded-full border text-muted-foreground" />
         <UserProfileDropdown
           user={user}
           accountSlug={account}
