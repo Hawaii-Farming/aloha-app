@@ -1,5 +1,6 @@
 import type { JwtPayload } from '@supabase/supabase-js';
 
+import { ModeToggle } from '@aloha/ui/mode-toggle';
 import { Separator } from '@aloha/ui/separator';
 import { SidebarTrigger } from '@aloha/ui/shadcn-sidebar';
 
@@ -40,6 +41,7 @@ export function WorkspaceNavbar(props: WorkspaceNavbarProps) {
 
       <div className="flex shrink-0 items-center gap-3">
         <NavbarSearch />
+        <ModeToggle className="size-8 rounded-full text-muted-foreground" />
         <AiChatButton />
         <UserProfileDropdown
           user={user}

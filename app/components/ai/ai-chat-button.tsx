@@ -1,4 +1,4 @@
-import { Lightbulb, X } from 'lucide-react';
+import { X, Zap } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 
@@ -16,7 +16,7 @@ export function AiChatButton() {
       aria-label={open ? 'Close AI assistant' : 'Open AI assistant'}
       data-test="ai-chat-button"
     >
-      {open ? <X className="size-4" /> : <Lightbulb className="size-4" />}
+      {open ? <X className="size-4" /> : <Zap className="size-4" />}
     </Button>
   );
 }
