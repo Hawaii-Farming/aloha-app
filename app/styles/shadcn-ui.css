@@ -78,8 +78,8 @@
         --destructive: var(--color-red-500);
         --destructive-foreground: var(--color-white);
 
-        --border: oklch(65% 0 none);
-        --input: oklch(60% 0 none);
+        --border: oklch(87% 0 none);
+        --input: oklch(82% 0 none);
         --ring: oklch(47% 0.165 160);
 
         --radius: 0.5rem;
@@ -96,7 +96,7 @@
         --sidebar-primary-foreground: oklch(99% 0 none);
         --sidebar-accent: oklch(95% 0.01 160);
         --sidebar-accent-foreground: oklch(30% 0 none);
-        --sidebar-border: oklch(65% 0 none);
+        --sidebar-border: oklch(87% 0 none);
         --sidebar-ring: oklch(47% 0.165 160);
     }
 
