@@ -78,10 +78,11 @@ function StaticNavigationItems({ account }: { account: string }) {
               <SidebarMenuButton
                 asChild
                 isActive={currentPath.startsWith(item.path)}
+                tooltip={item.label}
               >
                 <a href={item.path}>
-                  <item.Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
+                  <item.Icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{item.label}</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

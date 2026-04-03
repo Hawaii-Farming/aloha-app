@@ -97,7 +97,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                             )}
                           >
                             {createElement(IconComponent, {
-                              className: 'h-4 w-4',
+                              className: 'h-4 w-4 shrink-0',
                             })}
                             <span className="uppercase">{mod.display_name}</span>
                           </SidebarMenuButton>
@@ -123,7 +123,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                   )}
                                 >
                                   {createElement(SubModuleIcon, {
-                                    className: 'h-4 w-4',
+                                    className: 'h-4 w-4 shrink-0',
                                   })}
                                   <span className="truncate capitalize">{sm.display_name}</span>
                                 </a>
@@ -157,7 +157,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                     )}
                   >
                     {createElement(IconComponent, {
-                      className: 'h-4 w-4',
+                      className: 'h-4 w-4 shrink-0',
                     })}
                     <span className="flex-1 truncate text-left uppercase">{mod.display_name}</span>
                     <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
@@ -187,7 +187,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                             >
                               <a href={subModulePath}>
                                 {createElement(SubModuleIcon, {
-                                  className: 'h-4 w-4',
+                                  className: 'h-4 w-4 shrink-0',
                                 })}
                                 <span className="truncate capitalize">{sm.display_name}</span>
                               </a>
