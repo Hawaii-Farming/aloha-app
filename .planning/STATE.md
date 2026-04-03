@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-03 - Completed quick task 260403-anf: add space between navbar and table content
+Last activity: 2026-04-03 - Completed quick task 260403-arw: convert Create button to slide-in Sheet panel
 
 Progress: [██████████] 100%
 
@@ -71,6 +71,7 @@ None — milestone shipped.
 | 260403-ajc | remove members link from avatar profile dropdown | 2026-04-03 | 7f987dc | [260403-ajc-remove-members-link-from-avatar-profile-](./quick/260403-ajc-remove-members-link-from-avatar-profile-/) |
 | 260403-alg | remove breadcrumbs and title between navbar and table | 2026-04-03 | c867e4f | [260403-alg-remove-breadcrumbs-and-title-between-nav](./quick/260403-alg-remove-breadcrumbs-and-title-between-nav/) |
 | 260403-anf | add space between navbar and table content | 2026-04-03 | d175b56 | [260403-anf-add-space-between-navbar-and-table-conte](./quick/260403-anf-add-space-between-navbar-and-table-conte/) |
+| 260403-arw | convert Create button to slide-in Sheet panel | 2026-04-03 | 31f41b1 | [260403-arw-convert-create-button-from-page-navigati](./quick/260403-arw-convert-create-button-from-page-navigati/) |
 
 ## Session Continuity
 
