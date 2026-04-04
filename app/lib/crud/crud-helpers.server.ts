@@ -30,7 +30,6 @@ export async function loadTableData<T = Record<string, unknown>>(
     params.searchParams.get('dir') ??
     (params.defaultSort?.ascending ? 'asc' : 'desc');
   const search = params.searchParams.get('q') ?? '';
-  const showDeleted = params.searchParams.get('deleted') === 'true';
   const size = params.pageSize ?? 25;
   const from = (page - 1) * size;
   const to = from + size - 1;
@@ -38,11 +37,16 @@ export async function loadTableData<T = Record<string, unknown>>(
   let query = params.client
     .from(params.viewName)
     .select('*', { count: 'exact' })
-    .eq('org_id', params.orgId);
+    .eq('org_id', params.orgId)
+    .eq('is_deleted', false);
 
-  // Soft-delete filter (TABLE-08)
-  if (!showDeleted) {
-    query = query.eq('is_deleted', false);
+  // Active/Inactive filter: toggle between active (no end_date) and inactive (has end_date)
+  const showInactive = params.searchParams.get('inactive') === 'true';
+
+  if (showInactive) {
+    query = query.not('end_date', 'is', null);
+  } else {
+    query = query.is('end_date', null);
   }
 
   // Text search (TABLE-05) using PostgREST .or() syntax

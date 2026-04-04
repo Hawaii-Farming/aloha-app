@@ -26,7 +26,7 @@ import {
 type RowData = Record<string, unknown>;
 
 function buildColumns(config?: {
-  columns: { key: string; label: string; sortable?: boolean }[];
+  columns: { key: string; label: string; sortable?: boolean; type?: string; render?: string }[];
 }): ColumnDef<RowData>[] {
   if (!config) {
     return [];
@@ -41,10 +41,21 @@ function buildColumns(config?: {
       enableSorting: col.sortable ?? false,
     };
 
-    if (col.key === 'created_at') {
+    if (col.render === 'full_name') {
+      def.cell = ({ row }) => {
+        const first = row.original['first_name'] as string ?? '';
+        const last = row.original['last_name'] as string ?? '';
+        return `${last}, ${first}`.replace(/(^, |, $)/, '');
+      };
+    } else if (col.type === 'date') {
       def.cell = ({ getValue }) => {
         const value = getValue() as string | null;
-        return value ? new Date(value).toLocaleDateString() : '-';
+        return value ? new Date(value).toLocaleDateString() : '';
+      };
+    } else if (col.type === 'datetime' || col.key === 'created_at') {
+      def.cell = ({ getValue }) => {
+        const value = getValue() as string | null;
+        return value ? new Date(value).toLocaleDateString() : '';
       };
     }
 
@@ -83,6 +94,7 @@ export const loader = async (args: {
     config?.columns.find((c) => c.sortable)?.key ?? 'created_at';
 
   const url = new URL(args.request.url);
+  const pageSize = Number(url.searchParams.get('pageSize') ?? '25');
   const tableData = await loadTableData({
     client,
     viewName,
@@ -90,7 +102,7 @@ export const loader = async (args: {
     searchParams: url.searchParams,
     searchColumns,
     defaultSort: { column: defaultSortCol, ascending: true },
-    pageSize: 25,
+    pageSize,
   });
 
   const fkFields = (config?.formFields ?? []).filter((f) => f.type === 'fk');
@@ -145,7 +157,7 @@ export default function SubModulePage(props: {
   const sort = searchParams.get('sort') ?? 'id';
   const dir = searchParams.get('dir') ?? 'asc';
   const q = searchParams.get('q') ?? '';
-  const deleted = searchParams.get('deleted') ?? 'false';
+  const inactive = searchParams.get('inactive') ?? 'false';
 
   const updateParams = useCallback(
     (updates: Record<string, string | number>) => {
@@ -169,8 +181,8 @@ export default function SubModulePage(props: {
 
   return (
     <>
-      <PageBody>
-        <div className="flex flex-col gap-4" data-test="sub-module-list">
+      <div className="flex flex-1 flex-col overflow-hidden" data-test="sub-module-list">
+        <div className="shrink-0 pb-4">
           <DataTableToolbar
             searchValue={q}
             onSearchChange={(value) => updateParams({ q: value, page: 1 })}
@@ -178,9 +190,9 @@ export default function SubModulePage(props: {
               config?.search?.placeholder ??
               `Search ${subModuleAccess.display_name.toLowerCase()}...`
             }
-            showDeleted={deleted === 'true'}
-            onShowDeletedChange={(value) =>
-              updateParams({ deleted: value ? 'true' : 'false', page: 1 })
+            showInactive={inactive === 'true'}
+            onShowInactiveChange={(value) =>
+              updateParams({ inactive: value ? 'true' : 'false', page: 1 })
             }
             actionSlot={
               <Button
@@ -194,13 +206,16 @@ export default function SubModulePage(props: {
               </Button>
             }
           />
+        </div>
 
+        <div className="flex min-h-0 flex-1 flex-col">
           <DataTable
             data={tableData.data as RowData[]}
             columns={columns}
             pageIndex={tableData.page - 1}
             pageSize={tableData.pageSize}
             pageCount={tableData.pageCount}
+            totalCount={tableData.totalCount}
             manualPagination={true}
             manualSorting={true}
             sorting={[{ id: sort, desc: dir === 'desc' }]}
@@ -218,6 +233,9 @@ export default function SubModulePage(props: {
             onPaginationChange={(pagination) => {
               updateParams({ page: pagination.pageIndex + 1 });
             }}
+            onPageSizeChange={(size) => {
+              updateParams({ pageSize: size, page: 1 });
+            }}
             onRowClick={(row) => {
               const id = row[pkColumn] as string;
 
@@ -229,7 +247,7 @@ export default function SubModulePage(props: {
             tableProps={{ 'data-test': 'crud-data-table' }}
           />
         </div>
-      </PageBody>
+      </div>
 
       <CreatePanel
         open={createOpen}

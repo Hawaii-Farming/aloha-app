@@ -30,6 +30,8 @@ export interface ColumnConfig {
   label: string;
   sortable?: boolean;
   type?: ColumnType;
+  /** Custom render hint (e.g. 'full_name' concatenates first_name + last_name) */
+  render?: string;
 }
 
 export interface FilterConfig {
@@ -56,7 +58,7 @@ export interface FormFieldConfig {
   /** For type='fk': column to use as display label */
   fkLabelColumn?: string;
   /** For type='select': allowed values */
-  options?: string[];
+  options?: Array<string | { value: string; label: string }>;
 }
 
 export interface WorkflowStateConfig {

@@ -9,8 +9,8 @@ interface DataTableToolbarProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
-  showDeleted: boolean;
-  onShowDeletedChange: (value: boolean) => void;
+  showInactive: boolean;
+  onShowInactiveChange: (value: boolean) => void;
   filterSlot?: React.ReactNode;
   actionSlot?: React.ReactNode;
   selectedCount?: number;
@@ -19,15 +19,15 @@ interface DataTableToolbarProps {
 export function DataTableToolbar(props: DataTableToolbarProps) {
   return (
     <div
-      className="flex items-center justify-between gap-2"
+      className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
       data-test="data-table-toolbar"
     >
-      <div className="flex flex-1 items-center gap-2">
+      <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
         <Input
           value={props.searchValue}
           onChange={(e) => props.onSearchChange(e.target.value)}
           placeholder={props.searchPlaceholder}
-          className="h-8 w-[250px]"
+          className="h-8 w-full sm:w-[250px]"
           data-test="table-search"
         />
 
@@ -35,13 +35,16 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
 
         <div className="flex items-center gap-1.5">
           <Switch
-            checked={props.showDeleted}
-            onCheckedChange={props.onShowDeletedChange}
-            id="show-deleted"
+            checked={props.showInactive}
+            onCheckedChange={props.onShowInactiveChange}
+            id="show-inactive"
           />
 
-          <Label htmlFor="show-deleted" className="text-xs">
-            <Trans i18nKey="common:showDeleted" />
+          <Label htmlFor="show-inactive" className="text-xs">
+            <Trans
+              i18nKey="common:showInactive"
+              defaults="Show Inactive"
+            />
           </Label>
         </div>
       </div>

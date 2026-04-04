@@ -22,6 +22,7 @@ import { orgSiteConfig } from './org-site.config';
  * table/view to query and how to render columns/forms.
  */
 const registry = new Map<string, CrudModuleConfig>([
+  ['register', hrEmployeeConfig],
   ['departments', hrDepartmentConfig],
   ['employees', hrEmployeeConfig],
   ['time_off', hrTimeOffConfig],

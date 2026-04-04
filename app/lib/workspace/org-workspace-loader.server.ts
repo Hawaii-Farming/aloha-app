@@ -2,10 +2,13 @@ import { redirect } from 'react-router';
 
 import type { JwtPayload, SupabaseClient } from '@supabase/supabase-js';
 
-import type { AppOrgContext, AppUserOrgs } from '~/lib/auth/view-contracts';
 import type { Database } from '~/lib/database.types';
 import { requireUserLoader } from '~/lib/require-user-loader';
-import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
+import type {
+  AppNavModule,
+  AppNavSubModule,
+  AppNavigationRow,
+} from '~/lib/workspace/types';
 
 export interface OrgWorkspace {
   currentOrg: {
@@ -22,6 +25,13 @@ export interface OrgWorkspace {
   };
 }
 
+interface EmployeeOrgRow {
+  id: string;
+  org_id: string;
+  sys_access_level_id: string;
+  org: { name: string };
+}
+
 export async function loadOrgWorkspace(params: {
   orgSlug: string;
   client: SupabaseClient<Database>;
@@ -29,62 +39,88 @@ export async function loadOrgWorkspace(params: {
 }): Promise<OrgWorkspace> {
   const user = await requireUserLoader(params.request);
 
-  const { data: rawOrgs, error: orgsError } = await params.client
-    .from('app_user_orgs' as const)
-    .select('org_id, org_name');
+  // Query hr_employee directly — RLS ensures org-scoped access
+  const { data: employees, error: empError } = await params.client
+    .from('hr_employee')
+    .select('id, org_id, sys_access_level_id, org:org!inner(name)')
+    .eq('user_id', user.sub)
+    .eq('is_deleted', false);
 
-  const userOrgs = rawOrgs as AppUserOrgs[] | null;
+  const allOrgs = employees as unknown as EmployeeOrgRow[] | null;
 
-  if (orgsError || !userOrgs || userOrgs.length === 0) {
+  if (empError || !allOrgs || allOrgs.length === 0) {
     throw redirect('/no-access');
   }
 
-  const { data: rawContext, error: contextError } = await params.client
-    .from('app_org_context' as const)
-    .select('org_id, org_name, employee_id, access_level_id')
-    .eq('org_id', params.orgSlug)
-    .single();
+  const current = allOrgs.find((e) => e.org_id === params.orgSlug);
 
-  const orgContext = rawContext as AppOrgContext | null;
-
-  if (contextError || !orgContext) {
-    throw redirect(`/home/${userOrgs[0]!.org_id}`);
+  if (!current) {
+    throw redirect(`/home/${allOrgs[0]!.org_id}`);
   }
 
-  // Nav views exist in SQL but not in generated types — use untyped client
+  const orgContext = {
+    org_id: current.org_id,
+    org_name: current.org.name,
+    employee_id: current.id,
+    access_level_id: current.sys_access_level_id,
+  };
+
+  // Single view query — not in generated types, use untyped client
   const untypedClient = params.client as unknown as SupabaseClient;
 
-  const modulesQuery = untypedClient
-    .from('app_nav_modules')
-    .select(
-      'module_id, org_id, module_slug, display_name, display_order, can_edit, can_delete, can_verify',
-    )
-    .eq('org_id', params.orgSlug)
-    .order('display_order');
+  const { data: navRows } = await untypedClient
+    .from('app_navigation')
+    .select('*')
+    .eq('org_id', params.orgSlug);
 
-  const subModulesQuery = untypedClient
-    .from('app_nav_sub_modules')
-    .select(
-      'sub_module_id, org_id, module_slug, sub_module_slug, display_name, display_order',
-    )
-    .eq('org_id', params.orgSlug)
-    .order('display_order');
-
-  const [modulesResult, subModulesResult] = await Promise.all([
-    modulesQuery,
-    subModulesQuery,
-  ]);
-
-  const modules = (modulesResult.data as AppNavModule[]) ?? [];
-  const subModules = (subModulesResult.data as AppNavSubModule[]) ?? [];
+  const rows = (navRows as AppNavigationRow[]) ?? [];
+  const { modules, subModules } = deriveNavigation(rows, params.orgSlug);
 
   return {
     currentOrg: orgContext,
-    userOrgs,
+    userOrgs: allOrgs.map((e) => ({
+      org_id: e.org_id,
+      org_name: e.org.name,
+    })),
     user,
-    navigation: {
-      modules,
-      subModules,
-    },
+    navigation: { modules, subModules },
+  };
+}
+
+/** Derive deduplicated modules and sub-modules from flat navigation rows */
+function deriveNavigation(
+  rows: AppNavigationRow[],
+  orgId: string,
+): { modules: AppNavModule[]; subModules: AppNavSubModule[] } {
+  const moduleMap = new Map<string, AppNavModule>();
+  const subModules: AppNavSubModule[] = [];
+
+  for (const row of rows) {
+    if (!moduleMap.has(row.module_slug)) {
+      moduleMap.set(row.module_slug, {
+        module_id: row.module_id,
+        org_id: orgId,
+        module_slug: row.module_slug,
+        display_name: row.module_display_name,
+        display_order: row.module_display_order,
+        can_edit: row.can_edit,
+        can_delete: row.can_delete,
+        can_verify: row.can_verify,
+      });
+    }
+
+    subModules.push({
+      sub_module_id: row.sub_module_id,
+      org_id: orgId,
+      module_slug: row.module_slug,
+      sub_module_slug: row.sub_module_slug,
+      display_name: row.sub_module_display_name,
+      display_order: row.sub_module_display_order,
+    });
+  }
+
+  return {
+    modules: [...moduleMap.values()],
+    subModules,
   };
 }

@@ -8,83 +8,89 @@ import type { Table as ReactTable } from '@tanstack/react-table';
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
 } from 'lucide-react';
 
 import { Button } from '../shadcn/button';
-import { Trans } from './trans';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../shadcn/select';
+
+const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
 interface DataTablePaginationProps<TData> {
   table: ReactTable<TData>;
+  totalCount?: number;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 export function DataTablePagination<TData>({
   table,
+  totalCount,
+  onPageSizeChange,
 }: DataTablePaginationProps<TData>) {
-  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
-  const totalCount = table.getFilteredRowModel().rows.length;
+  const currentPageSize = table.getState().pagination.pageSize;
+  const currentPage = table.getState().pagination.pageIndex + 1;
+  const pageCount = table.getPageCount();
+  const recordCount = totalCount ?? table.getFilteredRowModel().rows.length;
+
+  const from = (currentPage - 1) * currentPageSize + 1;
+  const to = Math.min(currentPage * currentPageSize, recordCount);
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="text-muted-foreground text-sm">
-        {selectedCount > 0 ? (
-          <Trans
-            i18nKey="common:rowsSelected"
-            values={{ count: selectedCount, total: totalCount }}
-          />
-        ) : null}
-      </div>
+    <div className="flex items-center gap-3 text-sm">
+      <span className="text-muted-foreground whitespace-nowrap">
+        {recordCount > 0
+          ? `${from}–${to} of ${recordCount}`
+          : '0 records'}
+      </span>
 
-      <div className="flex items-center gap-x-4">
-        <span className="text-muted-foreground flex items-center text-sm">
-          <Trans
-            i18nKey="common:pageOfPages"
-            values={{
-              page: table.getState().pagination.pageIndex + 1,
-              total: table.getPageCount(),
-            }}
-          />
+      <div className="flex items-center gap-1">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-7 w-7"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+
+        <span className="text-muted-foreground min-w-[3rem] text-center text-xs">
+          {currentPage} / {pageCount}
         </span>
 
-        <div className="flex items-center gap-x-1">
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeft className="h-4" />
-          </Button>
-
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="h-4" />
-          </Button>
-
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRight className="h-4" />
-          </Button>
-
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRight className="h-4" />
-          </Button>
-        </div>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-7 w-7"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
+
+      {onPageSizeChange && (
+        <Select
+          value={String(currentPageSize)}
+          onValueChange={(value) => onPageSizeChange(Number(value))}
+        >
+          <SelectTrigger className="h-7 w-[65px] text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PAGE_SIZE_OPTIONS.map((size) => (
+              <SelectItem key={size} value={String(size)}>
+                {size}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 }

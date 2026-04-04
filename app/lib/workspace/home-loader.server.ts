@@ -4,30 +4,33 @@ import pathsConfig from '~/config/paths.config';
 import { requireUserLoader } from '~/lib/require-user-loader';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
-interface OrgRow {
-  org_id: string;
-  org_name: string;
-}
-
 export async function homeLoader(request: Request) {
   const client = getSupabaseServerClient(request);
-  await requireUserLoader(request);
+  const user = await requireUserLoader(request);
 
+  // Query hr_employee directly — RLS ensures org-scoped access
   const { data, error } = await client
-    .from('app_user_orgs' as const)
-    .select('org_id, org_name');
+    .from('hr_employee')
+    .select('org_id, org:org!inner(name)')
+    .eq('user_id', user.sub)
+    .eq('is_deleted', false);
 
-  const orgs = data as OrgRow[] | null;
+  const rows = data as unknown as Array<{
+    org_id: string;
+    org: { name: string };
+  }> | null;
 
-  if (error || !orgs || orgs.length === 0) {
+  if (error || !rows || rows.length === 0) {
     return redirect('/no-access');
   }
 
-  if (orgs.length === 1) {
-    const orgId = orgs[0]!.org_id;
+  if (rows.length === 1) {
+    const orgId = rows[0]!.org_id;
 
     return redirect(pathsConfig.app.accountHome.replace('[account]', orgId));
   }
 
-  return { orgs };
+  return {
+    orgs: rows.map((r) => ({ org_id: r.org_id, org_name: r.org.name })),
+  };
 }

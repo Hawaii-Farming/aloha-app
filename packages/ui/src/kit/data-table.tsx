@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   flexRender,
@@ -22,7 +22,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -48,6 +47,8 @@ interface ReactTableProps<T extends object> {
   enableRowSelection?: boolean;
   onRowSelectionChange?: (selection: Record<string, boolean>) => void;
   onRowClick?: (row: T) => void;
+  totalCount?: number;
+  onPageSizeChange?: (pageSize: number) => void;
   emptyStateProps?: { heading: string; description?: string };
   tableProps?: React.ComponentProps<typeof Table> &
     Record<`data-${string}`, string>;
@@ -68,12 +69,18 @@ export function DataTable<T extends object>({
   enableRowSelection = false,
   onRowClick,
   onRowSelectionChange,
+  totalCount,
+  onPageSizeChange,
   emptyStateProps,
 }: ReactTableProps<T>) {
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: pageIndex ?? 0,
-    pageSize: pageSize ?? 15,
-  });
+  // Derive pagination from props on every render (server-driven)
+  const paginationState = useMemo<PaginationState>(
+    () => ({
+      pageIndex: pageIndex ?? 0,
+      pageSize: pageSize ?? 25,
+    }),
+    [pageIndex, pageSize],
+  );
 
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? []);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -104,7 +111,7 @@ export function DataTable<T extends object>({
     },
     pageCount,
     state: {
-      pagination,
+      pagination: paginationState,
       sorting,
       columnFilters,
       columnVisibility,
@@ -130,103 +137,103 @@ export function DataTable<T extends object>({
     onPaginationChange: (updater) => {
       const navigate = (page: number) => setTimeout(() => navigateToPage(page));
 
-      if (typeof updater === 'function') {
-        setPagination((prevState) => {
-          const nextState = updater(prevState);
+      const nextState =
+        typeof updater === 'function' ? updater(paginationState) : updater;
 
-          if (onPaginationChange) {
-            onPaginationChange(nextState);
-          } else {
-            navigate(nextState.pageIndex);
-          }
-
-          return nextState;
-        });
+      if (onPaginationChange) {
+        onPaginationChange(nextState);
       } else {
-        setPagination(updater);
-
-        if (onPaginationChange) {
-          onPaginationChange(updater);
-        } else {
-          navigate(updater.pageIndex);
-        }
+        navigate(nextState.pageIndex);
       }
     },
   });
 
   return (
-    <div className={'overflow-hidden rounded-lg border'}>
-      <Table {...tableProps}>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  colSpan={header.colSpan}
-                  style={{
-                    width: header.column.getSize(),
-                  }}
-                  key={header.id}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-                className={
-                  onRowClick ? 'hover:bg-muted/50 cursor-pointer' : undefined
-                }
-                onClick={
-                  onRowClick ? () => onRowClick(row.original) : undefined
-                }
+    <div className={'flex flex-1 flex-col overflow-hidden rounded-lg border'}>
+      <div className="relative flex-1 overflow-auto">
+        <table
+          className="w-full caption-bottom text-sm"
+          {...tableProps}
+        >
+          <thead className="bg-background sticky top-0 z-10 [&_tr]:border-b">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr
+                key={headerGroup.id}
+                className="hover:bg-muted/50 border-b transition-colors"
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    colSpan={header.colSpan}
+                    style={{ width: header.column.getSize() }}
+                    key={header.id}
+                    className="bg-background text-muted-foreground h-10 px-2 text-left align-middle font-medium"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </th>
                 ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                <EmptyState className="border-none shadow-none">
-                  <EmptyStateHeading>
-                    {emptyStateProps?.heading ?? 'No records found'}
-                  </EmptyStateHeading>
+              </tr>
+            ))}
+          </thead>
 
-                  {emptyStateProps?.description ? (
-                    <EmptyStateText>
-                      {emptyStateProps.description}
-                    </EmptyStateText>
-                  ) : null}
-                </EmptyState>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+          <tbody className="[&_tr:last-child]:border-0">
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className={`hover:bg-muted/50 border-b transition-colors data-[state=selected]:bg-muted ${
+                    onRowClick ? 'cursor-pointer' : ''
+                  }`}
+                  onClick={
+                    onRowClick ? () => onRowClick(row.original) : undefined
+                  }
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="p-2 align-middle">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  <EmptyState className="border-none shadow-none">
+                    <EmptyStateHeading>
+                      {emptyStateProps?.heading ?? 'No records found'}
+                    </EmptyStateHeading>
 
-        <TableFooter className={'bg-background'}>
-          <TableRow>
-            <TableCell colSpan={columns.length}>
-              <DataTablePagination table={table} />
-            </TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+                    {emptyStateProps?.description ? (
+                      <EmptyStateText>
+                        {emptyStateProps.description}
+                      </EmptyStateText>
+                    ) : null}
+                  </EmptyState>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="shrink-0 border-t bg-background px-2 py-1">
+        <DataTablePagination
+          table={table}
+          totalCount={totalCount}
+          onPageSizeChange={onPageSizeChange}
+        />
+      </div>
     </div>
   );
 }

@@ -102,7 +102,9 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
-          options={(field.options ?? []).map((o) => ({ value: o, label: o }))}
+          options={(field.options ?? []).map((o) =>
+            typeof o === 'string' ? { value: o, label: o } : o,
+          )}
         />
       );
 
