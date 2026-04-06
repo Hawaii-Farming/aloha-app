@@ -58,7 +58,9 @@ export function FormFieldGrid({
           <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
             {section.fields.map((field) => {
               const isFullWidth =
-                field.fullWidth || field.type === 'textarea';
+                field.fullWidth ||
+                field.type === 'textarea' ||
+                field.type === 'fk';
               const node = renderFormField({
                 field,
                 control,

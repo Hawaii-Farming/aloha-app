@@ -16,13 +16,23 @@ export async function requireModuleAccess(params: {
   moduleSlug: string;
   orgSlug: string;
 }): Promise<NavModule> {
-  const { data } = await params.client
+  const { data, error } = await params.client
     .from('app_navigation')
     .select('*')
     .eq('org_id', params.orgSlug)
     .eq('module_slug', params.moduleSlug)
     .limit(1)
-    .single();
+    .maybeSingle();
+
+  // PGRST116 = no rows matched. That's a real 403 (no access).
+  // Anything else is an unexpected error and should surface as 500.
+  if (error && error.code !== 'PGRST116') {
+    console.error(
+      `[requireModuleAccess] DB error for ${params.orgSlug}/${params.moduleSlug}:`,
+      error,
+    );
+    throw new Response('Internal Server Error', { status: 500 });
+  }
 
   const row = data as unknown as AppNavigationRow | null;
 
@@ -53,13 +63,21 @@ export async function requireSubModuleAccess(params: {
   subModuleSlug: string;
   orgSlug: string;
 }): Promise<NavSubModule> {
-  const { data } = await params.client
+  const { data, error } = await params.client
     .from('app_navigation')
     .select('*')
     .eq('org_id', params.orgSlug)
     .eq('module_slug', params.moduleSlug)
     .eq('sub_module_slug', params.subModuleSlug)
-    .single();
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error(
+      `[requireSubModuleAccess] DB error for ${params.orgSlug}/${params.moduleSlug}/${params.subModuleSlug}:`,
+      error,
+    );
+    throw new Response('Internal Server Error', { status: 500 });
+  }
 
   const row = data as unknown as AppNavigationRow | null;
 

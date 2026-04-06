@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS hr_disciplinary_warning (
     id                              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id                          TEXT NOT NULL REFERENCES org(id),
-    hr_employee_id                     TEXT NOT NULL REFERENCES hr_employee(id),
+    hr_employee_id                     TEXT NOT NULL,
 
     -- Warning details
     warning_date                    DATE,
@@ -22,14 +22,22 @@ CREATE TABLE IF NOT EXISTS hr_disciplinary_warning (
     status                          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed')),
 
     reported_at                     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    reported_by                     TEXT REFERENCES hr_employee(id),
+    reported_by                     TEXT,
     reviewed_at                     TIMESTAMPTZ,
-    reviewed_by                     TEXT REFERENCES hr_employee(id),
+    reviewed_by                     TEXT,
     created_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                      TEXT,
     updated_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                      TEXT,
-    is_deleted                       BOOLEAN NOT NULL DEFAULT false
+    is_deleted                       BOOLEAN NOT NULL DEFAULT false,
+
+    -- Named FKs so PostgREST can disambiguate when embedding hr_employee
+    CONSTRAINT fk_hr_disciplinary_warning_employee
+      FOREIGN KEY (hr_employee_id) REFERENCES hr_employee(id),
+    CONSTRAINT fk_hr_disciplinary_warning_reported_by
+      FOREIGN KEY (reported_by) REFERENCES hr_employee(id),
+    CONSTRAINT fk_hr_disciplinary_warning_reviewed_by
+      FOREIGN KEY (reviewed_by) REFERENCES hr_employee(id)
 );
 
 COMMENT ON TABLE hr_disciplinary_warning IS 'Employee disciplinary warning records. Tracks the offense, action plan, and employee acknowledgment alongside a pending to reviewed workflow.';

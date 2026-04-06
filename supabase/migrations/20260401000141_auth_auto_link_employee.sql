@@ -36,6 +36,8 @@ END;
 $$;
 
 -- Trigger fires after every new auth.users insert (i.e., first-time sign-in)
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW
@@ -43,3 +45,11 @@ CREATE TRIGGER on_auth_user_created
 
 -- Grant execute to authenticated and service_role
 GRANT EXECUTE ON FUNCTION public.handle_new_auth_user() TO service_role;
+
+-- Backfill: link any existing auth.users to hr_employee rows.
+-- Idempotent — only updates rows where user_id is currently NULL.
+UPDATE public.hr_employee e
+SET user_id = u.id
+FROM auth.users u
+WHERE e.company_email = u.email
+  AND e.user_id IS NULL;

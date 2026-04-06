@@ -52,7 +52,7 @@ export const hrPayrollConfig: CrudModuleConfig<typeof hrPayrollSchema> = {
       label: 'Employee',
       type: 'fk',
       fkTable: 'hr_employee',
-      fkLabelColumn: 'first_name',
+      fkLabelColumn: 'preferred_name',
       required: true,
     },
     {

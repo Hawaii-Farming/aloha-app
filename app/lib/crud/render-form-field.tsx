@@ -50,6 +50,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
           disabled={isPk && mode === 'edit'}
           description={
             isPk && mode === 'edit'
@@ -66,6 +67,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
         />
       );
 
@@ -76,6 +78,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
         />
       );
 
@@ -86,6 +89,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
         />
       );
 
@@ -96,6 +100,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
         />
       );
 
@@ -106,6 +111,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
           options={(field.options ?? []).map((o) =>
             typeof o === 'string' ? { value: o, label: o } : o,
           )}
@@ -119,6 +125,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
           options={(field.options ?? []).map((o) =>
             typeof o === 'string' ? { value: o, label: o } : o,
           )}
@@ -132,6 +139,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
           options={comboboxOptions?.[field.key] ?? []}
         />
       );
@@ -143,6 +151,7 @@ export function renderFormField({
           control={control}
           name={name}
           label={field.label}
+          required={field.required}
           options={fkOptions?.[field.key] ?? []}
         />
       );

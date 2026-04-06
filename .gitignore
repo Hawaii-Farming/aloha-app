@@ -57,7 +57,10 @@ playwright/.cache/
 
 # local env files
 .env*
-.dev.vars.claude/worktrees/
+.dev.vars
 
+# claude code
+.claude/worktrees/
+.claude/settings.local.json
 
 credentials.json

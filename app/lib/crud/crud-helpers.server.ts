@@ -86,6 +86,15 @@ export interface LoadTableDataParams {
   pageSize?: number;
   select?: string;
   selfJoins?: Record<string, string>;
+  /** Whitelist of column keys allowed for sort/filter from URL params.
+   *  If omitted, sort and filter URL params are ignored entirely. */
+  allowedColumns?: string[];
+}
+
+/** Strip PostgREST filter delimiters from search input to prevent
+ *  users from injecting additional filter clauses via the search box. */
+function sanitizeSearch(value: string): string {
+  return value.replace(/[,()*]/g, '').trim();
 }
 
 export interface TableDataResult<T = Record<string, unknown>> {
@@ -100,14 +109,17 @@ export async function loadTableData<T = Record<string, unknown>>(
   params: LoadTableDataParams,
 ): Promise<TableDataResult<T>> {
   const page = Number(params.searchParams.get('page') ?? '1');
+  const allowed = new Set(params.allowedColumns ?? []);
+  const fallbackSort = params.defaultSort?.column ?? 'created_at';
+  const requestedSort = params.searchParams.get('sort');
+  // Only honor the URL sort column if it's in the whitelist
   const sortBy =
-    params.searchParams.get('sort') ??
-    params.defaultSort?.column ??
-    'created_at';
+    requestedSort && allowed.has(requestedSort) ? requestedSort : fallbackSort;
   const sortDir =
     params.searchParams.get('dir') ??
     (params.defaultSort?.ascending ? 'asc' : 'desc');
-  const search = params.searchParams.get('q') ?? '';
+  const rawSearch = params.searchParams.get('q') ?? '';
+  const search = sanitizeSearch(rawSearch);
   const size = params.pageSize ?? 25;
   const from = (page - 1) * size;
   const to = from + size - 1;
@@ -135,11 +147,14 @@ export async function loadTableData<T = Record<string, unknown>>(
     query = query.or(searchFilter);
   }
 
-  // Column filters (TABLE-04): parse filter_<column>=value from search params
+  // Column filters (TABLE-04): parse filter_<column>=value from search params.
+  // Only honor filters whose column is in the whitelist — silently drop the rest.
   for (const [key, value] of params.searchParams.entries()) {
     if (key.startsWith('filter_') && value) {
       const column = key.replace('filter_', '');
-      query = query.eq(column, value);
+      if (allowed.has(column)) {
+        query = query.eq(column, value);
+      }
     }
   }
 

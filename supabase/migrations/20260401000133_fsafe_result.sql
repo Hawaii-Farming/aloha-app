@@ -20,16 +20,22 @@ CREATE TABLE IF NOT EXISTS fsafe_result (
     notes           TEXT,
 
     sampled_at      TIMESTAMPTZ,
-    sampled_by      TEXT REFERENCES hr_employee(id),
+    sampled_by      TEXT,
     started_at TIMESTAMPTZ,
     completed_at    TIMESTAMPTZ,
     verified_at     TIMESTAMPTZ,
-    verified_by     TEXT REFERENCES hr_employee(id),
+    verified_by     TEXT,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by      TEXT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by      TEXT,
-    is_deleted      BOOLEAN NOT NULL DEFAULT false
+    is_deleted      BOOLEAN NOT NULL DEFAULT false,
+
+    -- Named FKs so PostgREST can disambiguate when embedding hr_employee
+    CONSTRAINT fk_fsafe_result_sampled_by
+      FOREIGN KEY (sampled_by) REFERENCES hr_employee(id),
+    CONSTRAINT fk_fsafe_result_verified_by
+      FOREIGN KEY (verified_by) REFERENCES hr_employee(id)
 );
 
 COMMENT ON TABLE fsafe_result IS 'Unified food safety test results table. Result type is derived from existing fields: EMP (site_id set, fsafe_test_hold_id null, zone != water), Test-and-Hold (fsafe_test_hold_id set), Water (site_id set, zone = water). Retests and vector tests link back to the original via fsafe_result_id_original.';

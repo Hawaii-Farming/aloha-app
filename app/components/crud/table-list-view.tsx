@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -236,6 +237,17 @@ export function TableListView({
   const [searchValue, setSearchValue] = useState(q);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Clear any pending search debounce on unmount so we don't try to update
+  // state on an unmounted component if the user navigates away mid-typing.
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+    };
+  }, []);
+
   const updateParams = useCallback(
     (updates: Record<string, string | number>) => {
       const next = new URLSearchParams(searchParams);
@@ -408,23 +420,34 @@ function BulkActions({
   const fetcher = useFetcher();
   const revalidator = useRevalidator();
   const isSubmitting = fetcher.state !== 'idle';
+  const hasHandledCompletion = useRef(false);
+
+  // Watch fetcher state for completion. When the submit finishes (state goes
+  // back to 'idle' and we have data), revalidate the loader and clear selection.
+  // The ref guards against re-running on every render once handled.
+  if (
+    fetcher.state === 'idle' &&
+    fetcher.data !== undefined &&
+    !hasHandledCompletion.current
+  ) {
+    hasHandledCompletion.current = true;
+    revalidator.revalidate();
+    onComplete();
+  }
 
   const handleBulkDelete = useCallback(() => {
+    hasHandledCompletion.current = false;
     fetcher.submit(
       JSON.stringify({ intent: 'bulk_delete', ids: selectedIds }),
       { method: 'POST', encType: 'application/json' },
     );
-
-    setTimeout(() => {
-      revalidator.revalidate();
-      onComplete();
-    }, 100);
-  }, [fetcher, selectedIds, revalidator, onComplete]);
+  }, [fetcher, selectedIds]);
 
   const handleBulkTransition = useCallback(
     (newStatus: string) => {
       if (!workflowConfig) return;
 
+      hasHandledCompletion.current = false;
       fetcher.submit(
         JSON.stringify({
           intent: 'bulk_transition',
@@ -435,13 +458,8 @@ function BulkActions({
         }),
         { method: 'POST', encType: 'application/json' },
       );
-
-      setTimeout(() => {
-        revalidator.revalidate();
-        onComplete();
-      }, 100);
     },
-    [fetcher, selectedIds, workflowConfig, revalidator, onComplete],
+    [fetcher, selectedIds, workflowConfig],
   );
 
   const allTransitions = useMemo(() => {

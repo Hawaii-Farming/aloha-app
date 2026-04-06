@@ -128,7 +128,7 @@ export const fsafeResultConfig: CrudModuleConfig<typeof fsafeResultSchema> = {
       label: 'Sampled By',
       type: 'fk',
       fkTable: 'hr_employee',
-      fkLabelColumn: 'first_name',
+      fkLabelColumn: 'preferred_name',
     },
   ],
 

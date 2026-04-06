@@ -50,9 +50,23 @@ GRANT EXECUTE ON FUNCTION public.get_user_org_ids() TO authenticated;
 -- Any authenticated employee in the same org can read all employees.
 -- This allows managers/admins to see the full roster.
 -- Uses get_user_org_ids() to avoid self-referential recursion.
--- Write permissions are enforced in the app layer via hr_module_access.
+--
+-- IMPORTANT — Mutation policy:
+-- There are intentionally NO INSERT/UPDATE/DELETE policies on hr_employee
+-- (or any other org-scoped table). All mutations from the app go through
+-- a server-side route action that uses the service_role key, which bypasses
+-- RLS by design. Authorization is enforced in the app layer:
+--   1. requireUserLoader() validates the JWT
+--   2. loadOrgWorkspace() resolves the employee + org membership
+--   3. requireModuleAccess() / requireSubModuleAccess() check hr_module_access
+--      for can_edit / can_delete / can_verify on the relevant module
+-- Direct PostgREST writes from the browser session client are blocked because
+-- no policy permits them. If a future feature needs client-side writes,
+-- add explicit INSERT/UPDATE policies — do not enable broad write access.
 
 ALTER TABLE public.hr_employee ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "hr_employee_read" ON public.hr_employee;
 
 CREATE POLICY "hr_employee_read" ON public.hr_employee
   FOR SELECT TO authenticated
@@ -66,6 +80,8 @@ CREATE POLICY "hr_employee_read" ON public.hr_employee
 -- ============================================================
 
 ALTER TABLE public.org ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "org_read" ON public.org;
 
 CREATE POLICY "org_read" ON public.org
   FOR SELECT TO authenticated
@@ -87,6 +103,15 @@ CREATE POLICY "org_read" ON public.org
 --
 -- module_slug     = sys_module.id      (e.g. 'human_resources')
 -- sub_module_slug = sys_sub_module.id  (e.g. 'employees')
+--
+-- TENANT SCOPING — important:
+-- This view is GRANTed to the `authenticated` role, but the WHERE clause
+-- below filters every row by `e.user_id = auth.uid()`. That means each
+-- caller only sees rows joined to THEIR own hr_employee record(s) — even
+-- though there is no separate RLS policy on the view itself. Multi-org
+-- users see one row per (org, module, sub_module) across all orgs they
+-- belong to, which is the intended behavior for the workspace switcher.
+-- Do not remove the auth.uid() filter; it is the entire access control.
 
 CREATE OR REPLACE VIEW public.app_navigation AS
 SELECT

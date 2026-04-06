@@ -188,7 +188,6 @@ export function CardDetailView({
   record,
   config,
   recordId,
-  moduleDisplayName: _moduleDisplayName,
   subModuleDisplayName,
   hasWorkflow,
   workflowConfig,

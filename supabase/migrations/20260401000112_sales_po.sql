@@ -14,14 +14,20 @@ CREATE TABLE IF NOT EXISTS sales_po (
     status                          TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'approved', 'fulfilled', 'unfulfilled', 'past_due')),
 
     approved_at                     TIMESTAMPTZ,
-    approved_by                     TEXT REFERENCES hr_employee(id),
+    approved_by                     TEXT,
     qb_uploaded_at                  TIMESTAMPTZ,
-    qb_uploaded_by                  TEXT REFERENCES hr_employee(id),
+    qb_uploaded_by                  TEXT,
     created_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                      TEXT,
     updated_at                      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                      TEXT,
-    is_deleted                       BOOLEAN NOT NULL DEFAULT false
+    is_deleted                       BOOLEAN NOT NULL DEFAULT false,
+
+    -- Named FKs so PostgREST can disambiguate when embedding hr_employee
+    CONSTRAINT fk_sales_po_approved_by
+      FOREIGN KEY (approved_by) REFERENCES hr_employee(id),
+    CONSTRAINT fk_sales_po_qb_uploaded_by
+      FOREIGN KEY (qb_uploaded_by) REFERENCES hr_employee(id)
 );
 
 COMMENT ON TABLE sales_po IS 'Customer order header. One row per order. Tracks customer, FOB, dates, approval workflow, and optional recurring frequency for standing orders.';

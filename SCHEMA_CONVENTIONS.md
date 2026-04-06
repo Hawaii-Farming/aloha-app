@@ -131,6 +131,49 @@ Exceptions:
 - **Multiple FKs to the same table** — use a semantic suffix (e.g. `site_id_parent` in `org_site`). When a table has only one `site_id`, use `site_id` with a COMMENT ON COLUMN to document which category filter applies
 - **Cross-module FKs** — retain the referenced table's prefix (e.g. `ops_corrective_action_taken.fsafe_result_id`)
 
+### Named constraints (required when 2+ FKs point to the same target)
+
+When a table has **two or more foreign keys pointing to the same target table** (including self-references), the FK constraints must be **explicitly named** so PostgREST can disambiguate them in embedded resource selects.
+
+The inline `column TYPE REFERENCES table(id)` shorthand auto-generates names like `tablename_columnname_fkey`. Those work for SQL but PostgREST cannot pick between two of them when you write `requester:hr_employee!fk_xxx(...)`.
+
+**Pattern:** declare the column as a bare type, then add a `CONSTRAINT fk_<table>_<purpose>` clause at the end of the table.
+
+```sql
+CREATE TABLE IF NOT EXISTS hr_time_off_request (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id          TEXT NOT NULL REFERENCES org(id),
+
+  -- Multiple FKs to hr_employee — declare bare, name explicitly below
+  hr_employee_id  TEXT NOT NULL,
+  requested_by    TEXT NOT NULL,
+  reviewed_by     TEXT,
+
+  -- ... other columns ...
+
+  -- Named FKs so PostgREST can disambiguate when embedding hr_employee
+  CONSTRAINT fk_hr_time_off_request_employee
+    FOREIGN KEY (hr_employee_id) REFERENCES hr_employee(id),
+  CONSTRAINT fk_hr_time_off_request_requested_by
+    FOREIGN KEY (requested_by) REFERENCES hr_employee(id),
+  CONSTRAINT fk_hr_time_off_request_reviewed_by
+    FOREIGN KEY (reviewed_by) REFERENCES hr_employee(id)
+);
+```
+
+**Naming convention:** `fk_<source_table>_<purpose>`. The purpose is usually the column name minus `_id`, or a meaningful suffix like `employee`, `requested_by`, `team_lead`, `compensation_manager`.
+
+**Single FK to target:** the inline `REFERENCES` shorthand is fine — PostgREST has no ambiguity to resolve.
+
+**Self-referential FKs:** always name them, even when there's only one. PostgREST treats parent and child lookups against the same table as separate operations and needs an explicit constraint name.
+
+**Frontend usage** — once named, configs can embed via:
+```ts
+select: '*, requester:hr_employee!fk_hr_time_off_request_requested_by(preferred_name)'
+```
+
+**Retrofitting an existing hosted table** — write a one-shot patch migration that uses `ALTER TABLE ... DROP CONSTRAINT ... ADD CONSTRAINT ...` wrapped in `pg_constraint` existence checks (idempotent). After applying to hosted, fold the named constraints into the original `CREATE TABLE` migration and mark the patch as reverted in remote history (`supabase migration repair --status reverted <ts>`), then delete the patch file.
+
 ---
 
 ## 6. Photos & JSONB
@@ -178,17 +221,9 @@ docs/schemas/YYYYMMDDHHMMSS_module.md
 docs/processes/YYYYMMDDHHMMSS_workflow_name.md
 ```
 
-**Migration scripts (one-time data import from legacy systems):**
-```
-scripts/migrations/YYYYMMDDHHMMSS_module.py
-```
+**Migration scripts and process scripts** live in the separate [`aloha-data-migrations`](../aloha-data-migrations) repo. They follow their own conventions documented in `MIGRATION_CONVENTIONS.md` over there. When schema changes here require updates to data import scripts, coordinate the changes across both repos.
 
-**Process scripts (ongoing operational workflows — named by function):**
-```
-scripts/processes/YYYYMMDDHHMMSS_process_name.py
-```
-
-The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260401000001_sys.md`, `20260401000001_sys_uom.sql`, `20260401000001_seed_system_data.py`).
+The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260401000001_sys.md`, `20260401000001_sys_uom.sql`).
 
 ---
 

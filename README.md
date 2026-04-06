@@ -229,9 +229,7 @@ Shared build and development configuration consumed by all packages. Keeping the
 
 **`supabase/migrations/`** -- The original 91 SQL migration files that define the complete database schema. These are the source of truth for schema design decisions and naming conventions. They are not deployed directly -- they document the schema that exists in the hosted Supabase project.
 
-**`scripts/python/`** -- Python utilities. `process_payroll.py` is an ETL script for importing payroll data from an external payroll processor into the `hr_payroll` table.
-
-**`scripts/sql/`** -- SQL deployment scripts. `deploy-views-and-seed.sql` creates the 5 view contracts and seeds system-level data (access levels, modules, sub-modules). `seed-test-data.sql` creates test users via the Supabase Auth admin API workaround and links them to `hr_employee` records with appropriate module access.
+**Data tooling lives in a separate repo: [`aloha-data-migrations`](../aloha-data-migrations).** That repo contains the Python ETL scripts that imported legacy Google Sheets data into Supabase, ongoing payroll processes, and one-shot SQL deploy scripts. They were extracted to keep the TypeScript app and Python data tooling independent. When the schema changes here, scripts there may need updating.
 
 **`.claude/`** -- Claude Code AI development workflow. Contains specialized agents (`code-quality-reviewer`), slash commands (`/feature-builder` for scaffolding complete features end-to-end), development skills (Playwright E2E, Postgres expert, React form builder, server action builder, service builder), and evaluation criteria for assessing implementation quality.
 
@@ -280,7 +278,7 @@ Five database views bridge the schema to the application UI. These views are sec
 | `app_nav_modules` | Modules the user can access in an org (pre-filtered by `hr_module_access`) |
 | `app_nav_sub_modules` | Sub-modules filtered by `sys_access_level` comparison |
 
-The view SQL is defined in `supabase/schemas/19-view-contracts.sql` and `20-nav-view-contracts.sql`. To deploy to a new Supabase project, run `scripts/sql/deploy-views-and-seed.sql` in the SQL Editor.
+The view SQL is defined in `supabase/schemas/19-view-contracts.sql` and `20-nav-view-contracts.sql`. To deploy to a new Supabase project, run `sql/deploy-views-and-seed.sql` from the [`aloha-data-migrations`](../aloha-data-migrations) repo in the SQL Editor.
 
 ## ERP Modules
 

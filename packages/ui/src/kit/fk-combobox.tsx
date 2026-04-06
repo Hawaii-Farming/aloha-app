@@ -32,6 +32,7 @@ interface FkComboboxProps<T extends FieldValues = FieldValues> {
   placeholder?: string;
   options: Array<{ value: string; label: string }>;
   disabled?: boolean;
+  required?: boolean;
 }
 
 export function FkCombobox<T extends FieldValues = FieldValues>({
@@ -41,6 +42,7 @@ export function FkCombobox<T extends FieldValues = FieldValues>({
   placeholder,
   options,
   disabled,
+  required,
 }: FkComboboxProps<T>) {
   const [open, setOpen] = useState(false);
 
@@ -50,7 +52,14 @@ export function FkCombobox<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>{label}</FormLabel>
+          <FormLabel>
+            {label}
+            {required && (
+              <span aria-hidden="true" className="text-destructive ml-0.5">
+                *
+              </span>
+            )}
+          </FormLabel>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>

@@ -32,6 +32,7 @@ interface CreatableComboboxProps<T extends FieldValues = FieldValues> {
   placeholder?: string;
   options: string[];
   disabled?: boolean;
+  required?: boolean;
 }
 
 export function CreatableCombobox<T extends FieldValues = FieldValues>({
@@ -41,6 +42,7 @@ export function CreatableCombobox<T extends FieldValues = FieldValues>({
   placeholder,
   options,
   disabled,
+  required,
 }: CreatableComboboxProps<T>) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -56,7 +58,14 @@ export function CreatableCombobox<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            {required && (
+              <span aria-hidden="true" className="text-destructive ml-0.5">
+                *
+              </span>
+            )}
+          </FormLabel>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
@@ -64,13 +73,17 @@ export function CreatableCombobox<T extends FieldValues = FieldValues>({
                   variant="outline"
                   role="combobox"
                   disabled={disabled}
+                  aria-label={`${label}${field.value ? `: ${field.value}` : ''}`}
                   className={cn(
                     'w-full justify-between font-normal',
                     !field.value && 'text-muted-foreground',
                   )}
                 >
                   {field.value || (placeholder ?? 'Select or type...')}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  <ChevronsUpDown
+                    aria-hidden="true"
+                    className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                  />
                 </Button>
               </FormControl>
             </PopoverTrigger>
@@ -97,6 +110,7 @@ export function CreatableCombobox<T extends FieldValues = FieldValues>({
                         }}
                       >
                         <Check
+                          aria-hidden="true"
                           className={cn(
                             'mr-2 h-4 w-4',
                             field.value === option
@@ -122,7 +136,7 @@ export function CreatableCombobox<T extends FieldValues = FieldValues>({
                           }}
                           className="text-primary"
                         >
-                          <Plus className="mr-2 h-4 w-4" />
+                          <Plus aria-hidden="true" className="mr-2 h-4 w-4" />
                           Add &ldquo;{trimmed}&rdquo;
                         </CommandItem>
                       </CommandGroup>

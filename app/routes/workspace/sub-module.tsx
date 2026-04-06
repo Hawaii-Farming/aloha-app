@@ -8,6 +8,7 @@ import {
   crudBulkTransitionAction,
 } from '~/lib/crud/crud-action.server';
 import { loadTableData } from '~/lib/crud/crud-helpers.server';
+import { loadFormOptions } from '~/lib/crud/load-form-options.server';
 import { getModuleConfig } from '~/lib/crud/registry';
 import type { CrudModuleConfig, ListViewProps } from '~/lib/crud/types';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
@@ -59,68 +60,15 @@ export const loader = async (args: {
     pageSize,
     select: config?.select,
     selfJoins: config?.selfJoins,
+    allowedColumns: config?.columns.map((c) => c.key),
   });
 
-  const fkFields = (config?.formFields ?? []).filter((f) => f.type === 'fk');
-  const fkOptions: Record<string, Array<{ value: string; label: string }>> = {};
-  const untypedClient = client as unknown as SupabaseClient;
-
-  for (const field of fkFields) {
-    if (field.fkTable && field.fkLabelColumn) {
-      const orderCol = field.fkOrderColumn ?? field.fkLabelColumn;
-      const selectCols = new Set(['id', field.fkLabelColumn, orderCol]);
-      let query = untypedClient
-        .from(field.fkTable)
-        .select([...selectCols].join(', '))
-        .eq('is_deleted', false);
-
-      if (field.fkOrgScoped !== false) {
-        query = query.eq('org_id', accountSlug);
-      }
-
-      if (field.fkFilter) {
-        for (const [col, val] of Object.entries(field.fkFilter)) {
-          query = query.eq(col, val);
-        }
-      }
-
-      const { data } = await query
-        .order(orderCol)
-        .limit(200);
-
-      const rows = (data ?? []) as unknown as Record<string, unknown>[];
-      fkOptions[field.key] = rows.map((row) => ({
-        value: String(row['id']),
-        label: String(row[field.fkLabelColumn!]),
-      }));
-    }
-  }
-
-  // Load distinct values for combobox fields
-  const comboboxFields = (config?.formFields ?? []).filter(
-    (f) => f.type === 'combobox',
-  );
-  const comboboxOptions: Record<string, string[]> = {};
-
-  for (const field of comboboxFields) {
-    const source = field.comboboxSource ?? {
-      table: config?.tableName ?? subModuleSlug,
-      column: field.key,
-    };
-
-    const { data } = await untypedClient
-      .from(source.table)
-      .select(source.column)
-      .eq('org_id', accountSlug)
-      .eq('is_deleted', false)
-      .not(source.column, 'is', null)
-      .order(source.column)
-      .limit(500);
-
-    const rows = (data ?? []) as unknown as Record<string, unknown>[];
-    const unique = [...new Set(rows.map((r) => String(r[source.column])))];
-    comboboxOptions[field.key] = unique;
-  }
+  const { fkOptions, comboboxOptions } = await loadFormOptions({
+    client: client as unknown as SupabaseClient,
+    config,
+    orgId: accountSlug,
+    subModuleSlug,
+  });
 
   return {
     config,

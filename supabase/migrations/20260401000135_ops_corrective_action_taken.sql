@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     ops_corrective_action_choice_id     TEXT        REFERENCES ops_corrective_action_choice(id),
 
     other_action        TEXT,
-    assigned_to         TEXT        REFERENCES hr_employee(id),
+    assigned_to         TEXT,
     due_date            DATE,
     completed_at        TIMESTAMPTZ,
     is_resolved         BOOLEAN     NOT NULL DEFAULT false,
@@ -17,12 +17,18 @@ CREATE TABLE IF NOT EXISTS ops_corrective_action_taken (
     result_description  TEXT,
 
     verified_at         TIMESTAMPTZ,
-    verified_by         TEXT        REFERENCES hr_employee(id),
+    verified_by         TEXT,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by          TEXT,
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by          TEXT,
-    is_deleted           BOOLEAN     NOT NULL DEFAULT false
+    is_deleted           BOOLEAN     NOT NULL DEFAULT false,
+
+    -- Named FKs so PostgREST can disambiguate when embedding hr_employee
+    CONSTRAINT fk_ops_corrective_action_taken_assigned_to
+      FOREIGN KEY (assigned_to) REFERENCES hr_employee(id),
+    CONSTRAINT fk_ops_corrective_action_taken_verified_by
+      FOREIGN KEY (verified_by) REFERENCES hr_employee(id)
 );
 
 COMMENT ON TABLE ops_corrective_action_taken IS 'Corrective actions raised against a failing checklist response or EMP test result. Tracks the action required, who is responsible, and the resolution status.';

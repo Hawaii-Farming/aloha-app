@@ -1,16 +1,13 @@
 -- Seed Data: LOCAL DEVELOPMENT
 --
--- This file is intentionally empty. All data is populated by the Python
--- migration scripts in scripts/migrations/.
+-- This file is intentionally empty. This project does not use local Supabase
+-- for development — the hosted Supabase project at kfwqtaazdankxmdlqdak is
+-- the dev database. See README.md for the development workflow.
 --
--- To populate a fresh local database, run the migration scripts
--- in dependency order:
---
---   SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_SERVICE_KEY=<local-secret-key> \
---     python scripts/migrations/20260401000001_sys.py
---   ... (remaining scripts in numbered order)
---
--- Get the local secret key from: pnpm supabase status
+-- If you ever need to seed a fresh local instance, the Python migration
+-- scripts that originally populated the data live in the separate
+-- aloha-data-migrations repo (a sibling directory). Run them in numbered
+-- order from that repo against the local Supabase URL.
 --
 -- The auto-link trigger (20260401000141_auth_auto_link_employee.sql)
 -- will connect auth.users to hr_employee on first sign-in.

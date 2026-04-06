@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS org_site (
     org_id                  TEXT NOT NULL REFERENCES org(id),
     farm_id                 TEXT REFERENCES org_farm(id),
     name                    TEXT NOT NULL,
-    org_site_category_id    TEXT NOT NULL REFERENCES org_site_category(id),
-    org_site_subcategory_id TEXT REFERENCES org_site_category(id),
+    org_site_category_id    TEXT NOT NULL,
+    org_site_subcategory_id TEXT,
     site_id_parent          TEXT REFERENCES org_site(id),
 
     -- Growing site details (shown when category = growing)
@@ -27,7 +27,13 @@ CREATE TABLE IF NOT EXISTS org_site (
     created_by              TEXT,
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by              TEXT,
-    is_deleted              BOOLEAN NOT NULL DEFAULT false
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+
+    -- Named FKs so PostgREST can disambiguate when embedding org_site_category
+    CONSTRAINT fk_org_site_category
+      FOREIGN KEY (org_site_category_id) REFERENCES org_site_category(id),
+    CONSTRAINT fk_org_site_subcategory
+      FOREIGN KEY (org_site_subcategory_id) REFERENCES org_site_category(id)
 );
 
 COMMENT ON TABLE org_site IS 'Unified site register for all physical locations across the organization. Supports a parent-child hierarchy via site_id_parent — top-level sites (greenhouses, packhouses, housing) contain child sites (food safety surfaces, pest traps, rooms). The category drives which fields are relevant in the UI.';

@@ -54,7 +54,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       label: 'Employee',
       type: 'fk',
       fkTable: 'hr_employee',
-      fkLabelColumn: 'first_name',
+      fkLabelColumn: 'preferred_name',
       required: true,
     },
     { key: 'start_date', label: 'Start Date', type: 'date', required: true },

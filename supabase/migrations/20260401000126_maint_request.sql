@@ -11,16 +11,22 @@ CREATE TABLE IF NOT EXISTS maint_request (
     recurring_frequency       TEXT        CHECK (recurring_frequency IN ('daily', 'weekly', 'monthly', 'quarterly', 'semi_annually', 'annually')),
     due_date                  DATE,
     completed_at              TIMESTAMPTZ,
-    fixer_id                  TEXT        REFERENCES hr_employee(id),
+    fixer_id                  TEXT,
     fixer_description         TEXT,
 
     requested_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
-    requested_by              TEXT        NOT NULL REFERENCES hr_employee(id),
+    requested_by              TEXT        NOT NULL,
     created_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_by                TEXT,
     updated_at                TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_by                TEXT,
-    is_deleted                 BOOLEAN     NOT NULL DEFAULT false
+    is_deleted                 BOOLEAN     NOT NULL DEFAULT false,
+
+    -- Named FKs so PostgREST can disambiguate when embedding hr_employee
+    CONSTRAINT fk_maint_request_fixer
+      FOREIGN KEY (fixer_id) REFERENCES hr_employee(id),
+    CONSTRAINT fk_maint_request_requested_by
+      FOREIGN KEY (requested_by) REFERENCES hr_employee(id)
 );
 
 COMMENT ON TABLE maint_request IS 'Standalone maintenance work order requests. Each request targets either a site or equipment, never both. Equipment location is derived from org_equipment.site_id. Preventive maintenance is indicated by recurring_frequency being set.';

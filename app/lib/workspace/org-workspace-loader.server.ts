@@ -68,10 +68,18 @@ export async function loadOrgWorkspace(params: {
   // Single view query — not in generated types, use untyped client
   const untypedClient = params.client as unknown as SupabaseClient;
 
-  const { data: navRows } = await untypedClient
+  const { data: navRows, error: navError } = await untypedClient
     .from('app_navigation')
     .select('*')
     .eq('org_id', params.orgSlug);
+
+  if (navError) {
+    console.error(
+      `[loadOrgWorkspace] app_navigation query failed for org ${params.orgSlug}:`,
+      navError,
+    );
+    throw new Response('Failed to load workspace navigation', { status: 500 });
+  }
 
   const rows = (navRows as AppNavigationRow[]) ?? [];
   const { modules, subModules } = deriveNavigation(rows, params.orgSlug);

@@ -36,12 +36,25 @@ interface FormFieldProps<T extends FieldValues = FieldValues> {
   placeholder?: string;
   description?: string;
   disabled?: boolean;
+  /** When true, renders a red asterisk after the label text. */
+  required?: boolean;
 }
 
 interface FormSelectFieldProps<
   T extends FieldValues = FieldValues,
 > extends FormFieldProps<T> {
   options: Array<{ value: string; label: string }>;
+}
+
+/** Renders a red asterisk after the label when required is true.
+ *  aria-hidden so screen readers rely on the form's own required attribute. */
+function RequiredMark({ required }: { required?: boolean }) {
+  if (!required) return null;
+  return (
+    <span aria-hidden="true" className="text-destructive ml-0.5">
+      *
+    </span>
+  );
 }
 
 export function FormTextField<T extends FieldValues = FieldValues>({
@@ -51,6 +64,7 @@ export function FormTextField<T extends FieldValues = FieldValues>({
   placeholder,
   description,
   disabled,
+  required,
 }: FormFieldProps<T>) {
   return (
     <FormField
@@ -58,7 +72,10 @@ export function FormTextField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            <RequiredMark required={required} />
+          </FormLabel>
           <FormControl>
             <Input
               type="text"
@@ -82,6 +99,7 @@ export function FormTextareaField<T extends FieldValues = FieldValues>({
   placeholder,
   description,
   disabled,
+  required,
 }: FormFieldProps<T>) {
   return (
     <FormField
@@ -89,7 +107,10 @@ export function FormTextareaField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            <RequiredMark required={required} />
+          </FormLabel>
           <FormControl>
             <Textarea
               placeholder={placeholder}
@@ -113,6 +134,7 @@ export function FormNumberField<T extends FieldValues = FieldValues>({
   placeholder,
   description,
   disabled,
+  required,
 }: FormFieldProps<T>) {
   return (
     <FormField
@@ -120,7 +142,10 @@ export function FormNumberField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            <RequiredMark required={required} />
+          </FormLabel>
           <FormControl>
             <Input
               type="number"
@@ -152,6 +177,7 @@ export function FormDateField<T extends FieldValues = FieldValues>({
   placeholder,
   description,
   disabled,
+  required,
 }: FormFieldProps<T>) {
   return (
     <FormField
@@ -159,7 +185,10 @@ export function FormDateField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            <RequiredMark required={required} />
+          </FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
@@ -203,6 +232,7 @@ export function FormBooleanField<T extends FieldValues = FieldValues>({
   label,
   description,
   disabled,
+  required,
 }: FormFieldProps<T>) {
   return (
     <FormField
@@ -210,7 +240,10 @@ export function FormBooleanField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            <RequiredMark required={required} />
+          </FormLabel>
           <div className="flex h-9 items-center rounded-md border px-3">
             <FormControl>
               <Switch
@@ -239,6 +272,7 @@ export function FormSelectField<T extends FieldValues = FieldValues>({
   placeholder,
   description,
   disabled,
+  required,
   options,
 }: FormSelectFieldProps<T>) {
   return (
@@ -247,7 +281,10 @@ export function FormSelectField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            <RequiredMark required={required} />
+          </FormLabel>
           <Select
             onValueChange={field.onChange}
             defaultValue={field.value}
@@ -280,6 +317,7 @@ export function FormRadioField<T extends FieldValues = FieldValues>({
   label,
   description,
   disabled,
+  required,
   options,
 }: FormSelectFieldProps<T>) {
   return (
@@ -288,7 +326,10 @@ export function FormRadioField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">
+            {label}
+            <RequiredMark required={required} />
+          </FormLabel>
           <FormControl>
             <RadioGroup
               onValueChange={field.onChange}

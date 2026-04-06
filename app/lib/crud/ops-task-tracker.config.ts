@@ -73,7 +73,7 @@ export const opsTaskTrackerConfig: CrudModuleConfig<
       label: 'Verified By',
       type: 'fk',
       fkTable: 'hr_employee',
-      fkLabelColumn: 'first_name',
+      fkLabelColumn: 'preferred_name',
     },
   ],
 

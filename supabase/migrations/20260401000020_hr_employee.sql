@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     hr_department_id             TEXT REFERENCES hr_department(id),
     hr_title_id                  TEXT REFERENCES hr_title(id),
     sys_access_level_id       TEXT NOT NULL REFERENCES sys_access_level(id),
-    team_lead_id                 TEXT REFERENCES hr_employee(id),
-    compensation_manager_id      TEXT REFERENCES hr_employee(id),
+    team_lead_id                 TEXT,
+    compensation_manager_id      TEXT,
 
     -- =============================================
     -- EMPLOYMENT
@@ -66,7 +66,14 @@ CREATE TABLE IF NOT EXISTS hr_employee (
     updated_by                   TEXT,
     is_deleted                    BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT uq_hr_employee_name UNIQUE (org_id, first_name, last_name)
+    CONSTRAINT uq_hr_employee_name UNIQUE (org_id, first_name, last_name),
+
+    -- Named self-referential FKs so PostgREST can disambiguate them
+    -- when embedding (e.g. team_lead:hr_employee!fk_hr_employee_team_lead(...))
+    CONSTRAINT fk_hr_employee_team_lead
+      FOREIGN KEY (team_lead_id) REFERENCES hr_employee(id),
+    CONSTRAINT fk_hr_employee_compensation_manager
+      FOREIGN KEY (compensation_manager_id) REFERENCES hr_employee(id)
 );
 
 COMMENT ON TABLE hr_employee IS 'Unified employee register and org membership table. Every employee gets a row here with a required sys_access_level_id that defines their role (owner, manager, team_lead, employee). Employees without app access have a null user_id. A user can belong to multiple orgs by having one row per org. Tracks employment details, management hierarchy, and compensation.';
