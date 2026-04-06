@@ -456,6 +456,29 @@ RULES = [
         '["maint_request.recurring_frequency", "maint_request.status"]',
         41,
     ),
+
+    # =====================================================================
+    # 10. AUTH — sign-in auto-link to hr_employee
+    # =====================================================================
+    rule(
+        "auth_auto_link_employee", "workflow", "human_resources",
+        "Auto-link auth.users to hr_employee on first sign-in",
+        "When a user signs in for the first time (Google OAuth or email/password), Supabase creates "
+        "a row in auth.users. A database trigger (on_auth_user_created) fires AFTER INSERT and matches "
+        "auth.users.email against hr_employee.company_email. If a match is found and user_id is NULL, "
+        "it sets hr_employee.user_id = auth.users.id for ALL matching rows (supporting multi-org "
+        "employees). RLS policies then use auth.uid() = hr_employee.user_id to grant org-scoped access. "
+        "If no hr_employee has a matching company_email, the user authenticates but has no org membership "
+        "and sees a 'no access' page. Prerequisites: (1) hr_employee must be populated with company_email "
+        "before the employee signs in, (2) enable_signup = true in supabase/config.toml, (3) Google OAuth "
+        "client ID/secret configured in config.toml under [auth.external.google]. "
+        "Trigger: public.handle_new_auth_user() — SECURITY DEFINER. "
+        "Migration: supabase/migrations/20260401000141_auth_auto_link_employee.sql.",
+        "Eliminates manual auth.users seeding. Employees are managed in hr_employee only — the auth "
+        "layer links automatically on first login.",
+        '["auth.users", "hr_employee.company_email", "hr_employee.user_id"]',
+        42,
+    ),
 ]
 
 
