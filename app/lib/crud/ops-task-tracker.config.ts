@@ -31,9 +31,9 @@ export const opsTaskTrackerConfig: CrudModuleConfig<
     { key: 'ops_task_id', label: 'Task', sortable: true },
     { key: 'is_completed', label: 'Completed', type: 'boolean' },
     { key: 'start_time', label: 'Started', type: 'datetime', sortable: true },
-    { key: 'stop_time', label: 'Stopped', type: 'datetime', sortable: true },
-    { key: 'farm_id', label: 'Farm', sortable: true },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true },
+    { key: 'stop_time', label: 'Stopped', type: 'datetime', sortable: true, priority: 'low' },
+    { key: 'farm_id', label: 'Farm', sortable: true, priority: 'low' },
+    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
   ],
 
   search: {

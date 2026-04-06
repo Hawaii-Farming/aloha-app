@@ -1,10 +1,12 @@
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
+import { CreatableCombobox } from '@aloha/ui/creatable-combobox';
 import { FkCombobox } from '@aloha/ui/fk-combobox';
 import {
   FormBooleanField,
   FormDateField,
   FormNumberField,
+  FormRadioField,
   FormSelectField,
   FormTextField,
   FormTextareaField,
@@ -18,6 +20,7 @@ interface RenderFormFieldParams {
   mode: 'create' | 'edit';
   pkColumn: string;
   fkOptions?: Record<string, Array<{ value: string; label: string }>>;
+  comboboxOptions?: Record<string, string[]>;
 }
 
 export function renderFormField({
@@ -26,6 +29,7 @@ export function renderFormField({
   mode,
   pkColumn,
   fkOptions,
+  comboboxOptions,
 }: RenderFormFieldParams): React.ReactNode | null {
   if (mode === 'create' && field.showOnCreate === false) {
     return null;
@@ -95,6 +99,19 @@ export function renderFormField({
         />
       );
 
+    case 'radio':
+      return (
+        <FormRadioField
+          key={field.key}
+          control={control}
+          name={name}
+          label={field.label}
+          options={(field.options ?? []).map((o) =>
+            typeof o === 'string' ? { value: o, label: o } : o,
+          )}
+        />
+      );
+
     case 'select':
       return (
         <FormSelectField
@@ -105,6 +122,17 @@ export function renderFormField({
           options={(field.options ?? []).map((o) =>
             typeof o === 'string' ? { value: o, label: o } : o,
           )}
+        />
+      );
+
+    case 'combobox':
+      return (
+        <CreatableCombobox
+          key={field.key}
+          control={control}
+          name={name}
+          label={field.label}
+          options={comboboxOptions?.[field.key] ?? []}
         />
       );
 

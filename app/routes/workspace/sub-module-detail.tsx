@@ -1,45 +1,25 @@
-import { useCallback } from 'react';
+import { lazy, Suspense } from 'react';
 
-import { Link, redirect, useFetcher } from 'react-router';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-import { Pencil, Trash2 } from 'lucide-react';
+import { redirect } from 'react-router';
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@aloha/ui/alert-dialog';
-
-import { Button } from '@aloha/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@aloha/ui/card';
-import { PageBody, PageHeader } from '@aloha/ui/page';
-import { Trans } from '@aloha/ui/trans';
-import { WorkflowHistory } from '@aloha/ui/workflow-history';
-import { WorkflowStatusBadge } from '@aloha/ui/workflow-status-badge';
-import { WorkflowTransitionButtons } from '@aloha/ui/workflow-transition';
-
+import { CardDetailView } from '~/components/crud/card-detail-view';
 import { createWorkflowAgent } from '~/lib/ai/workflow-automation.server';
 import {
   crudDeleteAction,
   crudTransitionAction,
+  crudUpdateAction,
 } from '~/lib/crud/crud-action.server';
 import { loadDetailData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
-import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
+import type { CrudModuleConfig, DetailViewProps } from '~/lib/crud/types';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
-import { AccessGate } from '~/lib/workspace/access-gate';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import {
   requireModuleAccess,
   requireSubModuleAccess,
 } from '~/lib/workspace/require-module-access.server';
-import { useModuleAccess } from '~/lib/workspace/use-module-access';
 
 export const loader = async (args: {
   request: Request;
@@ -71,11 +51,73 @@ export const loader = async (args: {
     orgId: accountSlug,
     pkColumn,
     pkValue: recordId,
+    select: config?.select,
+    selfJoins: config?.selfJoins,
   });
 
   const workflowConfig = config?.workflow ?? null;
 
+  // Load FK options for edit panel
+  const fkFields = (config?.formFields ?? []).filter((f) => f.type === 'fk');
+  const fkOptions: Record<string, Array<{ value: string; label: string }>> = {};
+  const untypedClient = client as unknown as SupabaseClient;
+
+  for (const field of fkFields) {
+    if (field.fkTable && field.fkLabelColumn) {
+      const orderCol = field.fkOrderColumn ?? field.fkLabelColumn;
+      const selectCols = new Set(['id', field.fkLabelColumn, orderCol]);
+      let query = untypedClient
+        .from(field.fkTable)
+        .select([...selectCols].join(', '))
+        .eq('is_deleted', false);
+
+      if (field.fkOrgScoped !== false) {
+        query = query.eq('org_id', accountSlug);
+      }
+
+      if (field.fkFilter) {
+        for (const [col, val] of Object.entries(field.fkFilter)) {
+          query = query.eq(col, val);
+        }
+      }
+
+      const { data } = await query.order(orderCol).limit(200);
+      const rows = (data ?? []) as unknown as Record<string, unknown>[];
+      fkOptions[field.key] = rows.map((row) => ({
+        value: String(row['id']),
+        label: String(row[field.fkLabelColumn!]),
+      }));
+    }
+  }
+
+  // Load combobox options for edit panel
+  const comboboxFields = (config?.formFields ?? []).filter(
+    (f) => f.type === 'combobox',
+  );
+  const comboboxOptions: Record<string, string[]> = {};
+
+  for (const field of comboboxFields) {
+    const source = field.comboboxSource ?? {
+      table: config?.tableName ?? subModuleSlug,
+      column: field.key,
+    };
+
+    const { data } = await untypedClient
+      .from(source.table)
+      .select(source.column)
+      .eq('org_id', accountSlug)
+      .eq('is_deleted', false)
+      .not(source.column, 'is', null)
+      .order(source.column)
+      .limit(500);
+
+    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const unique = [...new Set(rows.map((r) => String(r[source.column])))];
+    comboboxOptions[field.key] = unique;
+  }
+
   return {
+    config,
     moduleAccess,
     subModuleAccess,
     accountSlug,
@@ -83,6 +125,8 @@ export const loader = async (args: {
     recordId,
     hasWorkflow: !!workflowConfig,
     workflowConfig,
+    fkOptions,
+    comboboxOptions,
   };
 };
 
@@ -105,6 +149,25 @@ export const action = async (args: {
   const config = getModuleConfig(subModuleSlug);
   const tableName = config?.tableName ?? subModuleSlug;
   const pkColumn = config?.pkColumn ?? 'id';
+
+  if (body.intent === 'update') {
+    const schema = config?.schema;
+
+    if (!schema) {
+      return { success: false, error: 'No schema configured' };
+    }
+
+    return crudUpdateAction({
+      client,
+      tableName,
+      orgId: accountSlug,
+      employeeId: workspace.currentOrg.employee_id,
+      data: body.data,
+      schema,
+      pkColumn,
+      pkValue: recordId,
+    });
+  }
 
   if (body.intent === 'delete') {
     const result = await crudDeleteAction({
@@ -163,47 +226,33 @@ export const action = async (args: {
   return new Response('Invalid action', { status: 400 });
 };
 
-function formatFieldValue(value: unknown): string {
-  if (value === null || value === undefined) {
-    return '--';
-  }
+function resolveDetailView(config: CrudModuleConfig | undefined) {
+  const viewType = config?.viewType?.detail ?? 'card';
 
-  if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
-  }
+  switch (viewType) {
+    case 'custom': {
+      const loader = config?.customViews?.detail;
 
-  if (typeof value === 'string') {
-    const datePattern = /^\d{4}-\d{2}-\d{2}/;
-
-    if (datePattern.test(value)) {
-      try {
-        return new Date(value).toLocaleDateString();
-      } catch {
-        return value;
+      if (loader) {
+        return lazy(loader);
       }
+
+      return CardDetailView;
     }
 
-    return value;
+    // Future view types will be added here:
+    // case 'workspace':
+
+    default:
+      return CardDetailView;
   }
-
-  return String(value);
 }
-
-function formatFieldLabel(key: string): string {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-const hiddenFields = new Set([
-  'org_id',
-  'is_deleted',
-  'created_by',
-  'updated_by',
-]);
 
 export default function SubModuleDetailPage(props: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
   const {
+    config,
     moduleAccess,
     subModuleAccess,
     accountSlug,
@@ -211,150 +260,34 @@ export default function SubModuleDetailPage(props: {
     recordId,
     hasWorkflow,
     workflowConfig,
+    fkOptions,
+    comboboxOptions,
   } = props.loaderData;
 
-  const fetcher = useFetcher();
+  const ViewComponent = resolveDetailView(config);
 
-  const handleDelete = useCallback(() => {
-    fetcher.submit(
-      { intent: 'delete' },
-      { method: 'POST', encType: 'application/json' },
-    );
-  }, [fetcher]);
-
-  const handleTransition = useCallback(
-    (newStatus: string) => {
-      if (!workflowConfig) return;
-      const payload = {
-        intent: 'transition',
-        statusColumn: workflowConfig.statusColumn,
-        newStatus,
-        transitionFields: workflowConfig.transitionFields?.[newStatus],
-      };
-      fetcher.submit(payload as unknown as Record<string, string>, {
-        method: 'POST',
-        encType: 'application/json',
-      });
-    },
-    [fetcher, workflowConfig],
-  );
-
-  const _access = useModuleAccess();
-  const isDeleting = fetcher.state !== 'idle';
-  const recordName =
-    (record.name as string) ?? (record.id as string) ?? recordId;
-
-  const displayFields = Object.entries(record).filter(
-    ([key]) => !hiddenFields.has(key),
-  );
+  const viewProps: DetailViewProps = {
+    record,
+    config: config as CrudModuleConfig,
+    recordId,
+    accountSlug,
+    moduleDisplayName: moduleAccess.display_name,
+    subModuleDisplayName: subModuleAccess.display_name,
+    hasWorkflow,
+    workflowConfig,
+    fkOptions,
+    comboboxOptions,
+  };
 
   return (
-    <>
-      <PageHeader
-        title={recordName}
-        description={`${moduleAccess.display_name} > ${subModuleAccess.display_name}`}
-      >
-      </PageHeader>
-
-      <PageBody>
-        <div className="flex flex-col gap-6" data-test="crud-detail-page">
-          <div className="flex items-center gap-2">
-            {hasWorkflow && workflowConfig && (
-              <WorkflowStatusBadge
-                status={record[workflowConfig.statusColumn] as string}
-                states={workflowConfig.states}
-              />
-            )}
-
-            <div className="ml-auto flex items-center gap-2">
-              <AccessGate permission="can_edit">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="edit">
-                    <Pencil className="mr-2 h-4 w-4" />
-                    <Trans i18nKey="common:edit" />
-                  </Link>
-                </Button>
-              </AccessGate>
-
-              <AccessGate permission="can_delete">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      <Trans i18nKey="common:delete" />
-                    </Button>
-                  </AlertDialogTrigger>
-
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        <Trans i18nKey="common:confirmDelete" />
-                      </AlertDialogTitle>
-
-                      <AlertDialogDescription>
-                        <Trans i18nKey="common:confirmDeleteMessage" />
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>
-                        <Trans i18nKey="common:cancel" />
-                      </AlertDialogCancel>
-
-                      <AlertDialogAction onClick={handleDelete}>
-                        <Trans i18nKey="common:delete" />
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </AccessGate>
-            </div>
-          </div>
-
-          {hasWorkflow && workflowConfig && (
-            <>
-              <AccessGate permission="can_edit">
-                <WorkflowTransitionButtons
-                  currentStatus={record[workflowConfig.statusColumn] as string}
-                  transitions={workflowConfig.transitions}
-                  states={workflowConfig.states}
-                  onTransition={handleTransition}
-                  disabled={fetcher.state !== 'idle'}
-                />
-              </AccessGate>
-              <WorkflowHistory
-                entries={buildHistoryEntries(record, workflowConfig)}
-              />
-            </>
-          )}
-
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <Trans i18nKey="common:details" />
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2">
-                {displayFields.map(([key, value]) => (
-                  <div key={key}>
-                    <dt className="text-muted-foreground text-sm font-medium">
-                      {formatFieldLabel(key)}
-                    </dt>
-
-                    <dd className="mt-1 text-sm">{formatFieldValue(value)}</dd>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+    <Suspense
+      fallback={
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-muted-foreground text-sm">Loading view...</div>
         </div>
-      </PageBody>
-    </>
+      }
+    >
+      <ViewComponent {...viewProps} />
+    </Suspense>
   );
 }

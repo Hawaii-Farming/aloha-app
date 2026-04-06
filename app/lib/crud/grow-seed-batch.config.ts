@@ -39,10 +39,10 @@ export const growSeedBatchConfig: CrudModuleConfig<typeof growSeedBatchSchema> =
     { key: 'batch_code', label: 'Batch Code', sortable: true },
     { key: 'status', label: 'Status', type: 'workflow' },
     { key: 'seeding_date', label: 'Seeding Date', type: 'date', sortable: true },
-    { key: 'transplant_date', label: 'Transplant Date', type: 'date' },
-    { key: 'estimated_harvest_date', label: 'Est. Harvest Date', type: 'date' },
-    { key: 'number_of_units', label: 'Units', type: 'number' },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true },
+    { key: 'transplant_date', label: 'Transplant Date', type: 'date', priority: 'low' },
+    { key: 'estimated_harvest_date', label: 'Est. Harvest Date', type: 'date', priority: 'low' },
+    { key: 'number_of_units', label: 'Units', type: 'number', priority: 'low' },
+    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
   ],
 
   search: {

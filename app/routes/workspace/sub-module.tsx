@@ -1,67 +1,21 @@
-import { useCallback, useState } from 'react';
-
-import { useNavigate, useSearchParams } from 'react-router';
+import { lazy, Suspense } from 'react';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import type { ColumnDef } from '@tanstack/react-table';
-import { Plus } from 'lucide-react';
-
-import { Button } from '@aloha/ui/button';
-import { DataTableColumnHeader } from '@aloha/ui/data-table-column-header';
-import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
-import { DataTable } from '@aloha/ui/enhanced-data-table';
-import { PageBody } from '@aloha/ui/page';
-import { Trans } from '@aloha/ui/trans';
-
-import { CreatePanel } from '~/components/crud/create-panel';
+import { TableListView } from '~/components/crud/table-list-view';
+import {
+  crudBulkDeleteAction,
+  crudBulkTransitionAction,
+} from '~/lib/crud/crud-action.server';
 import { loadTableData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
+import type { CrudModuleConfig, ListViewProps } from '~/lib/crud/types';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
+import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import {
   requireModuleAccess,
   requireSubModuleAccess,
 } from '~/lib/workspace/require-module-access.server';
-
-type RowData = Record<string, unknown>;
-
-function buildColumns(config?: {
-  columns: { key: string; label: string; sortable?: boolean; type?: string; render?: string }[];
-}): ColumnDef<RowData>[] {
-  if (!config) {
-    return [];
-  }
-
-  return config.columns.map((col) => {
-    const def: ColumnDef<RowData> = {
-      accessorKey: col.key,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={col.label} />
-      ),
-      enableSorting: col.sortable ?? false,
-    };
-
-    if (col.render === 'full_name') {
-      def.cell = ({ row }) => {
-        const first = row.original['first_name'] as string ?? '';
-        const last = row.original['last_name'] as string ?? '';
-        return `${last}, ${first}`.replace(/(^, |, $)/, '');
-      };
-    } else if (col.type === 'date') {
-      def.cell = ({ getValue }) => {
-        const value = getValue() as string | null;
-        return value ? new Date(value).toLocaleDateString() : '';
-      };
-    } else if (col.type === 'datetime' || col.key === 'created_at') {
-      def.cell = ({ getValue }) => {
-        const value = getValue() as string | null;
-        return value ? new Date(value).toLocaleDateString() : '';
-      };
-    }
-
-    return def;
-  });
-}
 
 export const loader = async (args: {
   request: Request;
@@ -103,6 +57,8 @@ export const loader = async (args: {
     searchColumns,
     defaultSort: { column: defaultSortCol, ascending: true },
     pageSize,
+    select: config?.select,
+    selfJoins: config?.selfJoins,
   });
 
   const fkFields = (config?.formFields ?? []).filter((f) => f.type === 'fk');
@@ -111,12 +67,25 @@ export const loader = async (args: {
 
   for (const field of fkFields) {
     if (field.fkTable && field.fkLabelColumn) {
-      const { data } = await untypedClient
+      const orderCol = field.fkOrderColumn ?? field.fkLabelColumn;
+      const selectCols = new Set(['id', field.fkLabelColumn, orderCol]);
+      let query = untypedClient
         .from(field.fkTable)
-        .select(`id, ${field.fkLabelColumn}`)
-        .eq('org_id', accountSlug)
-        .eq('is_deleted', false)
-        .order(field.fkLabelColumn)
+        .select([...selectCols].join(', '))
+        .eq('is_deleted', false);
+
+      if (field.fkOrgScoped !== false) {
+        query = query.eq('org_id', accountSlug);
+      }
+
+      if (field.fkFilter) {
+        for (const [col, val] of Object.entries(field.fkFilter)) {
+          query = query.eq(col, val);
+        }
+      }
+
+      const { data } = await query
+        .order(orderCol)
         .limit(200);
 
       const rows = (data ?? []) as unknown as Record<string, unknown>[];
@@ -127,6 +96,32 @@ export const loader = async (args: {
     }
   }
 
+  // Load distinct values for combobox fields
+  const comboboxFields = (config?.formFields ?? []).filter(
+    (f) => f.type === 'combobox',
+  );
+  const comboboxOptions: Record<string, string[]> = {};
+
+  for (const field of comboboxFields) {
+    const source = field.comboboxSource ?? {
+      table: config?.tableName ?? subModuleSlug,
+      column: field.key,
+    };
+
+    const { data } = await untypedClient
+      .from(source.table)
+      .select(source.column)
+      .eq('org_id', accountSlug)
+      .eq('is_deleted', false)
+      .not(source.column, 'is', null)
+      .order(source.column)
+      .limit(500);
+
+    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const unique = [...new Set(rows.map((r) => String(r[source.column])))];
+    comboboxOptions[field.key] = unique;
+  }
+
   return {
     config,
     moduleAccess,
@@ -134,8 +129,79 @@ export const loader = async (args: {
     accountSlug,
     tableData,
     fkOptions,
+    comboboxOptions,
   };
 };
+
+export const action = async (args: {
+  request: Request;
+  params: Record<string, string>;
+}) => {
+  const accountSlug = args.params.account as string;
+  const subModuleSlug = args.params.subModule as string;
+  const client = getSupabaseServerClient(args.request);
+  const body = await args.request.json();
+  const workspace = await loadOrgWorkspace({
+    orgSlug: accountSlug,
+    client,
+    request: args.request,
+  });
+
+  const config = getModuleConfig(subModuleSlug);
+  const tableName = config?.tableName ?? subModuleSlug;
+  const pkColumn = config?.pkColumn ?? 'id';
+
+  if (body.intent === 'bulk_delete') {
+    return crudBulkDeleteAction({
+      client,
+      tableName,
+      orgId: accountSlug,
+      employeeId: workspace.currentOrg.employee_id,
+      pkColumn,
+      pkValues: body.ids,
+    });
+  }
+
+  if (body.intent === 'bulk_transition') {
+    return crudBulkTransitionAction({
+      client,
+      tableName,
+      orgId: accountSlug,
+      employeeId: workspace.currentOrg.employee_id,
+      pkColumn,
+      pkValues: body.ids,
+      statusColumn: body.statusColumn,
+      newStatus: body.newStatus,
+      transitionFields: body.transitionFields,
+    });
+  }
+
+  return new Response('Invalid action', { status: 400 });
+};
+
+function resolveListView(config: CrudModuleConfig | undefined) {
+  const viewType = config?.viewType?.list ?? 'table';
+
+  switch (viewType) {
+    case 'custom': {
+      const loader = config?.customViews?.list;
+
+      if (loader) {
+        return lazy(loader);
+      }
+
+      return TableListView;
+    }
+
+    // Future view types will be added here:
+    // case 'kanban':
+    // case 'calendar':
+    // case 'dashboard':
+
+    default:
+      return TableListView;
+  }
+}
 
 export default function SubModulePage(props: {
   loaderData: Awaited<ReturnType<typeof loader>>;
@@ -144,118 +210,33 @@ export default function SubModulePage(props: {
     config,
     moduleAccess: _moduleAccess,
     subModuleAccess,
-    accountSlug: _accountSlug,
+    accountSlug,
     tableData,
     fkOptions,
+    comboboxOptions,
   } = props.loaderData;
 
-  const [createOpen, setCreateOpen] = useState(false);
+  const ViewComponent = resolveListView(config);
 
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-
-  const sort = searchParams.get('sort') ?? 'id';
-  const dir = searchParams.get('dir') ?? 'asc';
-  const q = searchParams.get('q') ?? '';
-  const inactive = searchParams.get('inactive') ?? 'false';
-
-  const updateParams = useCallback(
-    (updates: Record<string, string | number>) => {
-      const next = new URLSearchParams(searchParams);
-
-      for (const [key, value] of Object.entries(updates)) {
-        if (value === '' || value === null || value === undefined) {
-          next.delete(key);
-        } else {
-          next.set(key, String(value));
-        }
-      }
-
-      navigate(`?${next.toString()}`, { preventScrollReset: true });
-    },
-    [searchParams, navigate],
-  );
-
-  const columns = buildColumns(config);
-  const pkColumn = config?.pkColumn ?? 'id';
+  const viewProps: ListViewProps = {
+    data: tableData.data as Record<string, unknown>[],
+    config: config as CrudModuleConfig,
+    tableData,
+    fkOptions,
+    comboboxOptions,
+    subModuleDisplayName: subModuleAccess.display_name,
+    accountSlug,
+  };
 
   return (
-    <>
-      <div className="flex flex-1 flex-col overflow-hidden" data-test="sub-module-list">
-        <div className="shrink-0 pb-4">
-          <DataTableToolbar
-            searchValue={q}
-            onSearchChange={(value) => updateParams({ q: value, page: 1 })}
-            searchPlaceholder={
-              config?.search?.placeholder ??
-              `Search ${subModuleAccess.display_name.toLowerCase()}...`
-            }
-            showInactive={inactive === 'true'}
-            onShowInactiveChange={(value) =>
-              updateParams({ inactive: value ? 'true' : 'false', page: 1 })
-            }
-            actionSlot={
-              <Button
-                size="sm"
-                variant="brand"
-                onClick={() => setCreateOpen(true)}
-                data-test="sub-module-create-button"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                <Trans i18nKey="common:create" />
-              </Button>
-            }
-          />
+    <Suspense
+      fallback={
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-muted-foreground text-sm">Loading view...</div>
         </div>
-
-        <div className="flex min-h-0 flex-1 flex-col">
-          <DataTable
-            data={tableData.data as RowData[]}
-            columns={columns}
-            pageIndex={tableData.page - 1}
-            pageSize={tableData.pageSize}
-            pageCount={tableData.pageCount}
-            totalCount={tableData.totalCount}
-            manualPagination={true}
-            manualSorting={true}
-            sorting={[{ id: sort, desc: dir === 'desc' }]}
-            onSortingChange={(sorting) => {
-              const s = sorting[0];
-
-              if (s) {
-                updateParams({
-                  sort: s.id,
-                  dir: s.desc ? 'desc' : 'asc',
-                  page: 1,
-                });
-              }
-            }}
-            onPaginationChange={(pagination) => {
-              updateParams({ page: pagination.pageIndex + 1 });
-            }}
-            onPageSizeChange={(size) => {
-              updateParams({ pageSize: size, page: 1 });
-            }}
-            onRowClick={(row) => {
-              const id = row[pkColumn] as string;
-
-              if (id) {
-                navigate(id);
-              }
-            }}
-            emptyStateProps={{ heading: 'No records found' }}
-            tableProps={{ 'data-test': 'crud-data-table' }}
-          />
-        </div>
-      </div>
-
-      <CreatePanel
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        config={config}
-        fkOptions={fkOptions}
-        subModuleDisplayName={subModuleAccess.display_name}
-      />
-    </>
+      }
+    >
+      <ViewComponent {...viewProps} />
+    </Suspense>
   );
 }

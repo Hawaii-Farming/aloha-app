@@ -3,7 +3,6 @@ import { z } from 'zod';
 import type { CrudModuleConfig } from '~/lib/crud/types';
 
 const hrEmployeeSchema = z.object({
-  id: z.string().min(1, 'ID is required'),
   first_name: z.string().min(1, 'First name is required'),
   last_name: z.string().min(1, 'Last name is required'),
   preferred_name: z.string().optional(),
@@ -23,7 +22,7 @@ const hrEmployeeSchema = z.object({
   end_date: z.string().optional(),
   payroll_id: z.string().optional(),
   pay_structure: z.string().optional(),
-  overtime_threshold: z.number().optional(),
+  overtime_threshold: z.union([z.string(), z.number()]).optional(),
   wc: z.string().optional(),
   payroll_processor: z.string().optional(),
   pay_delivery_method: z.string().optional(),
@@ -36,30 +35,50 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
   pkColumn: 'id',
   orgScoped: true,
 
+  generatePk: (data) => {
+    const last = String(data.last_name ?? '').toLowerCase().replace(/\s+/g, '_');
+    const first = String(data.first_name ?? '').toLowerCase().replace(/\s+/g, '_');
+    return `${last}_${first}`;
+  },
+
   views: {
     list: 'hr_employee',
     detail: 'hr_employee',
   },
 
+  select: [
+    '*',
+    'hr_department:hr_department!hr_department_id(name)',
+    'hr_work_authorization:hr_work_authorization!hr_work_authorization_id(name)',
+    'hr_title:hr_title!hr_title_id(name)',
+    'housing_site:org_site!site_id(name)',
+  ].join(', '),
+
+  selfJoins: {
+    compensation_manager_id: 'preferred_name',
+    team_lead_id: 'preferred_name',
+  },
+
   columns: [
-    { key: 'last_name', label: 'Name', sortable: true, render: 'full_name' },
     { key: 'preferred_name', label: 'Alias' },
-    { key: 'gender', label: 'Gender' },
-    { key: 'date_of_birth', label: 'DOB', type: 'date', sortable: true },
-    { key: 'phone', label: 'Phone' },
-    { key: 'company_email', label: 'Email' },
-    { key: 'hr_department_id', label: 'Department', sortable: true },
-    { key: 'hr_title_id', label: 'Title', sortable: true },
-    { key: 'team_lead_id', label: 'Team Lead' },
-    { key: 'compensation_manager_id', label: 'Comp Manager' },
-    { key: 'hr_work_authorization_id', label: 'Work Auth', sortable: true },
-    { key: 'start_date', label: 'Start Date', type: 'date', sortable: true },
-    { key: 'end_date', label: 'End Date', type: 'date', sortable: true },
-    { key: 'payroll_id', label: 'Payroll ID' },
-    { key: 'pay_structure', label: 'Pay Structure' },
-    { key: 'overtime_threshold', label: 'OT Threshold' },
+    { key: 'last_name', label: 'Name', sortable: true, render: 'full_name' },
+    { key: 'gender', label: 'Gender', render: 'proper_case' },
+    { key: 'hr_department_name', label: 'Department', sortable: true },
+    { key: 'hr_work_authorization_name', label: 'Status', sortable: true },
     { key: 'wc', label: 'WC Code' },
-    { key: 'site_id', label: 'Housing Site' },
+    { key: 'compensation_manager_id_preferred_name', label: 'Manager' },
+    { key: 'team_lead_id_preferred_name', label: 'Team Lead' },
+    { key: 'overtime_threshold', label: 'OT Threshold' },
+    { key: 'pay_structure', label: 'Pay Structure', render: 'proper_case', priority: 'low' },
+    { key: 'payroll_id', label: 'Payroll ID', priority: 'low' },
+    { key: 'payroll_processor', label: 'Payroll Processor', priority: 'low' },
+    { key: 'pay_delivery_method', label: 'Pay Delivery Method', priority: 'low' },
+    { key: 'housing_site_name', label: 'Housing', priority: 'low' },
+    { key: 'company_email', label: 'Company Email', priority: 'low' },
+    { key: 'hr_title_name', label: 'Title', sortable: true, priority: 'low' },
+    { key: 'date_of_birth', label: 'DOB', type: 'date', sortable: true, priority: 'low' },
+    { key: 'phone', label: 'Phone', priority: 'low' },
+    { key: 'email', label: 'Email', priority: 'low' },
   ],
 
   search: {
@@ -70,31 +89,38 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
   filters: [],
 
   formFields: [
-    {
-      key: 'id',
-      label: 'Employee ID',
-      type: 'text',
-      required: true,
-      showOnCreate: true,
-      showOnEdit: false,
-    },
-    { key: 'first_name', label: 'First Name', type: 'text', required: true },
+    // --- Personal ---
+    { key: 'first_name', label: 'First Name', type: 'text', required: true, section: 'Personal' },
     { key: 'last_name', label: 'Last Name', type: 'text', required: true },
-    { key: 'preferred_name', label: 'Preferred Name', type: 'text' },
+    { key: 'preferred_name', label: 'Alias', type: 'text' },
+    { key: 'is_minority', label: 'Minority', type: 'boolean' },
     {
       key: 'gender',
       label: 'Gender',
-      type: 'select',
+      type: 'radio',
       options: [
         { value: 'male', label: 'Male' },
         { value: 'female', label: 'Female' },
       ],
     },
     { key: 'date_of_birth', label: 'Date of Birth', type: 'date' },
-    { key: 'is_minority', label: 'Minority', type: 'boolean' },
-    { key: 'phone', label: 'Phone', type: 'text' },
+
+    // --- Contact ---
+    { key: 'phone', label: 'Phone', type: 'text', section: 'Contact' },
     { key: 'email', label: 'Personal Email', type: 'text' },
-    { key: 'company_email', label: 'Company Email', type: 'text' },
+
+    // --- App Access & Role ---
+    { key: 'company_email', label: 'Company Email', type: 'text', section: 'App Access' },
+    {
+      key: 'sys_access_level_id',
+      label: 'Access Level',
+      type: 'fk',
+      fkTable: 'sys_access_level',
+      fkLabelColumn: 'name',
+      fkOrgScoped: false,
+      fkOrderColumn: 'level',
+      required: true,
+    },
     {
       key: 'hr_department_id',
       label: 'Department',
@@ -103,63 +129,63 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       fkLabelColumn: 'name',
     },
     {
-      key: 'hr_title_id',
-      label: 'Title',
-      type: 'fk',
-      fkTable: 'hr_title',
-      fkLabelColumn: 'name',
-    },
-    {
-      key: 'sys_access_level_id',
-      label: 'Access Level',
-      type: 'fk',
-      fkTable: 'sys_access_level',
-      fkLabelColumn: 'name',
-      required: true,
-    },
-    {
-      key: 'team_lead_id',
-      label: 'Team Lead',
-      type: 'fk',
-      fkTable: 'hr_employee',
-      fkLabelColumn: 'last_name',
-    },
-    {
-      key: 'compensation_manager_id',
-      label: 'Compensation Manager',
-      type: 'fk',
-      fkTable: 'hr_employee',
-      fkLabelColumn: 'last_name',
-    },
-    {
       key: 'hr_work_authorization_id',
       label: 'Work Authorization',
       type: 'fk',
       fkTable: 'hr_work_authorization',
       fkLabelColumn: 'name',
     },
-    { key: 'start_date', label: 'Start Date', type: 'date' },
+    {
+      key: 'compensation_manager_id',
+      label: 'Manager',
+      type: 'fk',
+      fkTable: 'hr_employee',
+      fkLabelColumn: 'preferred_name',
+      fkFilter: { sys_access_level_id: 'manager' },
+    },
+    {
+      key: 'team_lead_id',
+      label: 'Team Lead',
+      type: 'fk',
+      fkTable: 'hr_employee',
+      fkLabelColumn: 'preferred_name',
+      fkFilter: { sys_access_level_id: 'team_lead' },
+    },
+    {
+      key: 'hr_title_id',
+      label: 'Title',
+      type: 'fk',
+      fkTable: 'hr_title',
+      fkLabelColumn: 'name',
+    },
+
+    // --- Employment ---
+    { key: 'start_date', label: 'Start Date', type: 'date', section: 'Employment' },
     { key: 'end_date', label: 'End Date', type: 'date' },
-    { key: 'payroll_id', label: 'Payroll ID', type: 'text' },
+
+    // --- Compensation ---
     {
       key: 'pay_structure',
       label: 'Pay Structure',
-      type: 'select',
+      type: 'radio',
       options: [
         { value: 'hourly', label: 'Hourly' },
         { value: 'salary', label: 'Salary' },
       ],
+      section: 'Compensation',
     },
-    { key: 'overtime_threshold', label: 'OT Threshold (hrs/week)', type: 'number' },
-    { key: 'wc', label: 'WC Code', type: 'text' },
-    { key: 'payroll_processor', label: 'Payroll Processor', type: 'text' },
-    { key: 'pay_delivery_method', label: 'Pay Delivery Method', type: 'text' },
+    { key: 'overtime_threshold', label: 'OT Threshold (hrs/week)', type: 'combobox' },
+    { key: 'wc', label: 'WC Code', type: 'combobox' },
+    { key: 'payroll_id', label: 'Payroll ID', type: 'text' },
+    { key: 'payroll_processor', label: 'Payroll Processor', type: 'combobox' },
+    { key: 'pay_delivery_method', label: 'Pay Check Delivery', type: 'combobox' },
     {
       key: 'site_id',
-      label: 'Housing Site',
+      label: 'Housing',
       type: 'fk',
       fkTable: 'org_site',
       fkLabelColumn: 'name',
+      fkFilter: { org_site_category_id: 'housing' },
     },
   ],
 

@@ -14,6 +14,7 @@ export async function crudCreateAction(
     data: Record<string, unknown>;
     schema: z.ZodType;
     pkType: 'text' | 'uuid';
+    generatePk?: (data: Record<string, unknown>) => string;
   },
 ) {
   const parsed = params.schema.safeParse(params.data);
@@ -22,15 +23,16 @@ export async function crudCreateAction(
     return { success: false as const, errors: parsed.error.flatten() };
   }
 
-  const insertData = {
+  const insertData: Record<string, unknown> = {
     ...parsed.data,
     org_id: params.orgId,
     created_by: params.employeeId,
     updated_by: params.employeeId,
   };
 
-  // For UUID PK tables, Supabase generates the ID automatically
-  // For TEXT PK tables, the ID comes from form data
+  if (params.generatePk) {
+    insertData.id = params.generatePk(parsed.data as Record<string, unknown>);
+  }
 
   const { data, error } = await params.client
     .from(params.tableName)
@@ -100,6 +102,65 @@ export async function crudDeleteAction(
   }
 
   return { success: true as const };
+}
+
+export async function crudBulkDeleteAction(
+  params: CrudActionParams & {
+    pkColumn: string;
+    pkValues: string[];
+  },
+) {
+  const { error } = await params.client
+    .from(params.tableName)
+    .update({
+      is_deleted: true,
+      updated_by: params.employeeId,
+    })
+    .in(params.pkColumn, params.pkValues)
+    .eq('org_id', params.orgId);
+
+  if (error) {
+    return { success: false as const, error: error.message };
+  }
+
+  return { success: true as const, count: params.pkValues.length };
+}
+
+export async function crudBulkTransitionAction(
+  params: CrudActionParams & {
+    pkColumn: string;
+    pkValues: string[];
+    statusColumn: string;
+    newStatus: string;
+    transitionFields?: Record<string, 'now' | 'currentEmployee'>;
+  },
+) {
+  const updateData: Record<string, unknown> = {
+    [params.statusColumn]: params.newStatus,
+    updated_by: params.employeeId,
+  };
+
+  if (params.transitionFields) {
+    for (const [field, value] of Object.entries(params.transitionFields)) {
+      if (value === 'now') {
+        updateData[field] = new Date().toISOString();
+      } else if (value === 'currentEmployee') {
+        updateData[field] = params.employeeId;
+      }
+    }
+  }
+
+  const { error } = await params.client
+    .from(params.tableName)
+    .update(updateData)
+    .in(params.pkColumn, params.pkValues)
+    .eq('org_id', params.orgId);
+
+  if (error) {
+    return { success: false as const, error: error.message };
+  }
+
+  return { success: true as const, count: params.pkValues.length };
 }
 
 export async function crudTransitionAction(

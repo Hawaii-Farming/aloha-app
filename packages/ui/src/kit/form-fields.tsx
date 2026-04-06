@@ -16,7 +16,9 @@ import {
   FormMessage,
 } from '../shadcn/form';
 import { Input } from '../shadcn/input';
+import { Label } from '../shadcn/label';
 import { Popover, PopoverContent, PopoverTrigger } from '../shadcn/popover';
+import { RadioGroup, RadioGroupItem } from '../shadcn/radio-group';
 import {
   Select,
   SelectContent,
@@ -56,7 +58,7 @@ export function FormTextField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">{label}</FormLabel>
           <FormControl>
             <Input
               type="text"
@@ -87,11 +89,12 @@ export function FormTextareaField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">{label}</FormLabel>
           <FormControl>
             <Textarea
               placeholder={placeholder}
               disabled={disabled}
+              rows={3}
               {...field}
             />
           </FormControl>
@@ -117,7 +120,7 @@ export function FormNumberField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">{label}</FormLabel>
           <FormControl>
             <Input
               type="number"
@@ -155,8 +158,8 @@ export function FormDateField<T extends FieldValues = FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-col">
-          <FormLabel>{label}</FormLabel>
+        <FormItem>
+          <FormLabel className="text-xs font-medium">{label}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
@@ -170,7 +173,7 @@ export function FormDateField<T extends FieldValues = FieldValues>({
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {field.value
-                    ? format(new Date(field.value), 'PPP')
+                    ? format(new Date(field.value), 'MM/dd/yyyy')
                     : (placeholder ?? 'Pick a date')}
                 </Button>
               </FormControl>
@@ -206,18 +209,22 @@ export function FormBooleanField<T extends FieldValues = FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-          <div className="space-y-0.5">
-            <FormLabel>{label}</FormLabel>
-            {description && <FormDescription>{description}</FormDescription>}
+        <FormItem>
+          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <div className="flex h-9 items-center rounded-md border px-3">
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={disabled}
+              />
+            </FormControl>
+            {description && (
+              <FormDescription className="text-xs">
+                {description}
+              </FormDescription>
+            )}
           </div>
-          <FormControl>
-            <Switch
-              checked={field.value}
-              onCheckedChange={field.onChange}
-              disabled={disabled}
-            />
-          </FormControl>
           <FormMessage />
         </FormItem>
       )}
@@ -240,7 +247,7 @@ export function FormSelectField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-xs font-medium">{label}</FormLabel>
           <Select
             onValueChange={field.onChange}
             defaultValue={field.value}
@@ -259,6 +266,52 @@ export function FormSelectField<T extends FieldValues = FieldValues>({
               ))}
             </SelectContent>
           </Select>
+          {description && <FormDescription>{description}</FormDescription>}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
+export function FormRadioField<T extends FieldValues = FieldValues>({
+  control,
+  name,
+  label,
+  description,
+  disabled,
+  options,
+}: FormSelectFieldProps<T>) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-xs font-medium">{label}</FormLabel>
+          <FormControl>
+            <RadioGroup
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+              disabled={disabled}
+              className="flex gap-4 pt-1"
+            >
+              {options.map((option) => (
+                <div key={option.value} className="flex items-center gap-1.5">
+                  <RadioGroupItem
+                    value={option.value}
+                    id={`${String(name)}-${option.value}`}
+                  />
+                  <Label
+                    htmlFor={`${String(name)}-${option.value}`}
+                    className="cursor-pointer text-sm font-normal"
+                  >
+                    {option.label}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </FormControl>
           {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>

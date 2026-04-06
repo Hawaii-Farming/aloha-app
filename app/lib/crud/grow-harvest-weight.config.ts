@@ -32,10 +32,10 @@ export const growHarvestWeightConfig: CrudModuleConfig<
     { key: 'grow_seed_batch_id', label: 'Seed Batch', sortable: true },
     { key: 'harvest_date', label: 'Harvest Date', type: 'date', sortable: true },
     { key: 'gross_weight', label: 'Gross Weight', type: 'number', sortable: true },
-    { key: 'net_weight', label: 'Net Weight', type: 'number', sortable: true },
-    { key: 'weight_uom', label: 'UOM' },
-    { key: 'number_of_containers', label: 'Containers', type: 'number' },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true },
+    { key: 'net_weight', label: 'Net Weight', type: 'number', sortable: true, priority: 'low' },
+    { key: 'weight_uom', label: 'UOM', priority: 'low' },
+    { key: 'number_of_containers', label: 'Containers', type: 'number', priority: 'low' },
+    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
   ],
 
   search: {

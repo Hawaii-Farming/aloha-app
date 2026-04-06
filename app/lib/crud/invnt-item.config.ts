@@ -24,13 +24,14 @@ export const invntItemConfig: CrudModuleConfig<typeof invntItemSchema> = {
   columns: [
     { key: 'id', label: 'ID', sortable: true },
     { key: 'name', label: 'Name', sortable: true },
-    { key: 'description', label: 'Description' },
+    { key: 'description', label: 'Description', priority: 'low' },
     { key: 'is_active', label: 'Active', type: 'boolean' },
     {
       key: 'created_at',
       label: 'Created',
       sortable: true,
       type: 'datetime',
+      priority: 'low',
     },
   ],
 

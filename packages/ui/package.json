@@ -113,6 +113,7 @@
     "./marketing": "./src/kit/marketing/index.tsx",
     "./form-fields": "./src/kit/form-fields.tsx",
     "./fk-combobox": "./src/kit/fk-combobox.tsx",
+    "./creatable-combobox": "./src/kit/creatable-combobox.tsx",
     "./workflow-status-badge": "./src/kit/workflow-status-badge.tsx",
     "./workflow-transition": "./src/kit/workflow-transition.tsx",
     "./workflow-history": "./src/kit/workflow-history.tsx",

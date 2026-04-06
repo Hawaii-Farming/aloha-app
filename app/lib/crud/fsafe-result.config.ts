@@ -36,10 +36,10 @@ export const fsafeResultConfig: CrudModuleConfig<typeof fsafeResultSchema> = {
     { key: 'fsafe_lab_test_id', label: 'Lab Test', sortable: true },
     { key: 'status', label: 'Status', type: 'workflow', sortable: true },
     { key: 'result_pass', label: 'Pass', type: 'boolean' },
-    { key: 'result_numeric', label: 'Result', type: 'number' },
-    { key: 'farm_id', label: 'Farm', sortable: true },
-    { key: 'sampled_at', label: 'Sampled', type: 'datetime', sortable: true },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true },
+    { key: 'result_numeric', label: 'Result', type: 'number', priority: 'low' },
+    { key: 'farm_id', label: 'Farm', sortable: true, priority: 'low' },
+    { key: 'sampled_at', label: 'Sampled', type: 'datetime', sortable: true, priority: 'low' },
+    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
   ],
 
   search: {

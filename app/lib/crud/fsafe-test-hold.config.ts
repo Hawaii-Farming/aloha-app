@@ -29,15 +29,16 @@ export const fsafeTestHoldConfig: CrudModuleConfig<
   columns: [
     { key: 'farm_id', label: 'Farm', sortable: true },
     { key: 'pack_lot_id', label: 'Pack Lot', sortable: true },
-    { key: 'fsafe_lab_id', label: 'Lab' },
-    { key: 'lab_test_id', label: 'Lab Test' },
+    { key: 'fsafe_lab_id', label: 'Lab', priority: 'low' },
+    { key: 'lab_test_id', label: 'Lab Test', priority: 'low' },
     {
       key: 'delivered_to_lab_on',
       label: 'Delivered to Lab',
       type: 'date',
       sortable: true,
+      priority: 'low',
     },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true },
+    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
   ],
 
   search: {

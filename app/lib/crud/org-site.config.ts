@@ -30,18 +30,20 @@ export const orgSiteConfig: CrudModuleConfig<typeof orgSiteSchema> = {
     { key: 'id', label: 'ID', sortable: true },
     { key: 'name', label: 'Name', sortable: true },
     { key: 'category', label: 'Category', sortable: true },
-    { key: 'zone', label: 'Zone' },
-    { key: 'acres', label: 'Acres', type: 'number' },
+    { key: 'zone', label: 'Zone', priority: 'low' },
+    { key: 'acres', label: 'Acres', type: 'number', priority: 'low' },
     {
       key: 'is_food_contact_surface',
       label: 'Food Contact Surface',
       type: 'boolean',
+      priority: 'low',
     },
     {
       key: 'created_at',
       label: 'Created',
       sortable: true,
       type: 'datetime',
+      priority: 'low',
     },
   ],
 

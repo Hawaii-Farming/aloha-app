@@ -1,5 +1,81 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+/** Flattens nested FK objects from Supabase embedded selects.
+ *  e.g. { compensation_manager: { preferred_name: 'Joe' } }
+ *  becomes { compensation_manager_preferred_name: 'Joe' } */
+function flattenRow(row: Record<string, unknown>): Record<string, unknown> {
+  const flat: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(row)) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      for (const [nestedKey, nestedValue] of Object.entries(
+        value as Record<string, unknown>,
+      )) {
+        flat[`${key}_${nestedKey}`] = nestedValue;
+      }
+    } else {
+      flat[key] = value;
+    }
+  }
+
+  return flat;
+}
+
+async function resolveSelfJoins(
+  client: SupabaseClient,
+  tableName: string,
+  rows: Record<string, unknown>[],
+  selfJoins: Record<string, string>,
+) {
+  const displayFields = [...new Set(Object.values(selfJoins))];
+  const fkColumns = Object.keys(selfJoins);
+
+  const ids = new Set<string>();
+
+  for (const row of rows) {
+    for (const fkCol of fkColumns) {
+      const val = row[fkCol];
+
+      if (typeof val === 'string' && val) {
+        ids.add(val);
+      }
+    }
+  }
+
+  if (ids.size === 0) return rows;
+
+  const { data: lookupData } = await client
+    .from(tableName)
+    .select(`id, ${displayFields.join(', ')}`)
+    .in('id', Array.from(ids));
+
+  const lookup = new Map<string, Record<string, unknown>>();
+
+  for (const item of (lookupData ?? []) as unknown as Record<
+    string,
+    unknown
+  >[]) {
+    lookup.set(String(item.id), item);
+  }
+
+  return rows.map((row) => {
+    const enriched = { ...row };
+
+    for (const [fkCol, displayField] of Object.entries(selfJoins)) {
+      const refId = row[fkCol];
+
+      if (typeof refId === 'string' && refId) {
+        const ref = lookup.get(refId);
+        enriched[`${fkCol}_${displayField}`] = ref?.[displayField] ?? null;
+      } else {
+        enriched[`${fkCol}_${displayField}`] = null;
+      }
+    }
+
+    return enriched;
+  });
+}
+
 export interface LoadTableDataParams {
   client: SupabaseClient;
   viewName: string;
@@ -8,6 +84,8 @@ export interface LoadTableDataParams {
   searchColumns?: string[];
   defaultSort?: { column: string; ascending: boolean };
   pageSize?: number;
+  select?: string;
+  selfJoins?: Record<string, string>;
 }
 
 export interface TableDataResult<T = Record<string, unknown>> {
@@ -36,7 +114,7 @@ export async function loadTableData<T = Record<string, unknown>>(
 
   let query = params.client
     .from(params.viewName)
-    .select('*', { count: 'exact' })
+    .select(params.select ?? '*', { count: 'exact' })
     .eq('org_id', params.orgId)
     .eq('is_deleted', false);
 
@@ -77,8 +155,20 @@ export async function loadTableData<T = Record<string, unknown>>(
     throw new Response(error.message, { status: 500 });
   }
 
+  const rows = (data ?? []) as unknown as Record<string, unknown>[];
+  let flatRows = params.select ? rows.map(flattenRow) : rows;
+
+  if (params.selfJoins && flatRows.length > 0) {
+    flatRows = await resolveSelfJoins(
+      params.client,
+      params.viewName,
+      flatRows,
+      params.selfJoins,
+    );
+  }
+
   return {
-    data: (data ?? []) as T[],
+    data: flatRows as T[],
     totalCount: count ?? 0,
     page,
     pageSize: size,
@@ -92,6 +182,8 @@ export interface LoadDetailDataParams {
   orgId: string;
   pkColumn: string;
   pkValue: string;
+  select?: string;
+  selfJoins?: Record<string, string>;
 }
 
 export async function loadDetailData<T = Record<string, unknown>>(
@@ -99,7 +191,7 @@ export async function loadDetailData<T = Record<string, unknown>>(
 ): Promise<T> {
   const { data, error } = await params.client
     .from(params.viewName)
-    .select('*')
+    .select(params.select ?? '*')
     .eq('org_id', params.orgId)
     .eq(params.pkColumn, params.pkValue)
     .single();
@@ -108,5 +200,21 @@ export async function loadDetailData<T = Record<string, unknown>>(
     throw new Response('Not Found', { status: 404 });
   }
 
-  return data as T;
+  let row = data as unknown as Record<string, unknown>;
+
+  if (params.select) {
+    row = flattenRow(row);
+  }
+
+  if (params.selfJoins) {
+    const resolved = await resolveSelfJoins(
+      params.client,
+      params.viewName,
+      [row],
+      params.selfJoins,
+    );
+    row = resolved[0] ?? row;
+  }
+
+  return row as T;
 }

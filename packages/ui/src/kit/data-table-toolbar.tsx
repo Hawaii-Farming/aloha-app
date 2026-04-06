@@ -41,10 +41,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
           />
 
           <Label htmlFor="show-inactive" className="text-xs">
-            <Trans
-              i18nKey="common:showInactive"
-              defaults="Show Inactive"
-            />
+            <Trans i18nKey="common:showInactive" defaults="Show Inactive" />
           </Label>
         </div>
       </div>

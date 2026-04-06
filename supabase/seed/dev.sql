@@ -1,16 +1,16 @@
 -- Seed Data: LOCAL DEVELOPMENT
 --
--- This file is intentionally empty. All data lives in the hosted
--- Supabase instance, populated by the Python migration scripts in
--- scripts/migrations/.
+-- This file is intentionally empty. All data is populated by the Python
+-- migration scripts in scripts/migrations/.
 --
 -- To populate a fresh local database, run the migration scripts
 -- in dependency order:
 --
---   python scripts/migrations/20260401000001_sys.py
---   python scripts/migrations/20260401000002_org.py
---   python scripts/migrations/20260401000003_hr.py
+--   SUPABASE_URL=http://127.0.0.1:54321 SUPABASE_SERVICE_KEY=<local-secret-key> \
+--     python scripts/migrations/20260401000001_sys.py
 --   ... (remaining scripts in numbered order)
+--
+-- Get the local secret key from: pnpm supabase status
 --
 -- The auto-link trigger (20260401000141_auth_auto_link_employee.sql)
 -- will connect auth.users to hr_employee on first sign-in.

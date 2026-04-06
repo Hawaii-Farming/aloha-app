@@ -5,10 +5,7 @@ import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 
 import type { Table as ReactTable } from '@tanstack/react-table';
-import {
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '../shadcn/button';
 import {
@@ -43,9 +40,7 @@ export function DataTablePagination<TData>({
   return (
     <div className="flex items-center gap-3 text-sm">
       <span className="text-muted-foreground whitespace-nowrap">
-        {recordCount > 0
-          ? `${from}–${to} of ${recordCount}`
-          : '0 records'}
+        {recordCount > 0 ? `${from}–${to} of ${recordCount}` : '0 records'}
       </span>
 
       <div className="flex items-center gap-1">

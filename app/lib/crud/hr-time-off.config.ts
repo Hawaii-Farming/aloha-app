@@ -28,9 +28,9 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   columns: [
     { key: 'hr_employee_id', label: 'Employee', sortable: true },
     { key: 'start_date', label: 'Start Date', type: 'date', sortable: true },
-    { key: 'return_date', label: 'Return Date', type: 'date' },
-    { key: 'pto_days', label: 'PTO Days', type: 'number' },
-    { key: 'sick_leave_days', label: 'Sick Days', type: 'number' },
+    { key: 'return_date', label: 'Return Date', type: 'date', priority: 'low' },
+    { key: 'pto_days', label: 'PTO Days', type: 'number', priority: 'low' },
+    { key: 'sick_leave_days', label: 'Sick Days', type: 'number', priority: 'low' },
     { key: 'status', label: 'Status', type: 'workflow', sortable: true },
   ],
 

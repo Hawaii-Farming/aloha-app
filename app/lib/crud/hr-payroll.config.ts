@@ -29,12 +29,12 @@ export const hrPayrollConfig: CrudModuleConfig<typeof hrPayrollSchema> = {
 
   columns: [
     { key: 'employee_name', label: 'Employee', sortable: true },
-    { key: 'payroll_id', label: 'Payroll ID', sortable: true },
+    { key: 'payroll_id', label: 'Payroll ID', sortable: true, priority: 'low' },
     { key: 'check_date', label: 'Check Date', type: 'date', sortable: true },
-    { key: 'pay_period_start', label: 'Period Start', type: 'date' },
-    { key: 'pay_period_end', label: 'Period End', type: 'date' },
-    { key: 'regular_hours', label: 'Reg Hours', type: 'number' },
-    { key: 'overtime_hours', label: 'OT Hours', type: 'number' },
+    { key: 'pay_period_start', label: 'Period Start', type: 'date', priority: 'low' },
+    { key: 'pay_period_end', label: 'Period End', type: 'date', priority: 'low' },
+    { key: 'regular_hours', label: 'Reg Hours', type: 'number', priority: 'low' },
+    { key: 'overtime_hours', label: 'OT Hours', type: 'number', priority: 'low' },
     { key: 'gross_wage', label: 'Gross', type: 'number', sortable: true },
     { key: 'net_pay', label: 'Net Pay', type: 'number', sortable: true },
   ],

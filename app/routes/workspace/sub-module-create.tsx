@@ -12,7 +12,8 @@ import { z } from 'zod';
 
 
 import { Button } from '@aloha/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@aloha/ui/card';
+import { Card, CardContent } from '@aloha/ui/card';
+import { Separator } from '@aloha/ui/separator';
 import { Form } from '@aloha/ui/form';
 import { If } from '@aloha/ui/if';
 import { PageBody, PageHeader } from '@aloha/ui/page';
@@ -20,13 +21,14 @@ import { toast } from '@aloha/ui/sonner';
 import { Trans } from '@aloha/ui/trans';
 
 import { AiFormAssist } from '~/components/ai/ai-form-assist';
+import { FormFieldGrid } from '~/components/crud/form-field-grid';
 import {
   crudCreateAction,
   crudUpdateAction,
 } from '~/lib/crud/crud-action.server';
 import { loadDetailData } from '~/lib/crud/crud-helpers.server';
 import { getModuleConfig } from '~/lib/crud/registry';
-import { renderFormField } from '~/lib/crud/render-form-field';
+import type { FormFieldConfig } from '~/lib/crud/types';
 import { buildDefaultValues } from '~/lib/crud/workflow-helpers';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
@@ -41,17 +43,17 @@ const fallbackSchema = z.object({
   description: z.string().optional(),
 });
 
-const fallbackFormFields = [
+const fallbackFormFields: FormFieldConfig[] = [
   {
     key: 'id',
     label: 'ID',
-    type: 'text' as const,
+    type: 'text',
     required: true,
     showOnCreate: true,
     showOnEdit: false,
   },
-  { key: 'name', label: 'Name', type: 'text' as const, required: true },
-  { key: 'description', label: 'Description', type: 'textarea' as const },
+  { key: 'name', label: 'Name', type: 'text', required: true },
+  { key: 'description', label: 'Description', type: 'textarea' },
 ];
 
 export const loader = async (args: {
@@ -97,12 +99,25 @@ export const loader = async (args: {
 
   for (const field of fkFields) {
     if (field.fkTable && field.fkLabelColumn) {
-      const { data } = await untypedClient
+      const orderCol = field.fkOrderColumn ?? field.fkLabelColumn;
+      const selectCols = new Set(['id', field.fkLabelColumn, orderCol]);
+      let query = untypedClient
         .from(field.fkTable)
-        .select(`id, ${field.fkLabelColumn}`)
-        .eq('org_id', accountSlug)
-        .eq('is_deleted', false)
-        .order(field.fkLabelColumn)
+        .select([...selectCols].join(', '))
+        .eq('is_deleted', false);
+
+      if (field.fkOrgScoped !== false) {
+        query = query.eq('org_id', accountSlug);
+      }
+
+      if (field.fkFilter) {
+        for (const [col, val] of Object.entries(field.fkFilter)) {
+          query = query.eq(col, val);
+        }
+      }
+
+      const { data } = await query
+        .order(orderCol)
         .limit(200);
 
       const rows = (data ?? []) as unknown as Record<string, unknown>[];
@@ -113,6 +128,32 @@ export const loader = async (args: {
     }
   }
 
+  // Load distinct values for combobox fields
+  const comboboxFields = (config?.formFields ?? []).filter(
+    (f) => f.type === 'combobox',
+  );
+  const comboboxOptions: Record<string, string[]> = {};
+
+  for (const field of comboboxFields) {
+    const source = field.comboboxSource ?? {
+      table: config?.tableName ?? subModuleSlug,
+      column: field.key,
+    };
+
+    const { data } = await untypedClient
+      .from(source.table)
+      .select(source.column)
+      .eq('org_id', accountSlug)
+      .eq('is_deleted', false)
+      .not(source.column, 'is', null)
+      .order(source.column)
+      .limit(500);
+
+    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const unique = [...new Set(rows.map((r) => String(r[source.column])))];
+    comboboxOptions[field.key] = unique;
+  }
+
   return {
     moduleAccess,
     subModuleAccess,
@@ -120,6 +161,7 @@ export const loader = async (args: {
     mode: recordId ? ('edit' as const) : ('create' as const),
     record,
     fkOptions,
+    comboboxOptions,
   };
 };
 
@@ -166,6 +208,7 @@ export const action = async (args: {
       data: formData,
       schema,
       pkType,
+      generatePk: config?.generatePk,
     });
 
     if (!result.success) return result;
@@ -184,6 +227,7 @@ export default function SubModuleCreatePage(props: {
     mode,
     record,
     fkOptions,
+    comboboxOptions,
   } = props.loaderData;
 
   const fetcher = useFetcher();
@@ -233,11 +277,7 @@ export default function SubModuleCreatePage(props: {
 
       <PageBody>
         <Card className="mx-auto max-w-2xl">
-          <CardHeader>
-            <CardTitle>{title}</CardTitle>
-          </CardHeader>
-
-          <CardContent>
+          <CardContent className="pt-6">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -252,18 +292,23 @@ export default function SubModuleCreatePage(props: {
                   )}
                 />
 
-                {formFields.map((field) =>
-                  renderFormField({
-                    field,
-                    control: form.control,
-                    mode,
-                    pkColumn,
-                    fkOptions,
-                  }),
-                )}
+                <FormFieldGrid
+                  fields={formFields}
+                  control={form.control}
+                  mode={mode}
+                  pkColumn={pkColumn}
+                  fkOptions={fkOptions}
+                  comboboxOptions={comboboxOptions}
+                />
 
-                <div className="flex items-center gap-4">
-                  <Button type="submit" disabled={isSubmitting}>
+                <Separator />
+
+                <div className="flex items-center gap-3">
+                  <Button
+                    type="submit"
+                    variant="brand"
+                    disabled={isSubmitting}
+                  >
                     <If condition={isSubmitting}>
                       <Trans i18nKey="common:loading" />
                     </If>

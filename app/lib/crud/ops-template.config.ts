@@ -29,9 +29,9 @@ export const opsTemplateConfig: CrudModuleConfig<typeof opsTemplateSchema> = {
     { key: 'name', label: 'Name', sortable: true },
     { key: 'ops_template_category_id', label: 'Category', sortable: true },
     { key: 'farm_id', label: 'Farm', sortable: true },
-    { key: 'atp_site_count', label: 'ATP Sites', type: 'number' },
-    { key: 'display_order', label: 'Order', type: 'number', sortable: true },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true },
+    { key: 'atp_site_count', label: 'ATP Sites', type: 'number', priority: 'low' },
+    { key: 'display_order', label: 'Order', type: 'number', sortable: true, priority: 'low' },
+    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
   ],
 
   search: {

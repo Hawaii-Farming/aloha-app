@@ -22,12 +22,13 @@ export const hrDepartmentConfig: CrudModuleConfig<typeof hrDepartmentSchema> = {
   columns: [
     { key: 'id', label: 'ID', sortable: true },
     { key: 'name', label: 'Name', sortable: true },
-    { key: 'description', label: 'Description' },
+    { key: 'description', label: 'Description', priority: 'low' },
     {
       key: 'created_at',
       label: 'Created',
       sortable: true,
       type: 'datetime',
+      priority: 'low',
     },
   ],
 

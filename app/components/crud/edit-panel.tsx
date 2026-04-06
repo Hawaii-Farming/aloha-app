@@ -28,23 +28,25 @@ const fallbackFormFields: FormFieldConfig[] = [
   { key: 'description', label: 'Description', type: 'textarea' },
 ];
 
-interface CreatePanelProps {
+interface EditPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   config: CrudModuleConfig | undefined;
+  record: Record<string, unknown> | null;
   fkOptions: Record<string, Array<{ value: string; label: string }>>;
   comboboxOptions?: Record<string, string[]>;
   subModuleDisplayName: string;
 }
 
-export function CreatePanel({
+export function EditPanel({
   open,
   onOpenChange,
   config,
+  record,
   fkOptions,
   comboboxOptions,
   subModuleDisplayName,
-}: CreatePanelProps) {
+}: EditPanelProps) {
   const fetcher = useFetcher();
   const revalidator = useRevalidator();
   const hasHandledSuccess = useRef(false);
@@ -55,7 +57,7 @@ export function CreatePanel({
 
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: buildDefaultValues(formFields, null),
+    defaultValues: buildDefaultValues(formFields, record),
   });
 
   const fetcherData = fetcher.data as
@@ -64,28 +66,17 @@ export function CreatePanel({
 
   const isSubmitting = fetcher.state !== 'idle';
 
-  // Handle fetcher response inline (no useEffect)
-  // The create action returns redirect() on success, which useFetcher swallows
-  // (fetcherData stays undefined). On error, it returns { success: false, error }.
   if (fetcher.state === 'idle' && !hasHandledSuccess.current) {
     if (fetcherData !== undefined && !fetcherData.success) {
       toast.error(fetcherData.error ?? 'Validation failed');
       hasHandledSuccess.current = true;
-    } else if (
-      fetcher.data === undefined &&
-      fetcher.state === 'idle' &&
-      form.formState.submitCount > 0 &&
-      form.formState.isSubmitSuccessful
-    ) {
-      // Redirect was swallowed — treat as success
+    } else if (fetcherData !== undefined && fetcherData.success) {
       hasHandledSuccess.current = true;
       onOpenChange(false);
-      form.reset(buildDefaultValues(formFields, null));
       revalidator.revalidate();
     }
   }
 
-  // Reset tracking ref when panel reopens
   if (open && hasHandledSuccess.current && fetcher.state === 'idle') {
     hasHandledSuccess.current = false;
   }
@@ -93,11 +84,10 @@ export function CreatePanel({
   const onSubmit = useCallback(
     (data: Record<string, unknown>) => {
       hasHandledSuccess.current = false;
-      fetcher.submit(data as unknown as Record<string, string>, {
-        method: 'POST',
-        action: 'create',
-        encType: 'application/json',
-      });
+      fetcher.submit(
+        JSON.stringify({ intent: 'update', data }),
+        { method: 'POST', encType: 'application/json' },
+      );
     },
     [fetcher],
   );
@@ -105,11 +95,12 @@ export function CreatePanel({
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
       if (!nextOpen) {
-        form.reset(buildDefaultValues(formFields, null));
+        form.reset(buildDefaultValues(formFields, record));
       }
+
       onOpenChange(nextOpen);
     },
-    [form, formFields, onOpenChange],
+    [form, formFields, record, onOpenChange],
   );
 
   return (
@@ -117,11 +108,11 @@ export function CreatePanel({
       <SheetContent
         side="right"
         className="flex h-full w-[90%] flex-col gap-0 p-0 sm:max-w-2xl"
-        data-test="create-panel"
+        data-test="edit-panel"
       >
-        <SheetHeader className="px-6 pt-6 pb-4 border-b">
+        <SheetHeader className="border-b px-6 pt-6 pb-4">
           <SheetTitle>
-            <Trans i18nKey="common:create" /> {subModuleDisplayName}
+            <Trans i18nKey="common:edit" /> {subModuleDisplayName}
           </SheetTitle>
         </SheetHeader>
 
@@ -129,13 +120,13 @@ export function CreatePanel({
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-1 flex-col overflow-hidden"
-            data-test="create-panel-form"
+            data-test="edit-panel-form"
           >
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <FormFieldGrid
                 fields={formFields}
                 control={form.control}
-                mode="create"
+                mode="edit"
                 pkColumn={pkColumn}
                 fkOptions={fkOptions}
                 comboboxOptions={comboboxOptions}
@@ -148,13 +139,13 @@ export function CreatePanel({
                   type="submit"
                   variant="brand"
                   disabled={isSubmitting}
-                  data-test="create-panel-submit"
+                  data-test="edit-panel-submit"
                 >
                   <If condition={isSubmitting}>
                     <Trans i18nKey="common:loading" />
                   </If>
                   <If condition={!isSubmitting}>
-                    <Trans i18nKey="common:create" />
+                    <Trans i18nKey="common:save" />
                   </If>
                 </Button>
 
