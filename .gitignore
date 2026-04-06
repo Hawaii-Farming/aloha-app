@@ -62,5 +62,6 @@ playwright/.cache/
 # claude code
 .claude/worktrees/
 .claude/settings.local.json
+.claude/settings.json
 
 credentials.json
