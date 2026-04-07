@@ -3,7 +3,7 @@
 ## Core Stack
 
 - **React Router 7** (SSR/Framework mode) + **Vite** + **React 19** + **TypeScript**
-- **Supabase** (PostgreSQL 15, Auth, RLS, Realtime)
+- **Supabase** (PostgreSQL 17, Auth, RLS, Realtime)
 - **Tailwind CSS 4** + **Shadcn UI** (Radix primitives) + **Lucide React** icons
 - **Turborepo** monorepo with pnpm workspaces
 
