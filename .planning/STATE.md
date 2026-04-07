@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-07 - Completed quick task 260407-e8h: Fix type safety - remove unsafe casts in CRUD and workspace files
+Last activity: 2026-04-07 - Completed quick task 260407-ekz: Add tests for PR #6: pgTAP, Vitest unit, Playwright E2E
 
 Progress: [██████████] 100%
 
@@ -74,6 +74,7 @@ None — milestone shipped.
 | 260403-arw | convert Create button to slide-in Sheet panel | 2026-04-03 | 31f41b1 | [260403-arw-convert-create-button-from-page-navigati](./quick/260403-arw-convert-create-button-from-page-navigati/) |
 | 260407-dz4 | Fix PR #6 blockers: auth trigger validation and RLS coverage gaps | 2026-04-07 | b3598cd | [260407-dz4-fix-pr-6-blockers-auth-trigger-validatio](./quick/260407-dz4-fix-pr-6-blockers-auth-trigger-validatio/) |
 | 260407-e8h | Fix type safety: remove unsafe casts in CRUD and workspace files | 2026-04-07 | 380353a | [260407-e8h-fix-type-safety-remove-unsafe-casts-in-c](./quick/260407-e8h-fix-type-safety-remove-unsafe-casts-in-c/) |
+| 260407-ekz | Add tests for PR #6: pgTAP, Vitest unit, Playwright E2E | 2026-04-07 | 2556c44 | [260407-ekz-add-tests-for-pr-6-pgtap-for-auth-trigge](./quick/260407-ekz-add-tests-for-pr-6-pgtap-for-auth-trigge/) |
 
 ## Session Continuity
 
