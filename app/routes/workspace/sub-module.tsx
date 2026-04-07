@@ -1,7 +1,5 @@
 import { lazy, Suspense } from 'react';
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-
 import { TableListView } from '~/components/crud/table-list-view';
 import {
   crudBulkDeleteAction,
@@ -64,7 +62,7 @@ export const loader = async (args: {
   });
 
   const { fkOptions, comboboxOptions } = await loadFormOptions({
-    client: client as unknown as SupabaseClient,
+    client,
     config,
     orgId: accountSlug,
     subModuleSlug,

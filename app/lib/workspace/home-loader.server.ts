@@ -1,6 +1,7 @@
 import { redirect } from 'react-router';
 
 import pathsConfig from '~/config/paths.config';
+import { castRows } from '~/lib/crud/typed-query.server';
 import { requireUserLoader } from '~/lib/require-user-loader';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
@@ -15,12 +16,9 @@ export async function homeLoader(request: Request) {
     .eq('user_id', user.sub)
     .eq('is_deleted', false);
 
-  const rows = data as unknown as Array<{
-    org_id: string;
-    org: { name: string };
-  }> | null;
+  const rows = castRows<{ org_id: string; org: { name: string } }>(data);
 
-  if (error || !rows || rows.length === 0) {
+  if (error || rows.length === 0) {
     return redirect('/no-access');
   }
 

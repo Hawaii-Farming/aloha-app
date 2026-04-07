@@ -1,6 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { CrudModuleConfig } from '~/lib/crud/types';
+import type { Database } from '~/lib/database.types';
+
+import { castRows } from './typed-query.server';
 
 export interface FormOptions {
   fkOptions: Record<string, Array<{ value: string; label: string }>>;
@@ -8,7 +11,7 @@ export interface FormOptions {
 }
 
 interface LoadFormOptionsParams {
-  client: SupabaseClient;
+  client: SupabaseClient<Database>;
   config: CrudModuleConfig | undefined;
   orgId: string;
   subModuleSlug: string;
@@ -48,7 +51,7 @@ export async function loadFormOptions(
     const orderCol = field.fkOrderColumn ?? field.fkLabelColumn!;
     const selectCols = new Set(['id', field.fkLabelColumn!, orderCol]);
     let query = client
-      .from(field.fkTable!)
+      .from(field.fkTable! as never)
       .select([...selectCols].join(', '))
       .eq('is_deleted', false);
 
@@ -72,7 +75,7 @@ export async function loadFormOptions(
       return { key: field.key, options: [] };
     }
 
-    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const rows = castRows(data);
     return {
       key: field.key,
       options: rows.map((row) => ({
@@ -89,7 +92,7 @@ export async function loadFormOptions(
     };
 
     const { data, error } = await client
-      .from(source.table)
+      .from(source.table as never)
       .select(source.column)
       .eq('org_id', orgId)
       .eq('is_deleted', false)
@@ -105,7 +108,7 @@ export async function loadFormOptions(
       return { key: field.key, values: [] };
     }
 
-    const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    const rows = castRows(data);
     const unique = [...new Set(rows.map((r) => String(r[source.column])))];
     return { key: field.key, values: unique };
   });

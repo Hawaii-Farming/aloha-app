@@ -1,7 +1,9 @@
 import { redirect } from 'react-router';
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-
+import {
+  castRows,
+  queryUntypedView,
+} from '~/lib/crud/typed-query.server';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { requireModuleAccess } from '~/lib/workspace/require-module-access.server';
 
@@ -21,9 +23,8 @@ export const loader = async (args: {
   });
 
   // Get sub-modules for this module, ordered by display_order
-  // Cast to untyped client since app_nav_sub_modules view is not in generated types
-  const { data } = await (client as unknown as SupabaseClient)
-    .from('app_nav_sub_modules')
+  // View is not in generated types — use queryUntypedView helper
+  const { data } = await queryUntypedView(client, 'app_nav_sub_modules')
     .select(
       'sub_module_id, org_id, module_slug, sub_module_slug, display_name, display_order',
     )
@@ -31,8 +32,7 @@ export const loader = async (args: {
     .eq('module_slug', moduleSlug)
     .order('display_order');
 
-  const subModules =
-    (data as unknown as Array<{ sub_module_slug: string }>) ?? [];
+  const subModules = castRows<{ sub_module_slug: string }>(data);
 
   if (subModules.length > 0) {
     const first = subModules[0]!;

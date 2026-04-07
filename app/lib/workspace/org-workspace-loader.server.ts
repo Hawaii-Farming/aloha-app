@@ -2,6 +2,7 @@ import { redirect } from 'react-router';
 
 import type { JwtPayload, SupabaseClient } from '@supabase/supabase-js';
 
+import { castRows, queryUntypedView } from '~/lib/crud/typed-query.server';
 import type { Database } from '~/lib/database.types';
 import { requireUserLoader } from '~/lib/require-user-loader';
 import type {
@@ -46,9 +47,9 @@ export async function loadOrgWorkspace(params: {
     .eq('user_id', user.sub)
     .eq('is_deleted', false);
 
-  const allOrgs = employees as unknown as EmployeeOrgRow[] | null;
+  const allOrgs = castRows<EmployeeOrgRow>(employees);
 
-  if (empError || !allOrgs || allOrgs.length === 0) {
+  if (empError || allOrgs.length === 0) {
     throw redirect('/no-access');
   }
 
@@ -65,11 +66,11 @@ export async function loadOrgWorkspace(params: {
     access_level_id: current.sys_access_level_id,
   };
 
-  // Single view query — not in generated types, use untyped client
-  const untypedClient = params.client as unknown as SupabaseClient;
-
-  const { data: navRows, error: navError } = await untypedClient
-    .from('app_navigation')
+  // Single view query — not in generated types, use queryUntypedView helper
+  const { data: navRows, error: navError } = await queryUntypedView(
+    params.client,
+    'app_navigation',
+  )
     .select('*')
     .eq('org_id', params.orgSlug);
 
@@ -81,7 +82,7 @@ export async function loadOrgWorkspace(params: {
     throw new Response('Failed to load workspace navigation', { status: 500 });
   }
 
-  const rows = (navRows as AppNavigationRow[]) ?? [];
+  const rows = castRows<AppNavigationRow>(navRows);
   const { modules, subModules } = deriveNavigation(rows, params.orgSlug);
 
   return {

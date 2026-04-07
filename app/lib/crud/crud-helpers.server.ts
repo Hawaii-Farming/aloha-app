@@ -1,5 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import type { Database } from '~/lib/database.types';
+
+import { castRow, castRows } from './typed-query.server';
+
 /** Flattens nested FK objects from Supabase embedded selects.
  *  e.g. { compensation_manager: { preferred_name: 'Joe' } }
  *  becomes { compensation_manager_preferred_name: 'Joe' } */
@@ -22,7 +26,7 @@ function flattenRow(row: Record<string, unknown>): Record<string, unknown> {
 }
 
 async function resolveSelfJoins(
-  client: SupabaseClient,
+  client: SupabaseClient<Database>,
   tableName: string,
   rows: Record<string, unknown>[],
   selfJoins: Record<string, string>,
@@ -45,16 +49,13 @@ async function resolveSelfJoins(
   if (ids.size === 0) return rows;
 
   const { data: lookupData } = await client
-    .from(tableName)
+    .from(tableName as never)
     .select(`id, ${displayFields.join(', ')}`)
     .in('id', Array.from(ids));
 
   const lookup = new Map<string, Record<string, unknown>>();
 
-  for (const item of (lookupData ?? []) as unknown as Record<
-    string,
-    unknown
-  >[]) {
+  for (const item of castRows(lookupData)) {
     lookup.set(String(item.id), item);
   }
 
@@ -77,7 +78,7 @@ async function resolveSelfJoins(
 }
 
 export interface LoadTableDataParams {
-  client: SupabaseClient;
+  client: SupabaseClient<Database>;
   viewName: string;
   orgId: string;
   searchParams: URLSearchParams;
@@ -125,7 +126,7 @@ export async function loadTableData<T = Record<string, unknown>>(
   const to = from + size - 1;
 
   let query = params.client
-    .from(params.viewName)
+    .from(params.viewName as never)
     .select(params.select ?? '*', { count: 'exact' })
     .eq('org_id', params.orgId)
     .eq('is_deleted', false);
@@ -170,7 +171,7 @@ export async function loadTableData<T = Record<string, unknown>>(
     throw new Response(error.message, { status: 500 });
   }
 
-  const rows = (data ?? []) as unknown as Record<string, unknown>[];
+  const rows = castRows(data);
   let flatRows = params.select ? rows.map(flattenRow) : rows;
 
   if (params.selfJoins && flatRows.length > 0) {
@@ -192,7 +193,7 @@ export async function loadTableData<T = Record<string, unknown>>(
 }
 
 export interface LoadDetailDataParams {
-  client: SupabaseClient;
+  client: SupabaseClient<Database>;
   viewName: string;
   orgId: string;
   pkColumn: string;
@@ -205,7 +206,7 @@ export async function loadDetailData<T = Record<string, unknown>>(
   params: LoadDetailDataParams,
 ): Promise<T> {
   const { data, error } = await params.client
-    .from(params.viewName)
+    .from(params.viewName as never)
     .select(params.select ?? '*')
     .eq('org_id', params.orgId)
     .eq(params.pkColumn, params.pkValue)
@@ -215,7 +216,7 @@ export async function loadDetailData<T = Record<string, unknown>>(
     throw new Response('Not Found', { status: 404 });
   }
 
-  let row = data as unknown as Record<string, unknown>;
+  let row = castRow(data);
 
   if (params.select) {
     row = flattenRow(row);

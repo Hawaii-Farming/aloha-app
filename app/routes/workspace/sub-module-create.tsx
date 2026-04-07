@@ -2,8 +2,6 @@ import { useCallback } from 'react';
 
 import { Link, redirect, useFetcher } from 'react-router';
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Path } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -94,7 +92,7 @@ export const loader = async (args: {
   }
 
   const { fkOptions, comboboxOptions } = await loadFormOptions({
-    client: client as unknown as SupabaseClient,
+    client,
     config,
     orgId: accountSlug,
     subModuleSlug,

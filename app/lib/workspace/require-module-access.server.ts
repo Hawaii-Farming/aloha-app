@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import { castRow } from '~/lib/crud/typed-query.server';
+import type { Database } from '~/lib/database.types';
 import type {
   AppNavModule as NavModule,
   AppNavSubModule as NavSubModule,
@@ -12,12 +14,12 @@ import type {
  * If no row is returned, the user has no access — throws 403 Response.
  */
 export async function requireModuleAccess(params: {
-  client: SupabaseClient;
+  client: SupabaseClient<Database>;
   moduleSlug: string;
   orgSlug: string;
 }): Promise<NavModule> {
   const { data, error } = await params.client
-    .from('app_navigation')
+    .from('app_navigation' as never)
     .select('*')
     .eq('org_id', params.orgSlug)
     .eq('module_slug', params.moduleSlug)
@@ -34,7 +36,7 @@ export async function requireModuleAccess(params: {
     throw new Response('Internal Server Error', { status: 500 });
   }
 
-  const row = data as unknown as AppNavigationRow | null;
+  const row = castRow<AppNavigationRow | null>(data);
 
   if (!row) {
     throw new Response('Forbidden', { status: 403 });
@@ -58,13 +60,13 @@ export async function requireModuleAccess(params: {
  * If no row is returned, the user has no access — throws 403 Response.
  */
 export async function requireSubModuleAccess(params: {
-  client: SupabaseClient;
+  client: SupabaseClient<Database>;
   moduleSlug: string;
   subModuleSlug: string;
   orgSlug: string;
 }): Promise<NavSubModule> {
   const { data, error } = await params.client
-    .from('app_navigation')
+    .from('app_navigation' as never)
     .select('*')
     .eq('org_id', params.orgSlug)
     .eq('module_slug', params.moduleSlug)
@@ -79,7 +81,7 @@ export async function requireSubModuleAccess(params: {
     throw new Response('Internal Server Error', { status: 500 });
   }
 
-  const row = data as unknown as AppNavigationRow | null;
+  const row = castRow<AppNavigationRow | null>(data);
 
   if (!row) {
     throw new Response('Forbidden', { status: 403 });

@@ -1,7 +1,5 @@
 import { lazy, Suspense } from 'react';
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-
 import { redirect } from 'react-router';
 
 import { CardDetailView } from '~/components/crud/card-detail-view';
@@ -59,7 +57,7 @@ export const loader = async (args: {
   const workflowConfig = config?.workflow ?? null;
 
   const { fkOptions, comboboxOptions } = await loadFormOptions({
-    client: client as unknown as SupabaseClient,
+    client,
     config,
     orgId: accountSlug,
     subModuleSlug,
