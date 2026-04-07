@@ -2,7 +2,6 @@
   "extends": "@aloha/tsconfig/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "moduleResolution": "bundler",
     "paths": {
       "~/*": ["./app/*"],
@@ -12,11 +11,6 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "rootDirs": [".", "./.react-router/types"]
   },
-  "include": [
-    "*.ts",
-    "*.tsx",
-    "app",
-    ".react-router/types/**/*"
-  ],
+  "include": ["*.ts", "*.tsx", "app", ".react-router/types/**/*"],
   "exclude": ["node_modules"]
 }
