@@ -94,7 +94,7 @@ export interface LoadTableDataParams {
 
 /** Strip PostgREST filter delimiters from search input to prevent
  *  users from injecting additional filter clauses via the search box. */
-function sanitizeSearch(value: string): string {
+export function sanitizeSearch(value: string): string {
   return value.replace(/[,()*]/g, '').trim();
 }
 
