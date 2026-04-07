@@ -11,7 +11,11 @@ import { isbot } from 'isbot';
 import { PassThrough } from 'node:stream';
 import { renderToPipeableStream } from 'react-dom/server';
 
+import { getServerEnv } from '~/lib/env.server';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
+
+// Validate env vars eagerly at startup
+getServerEnv();
 
 /**
  * The delay in milliseconds before the server router aborts the request.

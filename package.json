@@ -44,7 +44,17 @@
     "supabase:db:lint": "supabase db lint",
     "supabase:deploy": "supabase link --project-ref $SUPABASE_PROJECT_REF && supabase db push",
     "supabase:typegen": "supabase gen types typescript --local > ./app/lib/database.types.ts",
-    "supabase:db:dump:local": "supabase db dump --local --data-only"
+    "supabase:db:dump:local": "supabase db dump --local --data-only",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --cache --cache-location ./node_modules/.cache/eslint --fix",
+      "prettier --write --cache --cache-location=node_modules/.cache/.prettiercache"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write --cache --cache-location=node_modules/.cache/.prettiercache"
+    ]
   },
   "prettier": "@aloha/prettier-config",
   "packageManager": "pnpm@10.18.1",
@@ -91,8 +101,10 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "husky": "^9.1.7",
     "i18next-resources-to-backend": "^1.2.1",
     "isbot": "^5.1.32",
+    "lint-staged": "^16.4.0",
     "lucide-react": "^0.562.0",
     "next-themes": "0.4.6",
     "pino": "^10.1.0",

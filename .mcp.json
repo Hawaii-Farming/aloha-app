@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aloha": {
+      "command": "node",
+      "args": ["packages/mcp-server/build/index.js"]
+    }
+  }
+}
