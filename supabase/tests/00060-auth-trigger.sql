@@ -11,7 +11,7 @@
 
 BEGIN;
 
-SELECT plan(10);
+SELECT plan(12);
 
 -- ============================================================
 -- Test data setup
@@ -291,6 +291,29 @@ SELECT is(
   '11111111-1111-1111-1111-111111111006'::uuid,
   'TRIGGER UPDATE: after confirmation — hr_employee.user_id linked'
 );
+
+-- ============================================================
+-- Test 7: auth_link_log not readable by authenticated role
+-- ============================================================
+
+-- Verify rows exist as superuser (tests 2-3 created at least 3)
+SELECT ok(
+  (SELECT count(*)::integer FROM public.auth_link_log) >= 3,
+  'RLS: auth_link_log has rows (superuser can see them)'
+);
+
+-- Switch to authenticated role to test access
+SET LOCAL ROLE authenticated;
+SET LOCAL request.jwt.claims = '{"sub": "11111111-1111-1111-1111-111111111002", "role": "authenticated"}';
+
+SELECT is(
+  (SELECT count(*)::integer FROM public.auth_link_log),
+  0,
+  'RLS: authenticated role cannot read auth_link_log'
+);
+
+-- Reset to superuser for finish()
+RESET ROLE;
 
 SELECT * FROM finish();
 
