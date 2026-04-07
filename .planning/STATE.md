@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: —
 Plan: —
 Status: v1.0 milestone complete — ready for next milestone
-Last activity: 2026-04-07 - Completed quick task 260407-ekz: Add tests for PR #6: pgTAP, Vitest unit, Playwright E2E
+Last activity: 2026-04-07 - Completed quick task 260407-f3m: Fix test quality: storageState auth, data-test selectors, typed mocks, audit log RLS
 
 Progress: [██████████] 100%
 
@@ -75,6 +75,7 @@ None — milestone shipped.
 | 260407-dz4 | Fix PR #6 blockers: auth trigger validation and RLS coverage gaps | 2026-04-07 | b3598cd | [260407-dz4-fix-pr-6-blockers-auth-trigger-validatio](./quick/260407-dz4-fix-pr-6-blockers-auth-trigger-validatio/) |
 | 260407-e8h | Fix type safety: remove unsafe casts in CRUD and workspace files | 2026-04-07 | 380353a | [260407-e8h-fix-type-safety-remove-unsafe-casts-in-c](./quick/260407-e8h-fix-type-safety-remove-unsafe-casts-in-c/) |
 | 260407-ekz | Add tests for PR #6: pgTAP, Vitest unit, Playwright E2E | 2026-04-07 | 2556c44 | [260407-ekz-add-tests-for-pr-6-pgtap-for-auth-trigge](./quick/260407-ekz-add-tests-for-pr-6-pgtap-for-auth-trigge/) |
+| 260407-f3m | Fix test quality: storageState auth, data-test selectors, typed mocks, audit log RLS | 2026-04-07 | de53b4f | [260407-f3m-fix-test-quality-e2e-auth-storagestate-d](./quick/260407-f3m-fix-test-quality-e2e-auth-storagestate-d/) |
 
 ## Session Continuity
 
