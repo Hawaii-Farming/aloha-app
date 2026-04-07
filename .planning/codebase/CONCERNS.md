@@ -1,189 +1,237 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-04-02
+**Analysis Date:** 2026-04-07
 
-## Tech Debt
+## Performance Bottlenecks
 
-**Type Generation Gap for SQL Views:**
-- Issue: Navigation views (`app_nav_modules`, `app_nav_sub_modules`) exist in SQL but are not included in generated TypeScript types from `supabase typegen`. This forces developers to use `as unknown as` type assertions to query these views.
-- Files: `app/lib/workspace/org-workspace-loader.server.ts` (line 54-55), `app/routes/workspace/sub-module-create.tsx` (line 96), `app/routes/workspace/module.tsx` (line 25), `app/lib/workspace/require-module-access.server.ts` (line 27, 57)
-- Impact: 10 unsafe type casts scattered across codebase; reduces type safety; makes future refactoring risky
-- Fix approach: Run `supabase typegen` with `--linked` flag to include views in schema snapshot, or maintain manual type definitions for views in a `view-types.ts` file and document the pattern
+**Soft-delete filtering without comprehensive indexing:**
+- Problem: Over 110 occurrences of `is_deleted` columns across the schema, but only 5 tables have explicit `is_deleted` indexes. Query filters on `is_deleted = false` in `loadTableData()` and `loadDetailData()` will full-table scan on unindexed tables, especially as org data grows.
+- Files: `app/lib/crud/crud-helpers.server.ts` (lines 132, 140), `supabase/migrations/` (all table definitions from `20260401000001_*` onward)
+- Cause: Tables created without `CREATE INDEX idx_<table>_active ON <table>(org_id, is_deleted)` pattern. Some tables have it (e.g., `hr_department`, `hr_work_authorization`), but majority don't.
+- Improvement path: 
+  1. Audit all migrations and count tables with `is_deleted` but no index
+  2. Create a single migration adding missing composite indexes: `(org_id, is_deleted)` for all org-scoped tables that filter by these columns
+  3. Add index creation to table template in `supabase/CLAUDE.md`
 
-**CRUD Registry Incompleteness:**
-- Issue: Only 2 modules (`departments`, `products`) have CRUD configs in `app/lib/crud/registry.ts`. As new modules are added to the ERP, they each require a manual config entry. Without a config, routes fall back to generic `fallbackSchema` (id + name + description only).
-- Files: `app/lib/crud/registry.ts` (13 tables but only 2 registered), `app/routes/workspace/sub-module-create.tsx` (lines 38-55 fallback)
-- Impact: New modules ship with incomplete form handling; complex fields won't render correctly; developers must manually register every new module
-- Fix approach: Build a config generator that reads Supabase schema and auto-generates CRUD configs; or implement schema-driven form rendering that discovers columns at runtime
+**Self-join resolution via additional queries:**
+- Problem: `resolveSelfJoins()` in `app/lib/crud/crud-helpers.server.ts` (lines 28-78) makes a second database query for every table with self-referential foreign keys. With large datasets (>1000 rows), this compounds overhead.
+- Files: `app/lib/crud/crud-helpers.server.ts` (lines 177-183, 225-232)
+- Cause: PostgREST doesn't disambiguate multiple FKs to the same table without explicit constraint names. The app works around this by flattening the first query, then looking up display values in a second query.
+- Improvement path:
+  1. Document this as a known pattern (not a bug, but a cost)
+  2. Consider caching self-join lookup results if a table is queried multiple times per request
+  3. Monitor page load times for tables with 2+ self-joins (e.g., `hr_employee` with manager/compensation_manager)
 
-**Untyped Client Workarounds:**
-- Issue: Multiple locations cast Supabase client to `unknown as SupabaseClient` to bypass type checking on view queries, creating fragile code paths.
-- Files: `app/lib/workspace/org-workspace-loader.server.ts` (55), `app/routes/workspace/sub-module-create.tsx` (96), `app/routes/workspace/module.tsx` (25)
-- Impact: Silent failures if view schema changes; no IDE autocomplete; increases regression risk
-- Fix approach: Generate proper TypeScript types for views or create strongly-typed view clients with explicit column selections
-
-**Generated Database Types File Size:**
-- Issue: `app/lib/database.types.ts` is 9,762 lines, making it difficult to navigate and import selectively. Every Supabase schema change triggers a full regeneration.
-- Files: `app/lib/database.types.ts`
-- Impact: Slow IDE performance; large bundle bloat; git diffs are hard to review; type regeneration is slower than it should be
-- Fix approach: Split generated types into per-table modules, e.g., `@aloha/supabase/types/org.ts`, `@aloha/supabase/types/hr-employee.ts`; use Supabase CLI's `--type-def-file-path` to distribute types
+**Date formatting in loop (table list and detail views):**
+- Problem: `formatDate()` runs inline in cell render (called per row, per date column) instead of once at data preparation time. For large tables (>100 rows), this recalculates the same transformation repeatedly.
+- Files: `app/components/crud/table-list-view.tsx` (lines 115-129), `app/components/crud/card-detail-view.tsx` (lines 37-40)
+- Cause: Date formatting logic in component render path, not in loader
+- Improvement path: Move date formatting to `loadTableData()` return or use `useMemo()` for date columns in table building
 
 ## Fragile Areas
 
-**RLS Policy Rollout Status:**
-- Issue: 104 database migration files exist; 9 are RLS-specific (created Apr 1, 2026). This suggests RLS enforcement is very recent. If any RLS policy is too permissive or has edge cases, data leakage could occur before discovery.
-- Files: `supabase/migrations/20260401000099_rls_org_hr_tables.sql` through `20260401000103_rls_*.sql`; `supabase/tests/` (7 pgTAP test files)
-- Risk: 81+ tables with 204+ RLS policies deployed in final wave; test suite has 78 tests but coverage may not span all table combinations
-- Safe modification: Always run full pgTAP suite (`pnpm supabase:test`) before applying new RLS policies; add integration tests for cross-org denial; schedule quarterly RLS audit
-- Test coverage: 78 pgTAP tests exist covering helper functions and positive/negative access cases, but no test for accidental data leakage via FK joins
+**CRUD module registry and dynamic config lookups:**
+- Files: `app/lib/crud/registry.ts`, `app/lib/crud/types.ts`, configs like `app/lib/crud/hr-employee.config.ts`
+- Why fragile: 
+  - `getModuleConfig(subModuleSlug)` returns `undefined` if slug not registered; routes have fallback schema but silently degrade
+  - Adding a new sub-module requires editing registry AND writing a new config file — no scaffolding or automation
+  - Configuration is scattered across multiple files; no single source of truth
+  - Column visibility (`priority: 'low'`), form field layout, workflow transitions are hardcoded per module
+- Safe modification:
+  1. Always check `if (!config)` and use fallbacks
+  2. Test with invalid module slug before deploying
+  3. After adding new module config, manually verify all routes render without console errors
+- Test coverage: `app/lib/crud/__tests__/crud-helpers.test.ts` covers helpers but not registry access patterns
 
-**Dynamic Form Field Rendering:**
-- Issue: `app/routes/workspace/sub-module-create.tsx` builds forms dynamically from `config.formFields` (lines 192-199). If a field config is missing or malformed, the form silently skips it or uses fallback values.
-- Files: `app/routes/workspace/sub-module-create.tsx` (lines 77-123 loader), `app/lib/crud/render-form-field.tsx` (infers behavior from field type)
-- Risk: Data loss if new fields are added to database but not registered in form config; users can bypass required fields using fallback schema
-- Safe modification: Validate form config against Supabase table schema at build time; throw hard error if required columns are missing from config; use schema-driven rendering instead
+**FK resolution via column name inference:**
+- Files: `app/components/crud/card-detail-view.tsx` (lines 46-84)
+- Why fragile: Uses fuzzy matching to find resolved FK names (`field_key`, `${baseKey}_${label}`, or searching through all record keys). Works for common patterns but breaks if naming conventions change.
+- Safe modification: Add `fkResolvedKeyName` property to `FormFieldConfig` to make FK label resolution explicit instead of inferred
+- Test coverage: No E2E tests for complex FK scenarios
 
-**Server Action Error Handling Inconsistency:**
-- Issue: Error objects from Supabase are sometimes cast to `unknown as { code: string }` (e.g., `app/components/auth/update-password-form.tsx` line 46). Error handling relies on manually checking `.code` property that may not exist.
-- Files: `app/components/auth/update-password-form.tsx` (46), `app/lib/supabase/auth-callback.service.server.ts` (error handling)
-- Impact: If error object structure changes, UI will display generic "Validation failed" instead of specific error message
-- Fix approach: Create error parsing utility that validates error object structure before accessing properties; use discriminated unions for error types
+**Workspace loader and org-switching fallback:**
+- Files: `app/lib/workspace/org-workspace-loader.server.ts` (lines 56-59)
+- Why fragile: If user is removed from their current org (soft-deleted), loader silently redirects to first org in `allOrgs` without logging or user notification. User may be confused about workspace change.
+- Safe modification: Add explicit notification or keep redirect but log the event
+- Test coverage: No test for multi-org user losing access mid-session
 
-**Navigation Module Access Queries:**
-- Issue: `requireModuleAccess()` and `requireSubModuleAccess()` query untyped views and return 403 if view returns no data. But queries don't filter by `is_enabled` or check RLS — they rely on the view itself to apply auth context.
-- Files: `app/lib/workspace/require-module-access.server.ts` (lines 13-64)
-- Risk: If `app_nav_modules` view has an RLS bug or returns stale data, unauthorized users could see modules
-- Safe modification: Add explicit `WHERE is_enabled = true` to queries; verify view RLS policies in `supabase/schemas/06-nav-view-contracts.sql`; add integration test that spawns requests as different users
+## Scaling Limits
 
-## Logging Inconsistency
+**Table data pagination with high cardinality lookups:**
+- Current capacity: Page size defaults to 25 rows; reasonable for 10k+ row tables
+- Limit: If a table grows to 100k+ rows AND has FK options (dropdowns) for lookup tables, `loadFormOptions()` queries ALL valid values per-request. This is not paginated and will grow memory usage linearly with lookup table size.
+- Scaling path: Implement combobox search (already supported in form config) for all high-cardinality FK fields instead of pre-loading all options
 
-**Console Output in Production:**
-- Issue: `console.log`, `console.error`, and `console.warn` are used throughout app for error reporting and initialization, but production doesn't route these to structured logs.
-- Files: `app/entry.server.tsx` (84, 133, 144), `app/lib/i18n/i18n-client.ts` (32-34), `app/lib/i18n/i18n-server.ts` (similar), `app/lib/supabase/auth-callback.service.server.ts`
-- Impact: Production errors are lost if server stdout is not captured; no error aggregation or alerting; debugging production issues is blind
-- Fix approach: Replace `console.*` calls with structured logger from `@aloha/shared/logger` in all `.server.ts` files; use Pino in production mode with remote sink (e.g., Datadog, Honeycomb)
+**Soft-deleted rows remain in database indefinitely:**
+- Current capacity: Soft deletes work indefinitely, no cleanup strategy
+- Limit: Over time, `is_deleted = true` rows accumulate. Without archival or purging, tables grow unbounded. Full-table scans become slower even with indexes.
+- Scaling path: Implement time-based archival (e.g., move records older than 1 year to archive table or hard-delete after 2 years) with a scheduled job
 
-**i18n Initialization Debug Logging:**
-- Issue: `app/lib/i18n/i18n-client.ts` (lines 32-34) logs failed locale loads to `console.log`, making it easy to miss missing locale files in CI/CD.
-- Files: `app/lib/i18n/i18n-client.ts` (32-34), `app/lib/i18n/i18n-server.ts` (equivalent)
-- Impact: Silently falls back to empty object `{}` if locale file is missing; users see untranslated UI; no alerting in production
-- Fix approach: Throw error on missing critical namespaces (e.g., `common`, `navigation`); log to structured logger instead of console
+**Multi-org workspace view re-computation on every layout load:**
+- Current capacity: `loadOrgWorkspace()` queries `app_navigation` view on every route change within a workspace
+- Limit: View is not indexed; cross-joins 7+ tables (org, hr_employee, sys_access_level, sys_module, org_module, hr_module_access, etc.). With 20+ org users each with 5+ modules, view becomes slow.
+- Scaling path: Cache view results in layout-scoped state (React Router loader cache) or add materialized view with refresh strategy
 
-## Missing Test Coverage
+## Dependencies at Risk
 
-**End-to-End Tests:**
-- Issue: `e2e/tests/` directory contains only a page object (`auth.po.ts`) with no actual test files (`.spec.ts`). No E2E tests for core workflows (login, create/edit module data, navigation).
-- Files: `e2e/tests/authentication/auth.po.ts` exists but no `.spec.ts` tests
-- Risk: UI bugs and integration failures are not caught until production; browser-specific issues (SSR mismatch, hydration errors) are unknown
-- Priority: High — Add smoke tests for auth flow, data list/detail pages, and form submission
+**@edge-csrf/core 2.5.3-cloudflare-rc1:**
+- Risk: Pre-release RC version pinned in package.json. Cloudflare-specific, no guarantee of stability or long-term support.
+- Impact: CSRF token generation could break if Cloudflare discontinues this package or releases breaking changes
+- Migration plan: Monitor for stable release; upgrade if available. If RC remains only option, document rationale. Consider forking or reimplementing token generation with standard crypto module if RC is abandoned.
 
-**Unit Tests for CRUD Layer:**
-- Issue: No unit tests for `crudCreateAction()`, `crudUpdateAction()`, `crudDeleteAction()`, or `loadTableData()`.
-- Files: `app/lib/crud/crud-action.server.ts`, `app/lib/crud/crud-helpers.server.ts` have no `.test.ts` files
-- Risk: Schema validation logic, soft-delete behavior, and FK option fetching are untested; regressions are invisible
-- Priority: High — Add tests for validation failures, org scoping, and soft-delete flag
+**next-themes 0.4.6 (legacy):**
+- Risk: Package is unmaintained; last update ~2 years ago. Theme toggle and localStorage sync may not work with future React versions.
+- Impact: Dark mode toggle may break; theme preference persistence could fail.
+- Migration plan: Audit `next-themes` integration in `app/entry.tsx` and root layout. If breaking changes hit React 19.x, reimplement theme toggle with native `localStorage` and CSS custom properties.
 
-**CRUD Registry Config Validation:**
-- Issue: Registry lookup (`getModuleConfig()`) returns `undefined` for unconfigured modules, but callers don't validate the return value before using it.
-- Files: `app/routes/workspace/sub-module-create.tsx` (77, 191), `app/routes/workspace/sub-module-detail.tsx` (similar)
-- Risk: If a module slug is typo'd or missing from registry, code silently falls back to generic schema without warning
-- Priority: Medium — Add invariant checks; throw error if module config is required but not found
-
-## Performance Concerns
-
-**Navigation Data Loading:**
-- Issue: `loadOrgWorkspace()` makes three parallel queries to `app_org_context`, `app_nav_modules`, `app_nav_sub_modules` on every workspace-scoped route load (lines 73-76 of `org-workspace-loader.server.ts`). No caching.
-- Files: `app/lib/workspace/org-workspace-loader.server.ts` (25-90)
-- Impact: N+1 queries; repeated loads of same org/user combo hit database each time; layout re-renders cause loader re-runs
-- Fix approach: Cache workspace loader result in React Router's loader context or use TanStack Query with stale-while-revalidate
-
-**Form Field Options Fetching:**
-- Issue: `sub-module-create.tsx` loader fetches FK options sequentially for each FK field, then waits for all via `Promise.all()` (lines 98-114). If there are many FK fields, this blocks page render.
-- Files: `app/routes/workspace/sub-module-create.tsx` (93-114)
-- Impact: Forms with 5+ FK fields have slow initial load; no pagination on FK options (limit 200); large option lists will cause dropdown lag
-- Fix approach: Lazy-load FK options on select focus; implement virtual scrolling in dropdowns; add query caching
-
-**Database Type Generation:**
-- Issue: `pnpm supabase:typegen` runs sequentially and generates 9,762-line single file. No caching of Supabase CLI output; runs on every local schema change.
-- Impact: Slow local dev loop; `react-router typegen && tsc` waits for all types to be available
-- Fix approach: Cache Supabase schema snapshot; split type generation into separate modules; use `--linked` mode to avoid full regeneration
+**Vercel AI SDK (ai 6.0.141, @ai-sdk/anthropic 3.0.64):**
+- Risk: Rapidly evolving; major version changes are frequent. API surface changes year-over-year.
+- Impact: AI form assist and workflow automation could break if SDK changes streaming API or error handling.
+- Migration plan: Pin to major version only. Maintain `app/lib/ai/` as abstraction layer so migrations are contained. Test all AI routes on every package update.
 
 ## Security Considerations
 
-**RLS Edge Cases Not Documented:**
-- Issue: RLS policies use `user_has_org_access(org_id)` helper (added Apr 1, 2026), but the helper function's behavior with org switching, employee deletion, and access level changes is not explicitly tested.
-- Files: `supabase/migrations/20260401000099_rls_org_hr_tables.sql` (policy definitions), `supabase/tests/00040-rls-edge-cases.sql` (only 210 lines for all edge cases)
-- Risk: If employee is soft-deleted (`is_deleted = true`), can they still read data? If user is removed from `hr_employee`, does RLS trigger immediately? These scenarios need explicit test cases.
-- Recommendation: Add test for each RLS edge case: employee removal, access level downgrade, org ID change, concurrent deletion; document in SECURITY.md
+**Multi-tenant org isolation via RLS + application-layer access checks:**
+- Risk: RLS policies on `hr_employee` and org depend on `auth.uid()` session cookie. If session is hijacked, attacker can read/write any org the victim belongs to.
+- Files: `supabase/migrations/20260401000142_app_views.sql` (lines 39-73, app_navigation view), `app/lib/workspace/org-workspace-loader.server.ts` (lines 44-54)
+- Current mitigation: 
+  1. RLS policies use `auth.uid()` from JWT; Supabase session is httpOnly cookie
+  2. Application checks `hr_module_access` for can_edit/can_delete before mutations
+  3. Service role key used server-side only, not exposed to client
+- Recommendations:
+  1. Add session timeout config (Supabase default is 1 hour; consider shorter for sensitive operations)
+  2. Audit `org_workspace_loader.server.ts` to ensure employee record is verified before accessing org data
+  3. Log all mutations with employee_id + org_id for audit trail (partially done via `created_by`, `updated_by` but no audit table)
 
-**Soft Delete Enforcement:**
-- Issue: `is_deleted` flag is relied upon for data privacy, but there's no policy that prevents admins from restoring deleted records if needed. Also, views may leak soft-deleted data if they don't filter by `is_deleted = false`.
-- Files: `supabase/migrations/` (all tables have `is_deleted BOOLEAN DEFAULT false`), `app/lib/crud/crud-action.server.ts` (line 88-96 soft-delete implementation)
-- Impact: Accidentally restored deleted records are not visible in audit logs; soft-deleted data could appear in reports if views are not careful
-- Recommendation: Create an audit table that logs soft-delete actions with timestamp and user_id; update all views to filter `is_deleted = false` explicitly
+**CSRF protection on POST /api routes:**
+- Risk: CSRF token is generated in root loader and stored in HTML meta tag. If token extraction fails, API endpoint might not validate properly.
+- Files: `app/lib/csrf/server/create-csrf-protect.server.ts`, form handling in routes
+- Current mitigation: Token is generated per-request and validated before mutations
+- Recommendations:
+  1. Audit all `/api/*` routes to ensure they call `verifyCsrfToken()` before processing
+  2. Test CSRF validation by submitting forms with invalid/expired tokens
+  3. Add rate limiting to `/api/*` endpoints to prevent token brute-forcing
 
-**Type Casting in Auth Error Handling:**
-- Issue: `app/components/auth/update-password-form.tsx` (line 46) casts error to `{ code: string }` without validation. Attacker could pass malformed error object that crashes the UI.
-- Files: `app/components/auth/update-password-form.tsx` (46)
-- Impact: Potential to trigger unhandled exception in UI if error object structure is unexpected
-- Recommendation: Create error validation schema (`authErrorSchema.ts`) using Zod; validate error before accessing properties
+**Redirect validation in auth callback:**
+- Risk: `isSafeRedirectPath()` in `auth-callback.service.server.ts` (lines 11-16) blocks `//` and `://` but allows single `/` followed by any path. An open redirect is prevented, but logic should be defensive.
+- Files: `app/lib/supabase/auth-callback.service.server.ts` (lines 11-96)
+- Current mitigation: Checks `!path.startsWith('//')`, blocks `://`, blocks `\`
+- Recommendations:
+  1. Add whitelist of allowed redirect paths (e.g., `/home/*`, `/auth/callback/next`)
+  2. Reject paths containing `?`, `#` (except for the final query string after callback resolution)
+  3. Test with malicious inputs: `/home/../../../etc/passwd`, `/home/\x00`, `/home//double-slash`
 
-## Deployment & Environment
+## Tech Debt
 
-**Environment Variable Documentation:**
-- Issue: `.env.template` lists MAILER_PROVIDER, ANTHROPIC_API_KEY, and OAuth client secrets, but no documentation of which are required vs optional, or what happens if they're missing.
-- Files: `.env.template`
-- Impact: Deployment to production may fail silently if a required env var is not set; no clear error message
-- Fix approach: Document required vs optional env vars; validate all required vars on app startup in `root.tsx` loader; throw 500 if missing
+**Database type generation requires manual regeneration:**
+- Issue: `supabase:typegen` must be run manually after schema changes. If types drift from schema, type safety is lost.
+- Files: `app/lib/database.types.ts` (9130 lines, generated), `package.json` scripts
+- Impact: 
+  1. Large PR diffs when types change (hard to review actual schema changes)
+  2. Easy to forget; branches with schema changes but no type updates cause runtime errors
+- Fix approach:
+  1. Add pre-commit hook to regenerate types if any `supabase/migrations/*.sql` files change
+  2. Document in CONTRIBUTING.md that types must be committed alongside migrations
+  3. Consider `supabase link --project-ref` + automatic type generation in CI
 
-**Secrets in Template File:**
-- Issue: `.env.template` contains demo Supabase keys for local development. These are safe (hardcoded in Supabase docs), but the pattern invites copy-paste of real secrets into git.
-- Files: `.env.template` (lines 32-34)
-- Impact: Low immediate risk, but sets bad precedent; if developer renames `.env.template` to `.env` and adds real secrets, they could accidentally commit
-- Recommendation: Use `.env.local` for secrets; keep `.env.template` secrets-free with comments like `SUPABASE_SECRET_KEY=<set in your hosting provider>`
+**Duplication in route loaders (sub-module detail, create, list):**
+- Issue: Three routes have nearly identical patterns:
+  1. `getSupabaseServerClient(request)`
+  2. `requireModuleAccess()` + `requireSubModuleAccess()`
+  3. `getModuleConfig(subModuleSlug)`
+  4. Load form options via `loadFormOptions()`
+- Files: `app/routes/workspace/sub-module-detail.tsx` (lines 23-77), `app/routes/workspace/sub-module-create.tsx` (lines 58-126), `app/routes/workspace/sub-module.tsx`
+- Impact: Changes to access control or config loading must be made in 3 places; easy to miss one
+- Fix approach: Extract shared loader logic into `app/lib/crud/load-submodule-context.server.ts` exporting single function
 
-## Migration & Schema
+**Fallback form schema hardcoded in routes:**
+- Issue: Routes define fallback schema if module config is not found:
+  ```typescript
+  const fallbackSchema = z.object({
+    id: z.string().min(1, 'ID is required'),
+    name: z.string().min(1, 'Name is required'),
+    description: z.string().optional(),
+  });
+  ```
+- Files: `app/routes/workspace/sub-module-create.tsx` (lines 39-43), likely duplicated in detail/edit routes
+- Impact: If config is missing, form will use generic schema; validation differs from intended module schema
+- Fix approach: Store fallback schema in registry or config loader, not in routes
 
-**104 Migration Files Without Clear Timeline:**
-- Issue: 104 SQL migration files in `supabase/migrations/`. No index or README explaining the migration order, purpose, or blockers. RLS migrations (Wave 1 through 3) were applied Apr 1, 2026 in a single commit.
-- Files: `supabase/migrations/` (104 files, latest dated 2026-04-01)
-- Impact: Hard to understand schema evolution; reverting a migration requires understanding downstream dependencies
-- Fix approach: Create `supabase/migrations/README.md` with a table of migration waves (foundation, org/hr, inventory, etc.); add comments at top of each migration explaining purpose
+**No transaction support for multi-step operations:**
+- Issue: Workflow transitions (`crudBulkTransitionAction`, `crudTransitionAction`) and complex creates may involve multiple mutations without transaction wrapping. If one fails mid-transaction, state is inconsistent.
+- Files: `app/lib/crud/crud-action.server.ts` (lines 129-202), workflow helpers
+- Impact: If a transition step fails after updating status but before setting related fields, record is left in invalid state
+- Fix approach:
+  1. Use Supabase RPC functions for multi-step operations
+  2. Wrap related mutations in explicit transaction (requires custom Supabase client method or SDK RPC)
+  3. Document current behavior and document manual recovery steps if edge cases occur
 
-**RLS Migration Wave Rollout:**
-- Issue: 9 RLS migrations added in a single day (Apr 1, 2026), enabling RLS on 81 tables with 204+ policies. This is high-risk if any policy is malformed.
-- Files: `supabase/migrations/20260401000099_rls_org_hr_tables.sql` through `20260401000103_rls_*.sql`
-- Risk: If a policy is too permissive or has a typo, all 81 tables are exposed until noticed
-- Recommendation: Stage RLS rollout per feature module; validate each migration with full pgTAP suite before deploying; use feature flags to disable RLS per module if needed
+**Missing error details in user-facing API responses:**
+- Issue: Routes catch Supabase errors and return generic status codes:
+  ```typescript
+  if (error) {
+    return { success: false as const, error: error.message };
+  }
+  ```
+- Files: `app/lib/crud/crud-action.server.ts` (lines 43-44, 77-78, 100-101, 159-160), `app/components/crud/create-panel.tsx`, `app/components/crud/edit-panel.tsx`
+- Impact: Users see cryptic database error messages (e.g., "duplicate key value violates unique constraint") instead of friendly guidance. Errors are not localized.
+- Fix approach:
+  1. Create error classifier: `classifySupabaseError(error: SupabaseError): UserFacingError`
+  2. Map constraint errors to user messages: `{fk: "Department not found", unique: "Name already in use", check: "Value outside allowed range"}`
+  3. Return localized error key to client, render i18n message
 
-## Scaling & Architecture
+## Missing Critical Features
 
-**Single-Namespace CRUD Registry:**
-- Issue: All modules map to a single `registry` map in `app/lib/crud/registry.ts` (line 13). As ERP grows to 50+ modules, this becomes a bottleneck and maintenance nightmare.
-- Files: `app/lib/crud/registry.ts` (13 entries but only 2 configured)
-- Impact: All module configs must be centralized; new modules can't provide their own config; hard to organize by feature
-- Fix approach: Refactor registry to accept plugins or lazy-load configs per module; use a feature-based structure where each module package exports its own config
+**No audit logging for data mutations:**
+- Problem: `created_by`, `updated_by` columns track who, but no separate audit table tracks when/what changed. Compliance and debugging is difficult.
+- Blocks: Regulatory requirements for data lineage; incident investigation
+- Suggested implementation:
+  1. Create `audit_log` table: `(id UUID, org_id, table_name, record_id, action, old_values JSONB, new_values JSONB, user_id, created_at)`
+  2. Use PostgreSQL trigger to auto-log inserts/updates/deletes
+  3. Expose audit log in admin UI (read-only)
 
-**Navigation Views Hardcoded in Loaders:**
-- Issue: Sidebar and navigation are loaded from `app_nav_modules` and `app_nav_sub_modules` views on every workspace load. If these views are slow or have permissions issues, all pages are affected.
-- Files: `app/lib/workspace/org-workspace-loader.server.ts` (57-76)
-- Impact: Single point of failure; can't disable a slow query without affecting navigation
-- Fix approach: Cache nav data for 30 seconds; make nav loading non-blocking (fetch in background, use stale cache); add dedicated nav endpoints
+**No bulk import / CSV upload:**
+- Problem: Adding 100+ employees, inventory items, or seed batches requires clicking forms 100 times. No bulk data ingestion.
+- Blocks: On-boarding of large orgs; data migration from legacy systems
+- Suggested implementation:
+  1. Add `/api/bulk-import` endpoint accepting CSV
+  2. Parse rows, validate against module schema, batch insert
+  3. Return import report with success/failure counts and errors
 
-## Code Quality
+**No webhooks or event streaming:**
+- Problem: External systems (e.g., field sensors, ERP integrations) can't receive real-time updates when records change.
+- Blocks: Real-time integrations; sync with external systems
+- Suggested implementation:
+  1. Use Supabase realtime subscriptions or webhooks
+  2. Emit events from mutation routes: `emitEvent('grow_seed_batch.created', { id, org_id, ...})`
+  3. Document event schema for integrators
 
-**Unsafe Type Assertions (10 instances):**
-- Issue: 10 places use `as unknown as Type` pattern, bypassing TypeScript compiler. While intentional (documented comments), this creates maintenance burden and hides intent.
-- Files: Listed in "Type Generation Gap" section above
-- Impact: Future developers may not understand why the assertion is needed; easy to accidentally remove it without understanding consequences
-- Fix approach: Document with JSDoc why each assertion is needed; create a typed helper function `queryUntypedView(tableName, columns)` that documents the pattern once
+## Test Coverage Gaps
 
-**Fallback Form Schema:**
-- Issue: `fallbackSchema` in `sub-module-create.tsx` (line 38-42) is ultra-generic (id, name, description only). Any module without a config will have broken forms.
-- Files: `app/routes/workspace/sub-module-create.tsx` (38-55)
-- Impact: Encourages lazy form implementation; new modules ship broken until config added
-- Fix approach: Throw error if module config is missing instead of falling back; force explicit CRUD config for all modules
+**Routes with complex loader logic lack E2E coverage:**
+- What's not tested: Multi-org user switching in workspace layout, permission boundaries (user from Org A cannot read Org B data)
+- Files: `app/routes/workspace/layout.tsx`, `app/lib/workspace/org-workspace-loader.server.ts`, `app/lib/workspace/require-module-access.server.ts`
+- Risk: Org isolation could silently fail if RLS policy is accidentally removed or if loader caching is added incorrectly
+- Priority: High — security-critical
+
+**FK resolution and embedded selects lack unit test coverage:**
+- What's not tested: `flattenRow()`, `resolveSelfJoins()`, FK display name inference (card-detail-view buildFkKeyMap)
+- Files: `app/lib/crud/crud-helpers.server.ts`, `app/components/crud/card-detail-view.tsx`
+- Risk: Refactoring FK handling could silently break display on detail views
+- Priority: Medium — impacts user experience on complex modules
+
+**AI form assist error handling:**
+- What's not tested: API endpoint returning non-JSON, timeout, partial field population
+- Files: `app/components/ai/ai-form-assist.tsx` (lines 80-133), `/api/ai/form-assist` route
+- Risk: Error states not covered; user may be confused by timeout behavior
+- Priority: Medium
+
+**CRUD workflow transitions:**
+- What's not tested: Workflow state machine enforced correctly (can only transition from state A to state B, not arbitrary states)
+- Files: `app/lib/crud/crud-action.server.ts` (lines 129-202), workflow configs per module
+- Risk: Invalid transitions could be applied; no enforcement
+- Priority: High if workflows are business-critical
 
 ---
 
-*Concerns audit: 2026-04-02*
+*Concerns audit: 2026-04-07*

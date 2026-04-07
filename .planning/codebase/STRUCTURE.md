@@ -1,328 +1,344 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-04-02
+**Analysis Date:** 2026-04-07
 
 ## Directory Layout
 
 ```
 aloha-app/
-├── app/                           # React Router app (SSR)
-│   ├── components/                # React components (pages, auth, sidebar, AI)
-│   ├── config/                    # App config (auth, paths, features, icons)
-│   ├── entry.server.tsx           # HTTP entry point (bot detection, streaming)
-│   ├── lib/                       # App-level utilities (server & client)
-│   ├── root.tsx                   # Root component (CSRF, theme, i18n, providers)
-│   ├── routes/                    # React Router route definitions
-│   ├── routes.ts                  # Route config (layout groups, paths)
-│   └── styles/                    # Global CSS (Tailwind + custom)
-├── e2e/                           # Playwright end-to-end tests
-├── packages/                      # Monorepo packages
-│   ├── mcp-server/                # MCP server for Claude integration
-│   └── ui/                        # Shadcn UI component library
-├── supabase/                      # PostgreSQL + RLS
-│   ├── migrations/                # Database migrations (numbered by Supabase)
-│   ├── schemas/                   # SQL schema definitions (ordered 00-05)
-│   ├── seed/                      # Seed scripts for local dev
-│   └── tests/                     # pgTAP unit tests for RLS
-├── tooling/                       # Build & dev tools (shared configs)
-│   ├── eslint/                    # ESLint flat config
-│   ├── prettier/                  # Prettier config
-│   ├── tailwind/                  # Tailwind CSS config plugin
-│   └── typescript/                # TypeScript base config
-├── docs/                          # Documentation
-│   ├── processes/                 # Business workflow diagrams
-│   └── schemas/                   # Per-module schema docs
-├── public/                        # Static assets
-├── scripts/                       # CLI scripts (Python, SQL)
-├── turbo.json                     # Turborepo config (tasks, caching)
-├── vite.config.ts                 # Vite build config (Tailwind plugin)
-├── react-router.config.ts         # React Router SSR config
-├── tsconfig.json                  # TypeScript config (path aliases)
-└── pnpm-workspace.yaml            # pnpm monorepo config
+├── app/                        # Main React Router SSR application
+│   ├── components/             # Reusable React components organized by feature
+│   │   ├── ai/                 # AI chat, form assist components
+│   │   ├── auth/               # Auth forms, sign-in, password reset
+│   │   ├── crud/               # CRUD table views, form field rendering
+│   │   ├── navbar/             # Top navigation, breadcrumbs, search
+│   │   ├── sidebar/            # Left sidebar, org selector, navigation
+│   │   └── *.tsx               # Root providers, error boundaries, shared components
+│   ├── config/                 # App-wide configuration
+│   │   ├── app.config.ts       # App metadata, theme, site settings
+│   │   ├── auth.config.ts      # Auth providers (OAuth, password)
+│   │   ├── feature-flags.config.ts  # Feature toggles
+│   │   ├── module-icons.config.ts   # Module slug to icon mappings
+│   │   ├── paths.config.ts     # Route paths for redirects
+│   │   └── workspace-navigation.config.tsx  # Default nav structure
+│   ├── lib/                    # Server and client utilities, organized by concern
+│   │   ├── ai/                 # AI integrations (Claude, system prompt builder)
+│   │   ├── auth/               # Auth helpers, schemas, password reset
+│   │   ├── crud/               # CRUD module configs, registry, helpers
+│   │   │   ├── *.config.ts     # Per-module CRUD config (hr-employee, invnt-item, etc.)
+│   │   │   ├── crud-action.server.ts     # Create, update, delete operations
+│   │   │   ├── crud-helpers.server.ts    # Query/load helpers
+│   │   │   ├── registry.ts     # Map submodule slug → config
+│   │   │   ├── types.ts        # CRUD type definitions
+│   │   │   └── __tests__/      # Vitest unit tests
+│   │   ├── csrf/               # CSRF protection, token generation/validation
+│   │   │   ├── server/         # Server-side: token generation, cookies
+│   │   │   └── client/         # Client-side: token meta tag, form field
+│   │   ├── i18n/               # Internationalization
+│   │   │   ├── i18n.server.ts  # Server-side i18n instance creation
+│   │   │   ├── i18n-client.ts  # Client-side i18n setup
+│   │   │   ├── locales/        # Translation JSON files by language
+│   │   │   └── *.ts            # Language detection, settings, resolvers
+│   │   ├── shared/             # Cross-cutting concerns
+│   │   │   ├── hooks/          # Custom React hooks
+│   │   │   ├── logger/         # Logger interface and implementations (console, pino)
+│   │   │   └── utils.ts        # Shared utilities
+│   │   ├── supabase/           # Supabase integrations
+│   │   │   ├── clients/        # Server and browser clients
+│   │   │   │   ├── server-client.server.ts    # Request-scoped server client
+│   │   │   │   ├── server-admin-client.server.ts  # Admin/service role client
+│   │   │   │   └── browser-client.ts   # Browser client
+│   │   │   ├── hooks/          # React hooks (auth, user, mutations)
+│   │   │   ├── auth.ts         # Auth helpers
+│   │   │   └── require-user.ts # Auth check utility
+│   │   ├── webhooks/           # Database webhook handlers, verifiers, routers
+│   │   ├── workspace/          # Org/workspace loaders and access control
+│   │   │   ├── org-workspace-loader.server.ts  # Load org context and nav
+│   │   │   ├── require-module-access.server.ts # Module access check
+│   │   │   ├── access-gate.tsx # Access-denied component wrapper
+│   │   │   └── types.ts        # Workspace type definitions
+│   │   ├── cookies.ts          # Cookie serialization (theme, sidebar, etc.)
+│   │   ├── database.types.ts   # Generated TypeScript types from Supabase schema
+│   │   └── require-user-loader.ts  # Auth check for loaders
+│   ├── routes/                 # React Router page routes (file-based routing)
+│   │   ├── index.ts            # Root, redirects to /auth/sign-in
+│   │   ├── version.ts          # GET /version (app version info)
+│   │   ├── healthcheck.ts      # GET /healthcheck (health status)
+│   │   ├── no-access.tsx       # /no-access (permission denied page)
+│   │   ├── workspace-redirect.tsx  # /home (redirect to current account)
+│   │   ├── api/                # API routes (actions only, no pages)
+│   │   │   ├── ai/             # /api/ai/* - AI endpoints
+│   │   │   │   ├── chat.ts     # Stream text responses
+│   │   │   │   └── form-assist.ts  # Form field suggestions
+│   │   │   └── db/             # /api/db/* - Database operations
+│   │   │       └── webhook.ts  # Handle Supabase database change webhooks
+│   │   ├── auth/               # Authentication routes (auth layout group)
+│   │   │   ├── layout.tsx      # Auth shell (sign-in form container)
+│   │   │   ├── sign-in.tsx     # /auth/sign-in page
+│   │   │   ├── password-reset.tsx   # /auth/password-reset
+│   │   │   ├── update-password.tsx  # /auth/update-password
+│   │   │   ├── callback.tsx    # /auth/callback (OAuth redirect handler)
+│   │   │   └── callback-error.tsx   # /auth/callback/error (OAuth error)
+│   │   └── workspace/          # Workspace routes (workspace layout group)
+│   │       ├── layout.tsx      # Workspace shell (sidebar + outlet)
+│   │       ├── home.tsx        # /home/:account (home dashboard)
+│   │       ├── settings.tsx    # /home/:account/settings (account settings)
+│   │       ├── module.tsx      # /home/:account/:module (module home)
+│   │       ├── sub-module.tsx  # /home/:account/:module/:subModule (list view)
+│   │       ├── sub-module-create.tsx  # /home/:account/:module/:subModule/create (form)
+│   │       └── sub-module-detail.tsx  # /home/:account/:module/:subModule/:recordId (detail view)
+│   ├── styles/                 # Global CSS (Tailwind)
+│   │   └── global.css          # Global styles, Tailwind imports
+│   ├── entry.server.tsx        # Server entry point (streaming, bot detection)
+│   ├── root.tsx                # Root layout, theme, i18n, CSRF provider
+│   └── routes.ts               # Route configuration (maps paths to files)
+├── packages/                   # Monorepo shared packages
+│   ├── ui/                     # UI component library
+│   │   ├── src/
+│   │   │   ├── shadcn/         # Shadcn UI components (Button, Form, Card, etc.)
+│   │   │   ├── kit/            # Custom Aloha-branded components
+│   │   │   ├── hooks/          # Custom React hooks (useIsMobile, etc.)
+│   │   │   └── lib/            # Utilities (cn, class merging)
+│   │   └── package.json        # Exported as @aloha/ui
+│   └── mcp-server/             # Model Context Protocol server for AI integration
+├── e2e/                        # End-to-end tests (Playwright)
+│   ├── tests/                  # Test files organized by feature
+│   │   ├── auth/               # Auth tests (sign-in, password reset)
+│   │   ├── crud/               # CRUD tests (create, update, delete, search)
+│   │   └── *.po.ts             # Page object files for selectors
+│   ├── playwright.config.ts    # Playwright configuration
+│   └── fixtures/               # Test data factories, auth tokens
+├── supabase/                   # Database schema and migrations
+│   ├── schemas/                # SQL table definitions, RLS policies, views
+│   ├── migrations/             # Numbered migration files
+│   ├── tests/                  # pgTAP unit tests for database
+│   ├── config.toml             # Supabase local dev configuration
+│   └── seed.sql                # Database seed data for development
+├── tooling/                    # Build tools, dev dependencies, linting config
+│   ├── eslint/                 # ESLint configuration package
+│   ├── prettier/               # Prettier configuration package
+│   ├── tailwind/               # Tailwind CSS configuration package
+│   └── typescript/             # TypeScript configuration package
+├── .planning/                  # GSD planning documents (phases, codebase analysis)
+│   └── codebase/               # Codebase mapping documents (ARCHITECTURE.md, STRUCTURE.md, etc.)
+├── .claude/                    # Claude AI development tools and skills
+├── docs/                       # Developer documentation
+├── public/                     # Static assets, locale JSON files
+│   └── locales/                # i18n translation files
+├── build/                      # Compiled output (gitignored)
+├── .react-router/              # React Router generated files and types
+├── .turbo/                     # Turborepo cache
+├── package.json                # Root workspace manifest
+├── pnpm-workspace.yaml         # Workspace configuration
+├── pnpm-lock.yaml              # Dependency lock file
+├── react-router.config.ts      # React Router SSR configuration
+├── vite.config.ts              # Vite build configuration
+├── tsconfig.json               # Root TypeScript configuration
+├── eslint.config.mjs           # Root ESLint configuration
+├── CLAUDE.md                   # Claude AI project instructions
+├── DESIGN.md                   # Design system documentation
+├── SCHEMA_CONVENTIONS.md       # Database schema conventions
+└── README.md                   # Project overview
 ```
 
 ## Directory Purposes
 
-**`app/`:**
-- Purpose: Main React Router application (SSR mode)
-- Contains: Routes, components, utilities, config, styles
-- Key files: `entry.server.tsx`, `root.tsx`, `routes.ts`
-
 **`app/components/`:**
-- Purpose: React components organized by feature (auth, sidebar, AI)
-- Contains: Page wrappers, form components, layout wrappers
-- Naming: `kebab-case.tsx` for components, `kebab-case.server.tsx` for server-only components
-- Examples: `auth/password-sign-in-container.tsx`, `sidebar/workspace-sidebar.tsx`, `root-error-boundary.tsx`
+- Purpose: React components organized by feature domain
+- Contains: Auth forms, CRUD UI, navigation, AI chat, shared atoms
+- Pattern: `kebab-case.tsx` file names, PascalCase component names
+- Key files: `root-providers.tsx` (global context), `root-error-boundary.tsx` (error page), `workspace-sidebar.tsx` (left nav)
 
 **`app/config/`:**
-- Purpose: Centralized app configuration
-- Contains: Auth providers, feature flags, path constants, module icons, navigation structure
-- Key files:
-  - `app.config.ts` — app title, version, default theme
-  - `auth.config.ts` — OAuth providers (GitHub, Google), auth callback URL
-  - `feature-flags.config.ts` — feature toggles by feature name
-  - `paths.config.ts` — URL path constants (sign-in, callback, home)
-  - `workspace-navigation.config.tsx` — sidebar menu items
+- Purpose: Configuration files for app settings, feature flags, and metadata
+- Contains: Environment-specific settings, auth providers, feature toggles, icon mappings
+- Pattern: `*.config.ts` file names, exported as constants or functions
+- Key: Changes here affect behavior across app without code changes
 
 **`app/lib/`:**
-- Purpose: App-level utilities (server and client)
-- Subdirectories by concern: `auth/`, `supabase/`, `workspace/`, `crud/`, `ai/`, `i18n/`, `csrf/`, `shared/`
-
-**`app/lib/auth/`:**
-- Purpose: Auth-related utilities and schemas
-- Contains: Sign-in flow, password reset, view contracts (types for SQL views)
-- Examples: `sign-in.ts`, `password-reset.ts`, `schemas/password-sign-in.schema.ts`
-
-**`app/lib/supabase/`:**
-- Purpose: Supabase client factory and auth validation
-- Contains: Server client, admin client (server-only), auth callback handler
-- Key files:
-  - `clients/server-client.server.ts` — request-scoped client with session management
-  - `clients/server-admin-client.server.ts` — service-role client (server-only)
-  - `require-user.ts` — validation helper to check user session
-- Subdirectory `hooks/` — client-side hooks: `useSupabase()`, `useSupabaseQuery()`
-
-**`app/lib/workspace/`:**
-- Purpose: Org/workspace context loading and access control
-- Contains: Workspace loader, module/submodule access guards
-- Key files:
-  - `org-workspace-loader.server.ts` — loads current org, user's orgs, navigation
-  - `require-module-access.server.ts` — guards routes by module/submodule CRUD permissions
-  - `use-module-access.ts` — client-side hook to check permissions
-  - `types.ts` — TypeScript types for nav views
+- Purpose: Shared utilities, helpers, and business logic
+- Contains: Supabase clients, auth helpers, CRUD operations, validation schemas
+- Organization: Organized by concern (auth, crud, supabase, workspace, etc.)
+- Pattern: `.server.ts` suffix for server-only files; never imported client-side
 
 **`app/lib/crud/`:**
-- Purpose: Generic CRUD helpers and module registry
-- Contains: Dynamic table loading, row helpers, module config registry
-- Key files:
-  - `crud-helpers.server.ts` — `loadTableData()` queries table by module slug
-  - `crud-action.server.ts` — generic create/update/delete action handler
-  - `registry.ts` — `getModuleConfig()` maps module slug → schema, columns, API
+- Purpose: CRUD module system — maps submodule slugs to table configs and form schemas
+- Contains: Registry, module configs, action helpers, data loading helpers
+- Module Config Files: `hr-employee.config.ts`, `invnt-item.config.ts`, etc. (one per Supabase table)
+- Key Pattern: Each config exports metadata (table name, columns, schema, joins) used by list/detail/create routes
 
-**`app/lib/ai/`:**
-- Purpose: AI assistant context and workflow helpers
-- Contains: System prompt builder, workflow automation logic
-- Key files:
-  - `build-system-prompt.server.ts` — generates Claude system prompt with org context
-  - `workflow-automation.server.ts` — automation rules for multi-step workflows
-
-**`app/lib/i18n/`:**
-- Purpose: Internationalization (i18next) setup and locale files
-- Contains: Server-side i18n instance, locale JSON files
-- Key files:
-  - `i18n.server.ts` — creates i18n instance for SSR (language detection from request)
-  - `locales/en/` — English translation files (common, auth, teams, modules)
-
-**`app/lib/csrf/`:**
-- Purpose: CSRF protection via edge-csrf
-- Subdirectories:
-  - `server/` — token generation in loader
-  - `client/` — token validation in form actions
-
-**`app/lib/shared/`:**
-- Purpose: Cross-cutting utilities (logging, hooks, helpers)
-- Contains: Logger (Pino/console impl), React hooks, utility functions
-- Examples: `logger/`, `hooks/`, `utils.ts` (safe redirect, env helpers)
+**`app/lib/supabase/clients/`:**
+- Purpose: Supabase database clients with different auth scopes
+- Contains:
+  - `server-client.server.ts`: Request-scoped client with session cookies (used in loaders/actions)
+  - `server-admin-client.server.ts`: Service role client for admin operations
+  - `browser-client.ts`: Client-side Supabase client for React hooks
 
 **`app/routes/`:**
-- Purpose: React Router route definitions (loader + component pairs)
-- Layout-organized subdirectories: `auth/`, `workspace/`, `api/`
-- Pattern: Each route file exports `loader`, `action`, `default` (component), `meta`, `ErrorBoundary`
-
-**`app/routes/auth/`:**
-- Purpose: Authentication flow routes
-- Key routes:
-  - `sign-in.tsx` — login page (OAuth + password)
-  - `callback.tsx` — OAuth callback handler
-  - `password-reset.tsx` — request password reset
-  - `update-password.tsx` — set new password
-  - `layout.tsx` — auth page wrapper
+- Purpose: Page routes organized by feature layout groups
+- Pattern: File-based routing via `@react-router/fs-routes`; each file exports `loader`, `action`, `default` component
+- Layout Groups:
+  - `auth/`: Authentication pages (no sidebar)
+  - `workspace/`: Authenticated pages (with sidebar and org context)
+  - `api/`: API routes (actions only, no UI)
 
 **`app/routes/workspace/`:**
-- Purpose: Protected workspace routes (org-scoped)
-- Key routes:
-  - `layout.tsx` — workspace loader (org context, nav)
-  - `home.tsx` — org dashboard
-  - `settings.tsx` — org settings
-  - `module.tsx` — module page (details for a feature)
-  - `sub-module.tsx` — table list view (dynamic CRUD)
-  - `sub-module-detail.tsx` — record detail page
-  - `sub-module-create.tsx` — create/edit form (reused for both)
-
-**`app/routes/api/`:**
-- Purpose: HTTP API endpoints (server actions)
-- Subdirectories: `ai/`, `db/`, `otp/`, `accounts/`
-- Pattern: Export `action({ request })` — no React component
-
-**`app/styles/`:**
-- Purpose: Global CSS and theme configuration
-- Contains: Tailwind globals, CSS variables, dark mode setup
-
-**`supabase/schemas/`:**
-- Purpose: PostgreSQL schema definitions (ordered by dependency)
+- Purpose: Authenticated app routes with org workspace context
 - Files:
-  - `00-privileges.sql` — DB role setup for RLS
-  - `01-enums.sql` — Custom enum types (access levels, statuses)
-  - `02-config.sql` — Configuration tables
-  - `03-accounts.sql` — Auth accounts (template schema)
-  - `04-tables.sql` — All business tables (org, hr_employee, inventory, etc.)
-  - `05-view-contracts.sql` — Auth views (app_org_context, app_user_orgs)
-  - `06-nav-view-contracts.sql` — Navigation views (app_nav_modules, app_nav_sub_modules)
-
-**`supabase/migrations/`:**
-- Purpose: Incremental database changes (generated by `supabase db diff`)
-- Naming: Timestamp-based, auto-generated by Supabase CLI
-- Usage: Run during `supabase db push` on production
-
-**`supabase/tests/`:**
-- Purpose: pgTAP unit tests for RLS policies
-- Language: SQL (pgTAP framework)
-- Run: `pnpm supabase:test`
+  - `layout.tsx`: Workspace shell (sidebar, header, outlet)
+  - `sub-module.tsx`: List/table view for CRUD records
+  - `sub-module-create.tsx`: Create/edit form view
+  - `sub-module-detail.tsx`: Single record detail view
+- Pattern: Each uses `getModuleConfig()` to load dynamic config for its module
 
 **`packages/ui/`:**
-- Purpose: Shared component library (Shadcn UI wrappers + custom)
-- Subdirectories:
-  - `src/shadcn/` — Shadcn components (Button, Input, Dialog, etc.)
-  - `src/kit/` — Custom components (AppBreadcrumbs, DataTable, PageLayout)
-  - `src/utils/` — `cn()` utility for Tailwind class merging
-  - `src/trans/` — i18n Trans component
+- Purpose: Shared component library exported as `@aloha/ui`
+- Contains: Shadcn UI components, custom Aloha components, utilities
+- Organization:
+  - `shadcn/`: Shadcn primitive components (Button, Card, Dialog, Form, etc.)
+  - `kit/`: Custom Aloha-branded components (Page, Navigation, etc.)
+  - `lib/`: Class name utilities (cn, tailwind-merge)
 
-**`packages/mcp-server/`:**
-- Purpose: Model Context Protocol server for Claude integration
-- Contains: Tools for database introspection, schema exploration, CRUD operations
+**`e2e/`:**
+- Purpose: End-to-end tests via Playwright
+- Organization: Tests grouped by feature (auth, crud)
+- Page Objects: `*.po.ts` files define selectors and interactions for each page
+- Config: `playwright.config.ts` sets base URL, timeouts, browser options
+
+**`supabase/schemas/`:**
+- Purpose: Database schema definitions, RLS policies, views
+- Contains: CREATE TABLE, CREATE POLICY (RLS), CREATE VIEW statements
+- Views: `app_org_context`, `app_navigation`, `app_user_orgs` enforce tenant isolation
 
 **`tooling/`:**
-- Purpose: Shared build and dev configs (shared across workspace)
-- Packages:
-  - `eslint/` — ESLint 9 flat config with React, TypeScript rules
-  - `prettier/` — Prettier config with import sorting, Tailwind sorting
-  - `tailwind/` — Tailwind CSS config with Vite plugin
-  - `typescript/` — TypeScript base config (extends by all packages)
+- Purpose: Shared build and dev tool configurations
+- Contains: ESLint, Prettier, Tailwind, TypeScript configs as packages
+- Usage: Root and workspace packages extend these configs
 
-**`docs/schemas/`:**
-- Purpose: Schema documentation per module (ERD, column definitions)
-- Examples: `inventory.md`, `hr.md`, `sales.md`
-
-**`docs/processes/`:**
-- Purpose: Business process workflows (diagrams, descriptions)
+**`public/locales/`:**
+- Purpose: i18n translation files organized by language
+- Pattern: `locales/[lang]/[namespace].json` (e.g., `locales/en/auth.json`)
+- Usage: Lazy-loaded by i18next, not bundled
 
 ## Key File Locations
 
 **Entry Points:**
-- `app/entry.server.tsx` — HTTP entry (bot detection, streaming)
-- `app/root.tsx` — Root component (CSRF, theme, i18n)
-- `app/routes.ts` — Route config
+- `app/entry.server.tsx`: Server entry point (streaming, bot detection)
+- `app/root.tsx`: Root layout, theme, i18n, CSRF provider
+- `app/routes.ts`: Route configuration
 
 **Configuration:**
-- `app/config/app.config.ts` — App metadata
-- `app/config/auth.config.ts` — OAuth providers
-- `app/config/paths.config.ts` — URL constants
-- `vite.config.ts` — Build config (Tailwind plugin)
-- `react-router.config.ts` — SSR config
+- `app/config/app.config.ts`: App metadata, theme colors, site title
+- `app/config/feature-flags.config.ts`: Feature toggles (team accounts, sidebar trigger, theme toggle)
+- `app/config/auth.config.ts`: OAuth providers list
+- `app/config/module-icons.config.ts`: Module slug to icon mappings
 
 **Core Logic:**
-- `app/lib/workspace/org-workspace-loader.server.ts` — Workspace hydration
-- `app/lib/supabase/clients/server-client.server.ts` — Request-scoped Supabase
-- `app/lib/crud/registry.ts` — Module config registry
-- `app/lib/auth/view-contracts.ts` — SQL view types
-
-**Database:**
-- `app/lib/database.types.ts` — Generated Supabase types (run `pnpm supabase:typegen`)
-- `supabase/schemas/04-tables.sql` — All business tables + RLS
-- `supabase/schemas/05-view-contracts.sql` — Auth/context views
-- `supabase/schemas/06-nav-view-contracts.sql` — Navigation views
+- `app/lib/workspace/org-workspace-loader.server.ts`: Load org, user, navigation
+- `app/lib/supabase/clients/server-client.server.ts`: Request-scoped database client
+- `app/lib/crud/registry.ts`: Module slug to config mapping
+- `app/lib/crud/crud-action.server.ts`: Create/update/delete with validation
+- `app/lib/auth/sign-in.ts`: Email/password authentication
+- `app/lib/ai/build-system-prompt.server.ts`: Generate Claude system prompt
 
 **Testing:**
-- `e2e/tests/` — Playwright tests
-- `supabase/tests/` — pgTAP database tests
+- `app/lib/crud/__tests__/`: Vitest unit tests for CRUD helpers
+- `e2e/tests/`: Playwright end-to-end tests
+- `supabase/tests/`: pgTAP database tests
+
+**Database:**
+- `supabase/schemas/`: SQL table definitions and RLS policies
+- `supabase/migrations/`: Numbered migration files (executed in order)
+- `app/lib/database.types.ts`: Generated TypeScript types (from `pnpm supabase:typegen`)
 
 ## Naming Conventions
 
 **Files:**
-- React components: `kebab-case.tsx` (e.g., `password-sign-in-container.tsx`)
-- Server-only modules: `kebab-case.server.ts` (e.g., `org-workspace-loader.server.ts`)
-- Service classes: `kebab-case.service.ts` (e.g., `account-invitations.service.ts`)
-- Zod schemas: `kebab-case.schema.ts` (e.g., `password-sign-in.schema.ts`)
-- Page objects (E2E): `kebab-case.po.ts` (e.g., `auth.po.ts`)
+- React components: `kebab-case.tsx` — e.g., `password-sign-in-form.tsx`, `module-sidebar-navigation.tsx`
+- Server-only modules: `.server.ts` suffix — e.g., `org-workspace-loader.server.ts`, `create-csrf-protect.server.ts`
+- Zod schemas: `.schema.ts` suffix — e.g., `password-sign-in.schema.ts`
+- Page objects for E2E: `.po.ts` suffix — e.g., `auth.po.ts`
+- Route loaders/components: `kebab-case.tsx` in route directories
+- Config files: `.config.ts` suffix — e.g., `app.config.ts`, `hr-employee.config.ts`
 
 **Directories:**
-- Feature-based: `lib/workspace/`, `lib/crud/`, `lib/auth/`
-- Route-based: `routes/auth/`, `routes/workspace/`, `routes/api/`
-- Utilities: `lib/shared/`, `lib/supabase/`
+- Features: `kebab-case` — e.g., `ai`, `auth`, `crud`, `supabase`
+- Components by feature: `kebab-case` — e.g., `sidebar`, `navbar`, `components/auth/`
 
 **Functions:**
-- camelCase for all function names
-- Factory functions: `createXxxService()`, `getSupabaseServerClient()`
-- Hooks: `useXxx()` (React convention)
-- Server actions: `xyzAction()` (e.g., `deletePersonalAccountAction`)
-
-**Components:**
-- PascalCase for all React components
-- Props interface: `interface ComponentNameProps`
-- Type aliases: `type ComponentName = ...`
+- camelCase — e.g., `handleGenerate()`, `loadOrgWorkspace()`, `crudCreateAction()`
 
 **Variables:**
-- camelCase for all local variables and parameters
-- Destructured object parameters preferred for complex inputs
-- Prefixed with `_` if unused (e.g., `_unusedParam`)
+- camelCase — e.g., `currentOrg`, `tableData`, `accountSlug`
+
+**React Components:**
+- PascalCase — e.g., `ModuleSidebarNavigation`, `PasswordSignInForm`, `AiChatProvider`
+
+**Types & Interfaces:**
+- `interface` for component props — e.g., `interface ModuleSidebarNavigationProps`
+- `type` for utility types and unions — e.g., `type AppNavModule`
 
 ## Where to Add New Code
 
-**New Feature (e.g., Inventory Management):**
-- Primary code: `app/routes/workspace/sub-module.tsx` (list), `sub-module-detail.tsx` (detail), `sub-module-create.tsx` (form) — reused generically via module registry
-- Module config: `app/lib/crud/registry.ts` — add entry mapping slug → schema
-- Database: `supabase/schemas/04-tables.sql` — create table with org_id, RLS policies
-- Navigation: `app/lib/workspace/types.ts` — add to nav view if new module
-- Tests: `supabase/tests/` — add pgTAP tests for RLS policies
+**New Feature:**
+- Primary code: `app/lib/[feature]/*.ts` (utilities), `app/components/[feature]/*.tsx` (UI)
+- Routes: `app/routes/workspace/[feature].tsx` or `app/routes/api/[feature].ts`
+- Tests: Co-located in same directory as implementation, e.g., `app/lib/[feature]/__tests__/*.test.ts`
 
 **New Component/Module:**
-- Implementation: `app/components/{feature}/` directory
-- Naming: `kebab-case.tsx` for all files
-- Props: `interface ComponentNameProps`
-- Tests: Colocated with component if unit tested, or `e2e/tests/`
+- UI component: `app/components/[feature]/[name].tsx`
+- Feature utilities: `app/lib/[feature]/[name].ts` or `.server.ts`
+- If reusable across apps: Add to `packages/ui/src/`
 
-**Utilities/Helpers:**
-- Shared within app: `app/lib/shared/`
-- Shared across workspace: `packages/ui/src/utils/`, `packages/shared/`
+**New CRUD Module:**
+- Create module config: `app/lib/crud/[module-name].config.ts` (export `CrudModuleConfig`)
+- Register in: `app/lib/crud/registry.ts` (add entry to `Map`)
+- Create schema: `app/lib/auth/schemas/[module-name].schema.ts` if custom validation needed
+- Routes use: `getModuleConfig(subModuleSlug)` automatically
 
-**Database Table:**
-1. Create SQL in `supabase/schemas/04-tables.sql`
-2. Add to module registry: `app/lib/crud/registry.ts`
-3. Run `pnpm supabase:reset` (local) or `supabase db diff -f migration-name` (production)
-4. Generate types: `pnpm supabase:typegen`
-5. Create routes: `routes/workspace/sub-module*.tsx` (reuse generic CRUD)
+**Database Changes:**
+- Schema: Add table definition to `supabase/schemas/*.sql` or new file
+- Migration: Create `supabase/migrations/[timestamp]_[description].sql`
+- RLS Policies: Add `CREATE POLICY` statements in schema
+- View: Add to `supabase/schemas/` if new view needed for tenant filtering
+- Types: Run `pnpm supabase:typegen` to regenerate `app/lib/database.types.ts`
+
+**Utilities:**
+- Shared helpers: `app/lib/shared/utils.ts` or new file in `app/lib/shared/`
+- Server-only utilities: `app/lib/[concern]/[name].server.ts`
+- Client/Server compatible: `app/lib/[concern]/[name].ts`
+
+**Configuration:**
+- App settings: `app/config/app.config.ts`
+- Feature flags: `app/config/feature-flags.config.ts`
+- Auth config: `app/config/auth.config.ts`
+- Paths: `app/config/paths.config.ts`
 
 ## Special Directories
 
-**`.react-router/types/`:**
-- Purpose: Generated React Router type definitions per route
-- Generated: Yes (by `react-router typegen` command)
-- Committed: No (in `.gitignore`)
-- Usage: Import `type Route` from `~/types/app/routes/{path}/+types/{filename}`
+**`.react-router/`:**
+- Purpose: Generated by React Router build process
+- Contains: Route types, manifest, type definitions
+- Generated: Yes (do not edit manually)
+- Committed: No (gitignored)
+
+**`.turbo/`:**
+- Purpose: Turborepo build cache
+- Generated: Yes
+- Committed: No (gitignored)
 
 **`build/`:**
-- Purpose: Build output (client + server bundles)
-- Generated: Yes (by `pnpm build`)
-- Committed: No
-- Client: `build/client/` (served by CDN or static server)
-- Server: `build/server/index.js` (entry for Node.js)
+- Purpose: Compiled SSR server and client assets
+- Contains: `build/server/index.js` (SSR entry), static assets
+- Generated: Yes (via `pnpm build`)
+- Committed: No (gitignored)
 
-**`node_modules/`:**
-- Purpose: Dependencies
-- Generated: Yes (by `pnpm install`)
-- Committed: No
-- Workspace-wide monorepo node_modules
-
-**`supabase/.branches/`:**
-- Purpose: Supabase CLI branch management
-- Generated: Yes (by `supabase start`)
-- Committed: No
-
-**`public/`:**
-- Purpose: Static assets (images, icons, fonts)
+**`public/locales/`:**
+- Purpose: i18n translation JSON files
+- Generated: No (manually maintained)
 - Committed: Yes
-- Served: At app root (`/images/`, etc.)
+- Pattern: `locales/[lang]/[namespace].json`
 
 ---
 
-*Structure analysis: 2026-04-02*
+*Structure analysis: 2026-04-07*

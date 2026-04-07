@@ -1,308 +1,345 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-04-02
+**Analysis Date:** 2026-04-07
 
 ## Naming Patterns
 
 **Files:**
-- React components: `kebab-case.tsx` — e.g., `password-sign-in-form.tsx`, `module-sidebar-navigation.tsx`, `ai-chat-provider.tsx`
-- Server-only modules: `.server.ts` suffix — e.g., `org-workspace-loader.server.ts`, `build-system-prompt.server.ts`, `create-csrf-protect.server.ts`
+- React components: `kebab-case.tsx` — e.g., `app-logo.tsx`, `sidebar-navigation.tsx`, `create-panel.tsx`, `navbar-search.tsx`
+- Server-only modules: `.server.ts` suffix — e.g., `org-workspace-loader.server.ts`, `server-client.server.ts`, `build-system-prompt.server.ts`
 - Zod schemas: `.schema.ts` suffix — e.g., `password-sign-in.schema.ts`, `password-reset.schema.ts`
-- Page objects for E2E: `.po.ts` suffix — e.g., `auth.po.ts`
-- Route loaders/components: `kebab-case.tsx` in route directories
-- Config files: `.config.ts` suffix — e.g., `app.config.ts`, `workspace-navigation.config.tsx`, `module-icons.config.ts`
+- Page objects for E2E: `.po.ts` suffix — e.g., `auth.po.ts`, `crud.po.ts`
+- Route loaders/components: `kebab-case.tsx` in route directories — e.g., `sub-module-create.tsx`, `workspace/layout.tsx`
+- Config files: `.config.ts` or `.config.tsx` suffix — e.g., `workspace-navigation.config.tsx`, `app.config.ts`, `module-icons.config.ts`, `hr-employee.config.ts`
 
-**Functions and variables:**
-- camelCase for all function names — e.g., `handleGenerate()`, `extractFieldDescriptions()`, `derivePageType()`
-- camelCase for local variables and parameters — e.g., `currentPath`, `state`, `setOpen`
-- React components: PascalCase — e.g., `ModuleSidebarNavigation`, `PasswordSignInForm`, `AiChatProvider`
+**Functions:**
+- camelCase for all function names — e.g., `handleGenerate()`, `extractFieldDescriptions()`, `derivePageType()`, `loadTableData()`, `sanitizeSearch()`, `createMockSupabaseChain()`
+- Server action functions: `xyzAction` suffix — e.g., `deletePersonalAccountAction`
 
-**Types:**
-- `interface` for component props objects — e.g., `interface ModuleSidebarNavigationProps`, `interface AiFormAssistProps<T>`
-- `type` for utility types, derived types, and unions — e.g., `type AppNavModule`, `type AppNavSubModule`
+**Variables & Parameters:**
+- camelCase for local variables, parameters, and properties — e.g., `currentPath`, `state`, `setOpen`, `hasHandledSuccess`, `testDeptName`
 - Destructured object parameters preferred over positional arguments for complex inputs
+
+**React Components:**
+- PascalCase for component names — e.g., `AppLogo`, `WorkspaceSidebar`, `CreatePanel`, `SidebarEdgeToggle`
+- `interface` for component props objects — e.g., `interface CreatePanelProps`, `interface OrgAccount`
+- Example from codebase:
+  ```typescript
+  interface CreatePanelProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    config: CrudModuleConfig | undefined;
+    fkOptions: Record<string, Array<{ value: string; label: string }>>;
+  }
+  export function CreatePanel({
+    open,
+    onOpenChange,
+    config,
+    fkOptions,
+  }: CreatePanelProps) { ... }
+  ```
+
+**Types & Interfaces:**
+- `interface` for component props and object contracts
+- `type` for utility types, derived types, and unions — e.g., `type AppNavModule`, `type OrgWorkspace`, `type LoadTableDataParams`
 - No explicit generics on `useForm` — Zod resolver infers types automatically
 
 **Exports:**
-- Default export for page components (function declaration, PascalCase) — e.g., `export default function App()`
+- Default export for page components (function declaration, PascalCase) — e.g., `export default function TeamWorkspaceLayout(props: Route.ComponentProps) { ... }`
 - Named exports for `loader`, `action`, `meta`, and utility functions
-- Server actions named `xyzAction` — e.g., `deletePersonalAccountAction`
+- Barrel files (index.ts) can export multiple related items
 
-**Unused variables:**
+**Unused Variables:**
 - Prefix with `_` to suppress ESLint warnings — e.g., `_unusedParam`, `_ignored`
 
 ## Code Style
 
-**Formatting:**
-- Tool: Prettier 3.7.4 with `@trivago/prettier-plugin-sort-imports` and `prettier-plugin-tailwindcss`
-- Settings:
-  - `tabWidth: 2`
-  - `useTabs: false`
-  - `semi: true`
-  - `printWidth: 80`
-  - `singleQuote: true`
-  - `arrowParens: 'always'`
+**Formatting Tool:** Prettier 3.7.4
 
-**Linting:**
-- ESLint 9.x with `typescript-eslint`, `eslint-plugin-react`, `eslint-plugin-react-hooks`
-- Key rules:
-  - `@typescript-eslint/no-unused-vars`: error with `argsIgnorePattern: '^_'`
-  - No anonymous default exports
-  - No use of `any` type — use generated Supabase `Tables<'table_name'>` and `Enums<'enum_name'>` types from `@aloha/supabase/database`
-  - Avoid `any`; use explicit type inference
-  - `react-i18next.Trans` must be imported from `@aloha/ui/trans`, never directly from `react-i18next`
-  - Avoid importing `Database` from `@aloha/supabase/database`; use `~/lib/database.types` instead
+**Format Settings:**
+- `tabWidth: 2`
+- `useTabs: false`
+- `semi: true` — always include semicolons
+- `printWidth: 80` — wrap lines at 80 characters
+- `singleQuote: true` — use single quotes
+- `arrowParens: 'always'` — always include parentheses around arrow function parameters
+
+**Linting Tool:** ESLint 9.39.2 with flat config format
+
+**Key ESLint Rules:**
+- `@typescript-eslint/no-unused-vars` — error with `argsIgnorePattern: '^_'` and `varsIgnorePattern: '^_'`
+- `react/react-in-jsx-scope` — off (React 19 doesn't require import)
+- `react/prop-types` — off (use TypeScript instead)
+- Import ordering and duplicate elimination enabled via plugins
+- Many TypeScript linting rules disabled to prevent overly strict checking (`@typescript-eslint/no-unsafe-assignment`, `no-unsafe-argument`, etc.)
+
+**Plugins:**
+- `@trivago/prettier-plugin-sort-imports` — automatic import ordering
+- `prettier-plugin-tailwindcss` — Tailwind class ordering
+- TypeScript ESLint plugin for type-aware rules
 
 ## Import Organization
 
-**Order (enforced by prettier-plugin-sort-imports):**
-1. CSS imports (special pattern: `/^(?!.*\.css).*$/`)
-2. `server-only` special marker
-3. React core: `react`, `react-dom`
-4. React Router: `react-router`, `@react-router/*`
-5. Supabase: `@supabase/supabase-js`
-6. Third-party modules (all others)
-7. Workspace packages: `@aloha/*` — e.g., `@aloha/ui/button`, `@aloha/supabase/server-client`
-8. App-level imports: `~/` — e.g., `~/config/auth.config`, `~/lib/i18n/i18n.server`, `~/components/root-error-boundary`
-9. Relative imports: `./` or `../`
+**Order (with blank line separation between groups):**
+1. `.css` files and style imports
+2. `server-only` (if used)
+3. React core: `react`, `react-dom`, `react-router`, `@react-router/*`
+4. Database/backend: `@supabase/supabase-js`
+5. Third-party modules
+6. Monorepo packages: `@aloha/*`
+7. App-level imports: `~/*` (aliased to `./app/*`)
+8. Relative imports: `./`, `../`
 
-**Path aliases:**
-- `@aloha/*` — monorepo packages (defined in workspace `package.json`)
-- `~/` — app-level imports in `apps/web` (aliased to `./app`)
-- Example: `import { cn } from '@aloha/ui/utils'` or `import appConfig from '~/config/app.config'`
+**Path Aliases:**
+- `~/*` → `./app/*` for app-level imports
+- `~/types/*` → `./.react-router/types/*` for React Router generated types
 
-**Separation and sorting:**
-- Import order separation enabled (blank lines between groups)
-- Specifiers within imports sorted alphabetically
-
-## React Patterns
-
-**Component definition:**
-- `export function ComponentName(props)` — preferred for route pages and standalone utilities
-- `export const ComponentName: React.FC<{...}>` — used for inline prop types in features
-- Default export for page components (function declaration)
-
-**Props:**
-- Props passed as destructured parameters with type annotation
-- Use `interface` for props types
-- Example:
-  ```typescript
-  interface PasswordSignInFormProps {
-    onSubmit: (params: z.infer<typeof PasswordSignInSchema>) => unknown;
-    loading: boolean;
-    redirecting: boolean;
-  }
-  
-  export const PasswordSignInForm: React.FC<PasswordSignInFormProps> = ({
-    onSubmit,
-    loading = false,
-    redirecting = false,
-  }) => {
-    // ...
-  };
-  ```
-
-**Hooks usage:**
-- `useState` preferred for simple boolean/primitive state — e.g., `const [showPassword, setShowPassword] = useState(false)`
-- Single `useState` for related state (prefer state object over multiple hooks) — e.g., `const [state, setState] = useState({ open: false, loading: false, error: null })`
-- `useCallback` wrapping all event handler functions passed as props
-- `useRef` for values that should not trigger re-renders — e.g., `redirecting.current`
-- `useEffect` is avoided; side effects handled in event handlers and server loaders
-- `useMemo` for derived state and expensive computations — e.g., `context` derived from route params
-
-**Data fetching:**
-- React Query mutations (`useMutation`, `mutateAsync`) preferred over manual fetch + state
-- Server state passed via React Router `loader` data as `props.loaderData`
-- Client state via React Query for async operations
-
-**Comments in code:**
-- Avoid obvious comments
-- Use block comments for complex logic or non-obvious intent
-- JSDoc/TSDoc for exported functions and components (see `AiFormAssist` example with full usage documentation)
-- Comments placed above the code they describe
-
-**Example with JSDoc:**
+**Example from codebase** (`app/components/crud/create-panel.tsx`):
 ```typescript
-/**
- * AiFormAssist - AI-powered form filling pattern component.
- *
- * A reusable button that consumers place inside their forms. It accepts
- * a Zod schema and a form's `setValue` function, prompts the user for
- * text, sends it to an API route that uses `generateObject`, and
- * populates the form fields from the structured response.
- *
- * Usage:
- *   <AiFormAssist
- *     schema={MyFormSchema}
- *     setValue={form.setValue}
- *     fieldNames={['name', 'description', 'category']}
- *   />
- */
-export function AiFormAssist<T extends FieldValues>(
-  props: AiFormAssistProps<T>,
-) {
-  // ...
-}
+import { useCallback, useRef } from 'react';
+
+import { useFetcher, useRevalidator } from 'react-router';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import type { ZodObject, ZodRawShape } from 'zod';
+import { z } from 'zod';
+
+import { Button } from '@aloha/ui/button';
+import { Form } from '@aloha/ui/form';
+import { If } from '@aloha/ui/if';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
+import { toast } from '@aloha/ui/sonner';
+import { Trans } from '@aloha/ui/trans';
+
+import { FormFieldGrid } from '~/components/crud/form-field-grid';
+import type { CrudModuleConfig, FormFieldConfig } from '~/lib/crud/types';
+import { buildDefaultValues } from '~/lib/crud/workflow-helpers';
 ```
 
-## Form Handling
-
-**Pattern:**
-- Schema defined in separate `.schema.ts` file — e.g., `password-sign-in.schema.ts`
-- `useForm({ resolver: zodResolver(Schema) })` — no explicit generic type on `useForm`
-- Never use `watch()`; use `useWatch` hook instead
-- Always include `<FormMessage />` in every field to display validation errors
-- `<FormDescription>` is optional
-
-**Example:**
-```typescript
-export const PasswordSignInForm: React.FC<{
-  onSubmit: (params: z.infer<typeof PasswordSignInSchema>) => unknown;
-  loading: boolean;
-  redirecting: boolean;
-}> = ({ onSubmit, loading = false, redirecting = false }) => {
-  const form = useForm({
-    resolver: zodResolver(PasswordSignInSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name={'email'}
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <EmailInput {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
-  );
-};
-```
+**Specifier Sorting:** Within each import, specifiers are sorted alphabetically.
 
 ## Error Handling
 
-**Strategy:** Synchronous error handling with try/catch for async operations; route-level error boundaries for render errors.
-
-**Patterns:**
-- API routes: try/catch returning `new Response(null, { status: 500 })` on failure — e.g., in `/api/ai/chat`
-- Auth errors: `requireUserLoader()` throws `redirect()` to sign-in path on auth failure
-- Service errors: Supabase operations check `.error` on result object and throw; callers use try/catch
-- Root error boundary: `components/root-error-boundary.tsx` catches all unhandled route errors
-- Server entry error handler: `handleError()` in `entry.server.tsx` logs error via console
-
-**Example error boundary:**
-```typescript
-export function RootErrorBoundary() {
-  const routeError = useRouteError();
-
-  const error =
-    routeError instanceof Error
-      ? routeError
-      : new Error(`Unknown error: ${JSON.stringify(routeError)}`);
-
-  const status = isRouteErrorResponse(error) ? error.status : 500;
-
-  if (status !== 404) {
-    console.error(error);
+**Server Loaders & Actions:**
+- Check `.error` field on Supabase query results and throw/redirect on failure
+- Use `requireUserLoader(request)` to validate session and redirect to sign-in if not authenticated — throws `redirect()` on auth failure
+- Example from `require-user-loader.ts`:
+  ```typescript
+  export async function requireUserLoader(request: Request) {
+    const client = getSupabaseServerClient(request);
+    const auth = await requireUser(client);
+    if (!auth.data || auth.error) {
+      const nextPath = new URL(request.url).pathname;
+      const redirectPath = auth.redirectTo + (nextPath ? `?next=${nextPath}` : '');
+      throw redirect(redirectPath);
+    }
+    return auth.data;
   }
-  // ... render error UI
+  ```
+- RLS policy denials return `{ data: null, error }` — loader checks and redirects to `/no-access`
+
+**API Routes & Actions:**
+- Wrap server operations in try/catch
+- Return `new Response(null, { status: 500 })` on failure
+- Log errors via `console.error()` in entry handler or specific loaders
+
+**React Components:**
+- Use error boundaries for render errors — root error boundary: `components/root-error-boundary.tsx`
+- Use React Query for async operations — handles error state within query objects
+- Form validation via Zod schema — errors displayed via `<FormMessage />` component
+
+**Pattern Example** from `org-workspace-loader.server.ts`:
+```typescript
+const { data: employees, error: empError } = await params.client
+  .from('hr_employee')
+  .select('id, org_id, sys_access_level_id, org:org!inner(name)')
+  .eq('user_id', user.sub)
+  .eq('is_deleted', false);
+
+const allOrgs = castRows<EmployeeOrgRow>(employees);
+
+if (empError || allOrgs.length === 0) {
+  throw redirect('/no-access');
 }
 ```
 
 ## Logging
 
-**Framework:** Console-based (`console.info`, `console.error`) or Pino for structured server-side logging.
+**Framework:** Console-based logging (browser) and `pino` (server-side)
 
-**Implementation:**
-- Files: `app/lib/shared/logger/logger.ts` (interface), `impl/console.ts`, `impl/pino.ts` (implementations)
-- Logger interface exports: `info`, `error`, `warn`, `debug`, `fatal` methods
-- All methods accept object + message or message-only patterns
+**Logger Interface:**
+- `info()`, `error()`, `warn()`, `debug()`, `fatal()` methods
+- Accept object + message or message-only patterns
+- File: `app/lib/shared/logger/logger.ts` (interface); implementations in `impl/console.ts` and `impl/pino.ts`
 
-**When to log:**
-- Server-side errors in entry handler and route loaders
-- Not used extensively in components (prefer error boundaries for render errors)
-- Example from `entry.server.tsx`: `console.error(error)` on shell rendering errors
+**Usage:**
+- Server-side errors logged in `entry.server.tsx` via `console.error(error)` on shell rendering errors
+- Used sparingly in route loaders and server actions
+- Not extensively used in components — rely on error boundaries instead
+
+**Example from `entry.server.tsx`:**
+```typescript
+onError(error: unknown) {
+  responseStatusCode = 500;
+  if (shellRendered) {
+    console.error(error);
+  }
+}
+```
+
+## Comments
+
+**When to Comment:**
+- Avoid obvious comments
+- Use block comments for complex logic or non-obvious intent
+- Comments placed above the code they describe
+- Justified only when "why" is not immediately clear from code
+
+**JSDoc/TSDoc:**
+- Used for exported functions and components
+- Full usage documentation for complex utilities
+- Example from `AiFormAssist` (available in codebase):
+  ```typescript
+  /**
+   * @name AiFormAssist
+   * @description Assists user with form filling via AI suggestions
+   * @param props - Form context and mode
+   * @returns JSX element
+   */
+  export function AiFormAssist(props: AiFormAssistProps) { ... }
+  ```
+
+## Function Design
+
+**Size:** Prefer smaller functions (<100 lines) for clarity and testability
+
+**Parameters:** Destructured object parameters for functions with multiple inputs
+- Example: `loadTableData({ client, viewName, orgId, ... })`
+
+**Return Values:** Explicit return types for public functions
+- Always annotate exported function return types
+- Async functions return Promises with specific types
+
+## React Patterns
+
+**Component Structure:**
+- Functional components using `function ComponentName()` syntax
+- Props passed as destructured parameters with type annotation
+- Use `interface` for props types
+- Example from `app-logo.tsx`:
+  ```typescript
+  function LogoImage({ className }: { className?: string; width?: number }) {
+    return (
+      <span className={cn('text-primary ...', className)}>
+        Aloha
+      </span>
+    );
+  }
+  
+  export function AppLogo({
+    href,
+    label,
+    className,
+  }: {
+    href?: string;
+    className?: string;
+    label?: string;
+  }) {
+    return (
+      <Link aria-label={label ?? 'Home Page'} to={href ?? '/'}>
+        <LogoImage className={className} />
+      </Link>
+    );
+  }
+  ```
+
+**State Management:**
+- `useState` for simple boolean/primitive state — e.g., `const [showPassword, setShowPassword] = useState(false)`
+- Prefer single `useState` for related state (state object over multiple hooks) — e.g.:
+  ```typescript
+  const [state, setState] = useState({ open: false, loading: false, error: null });
+  ```
+- Never use `watch()` — use `useWatch` hook instead when needed
+
+**Hooks:**
+- `useCallback` wrapping all event handler functions passed as props
+- `useRef` for values that should not trigger re-renders — e.g., `redirecting.current`, `hasHandledSuccess.current`
+- **`useEffect` is a code smell — avoid if possible.** Side effects handled via:
+  - Event handlers in components
+  - Server loaders passing initial data
+  - React Router `action` for form submissions
+  - React Query for async operations
+- Justified example: `NavbarSearch.tsx` uses `useEffect` to attach keyboard listener (Cmd/Ctrl+K)
+- `useMemo` for derived state and expensive computations
+
+**Form Handling:**
+- Schema defined in separate `.schema.ts` file
+- `useForm({ resolver: zodResolver(Schema) })` — no explicit generic type on `useForm`
+- Always include `<FormMessage />` in every field to display validation errors
+- `<FormDescription>` is optional
+- Example from `create-panel.tsx`:
+  ```typescript
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: buildDefaultValues(formFields, null),
+  });
+  ```
+
+**Server State & Async:**
+- Server state passed via React Router `loader` data as `props.loaderData`
+- React Query mutations (`useMutation`, `mutateAsync`) preferred for client-side async operations
+- `useFetcher()` for form submissions without navigation
+- Example from `create-panel.tsx`:
+  ```typescript
+  const fetcher = useFetcher();
+  const form = useForm({ ... });
+  const onSubmit = useCallback((data) => {
+    fetcher.submit(data, { method: 'POST', action: 'create' });
+  }, [fetcher]);
+  ```
+
+**Imperative State Management:**
+- Use `useRef` for flags that don't trigger re-renders
+- Example from `create-panel.tsx`:
+  ```typescript
+  const hasHandledSuccess = useRef(false);
+  if (fetcher.state === 'idle' && !hasHandledSuccess.current) {
+    if (fetcherData !== undefined && !fetcherData.success) {
+      toast.error(fetcherData.error ?? 'Validation failed');
+      hasHandledSuccess.current = true;
+    }
+  }
+  ```
 
 ## Module Design
 
 **Exports:**
-- Named exports for utilities, service functions, components
-- Default export for page components
-- Barrel files (index.ts) can export multiple related items
+- Named exports for utilities and service functions
+- Default export for page components only
+- Barrel files (index.ts) export multiple related items
+- Example: `app/lib/crud/` modules export functions for CRUD operations
 
-**Directory structure follows domain boundaries:**
-- `app/components/` — shared UI components organized by feature (auth, ai, sidebar, etc.)
+**Organization:**
+- `app/components/` — shared UI components organized by feature (auth, ai, sidebar, crud, etc.)
 - `app/lib/` — utilities organized by concern (auth, workspace, supabase, csrf, i18n, ai, crud)
-- `.server.ts` files live in same directory as their imports — never imported client-side
-
-## State Management
-
-**Client state:**
-- React `useState` for simple state (boolean flags, form input values)
-- State object pattern for related state: `const [state, setState] = useState({ open: false, loading: false, error: null })`
-- `useMemo` for derived state based on props/other state
-
-**Server state:**
-- React Router `loader` data passed as `props.loaderData` to route components
-- No manual state management for async server data — use React Query
-
-**Context:**
-- Create context via `createContext<ValueType | null>(null)`
-- Custom hook to access context: `useXxx()` pattern that throws if not in provider
-- Example: `useAiChat()` throws `'useAiChat must be used within an AiChatProvider'` if called outside provider
-- Memoized context value to prevent unnecessary re-renders
-
-**Example context pattern:**
-```typescript
-interface AiChatContextValue {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  context: AiPageContext;
-}
-
-const AiChatContext = createContext<AiChatContextValue | null>(null);
-
-export function AiChatProvider(props: React.PropsWithChildren<{ orgName: string }>) {
-  const [open, setOpen] = useState(false);
-  const context = useMemo<AiPageContext>(() => {
-    // derive context from params and location
-  }, [deps]);
-
-  const value = useMemo(
-    () => ({ open, setOpen, context }),
-    [open, setOpen, context],
-  );
-
-  return <AiChatContext value={value}>{props.children}</AiChatContext>;
-}
-
-export function useAiChat() {
-  const value = use(AiChatContext);
-  if (!value) {
-    throw new Error('useAiChat must be used within an AiChatProvider');
-  }
-  return value;
-}
-```
+- `.server.ts` files live in same directory as imports — never imported client-side
+- Example structure:
+  - `app/lib/crud/crud-helpers.server.ts` — server-only CRUD utilities
+  - `app/lib/workspace/org-workspace-loader.server.ts` — server-only workspace loader
+  - `app/lib/supabase/clients/server-client.server.ts` — server-only Supabase client
 
 ## Testing Attributes
 
-**E2E testing:**
-- Add `data-test` attribute to key UI elements for Playwright selectors
-- Used in page objects to identify elements
-- Example: `<button data-test="auth-submit-button">` → `await this.page.click('[data-test="auth-submit-button"]')`
+**Data-Test Attributes:**
+- Add `data-test` attribute to key UI elements for Playwright E2E test selectors
+- Used in page objects to identify elements without relying on fragile selectors
+- Examples from codebase:
+  - `<button data-test="create-panel-submit">` → queried as `page.locator('[data-test="create-panel-submit"]')`
+  - `<div data-test="crud-data-table">` → used as root for table queries
+  - `<input data-test="table-search">` → search input in CRUD lists
+  - `<tr>` in table body for `[data-test="crud-data-table"] tbody tr`
 
 ---
 
-*Convention analysis: 2026-04-02*
+*Convention analysis: 2026-04-07*

@@ -1,177 +1,173 @@
 # External Integrations
 
-**Analysis Date:** 2025-02-26
+**Analysis Date:** 2026-04-07
 
 ## APIs & External Services
 
-**AI/LLM:**
-- Anthropic Claude - AI-powered features (chat, form assistance, workflow automation)
-  - SDK: `@ai-sdk/anthropic` 3.0.64 via Vercel AI SDK
-  - Wrapper: `ai` 6.0.141
-  - Auth: `ANTHROPIC_API_KEY` (server-only env var)
+**AI & LLM:**
+- Anthropic Claude - AI chat and form field extraction
+  - SDK: `@ai-sdk/anthropic` 3.0.64 via Vercel AI SDK (`ai` 6.0.141)
+  - Auth: `ANTHROPIC_API_KEY` env var (required to enable AI features)
   - Endpoints:
-    - `POST /api/ai/chat` - Streaming chat completions (`app/routes/api/ai/chat.ts`)
-    - `POST /api/ai/form-assist` - Form field auto-population (`app/routes/api/ai/form-assist.ts`)
-    - Workflow automation in `app/lib/ai/workflow-automation.server.ts`
+    - `/api/ai/chat` (`app/routes/api/ai/chat.ts`) - Streaming AI chat responses using `claude-sonnet-4-20250514` model
+    - `/api/ai/form-assist` (`app/routes/api/ai/form-assist.ts`) - Structured form field extraction from text
+  - React hooks: `@ai-sdk/react` 3.0.143 for client-side streaming UI integration
 
-**OAuth Providers (Optional):**
-- Google OAuth - User authentication via Google
-  - Config: `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` (in `.env`)
-  - Integration: Supabase Auth external provider (configured in `supabase/config.toml` as `[auth.external.apple]` pattern)
-- Azure OAuth - User authentication via Microsoft Azure
-  - Config: `AZURE_OAUTH_CLIENT_ID`, `AZURE_OAUTH_CLIENT_SECRET` (in `.env`)
-  - Integration: Supabase Auth external provider
+**Authentication & OAuth:**
+- Supabase Auth (built-in via `@supabase/supabase-js` 2.89.0)
+  - Auth methods:
+    - Email/password (enabled locally, controlled by `VITE_AUTH_PASSWORD` flag)
+    - Magic link (optional, controlled by `VITE_AUTH_MAGIC_LINK` flag)
+    - Google OAuth (enabled locally in `supabase/config.toml`, requires `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET`)
+    - Azure OAuth (disabled by default, requires `AZURE_OAUTH_CLIENT_ID` and `AZURE_OAUTH_CLIENT_SECRET`)
+  - Session management: SSR-compatible via `@supabase/ssr` 0.8.0 with request-scoped client in `app/lib/supabase/clients/server-client.server.ts`
+  - Cookie-based session persistence for SSR
 
 ## Data Storage
 
-**Primary Database:**
-- Supabase PostgreSQL - Multi-tenant relational database
-  - Type: PostgreSQL 15 (major version in `supabase/config.toml`)
-  - Project: `aloha-app` (local) / `kfwqtaazdankxmdlqdak` (hosted)
-  - Schemas: `public`, `storage`, `graphql_public` (exposed in API); `extensions`, `auth` (internal)
-  - Client library: `@supabase/supabase-js` 2.89.0
-  - Server client: `@supabase/ssr` 0.8.0 for SSR-safe session cookie handling
-  - Connection:
-    - Client: via `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLIC_KEY` (public anon key)
-    - Server: via `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY` (service role, server-only)
-  - Clients:
-    - Server: `getSupabaseServerClient(request)` in `app/lib/supabase/clients/server-client.server.ts`
-    - Server Admin: `getSupabaseAdminClient()` in `app/lib/supabase/clients/server-admin-client.server.ts`
-    - Client Hook: `useSupabase<Db>()` in `app/lib/supabase/hooks/use-supabase.ts`
-  - ORM: Direct query builder (no ORM layer; Supabase JS client used directly)
-  - Migrations: 91+ migrations in `supabase/migrations/` numbered sequentially
-  - Local dev: `supabase start` via Docker; reset with `supabase db reset`
+**Databases:**
+- **Supabase (PostgreSQL 15)**
+  - Connection: `VITE_SUPABASE_URL` (public endpoint) + `VITE_SUPABASE_PUBLIC_KEY` (anon key) for client
+  - Service role: `SUPABASE_SECRET_KEY` or `SUPABASE_SERVICE_ROLE_KEY` for admin operations
+  - Client: `@supabase/supabase-js` 2.89.0
+  - Local dev: Via Supabase CLI (`supabase` 2.67.3) running PostgreSQL 15 in Docker
+  - Type generation: `pnpm supabase:typegen` generates `app/lib/database.types.ts` from schema
+  - Schema location: `supabase/schemas/` (numbered SQL files)
+  - Migrations: `supabase/migrations/` (auto-generated via `pnpm supabase db diff`)
+  - Row-Level Security (RLS): All app tables use org-scoped RLS via `hr_employee` membership model
+  - Multi-tenant model: `org` (tenant) + `hr_employee` (membership) with `sys_access_level` role hierarchy
 
 **File Storage:**
-- Supabase Storage - Cloud file hosting
-  - Type: Object storage (S3-compatible)
-  - Integration: Via `@supabase/supabase-js` storage client
-  - Max file size: 50MiB (configured in `supabase/config.toml`)
-  - Access: Public/private buckets via RLS policies
+- Supabase Storage (via `@supabase/supabase-js` 2.89.0)
+  - Local dev: Configured in `supabase/config.toml` with 50MiB file size limit
+  - Storage scope: Org-scoped (via RLS policies)
 
 **Caching:**
-- Not detected - No explicit Redis or caching layer; relies on TanStack Query client-side caching
+- Client-side caching via TanStack Query (`@tanstack/react-query` 5.90.12)
+- No distributed caching layer (Redis, Memcached) detected
 
 ## Authentication & Identity
 
 **Auth Provider:**
-- Supabase Auth - Built-in user management and session handling
-  - Implementation: Multi-layer approach
-    - **Template layer:** Supabase Auth's native `accounts` table (Supabase project's built-in auth)
-    - **Business layer:** Custom `org` (tenant) + `hr_employee` (membership) tables for ERP-specific access control
-  - Session management: via secure HTTP-only cookies (via `@supabase/ssr` adapter)
-  - Email auth: Enabled with signup disabled (invite-only model in production; `enable_signup: false` in `supabase/config.toml`)
-  - OAuth: Optional external providers (Google, Azure) configured in Supabase
-  - MFA: TOTP disabled in config (can be enabled)
-  - JWT expiry: 3600 seconds (1 hour)
-  - Password reset: Custom email template at `supabase/templates/reset-password.html`
-  - Email change confirmation: Custom template at `supabase/templates/change-email-address.html`
-  - Email testing (dev only): Inbucket server on port 54324
+- Supabase Auth (built-in, managed database: `auth.users`)
+- Session management: Cookie-based for SSR, via `@supabase/ssr` 0.8.0
+- CSRF protection: `@edge-csrf/core` 2.5.3-cloudflare-rc1 (see `app/lib/csrf/`)
+  - Token generation in root loader
+  - Verification in form actions
 
-**Access Control:**
-- Row Level Security (RLS) - PostgreSQL policies enforcing org-scoped access
-  - All business tables reference `org_id` and use RLS policies
-  - Helper tables: `hr_employee` (links users to orgs), `sys_access_level` (5-tier role hierarchy), `hr_module_access` (per-employee CRUD permissions)
-  - Policies: Org-scoped select/insert/update; soft-delete pattern (no hard DELETE grant)
-  - View contracts: `app_org_context`, `app_user_orgs` in `supabase/schemas/05-view-contracts.sql`
+**Identity Linking:**
+- Optional feature controlled by `VITE_AUTH_IDENTITY_LINKING` env var
+- Must be enabled in Supabase console for production use
 
 ## Monitoring & Observability
 
 **Error Tracking:**
-- Not detected - No Sentry, LogRocket, or error tracking service configured
+- None detected (Sentry/Rollbar not integrated)
+- Errors logged via console in `app/entry.server.tsx` and route loaders
 
-**Logging:**
-- Framework: Pino 10.1.0 (server-side structured logging)
-- Integration: Via `@aloha/shared/logger` package
-- Environment: Controlled by `LOGGER` env var
-- Storage: Logs written to stdout/stderr; external aggregation not configured
+**Logs:**
+- Server-side: Pino (`pino` 10.1.0) structured logging (see `app/lib/shared/logger/`)
+  - Implementations: Console and Pino via `impl/console.ts` and `impl/pino.ts`
+  - Log level controlled by `LOGGER` env var
+- Client-side: Console logging (minimal, not intercepted)
+- Database: Supabase provides built-in query logs and audit trails
+
+**Analytics:**
+- Disabled by default in `supabase/config.toml` (`analytics.enabled = false`)
 
 ## CI/CD & Deployment
 
 **Hosting:**
-- Vercel - Suggested deployment platform (preset commented in `react-router.config.ts`)
-- Or any Node.js host supporting SSR
-- Docker-ready: Dockerfile can be added to `build/` output
+- Production: React Router SSR via `react-router-serve ./build/server/index.js`
+- Deployment preset available for Vercel (commented in `react-router.config.ts`)
+- Environment: `NODE_ENV=production` required for build
+
+**Build:**
+- Vite 7.3.0 via `react-router build` command
+- Turborepo 2.6.2 for monorepo build orchestration
+- Output: `build/server/index.js` (SSR entry) + static assets
 
 **CI Pipeline:**
-- Not detected - No GitHub Actions, GitLab CI, or other CI config in repo root
-- E2E tests available via Playwright (`pnpm test` in `e2e/` directory) but no CI workflow configured
-
-**Build & Serve:**
-- Development: `pnpm dev` (Vite dev server on port 5173)
-- Production: `pnpm build` then `pnpm start` (runs `react-router-serve ./build/server/index.js`)
+- None detected in repository (GitHub Actions, GitLab CI, etc. not configured)
 
 ## Environment Configuration
 
-**Required env vars for production:**
+**Required env vars (production):**
 - `VITE_SUPABASE_URL` - Supabase API endpoint
-- `VITE_SUPABASE_PUBLIC_KEY` - Supabase public anon key
-- `SUPABASE_SECRET_KEY` - Supabase service role key (server-only)
-- `ANTHROPIC_API_KEY` - Claude API key (if AI features enabled)
-- `VITE_SITE_URL` - Site URL for auth redirects (must match Supabase allowed redirect URLs)
-- `MAILER_PROVIDER` - Email provider: `nodemailer` or `resend`
-- Email SMTP: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD` (if nodemailer)
-- `SUPABASE_DB_WEBHOOK_SECRET` - Webhook signature verification secret
+- `VITE_SUPABASE_PUBLIC_KEY` - Supabase anon key (public)
+- `SUPABASE_SERVICE_ROLE_KEY` - Service role key for admin operations
+- `VITE_SITE_URL` - App base URL for auth redirects
+- `VITE_PRODUCT_NAME`, `VITE_SITE_TITLE` - Branding
+- `ANTHROPIC_API_KEY` - Claude API key (optional, disables AI features if missing)
+
+**Optional env vars:**
+- OAuth provider secrets: `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `AZURE_OAUTH_CLIENT_ID`, `AZURE_OAUTH_CLIENT_SECRET`
+- Email: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_TLS`, `EMAIL_SENDER`, `MAILER_PROVIDER`
+- Logging: `LOGGER`
 
 **Secrets location:**
-- Development: `.env` file (git-ignored, created from `.env.template`)
-- Production: Environment variables in hosting provider (Vercel, etc.)
-- Never committed: `.env`, `.env.*` files in `.gitignore`
+- Development: `.env` file (not committed; use `.env.template` as guide)
+- Production: Hosting provider env vars (Vercel, AWS, etc.)
+- Never commit: `.env*` files, `credentials.json`, `*.pem`, `*.key` files
 
 ## Webhooks & Callbacks
 
-**Incoming (from External Sources):**
-- Supabase Database Webhooks - Real-time database change notifications
-  - Endpoint: `POST /api/db/webhook` (`app/routes/api/db/webhook.ts`)
-  - Secret: `SUPABASE_DB_WEBHOOK_SECRET` for signature verification
-  - Verifier: `PostgresDatabaseWebhookVerifierService` in `app/lib/webhooks/postgres-database-webhook-verifier.service.ts`
-  - Factory pattern: `createDatabaseWebhookVerifier()` in `app/lib/webhooks/database-webhook-verifier-factory.ts`
-  - Supporte trigger types: Database insert/update/delete events
+**Incoming:**
+- **Database Webhook:** `POST /api/db/webhook` (`app/routes/api/db/webhook.ts`)
+  - Purpose: Handle Supabase database events (inserts, updates, deletes)
+  - Verification: `SUPABASE_DB_WEBHOOK_SECRET` signature validation via `@edge-csrf/core`
+  - Handler: `getDatabaseWebhookHandlerService()` in `app/lib/webhooks/database-webhook-handler.service.ts`
+  - Service: `DatabaseWebhookHandler` receives `RecordChange` events and routes to appropriate handlers
+  - Used for: Reactive sync between database state and UI (e.g., inventory, HR data changes)
 
-**Outgoing (from App to External Systems):**
-- Not detected - No outgoing webhook triggers to external services configured
+**Outgoing:**
+- Auth callbacks: Supabase redirects to `VITE_SITE_URL + /auth/callback` and `/auth/update-password` (configured in `supabase/config.toml`)
 
-**Auth Callbacks:**
-- Supabase OAuth redirect: `http://localhost:5173/auth/callback` (configured in `supabase/config.toml`)
-- Password reset link: Redirect via email template to `/auth/update-password`
+## Email Delivery (if configured)
 
-## Email Services
+**SMTP (Nodemailer):**
+- Provider: Nodemailer (`nodemailer` 7.0.x) or Resend (swappable via `MAILER_PROVIDER`)
+- Local dev: Inbucket mock SMTP server (Supabase local; port 54325)
+- Production config: Via `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_TLS`, `EMAIL_SENDER` env vars
 
-**Provider Options:**
-- Nodemailer (default) - SMTP email sending via `nodemailer` 7.0.x
-  - Configuration: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_TLS`
-  - Usage: Server actions for password resets, invitations, notifications
-  - Provider selection: `MAILER_PROVIDER=nodemailer` in `.env`
+**Email Types (via Supabase Auth):**
+- Password reset: Template at `supabase/templates/reset-password.html`
+- Email change confirmation: Template at `supabase/templates/change-email-address.html`
+- Email confirmation (on signup): Subject "Confirm your email" (default Supabase template)
 
-- Resend (optional) - Alternative email provider with API key
-  - Not actively integrated; support structure exists for swappability
-  - Provider selection: `MAILER_PROVIDER=resend` in `.env`
-  - Would require `RESEND_API_KEY` env var
+## Real-Time Features
 
-**Email Templates:**
-- Password reset: `supabase/templates/reset-password.html`
-- Email change confirmation: `supabase/templates/change-email-address.html`
-- Configured in `supabase/config.toml` `[auth.email.template.*]` sections
+**Supabase Realtime:**
+- Available via `@supabase/supabase-js` 2.89.0
+- Not explicitly integrated in current codebase (can be added via `supabase.channel()` API)
 
 ## MCP Server Integration
 
-**Model Context Protocol (MCP):**
-- Package: `packages/mcp-server/`
-- Dependencies: `@modelcontextprotocol/sdk` 1.24.3, `postgres` 3.4.7
-- Purpose: Enable Claude AI to query the database schema and generate code
-- Usage: Consumed by Claude in AI Code sessions
+**Model Context Protocol:**
+- MCP Server SDK: `@modelcontextprotocol/sdk` 1.24.3
+- Location: `packages/mcp-server/`
+- Database client: `postgres` 3.4.7 for direct PostgreSQL queries
+- Purpose: Expose Aloha database schema and operations to Claude via MCP
+- Build: `pnpm build` in `packages/mcp-server/`
+- Entry: `bin.aloha-mcp-server` in `packages/mcp-server/package.json`
 
-## Rate Limiting
+## Feature Flags & Conditional Integrations
 
-**Supabase Auth:**
-- Email rate limit: 1000 requests per configured window (in `supabase/config.toml`)
+**AI Features:**
+- Enabled if `ANTHROPIC_API_KEY` is set
+- Disabled if missing; endpoints return 501 Not Implemented
+- Routes check env var before calling Claude API
 
-## API Response Limits
+**OAuth Providers:**
+- Google: Configured in `supabase/config.toml` if `GOOGLE_OAUTH_CLIENT_ID` set
+- Azure: Requires enabling in `supabase/config.toml` and setting env vars
+- Apple: Not enabled by default; requires configuration
 
-**Supabase API:**
-- Max rows returned: 1000 (configured in `supabase/config.toml` `max_rows`)
-- Payload size: Limited by max_rows to prevent accidental/malicious large requests
+**Email:**
+- Provider selectable via `MAILER_PROVIDER` env var
+- Default: `nodemailer`
+- Alternative: `resend` (swappable)
 
 ---
 
-*Integration audit: 2025-02-26*
+*Integration audit: 2026-04-07*
