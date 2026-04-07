@@ -1,4 +1,7 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
+
+import type { Database } from '~/lib/database.types';
 
 import { sanitizeSearch } from '../crud-helpers.server';
 
@@ -40,25 +43,46 @@ describe('sanitizeSearch', () => {
 // loadTableData — sort and filter validation via mock client
 // ============================================================
 
-// Chainable mock Supabase client that records method calls
-function createMockClient() {
+// Typed mock factory that records method calls without Proxy
+function createMockSupabaseChain() {
   const calls: { method: string; args: unknown[] }[] = [];
-  const chain = new Proxy(
-    {} as Record<string, unknown>,
-    {
-      get: (_, prop) => {
-        if (prop === 'then') return undefined;
-        return (...args: unknown[]) => {
-          calls.push({ method: String(prop), args });
-          if (prop === 'range') {
-            return Promise.resolve({ data: [], count: 0, error: null });
-          }
-          return chain;
-        };
-      },
+
+  const chain: Record<string, (...args: unknown[]) => unknown> = {};
+
+  const methods = [
+    'select',
+    'eq',
+    'is',
+    'not',
+    'or',
+    'ilike',
+    'order',
+    'in',
+  ] as const;
+
+  for (const method of methods) {
+    chain[method] = (...args: unknown[]) => {
+      calls.push({ method, args });
+      return chain;
+    };
+  }
+
+  chain.range = (...args: unknown[]) => {
+    calls.push({ method: 'range', args });
+    return Promise.resolve({ data: [], count: 0, error: null });
+  };
+
+  const client = {
+    from: (table: string) => {
+      calls.push({ method: 'from', args: [table] });
+      return chain;
     },
-  );
-  return { client: { from: () => chain }, calls };
+  };
+
+  return {
+    client: client as unknown as SupabaseClient<Database>,
+    calls,
+  };
 }
 
 // Dynamic import to handle the .server.ts module in vitest
@@ -69,11 +93,11 @@ async function getLoadTableData() {
 
 describe('loadTableData sort validation', () => {
   it('falls back to default sort when column not in whitelist', async () => {
-    const { client, calls } = createMockClient();
+    const { client, calls } = createMockSupabaseChain();
     const loadTableData = await getLoadTableData();
 
     await loadTableData({
-      client: client as never,
+      client,
       viewName: 'test_view',
       orgId: 'acme-farms',
       searchParams: new URLSearchParams('sort=evil_column'),
@@ -87,11 +111,11 @@ describe('loadTableData sort validation', () => {
   });
 
   it('honors whitelisted sort column', async () => {
-    const { client, calls } = createMockClient();
+    const { client, calls } = createMockSupabaseChain();
     const loadTableData = await getLoadTableData();
 
     await loadTableData({
-      client: client as never,
+      client,
       viewName: 'test_view',
       orgId: 'acme-farms',
       searchParams: new URLSearchParams('sort=name'),
@@ -106,11 +130,11 @@ describe('loadTableData sort validation', () => {
 
 describe('loadTableData filter validation', () => {
   it('rejects filter when column not in whitelist', async () => {
-    const { client, calls } = createMockClient();
+    const { client, calls } = createMockSupabaseChain();
     const loadTableData = await getLoadTableData();
 
     await loadTableData({
-      client: client as never,
+      client,
       viewName: 'test_view',
       orgId: 'acme-farms',
       searchParams: new URLSearchParams('filter_evil=value'),
@@ -124,11 +148,11 @@ describe('loadTableData filter validation', () => {
   });
 
   it('accepts filter when column is whitelisted', async () => {
-    const { client, calls } = createMockClient();
+    const { client, calls } = createMockSupabaseChain();
     const loadTableData = await getLoadTableData();
 
     await loadTableData({
-      client: client as never,
+      client,
       viewName: 'test_view',
       orgId: 'acme-farms',
       searchParams: new URLSearchParams('filter_name=John'),
