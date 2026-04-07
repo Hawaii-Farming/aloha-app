@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-import { AuthPageObject } from '../authentication/auth.po';
 import { CrudPageObject } from './crud.po';
 
 // E2E tests require a running app and valid credentials.
@@ -20,21 +19,6 @@ test.describe.serial('CRUD Flows — HR Departments', () => {
   );
 
   const testDeptName = `E2E Test Dept ${Date.now()}`;
-
-  test.beforeAll(async ({ browser }) => {
-    // Sign in once for the suite
-    const page = await browser.newPage();
-    const auth = new AuthPageObject(page);
-    await auth.goToSignIn();
-    await auth.signIn({
-      email: E2E_USER_EMAIL!,
-      password: E2E_USER_PASSWORD!,
-    });
-
-    // Wait for redirect to workspace
-    await page.waitForURL(/\/home\//);
-    await page.close();
-  });
 
   test('CRUD list view loads with data', async ({ page }) => {
     const crud = new CrudPageObject(page);

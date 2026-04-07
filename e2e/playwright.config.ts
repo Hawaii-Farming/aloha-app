@@ -10,6 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  globalSetup: require.resolve('./auth.setup'),
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -31,6 +32,9 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
     navigationTimeout: 15 * 1000,
+
+    /* Reuse auth state saved by globalSetup */
+    storageState: 'e2e/.auth/user.json',
   },
 
   // test timeout set to 2 minutes

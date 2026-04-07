@@ -15,17 +15,21 @@ export class CrudPageObject {
 
   /** Get the data table container */
   get table() {
-    return this.page.locator('table');
+    return this.page.locator('[data-test="crud-data-table"]');
   }
 
   /** Get visible table rows (tbody tr) */
   get tableRows() {
-    return this.page.locator('table tbody tr');
+    return this.page.locator(
+      '[data-test="crud-data-table"] tbody tr',
+    );
   }
 
   /** Type into the search input */
   async search(query: string) {
-    const searchInput = this.page.getByPlaceholder(/search/i);
+    const searchInput = this.page.locator(
+      '[data-test="table-search"]',
+    );
     await searchInput.fill(query);
     // Wait for table to update (debounced search triggers navigation)
     await this.page.waitForLoadState('networkidle');
@@ -33,9 +37,13 @@ export class CrudPageObject {
 
   /** Click the Create button to open the sheet */
   async openCreateSheet() {
-    await this.page.getByRole('button', { name: /create/i }).click();
+    await this.page
+      .locator('[data-test="sub-module-create-button"]')
+      .click();
     // Wait for sheet to slide in
-    await expect(this.page.locator('[role="dialog"]')).toBeVisible();
+    await expect(
+      this.page.locator('[data-test="create-panel"]'),
+    ).toBeVisible();
   }
 
   /** Fill a form field by label */
@@ -45,8 +53,9 @@ export class CrudPageObject {
 
   /** Submit the form in the sheet */
   async submitForm() {
-    const dialog = this.page.locator('[role="dialog"]');
-    await dialog.getByRole('button', { name: /save|create|submit/i }).click();
+    await this.page
+      .locator('[data-test="create-panel-submit"]')
+      .click();
   }
 
   /** Select a row by clicking its checkbox */
@@ -57,14 +66,19 @@ export class CrudPageObject {
       .check();
   }
 
-  /** Click the bulk delete button */
+  /** Click the bulk delete button and confirm */
   async bulkDelete() {
-    await this.page.getByRole('button', { name: /delete/i }).click();
-    // Confirm dialog if present
-    const confirmBtn = this.page.getByRole('button', {
-      name: /confirm|yes|delete/i,
+    await this.page
+      .locator('[data-test="bulk-delete-button"]')
+      .click();
+    // Confirm in the AlertDialog
+    const dialog = this.page.locator('[role="alertdialog"]');
+    const confirmBtn = dialog.getByRole('button', {
+      name: /delete/i,
     });
-    if (await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    if (
+      await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false)
+    ) {
       await confirmBtn.click();
     }
   }
