@@ -187,8 +187,8 @@ export default function SubModuleCreatePage(props: {
   });
 
   const onSubmit = useCallback(
-    (data: Record<string, unknown>) => {
-      fetcher.submit(data as unknown as Record<string, string>, {
+    (data: Record<string, string | number | boolean | null>) => {
+      fetcher.submit(data, {
         method: 'POST',
         encType: 'application/json',
       });

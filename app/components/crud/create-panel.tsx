@@ -91,9 +91,9 @@ export function CreatePanel({
   }
 
   const onSubmit = useCallback(
-    (data: Record<string, unknown>) => {
+    (data: Record<string, string | number | boolean | null>) => {
       hasHandledSuccess.current = false;
-      fetcher.submit(data as unknown as Record<string, string>, {
+      fetcher.submit(data, {
         method: 'POST',
         action: 'create',
         encType: 'application/json',

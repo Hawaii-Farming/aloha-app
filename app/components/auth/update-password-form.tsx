@@ -23,6 +23,7 @@ import { Trans } from '@aloha/ui/trans';
 
 import { PasswordResetSchema } from '~/lib/auth/schemas/password-reset.schema';
 import { useUpdateUser } from '~/lib/supabase/hooks/use-update-user-mutation';
+import { isErrorWithCode } from '~/lib/type-guards';
 
 import { PasswordInput } from './password-input';
 
@@ -42,10 +43,13 @@ export function UpdatePasswordForm(params: {
     },
   });
 
-  if (updateUser.error) {
-    const error = updateUser.error as unknown as { code: string };
-
-    return <ErrorState error={error} onRetry={() => updateUser.reset()} />;
+  if (updateUser.error && isErrorWithCode(updateUser.error)) {
+    return (
+      <ErrorState
+        error={updateUser.error}
+        onRetry={() => updateUser.reset()}
+      />
+    );
   }
 
   return (

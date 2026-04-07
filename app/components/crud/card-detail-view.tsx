@@ -207,13 +207,19 @@ export function CardDetailView({
   const handleTransition = useCallback(
     (newStatus: string) => {
       if (!workflowConfig) return;
-      const payload = {
+      const payload: Record<
+        string,
+        | string
+        | Record<string, string>
+        | null
+      > = {
         intent: 'transition',
         statusColumn: workflowConfig.statusColumn,
         newStatus,
-        transitionFields: workflowConfig.transitionFields?.[newStatus],
+        transitionFields:
+          workflowConfig.transitionFields?.[newStatus] ?? null,
       };
-      fetcher.submit(payload as unknown as Record<string, string>, {
+      fetcher.submit(payload, {
         method: 'POST',
         encType: 'application/json',
       });
