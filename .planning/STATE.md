@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-08T20:46:05.169Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-08T20:51:56.468Z"
 last_activity: 2026-04-08
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 17
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-08)
 ## Current Position
 
 Phase: 02 (scheduler) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-08
 
@@ -57,6 +57,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 01 P03 | 4min | 2 tasks | 7 files |
 | Phase 01 P04 | 8min | 2 tasks | 5 files |
 | Phase 02-scheduler P01 | 2min | 1 tasks | 5 files |
+| Phase 02-scheduler P02 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Cached lazy components at module scope to satisfy React Compiler static-components lint rule
 - [Phase 02-scheduler]: LEFT JOIN for department/work_authorization in weekly schedule view (employees may lack assignments)
 - [Phase 02-scheduler]: Stub SchedulerListView created for lazy import resolution; Plan 02 replaces with full implementation
+- [Phase 02-scheduler]: Custom loader branch in sub-module.tsx uses queryUntypedView for views lacking is_deleted/end_date
+- [Phase 02-scheduler]: SchedulerListView composes AgGridWrapper directly (not AgGridListView) for full toolbar control
+- [Phase 02-scheduler]: Week/dept filter state via URL searchParams for loader revalidation, no local state
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-08T20:46:05.166Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-08T20:51:56.465Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
