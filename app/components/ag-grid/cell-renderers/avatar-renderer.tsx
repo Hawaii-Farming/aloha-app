@@ -41,21 +41,21 @@ export function AvatarRenderer(props: CustomCellRendererProps) {
         <img
           src={profile_photo_url}
           alt={displayName}
-          className="h-8 w-8 shrink-0 rounded-full object-cover"
+          className="h-9 w-9 shrink-0 rounded-full object-cover"
           onError={(e) => {
             const target = e.currentTarget;
             const parent = target.parentElement;
             if (parent) {
               const fallback = document.createElement('div');
               fallback.className =
-                'bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold';
+                'bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold';
               fallback.textContent = initials;
               parent.replaceChild(fallback, target);
             }
           }}
         />
       ) : (
-        <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+        <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
           {initials}
         </div>
       )}

@@ -130,7 +130,7 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
   return (
     <div className="flex gap-5 px-4 py-4">
       {/* Avatar */}
-      <div className="flex shrink-0 flex-col items-center gap-1">
+      <div className="flex shrink-0 flex-col items-center gap-2">
         {photoUrl ? (
           <img
             src={photoUrl}

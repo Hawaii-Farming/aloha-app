@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type {
   GetRowIdParams,
@@ -59,13 +59,28 @@ export function useDetailRow({
     return params.rowNode.data?._isDetailRow === true;
   }, []);
 
+  const pendingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
-      // Ignore clicks on detail rows
       if (event.data?._isDetailRow) return;
+      if (pendingRef.current) clearTimeout(pendingRef.current);
 
       const clickedPk = String(event.data?.[pkColumn] ?? '');
-      setExpandedRowId((prev) => (prev === clickedPk ? null : clickedPk));
+
+      setExpandedRowId((prev) => {
+        // Toggling same row — collapse immediately
+        if (prev === clickedPk) return null;
+        // Switching rows — collapse first, then expand after a tick
+        if (prev !== null) {
+          pendingRef.current = setTimeout(
+            () => setExpandedRowId(clickedPk),
+            80,
+          );
+          return null;
+        }
+        return clickedPk;
+      });
     },
     [pkColumn],
   );
