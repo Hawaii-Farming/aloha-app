@@ -50,7 +50,12 @@ Plans:
   3. Employees exceeding the OT threshold are visually flagged in the grid
   4. Clicking a row expands to show that employee's historical schedule entries
   5. User can create a new schedule entry via the side-panel form and see it appear in the grid
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — View migration (add profile_photo_url, department/work auth names), CRUD config, Zod schema
+- [ ] 02-02-PLAN.md — SchedulerListView with week navigation, department filter, OT highlighting, schema reset
+- [ ] 02-03-PLAN.md — Detail row expansion, history toggle, create panel, visual verification
 **UI hint**: yes
 
 ### Phase 3: Time Off
@@ -113,7 +118,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. AG Grid Foundation | 0/4 | Planning complete | - |
-| 2. Scheduler | 0/TBD | Not started | - |
+| 2. Scheduler | 0/3 | Planning complete | - |
 | 3. Time Off | 0/TBD | Not started | - |
 | 4. Payroll Views | 0/TBD | Not started | - |
 | 5. Hours Comparison | 0/TBD | Not started | - |
