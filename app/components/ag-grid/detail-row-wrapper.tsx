@@ -39,14 +39,15 @@ export function useDetailRow({
   pkColumn = 'id',
   detailComponent: DetailComponent,
 }: UseDetailRowOptions): UseDetailRowReturn {
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  // Use a plain array — React handles array state changes reliably
+  const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
   const rowData = useMemo(() => {
     const result: Record<string, unknown>[] = [];
     for (const row of sourceData) {
       result.push(row);
       const pk = String(row[pkColumn] ?? '');
-      if (expandedIds.has(pk)) {
+      if (expandedIds.includes(pk)) {
         result.push({
           _isDetailRow: true,
           _parentData: row,
@@ -66,22 +67,19 @@ export function useDetailRow({
       if (event.data?._isDetailRow) return;
 
       const clickedPk = String(event.data?.[pkColumn] ?? '');
+      if (!clickedPk) return;
 
-      setExpandedIds((prev) => {
-        const next = new Set(prev);
-        if (next.has(clickedPk)) {
-          next.delete(clickedPk);
-        } else {
-          next.add(clickedPk);
-        }
-        return next;
-      });
+      setExpandedIds((prev) =>
+        prev.includes(clickedPk)
+          ? prev.filter((id) => id !== clickedPk)
+          : [...prev, clickedPk],
+      );
     },
     [pkColumn],
   );
 
   const collapseAll = useCallback(() => {
-    setExpandedIds(new Set());
+    setExpandedIds([]);
   }, []);
 
   const getRowId = useCallback(
@@ -114,7 +112,7 @@ export function useDetailRow({
     fullWidthCellRenderer,
     handleRowClicked,
     getRowId,
-    expandedCount: expandedIds.size,
+    expandedCount: expandedIds.length,
     collapseAll,
   };
 }

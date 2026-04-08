@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useFetcher, useRevalidator, useSearchParams } from 'react-router';
 
@@ -115,13 +115,6 @@ export default function AgGridListView({
     pkColumn,
     detailComponent,
   });
-
-  // Force AG Grid to process new/removed detail rows via API
-  // The rowData prop change alone doesn't trigger full-width row evaluation
-  useEffect(() => {
-    if (!gridApi) return;
-    gridApi.setGridOption('rowData', detailRowData as RowData[]);
-  }, [gridApi, detailRowData]);
 
   // Detail rows: compact card layout with avatar + info strips
   const getRowHeight = useCallback((params: RowHeightParams) => {
