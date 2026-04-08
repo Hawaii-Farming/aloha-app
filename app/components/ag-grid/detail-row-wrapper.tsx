@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type {
   GetRowIdParams,
@@ -59,31 +59,37 @@ export function useDetailRow({
     return params.rowNode.data?._isDetailRow === true;
   }, []);
 
-  const pendingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [pendingOpen, setPendingOpen] = useState<string | null>(null);
+
+  // Two-phase open: after close commits to DOM, open the pending row
+  useEffect(() => {
+    if (pendingOpen && expandedRowId === null) {
+      const id = pendingOpen;
+      const t = setTimeout(() => {
+        setPendingOpen(null);
+        setExpandedRowId(id);
+      }, 0);
+      return () => clearTimeout(t);
+    }
+  }, [pendingOpen, expandedRowId]);
 
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
       if (event.data?._isDetailRow) return;
-      if (pendingRef.current) {
-        clearTimeout(pendingRef.current);
-        pendingRef.current = null;
-      }
 
       const clickedPk = String(event.data?.[pkColumn] ?? '');
 
       // Same row — toggle off
       if (expandedRowId === clickedPk) {
+        setPendingOpen(null);
         setExpandedRowId(null);
         return;
       }
 
-      // Different row open — close first, then open after animation
+      // Different row open — close it, queue the new one
       if (expandedRowId !== null) {
+        setPendingOpen(clickedPk);
         setExpandedRowId(null);
-        pendingRef.current = setTimeout(() => {
-          setExpandedRowId(clickedPk);
-          pendingRef.current = null;
-        }, 150);
         return;
       }
 

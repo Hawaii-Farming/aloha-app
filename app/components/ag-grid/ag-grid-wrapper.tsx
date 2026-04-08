@@ -96,7 +96,6 @@ function AgGridInner({
       sortable: true,
       filter: true,
       minWidth: 100,
-      suppressSizeToFit: true,
     }),
     [],
   );
