@@ -239,7 +239,7 @@ export default function AgGridListView({
   return (
     <>
       <div
-        className="flex min-h-0 w-fit flex-1 flex-col"
+        className="flex min-h-0 w-fit flex-1 flex-col pr-2"
         data-test="sub-module-list"
       >
         <div className="shrink-0 overflow-visible pb-4">
