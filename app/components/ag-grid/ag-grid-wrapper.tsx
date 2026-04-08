@@ -95,7 +95,7 @@ function AgGridInner({
       resizable: true,
       sortable: true,
       filter: true,
-      minWidth: 100,
+      width: 120,
     }),
     [],
   );
