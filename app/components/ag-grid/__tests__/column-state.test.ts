@@ -48,7 +48,7 @@ describe('saveColumnState', () => {
     const stored = JSON.parse(
       mockLocalStorage.setItem.mock.calls[0]?.[1] as string,
     );
-    expect(stored.version).toBe(1);
+    expect(stored.version).toBe(2);
     expect(stored.columns).toEqual([
       { colId: 'name', width: 200 },
       { colId: 'status', width: 100 },
@@ -59,7 +59,7 @@ describe('saveColumnState', () => {
 describe('restoreColumnState', () => {
   it('calls applyColumnState with stored data', () => {
     mockStorage['ag-grid-state-employees'] = JSON.stringify({
-      version: 1,
+      version: 2,
       columns: [{ colId: 'name', width: 300 }],
     });
 

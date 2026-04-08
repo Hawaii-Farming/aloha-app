@@ -1,5 +1,5 @@
 import type { ComponentType, RefObject } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   ColDef,
@@ -102,17 +102,60 @@ function AgGridInner({
 
   const effectiveDomLayout = domLayout ?? 'normal';
 
+  // Horizontal scroll indicator — detect if content overflows to the right
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hasScrollRight, setHasScrollRight] = useState(false);
+
+  const checkScrollRef = useRef(() => {
+    const el = containerRef.current?.querySelector(
+      '.ag-body-horizontal-scroll-viewport',
+    ) as HTMLElement | null;
+    if (!el) return;
+    setHasScrollRight(el.scrollWidth > el.clientWidth + el.scrollLeft + 2);
+  });
+
+  useEffect(() => {
+    const handler = () => checkScrollRef.current();
+    const el = containerRef.current?.querySelector(
+      '.ag-body-horizontal-scroll-viewport',
+    ) as HTMLElement | null;
+    if (!el) return;
+    el.addEventListener('scroll', handler);
+    const observer = new ResizeObserver(handler);
+    observer.observe(el);
+    // Defer initial check to after layout
+    const raf = requestAnimationFrame(handler);
+    return () => {
+      el.removeEventListener('scroll', handler);
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <div
+      ref={containerRef}
       data-ag-theme-mode={resolvedTheme === 'dark' ? 'dark' : 'light'}
       data-test="ag-grid-wrapper"
-      className="h-full w-full"
+      className="relative h-full w-full"
       style={
         effectiveDomLayout === 'normal'
           ? { height: height ?? '100%' }
           : undefined
       }
     >
+      {/* Right-edge fade indicator when horizontal content overflows */}
+      {hasScrollRight && (
+        <div
+          className="pointer-events-none absolute top-0 right-0 z-10 h-full w-6"
+          style={{
+            background:
+              resolvedTheme === 'dark'
+                ? 'linear-gradient(to right, transparent, rgba(38,38,38,0.8))'
+                : 'linear-gradient(to right, transparent, rgba(250,250,250,0.8))',
+          }}
+        />
+      )}
       <AgGridProvider modules={[AllCommunityModule]}>
         <AgGridReact
           ref={gridRef}

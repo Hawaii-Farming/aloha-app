@@ -1,4 +1,4 @@
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, Mail, MapPin, Phone, User } from 'lucide-react';
 
 import { Badge } from '@aloha/ui/badge';
 import { Separator } from '@aloha/ui/separator';
@@ -61,7 +61,7 @@ function resolveFieldValue(
 
   const raw = record[field.key];
 
-  if (raw === null || raw === undefined) return '--';
+  if (raw === null || raw === undefined) return '';
   if (typeof raw === 'boolean') return raw ? 'Yes' : 'No';
 
   const str = String(raw);
@@ -83,26 +83,8 @@ function resolveFieldValue(
   return str;
 }
 
-interface FieldSection {
-  title: string | null;
-  fields: FormFieldConfig[];
-}
-
-function buildSections(formFields: FormFieldConfig[]): FieldSection[] {
-  const sections: FieldSection[] = [];
-  let current: FieldSection = { title: null, fields: [] };
-
-  for (const field of formFields) {
-    if (field.section) {
-      if (current.fields.length > 0) sections.push(current);
-      current = { title: field.section, fields: [field] };
-    } else {
-      current.fields.push(field);
-    }
-  }
-
-  if (current.fields.length > 0) sections.push(current);
-  return sections;
+function getInitials(first?: string | null, last?: string | null): string {
+  return `${first?.charAt(0)?.toUpperCase() ?? ''}${last?.charAt(0)?.toUpperCase() ?? ''}`;
 }
 
 interface InlineDetailRowProps {
@@ -111,73 +93,157 @@ interface InlineDetailRowProps {
 }
 
 export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
-  const formFields = config?.formFields ?? [];
-  const sections = buildSections(formFields);
   const fkKeyMap = buildFkKeyMap(config, data);
+  const formFields = config?.formFields ?? [];
+
+  const firstName = data['first_name'] as string | undefined;
+  const lastName = data['last_name'] as string | undefined;
+  const alias = data['preferred_name'] as string | undefined;
+  const photoUrl = data['profile_photo_url'] as string | undefined;
+  const initials = getInitials(firstName, lastName);
+  const fullName = [firstName, lastName].filter(Boolean).join(' ');
+
+  // Resolve key fields for the detail strip
+  const resolve = (key: string) => {
+    const field = formFields.find((f) => f.key === key);
+    if (!field) {
+      const raw = data[key];
+      return raw != null ? String(raw) : '';
+    }
+    return resolveFieldValue(field, data, fkKeyMap);
+  };
+
+  const department = resolve('hr_department_id');
+  const title = resolve('hr_title_id');
+  const workAuth = resolve('hr_work_authorization_id');
+  const manager = resolve('compensation_manager_id');
+  const teamLead = resolve('team_lead_id');
+  const phone = resolve('phone');
+  const email = resolve('email');
+  const companyEmail = resolve('company_email');
+  const startDate = resolve('start_date');
+  const payStructure = resolve('pay_structure');
+  const otThreshold = resolve('overtime_threshold');
+  const housing = resolve('site_id');
+  const gender = resolve('gender');
 
   return (
-    <div className="space-y-4 px-2 py-3">
-      {sections.map((section, i) => (
-        <div key={section.title ?? i}>
-          {i > 0 && <Separator className="mb-4" />}
-
-          {section.title && (
-            <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-              {section.title}
-            </h3>
-          )}
-
-          <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {section.fields.map((field) => {
-              const value = resolveFieldValue(field, data, fkKeyMap);
-              const isEmpty = value === '--';
-
-              return (
-                <div key={field.key} className="min-w-0">
-                  <dt className="text-muted-foreground text-[11px] font-medium">
-                    {field.label}
-                  </dt>
-                  <dd
-                    className={`truncate text-sm ${isEmpty ? 'text-muted-foreground/50' : ''}`}
-                    title={value}
-                  >
-                    {field.type === 'boolean' ? (
-                      <Badge
-                        variant={
-                          data[field.key] === true ? 'default' : 'secondary'
-                        }
-                      >
-                        {value}
-                      </Badge>
-                    ) : (
-                      value
-                    )}
-                  </dd>
-                </div>
-              );
-            })}
+    <div className="flex gap-5 px-4 py-3">
+      {/* Avatar */}
+      <div className="flex shrink-0 flex-col items-center gap-1">
+        {photoUrl ? (
+          <img
+            src={photoUrl}
+            alt={fullName}
+            className="h-14 w-14 rounded-full object-cover"
+            onError={(e) => {
+              const target = e.currentTarget;
+              const parent = target.parentElement;
+              if (parent) {
+                const fallback = document.createElement('div');
+                fallback.className =
+                  'bg-primary/10 text-primary flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold';
+                fallback.textContent = initials;
+                parent.replaceChild(fallback, target);
+              }
+            }}
+          />
+        ) : (
+          <div className="bg-primary/10 text-primary flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold">
+            {initials}
           </div>
-        </div>
-      ))}
+        )}
+        {alias && (
+          <span className="text-muted-foreground text-[11px]">
+            &ldquo;{alias}&rdquo;
+          </span>
+        )}
+      </div>
 
-      {/* Audit footer */}
-      <div className="text-muted-foreground flex flex-wrap items-center gap-4 pt-1 text-[11px]">
-        {typeof data['created_at'] === 'string' && (
-          <span className="flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
-            Created {formatDate(data['created_at'])}
-          </span>
-        )}
-        {typeof data['updated_at'] === 'string' && (
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            Updated {formatDate(data['updated_at'])}
-          </span>
-        )}
-        <span className="text-muted-foreground/50">
-          ID: {String(data[config.pkColumn ?? 'id'] ?? '')}
-        </span>
+      {/* Info columns */}
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        {/* Row 1: Name + badges */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold">{fullName}</span>
+          {title && (
+            <Badge variant="secondary" className="text-[11px]">
+              {title}
+            </Badge>
+          )}
+          {workAuth && (
+            <Badge variant="outline" className="text-[11px]">
+              {workAuth}
+            </Badge>
+          )}
+          {gender && (
+            <span className="text-muted-foreground text-[11px] capitalize">
+              {gender}
+            </span>
+          )}
+        </div>
+
+        {/* Row 2: Key info strip */}
+        <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+          {department && (
+            <InfoChip icon={User} label="Dept" value={department} />
+          )}
+          {manager && <InfoChip icon={User} label="Mgr" value={manager} />}
+          {teamLead && <InfoChip icon={User} label="Lead" value={teamLead} />}
+          {housing && (
+            <InfoChip icon={MapPin} label="Housing" value={housing} />
+          )}
+        </div>
+
+        {/* Row 3: Contact + dates */}
+        <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+          {(companyEmail || email) && (
+            <InfoChip icon={Mail} value={companyEmail || email} />
+          )}
+          {phone && <InfoChip icon={Phone} value={phone} />}
+
+          {startDate && (
+            <InfoChip icon={Calendar} label="Start" value={startDate} />
+          )}
+          {payStructure && <span className="capitalize">{payStructure}</span>}
+          {otThreshold && <span>OT: {otThreshold}h</span>}
+        </div>
+
+        {/* Row 4: Audit */}
+        <div className="text-muted-foreground/60 flex items-center gap-3 text-[11px]">
+          {typeof data['created_at'] === 'string' && (
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              Created {formatDate(data['created_at'])}
+            </span>
+          )}
+          {typeof data['updated_at'] === 'string' && (
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              Updated {formatDate(data['updated_at'])}
+            </span>
+          )}
+          <Separator orientation="vertical" className="h-3" />
+          <span>ID: {String(data[config.pkColumn ?? 'id'] ?? '')}</span>
+        </div>
       </div>
     </div>
+  );
+}
+
+function InfoChip({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label?: string;
+  value: string;
+}) {
+  return (
+    <span className="flex items-center gap-1">
+      <Icon className="h-3 w-3 shrink-0" />
+      {label && <span className="text-muted-foreground/70">{label}:</span>}
+      <span className="text-foreground">{value}</span>
+    </span>
   );
 }

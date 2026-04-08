@@ -64,18 +64,22 @@ const CHECKBOX_COL: ColDef = {
   filter: false,
   resizable: false,
   suppressMovable: true,
+  pinned: 'left',
+  lockPosition: true,
 };
 
 const AVATAR_COL: ColDef = {
   headerName: '',
   field: 'profile_photo_url',
   cellRenderer: AvatarRenderer,
-  maxWidth: 60,
-  minWidth: 60,
+  maxWidth: 52,
+  minWidth: 52,
   sortable: false,
   filter: false,
   resizable: false,
   suppressMovable: true,
+  pinned: 'left',
+  lockPosition: true,
 };
 
 export default function AgGridListView({
@@ -122,20 +126,14 @@ export default function AgGridListView({
     detailComponent,
   });
 
-  // Give detail rows enough height to render all form fields
-  const getRowHeight = useCallback(
-    (params: RowHeightParams) => {
-      if (params.data?._isDetailRow) {
-        const fieldCount = config?.formFields?.length ?? 10;
-        const cols = 5; // xl:grid-cols-5 in InlineDetailRow
-        const rows = Math.ceil(fieldCount / cols);
-        // ~28px per field row + section headers + audit footer + padding
-        return rows * 32 + 80;
-      }
-      return undefined;
-    },
-    [config?.formFields?.length],
-  );
+  // Detail rows: compact card layout with avatar + info strips
+  const getRowHeight = useCallback((params: RowHeightParams) => {
+    if (params.data?._isDetailRow) {
+      // 4 info rows (~18px each) + padding (24px) + avatar height
+      return 120;
+    }
+    return undefined;
+  }, []);
 
   const dataColDefs = useMemo(() => {
     if (config?.agGridColDefs) return config.agGridColDefs;
