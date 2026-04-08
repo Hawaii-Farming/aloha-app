@@ -1,0 +1,191 @@
+# Requirements: HR Module Submodules
+
+**Defined:** 2026-04-07
+**Core Value:** Every HR submodule renders real data from the database and supports full CRUD operations through AG Grid tables styled to the Supabase-inspired design system.
+
+## v1 Requirements
+
+Requirements for initial release. Each maps to roadmap phases.
+
+### AG Grid Foundation
+
+- [ ] **GRID-01**: AG Grid Community v35.x installed as project dependency (`ag-grid-react`)
+- [ ] **GRID-02**: Shared `AgGridWrapper` component with ClientOnly SSR safety, stable props (useMemo/useCallback), and loading/empty state overlays
+- [ ] **GRID-03**: AG Grid themed to DESIGN.md (Supabase-inspired dark/light) using Theming API v35 (`themeQuartz.withParams()`) bridged to next-themes
+- [ ] **GRID-04**: Full-width detail row component for row-click-to-expand across all submodules
+- [ ] **GRID-05**: Column sorting (multi-column), filtering (text/number/date), and quick-filter search bar on all grids
+- [ ] **GRID-06**: Column resize, reorder, and responsive hiding on narrower screens
+- [ ] **GRID-07**: Pagination on all grids
+- [ ] **GRID-08**: Side-panel CRUD forms (right-side Shadcn Sheet) matching register pattern for all submodules
+- [ ] **GRID-09**: Status badge cell renderer for status columns (pending/approved/denied, etc.)
+- [ ] **GRID-10**: Date formatting (locale-aware) and currency formatting ($, 2 decimals) via AG Grid valueFormatters
+- [ ] **GRID-11**: Employee photo/avatar cell renderer using `hr_employee.profile_photo_url`
+- [ ] **GRID-12**: Column state persistence to localStorage (widths, order, visibility) across sessions
+- [ ] **GRID-13**: CSV export for data grids (payroll and general)
+- [ ] **GRID-14**: Conditional row styling for OT warnings, variance highlighting, and status-based coloring via `rowClassRules`/`cellClassRules`
+
+### Scheduler
+
+- [ ] **SCHED-01**: Weekly schedule grid view using `ops_task_weekly_schedule` SQL view with Sun-Sat day columns
+- [ ] **SCHED-02**: Week navigation controls (previous/next/current week) filtering by `week_start_date`
+- [ ] **SCHED-03**: Employee name (with photo), department, work authorization, task, and total hours displayed per row
+- [ ] **SCHED-04**: Overtime flag/highlight when employee exceeds OT threshold (`is_over_ot_threshold`)
+- [ ] **SCHED-05**: Row-click full-width detail showing employee historical schedule data (day, dept, stat, task, start time, end time, hours, date)
+- [ ] **SCHED-06**: Create schedule entry form (side panel): employee dropdown (required), task dropdown (required), date (required), start time, end time, hours
+- [ ] **SCHED-07**: Department filter for the schedule grid
+- [ ] **SCHED-08**: Historical data summary view (date, number of employees, number of hours)
+
+### Time Off
+
+- [ ] **TOFF-01**: Time off request grid displaying: photo + full name, dept, stat, comp manager, start date, return date, PTO days, request off, sick leave, reason, justification, requested by, updated by, pending, approved
+- [ ] **TOFF-02**: Status filter tabs (All / Pending / Approved / Denied) filtering `hr_time_off_request.status`
+- [ ] **TOFF-03**: Inline status toggle (approve/deny) updating `status`, `reviewed_by`, `reviewed_at` in row
+- [ ] **TOFF-04**: Denial reason field displayed/required when denying a request
+- [ ] **TOFF-05**: Create time off request form (side panel): employee dropdown (required), leave start date (required), PTO days (int, optional), request off days (int, optional), sick leave days (int, optional), request reason (required)
+
+### Hours Comparison
+
+- [ ] **HCMP-01**: Comparison grid showing: photo + full name, scheduled hours (from `ops_task_schedule`), payroll hours (from `hr_payroll`), variance (diff)
+- [ ] **HCMP-02**: Pay period selector to scope the comparison
+- [ ] **HCMP-03**: Row-click full-width detail showing daily schedule breakdown (day of week, dept, stat, task, start time, end time, hours, date)
+- [ ] **HCMP-04**: Variance highlighting with conditional cell styling (red/amber when hours mismatch)
+- [ ] **HCMP-05**: New SQL view joining `ops_task_schedule` aggregated hours with `hr_payroll.total_hours` per employee per pay period
+
+### Payroll Comparison
+
+- [ ] **PCMP-01**: Aggregated by task view showing payroll data grouped by department/task
+- [ ] **PCMP-02**: Aggregated by employee view showing total compensation per employee
+- [ ] **PCMP-03**: Toggle between the two table views (task vs employee)
+- [ ] **PCMP-04**: Pay period filter for both views
+- [ ] **PCMP-05**: Pinned totals row (bottom) with grand totals
+- [ ] **PCMP-06**: New SQL views for payroll-by-task and payroll-by-employee aggregations
+
+### Payroll Comp Manager
+
+- [ ] **PMGR-01**: Payroll data filtered by compensation manager (`hr_employee.compensation_manager_id`)
+- [ ] **PMGR-02**: Manager selector/filter to switch between compensation managers
+- [ ] **PMGR-03**: Summary totals per manager (pinned bottom row or header section)
+- [ ] **PMGR-04**: New SQL view aggregating payroll data by compensation manager
+
+### Payroll Data
+
+- [ ] **PDAT-01**: Full payroll line items grid displaying all `hr_payroll` columns
+- [ ] **PDAT-02**: Column groups organizing 40+ fields into Hours / Earnings / Deductions / Employer Costs sections
+- [ ] **PDAT-03**: Pay period filter
+- [ ] **PDAT-04**: Employee filter
+- [ ] **PDAT-05**: CSV export for payroll data
+
+### Housing
+
+- [ ] **HOUS-01**: Housing sites grid showing: housing name, max beds, available beds (filtered from `org_site` where category=housing)
+- [ ] **HOUS-02**: Row-click full-width detail showing tenant list (employees assigned to that housing site via `hr_employee.site_id`)
+- [ ] **HOUS-03**: Create/edit housing form (side panel): housing name, max beds, available beds
+- [ ] **HOUS-04**: Schema addition: `max_beds` capacity field on `org_site` (or housing-specific approach)
+
+### Employee Review
+
+- [ ] **EREV-01**: Employee review grid showing: photo + full name, dept, stat, start date, quarter, productivity (1-3), attendance (1-3), quality (1-3), engagement (1-3), average, notes, lead, locked
+- [ ] **EREV-02**: Year-Quarter filter for review periods
+- [ ] **EREV-03**: Create/edit review form (side panel): employee, year, quarter, productivity (1-3 select), attendance (1-3 select), quality (1-3 select), engagement (1-3 select), notes, lead (employee dropdown), locked (checkbox)
+- [ ] **EREV-04**: Lock flag preventing edits after finalization (`is_locked`)
+- [ ] **EREV-05**: New `hr_employee_review` table migration with RLS policies
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Enhanced UX
+
+- **V2-01**: Drag-and-drop schedule builder for visual scheduling
+- **V2-02**: Bulk status update for time off requests (multi-select approve/deny)
+- **V2-03**: Print-friendly schedule view for field posting
+- **V2-04**: Configurable variance thresholds for hours comparison
+- **V2-05**: PTO balance/accrual tracking with running balance ledger
+- **V2-06**: Mobile-responsive grid layouts
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| AG Grid Enterprise features | License cost; Community covers all described UX |
+| Automated approval workflows | Manual toggle is the design; explicitly out of scope |
+| Payroll import/processing | Payroll imported externally; this project displays it |
+| Real-time collaborative editing | Standard request/response model |
+| Inline cell editing in grids | Side-panel forms are safer and more consistent |
+| Chart/graph visualizations | AG Grid Charts is Enterprise-only; tabular data sufficient |
+| Email/push notifications | No notification infrastructure; manual workflow |
+| Complex field-level RBAC in grid | Module-level `hr_module_access` sufficient |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| GRID-01 | Pending | Pending |
+| GRID-02 | Pending | Pending |
+| GRID-03 | Pending | Pending |
+| GRID-04 | Pending | Pending |
+| GRID-05 | Pending | Pending |
+| GRID-06 | Pending | Pending |
+| GRID-07 | Pending | Pending |
+| GRID-08 | Pending | Pending |
+| GRID-09 | Pending | Pending |
+| GRID-10 | Pending | Pending |
+| GRID-11 | Pending | Pending |
+| GRID-12 | Pending | Pending |
+| GRID-13 | Pending | Pending |
+| GRID-14 | Pending | Pending |
+| SCHED-01 | Pending | Pending |
+| SCHED-02 | Pending | Pending |
+| SCHED-03 | Pending | Pending |
+| SCHED-04 | Pending | Pending |
+| SCHED-05 | Pending | Pending |
+| SCHED-06 | Pending | Pending |
+| SCHED-07 | Pending | Pending |
+| SCHED-08 | Pending | Pending |
+| TOFF-01 | Pending | Pending |
+| TOFF-02 | Pending | Pending |
+| TOFF-03 | Pending | Pending |
+| TOFF-04 | Pending | Pending |
+| TOFF-05 | Pending | Pending |
+| HCMP-01 | Pending | Pending |
+| HCMP-02 | Pending | Pending |
+| HCMP-03 | Pending | Pending |
+| HCMP-04 | Pending | Pending |
+| HCMP-05 | Pending | Pending |
+| PCMP-01 | Pending | Pending |
+| PCMP-02 | Pending | Pending |
+| PCMP-03 | Pending | Pending |
+| PCMP-04 | Pending | Pending |
+| PCMP-05 | Pending | Pending |
+| PCMP-06 | Pending | Pending |
+| PMGR-01 | Pending | Pending |
+| PMGR-02 | Pending | Pending |
+| PMGR-03 | Pending | Pending |
+| PMGR-04 | Pending | Pending |
+| PDAT-01 | Pending | Pending |
+| PDAT-02 | Pending | Pending |
+| PDAT-03 | Pending | Pending |
+| PDAT-04 | Pending | Pending |
+| PDAT-05 | Pending | Pending |
+| HOUS-01 | Pending | Pending |
+| HOUS-02 | Pending | Pending |
+| HOUS-03 | Pending | Pending |
+| HOUS-04 | Pending | Pending |
+| EREV-01 | Pending | Pending |
+| EREV-02 | Pending | Pending |
+| EREV-03 | Pending | Pending |
+| EREV-04 | Pending | Pending |
+| EREV-05 | Pending | Pending |
+
+**Coverage:**
+- v1 requirements: 53 total
+- Mapped to phases: 0
+- Unmapped: 53
+
+---
+*Requirements defined: 2026-04-07*
+*Last updated: 2026-04-07 after initial definition*
