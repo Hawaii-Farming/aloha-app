@@ -1,46 +1,16 @@
 import type { CustomCellRendererProps } from 'ag-grid-react';
 
 /**
- * Pill color palettes using theme-compatible semantic colors.
- * Each palette: [bg, border, text] as Tailwind classes.
+ * Color palettes: [dotColor, borderColor]
+ * Matching the AG Grid HR demo style — colored dot + subtle border.
  */
 const PALETTES = [
-  // Emerald (accent)
-  [
-    'bg-emerald-50 dark:bg-emerald-950/40',
-    'border-emerald-200 dark:border-emerald-800',
-    'text-emerald-700 dark:text-emerald-300',
-  ],
-  // Slate (neutral)
-  [
-    'bg-slate-50 dark:bg-slate-900/40',
-    'border-slate-200 dark:border-slate-700',
-    'text-slate-600 dark:text-slate-300',
-  ],
-  // Blue
-  [
-    'bg-blue-50 dark:bg-blue-950/40',
-    'border-blue-200 dark:border-blue-800',
-    'text-blue-700 dark:text-blue-300',
-  ],
-  // Amber
-  [
-    'bg-amber-50 dark:bg-amber-950/40',
-    'border-amber-200 dark:border-amber-800',
-    'text-amber-700 dark:text-amber-300',
-  ],
-  // Violet
-  [
-    'bg-violet-50 dark:bg-violet-950/40',
-    'border-violet-200 dark:border-violet-800',
-    'text-violet-700 dark:text-violet-300',
-  ],
-  // Rose
-  [
-    'bg-rose-50 dark:bg-rose-950/40',
-    'border-rose-200 dark:border-rose-800',
-    'text-rose-700 dark:text-rose-300',
-  ],
+  ['#3ecf8e', '#3ecf8e50'], // emerald
+  ['#7e80e7', '#7e80e751'], // violet
+  ['#f3a23a', '#f3a33a53'], // amber
+  ['#47a8f8', '#47a8f86c'], // blue
+  ['#e879a0', '#e879a060'], // rose
+  ['#87cf2b', '#88cf2b55'], // lime
 ] as const;
 
 function paletteForValue(value: string) {
@@ -52,21 +22,38 @@ function paletteForValue(value: string) {
 }
 
 /**
- * AG Grid cell renderer that displays categorical values as styled pills.
- * Consistent color per value (hash-based). Theme-aware light/dark.
+ * AG Grid cell renderer — compact tag with colored dot and subtle border.
+ * Matches the AG Grid HR demo tag style. Consistent color per value.
  */
 export function BadgeCellRenderer(props: CustomCellRendererProps) {
   const value = props.value as string | null | undefined;
   if (!value) return null;
 
   const display = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-  const [bg, border, text] = paletteForValue(value);
+  const [dot, border] = paletteForValue(value);
 
   return (
     <div className="flex h-full items-center">
       <span
-        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${bg} ${border} ${text}`}
+        className="inline-flex items-center rounded-md text-[12px] font-medium"
+        style={{
+          height: 24,
+          paddingLeft: 4,
+          paddingRight: 8,
+          border: `1px solid ${border}`,
+          boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
+        }}
       >
+        <span
+          className="shrink-0 rounded-full"
+          style={{
+            width: 8,
+            height: 8,
+            backgroundColor: dot,
+            marginRight: 6,
+            marginLeft: 2,
+          }}
+        />
         {display}
       </span>
     </div>
