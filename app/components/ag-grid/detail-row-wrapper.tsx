@@ -68,7 +68,7 @@ export function useDetailRow({
       const t = setTimeout(() => {
         setPendingOpen(null);
         setExpandedRowId(id);
-      }, 0);
+      }, 250);
       return () => clearTimeout(t);
     }
   }, [pendingOpen, expandedRowId]);
