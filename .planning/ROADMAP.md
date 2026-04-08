@@ -55,7 +55,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — View migration (add profile_photo_url, department/work auth names), CRUD config, Zod schema
 - [x] 02-02-PLAN.md — SchedulerListView with week navigation, department filter, OT highlighting, schema reset
-- [ ] 02-03-PLAN.md — Detail row expansion, history toggle, create panel, visual verification
+- [x] 02-03-PLAN.md — Detail row expansion, history toggle, create panel, visual verification
 **UI hint**: yes
 
 ### Phase 3: Time Off

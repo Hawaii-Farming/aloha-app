@@ -31,10 +31,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SCHED-02**: Week navigation controls (previous/next/current week) filtering by `week_start_date`
 - [x] **SCHED-03**: Employee name (with photo), department, work authorization, task, and total hours displayed per row
 - [x] **SCHED-04**: Overtime flag/highlight when employee exceeds OT threshold (`is_over_ot_threshold`)
-- [ ] **SCHED-05**: Row-click full-width detail showing employee historical schedule data (day, dept, stat, task, start time, end time, hours, date)
+- [x] **SCHED-05**: Row-click full-width detail showing employee historical schedule data (day, dept, stat, task, start time, end time, hours, date)
 - [x] **SCHED-06**: Create schedule entry form (side panel): employee dropdown (required), task dropdown (required), date (required), start time, end time, hours
 - [x] **SCHED-07**: Department filter for the schedule grid
-- [ ] **SCHED-08**: Historical data summary view (date, number of employees, number of hours)
+- [x] **SCHED-08**: Historical data summary view (date, number of employees, number of hours)
 
 ### Time Off
 
@@ -145,10 +145,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-02 | Phase 2 | Complete |
 | SCHED-03 | Phase 2 | Complete |
 | SCHED-04 | Phase 2 | Complete |
-| SCHED-05 | Phase 2 | Pending |
+| SCHED-05 | Phase 2 | Complete |
 | SCHED-06 | Phase 2 | Complete |
 | SCHED-07 | Phase 2 | Complete |
-| SCHED-08 | Phase 2 | Pending |
+| SCHED-08 | Phase 2 | Complete |
 | TOFF-01 | Phase 3 | Pending |
 | TOFF-02 | Phase 3 | Pending |
 | TOFF-03 | Phase 3 | Pending |
