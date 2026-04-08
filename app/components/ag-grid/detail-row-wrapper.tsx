@@ -114,7 +114,7 @@ export function useDetailRow({
         if (!parentData) return null;
 
         return (
-          <div className="border-border animate-in fade-in slide-in-from-top-2 border-b px-2 py-2 duration-300 ease-out">
+          <div className="border-border animate-in fade-in slide-in-from-top-3 border-b px-2 py-2 duration-500 ease-out">
             <DetailComponent data={parentData} />
           </div>
         );
