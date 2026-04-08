@@ -9,17 +9,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### AG Grid Foundation
 
-- [ ] **GRID-01**: AG Grid Community v35.x installed as project dependency (`ag-grid-react`)
+- [x] **GRID-01**: AG Grid Community v35.x installed as project dependency (`ag-grid-react`)
 - [ ] **GRID-02**: Shared `AgGridWrapper` component with ClientOnly SSR safety, stable props (useMemo/useCallback), and loading/empty state overlays
-- [ ] **GRID-03**: AG Grid themed to DESIGN.md (Supabase-inspired dark/light) using Theming API v35 (`themeQuartz.withParams()`) bridged to next-themes
+- [x] **GRID-03**: AG Grid themed to DESIGN.md (Supabase-inspired dark/light) using Theming API v35 (`themeQuartz.withParams()`) bridged to next-themes
 - [ ] **GRID-04**: Full-width detail row component for row-click-to-expand across all submodules
 - [ ] **GRID-05**: Column sorting (multi-column), filtering (text/number/date), and quick-filter search bar on all grids
 - [ ] **GRID-06**: Column resize, reorder, and responsive hiding on narrower screens
 - [ ] **GRID-07**: Pagination on all grids
 - [ ] **GRID-08**: Side-panel CRUD forms (right-side Shadcn Sheet) matching register pattern for all submodules
-- [ ] **GRID-09**: Status badge cell renderer for status columns (pending/approved/denied, etc.)
-- [ ] **GRID-10**: Date formatting (locale-aware) and currency formatting ($, 2 decimals) via AG Grid valueFormatters
-- [ ] **GRID-11**: Employee photo/avatar cell renderer using `hr_employee.profile_photo_url`
+- [x] **GRID-09**: Status badge cell renderer for status columns (pending/approved/denied, etc.)
+- [x] **GRID-10**: Date formatting (locale-aware) and currency formatting ($, 2 decimals) via AG Grid valueFormatters
+- [x] **GRID-11**: Employee photo/avatar cell renderer using `hr_employee.profile_photo_url`
 - [ ] **GRID-12**: Column state persistence to localStorage (widths, order, visibility) across sessions
 - [ ] **GRID-13**: CSV export for data grids (payroll and general)
 - [ ] **GRID-14**: Conditional row styling for OT warnings, variance highlighting, and status-based coloring via `rowClassRules`/`cellClassRules`
@@ -126,17 +126,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GRID-01 | Phase 1 | Pending |
+| GRID-01 | Phase 1 | Complete |
 | GRID-02 | Phase 1 | Pending |
-| GRID-03 | Phase 1 | Pending |
+| GRID-03 | Phase 1 | Complete |
 | GRID-04 | Phase 1 | Pending |
 | GRID-05 | Phase 1 | Pending |
 | GRID-06 | Phase 1 | Pending |
 | GRID-07 | Phase 1 | Pending |
 | GRID-08 | Phase 1 | Pending |
-| GRID-09 | Phase 1 | Pending |
-| GRID-10 | Phase 1 | Pending |
-| GRID-11 | Phase 1 | Pending |
+| GRID-09 | Phase 1 | Complete |
+| GRID-10 | Phase 1 | Complete |
+| GRID-11 | Phase 1 | Complete |
 | GRID-12 | Phase 1 | Pending |
 | GRID-13 | Phase 1 | Pending |
 | GRID-14 | Phase 1 | Pending |
