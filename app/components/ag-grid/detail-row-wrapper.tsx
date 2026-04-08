@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type {
   GetRowIdParams,
@@ -28,8 +28,10 @@ interface UseDetailRowReturn {
   handleRowClicked: (event: RowClickedEvent) => void;
   /** Pass to AgGridWrapper.getRowId */
   getRowId: (params: GetRowIdParams) => string;
-  /** Currently expanded row ID (null if none) */
-  expandedRowId: string | null;
+  /** Number of currently expanded rows */
+  expandedCount: number;
+  /** Collapse all expanded rows */
+  collapseAll: () => void;
 }
 
 export function useDetailRow({
@@ -37,14 +39,14 @@ export function useDetailRow({
   pkColumn = 'id',
   detailComponent: DetailComponent,
 }: UseDetailRowOptions): UseDetailRowReturn {
-  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const rowData = useMemo(() => {
     const result: Record<string, unknown>[] = [];
     for (const row of sourceData) {
       result.push(row);
       const pk = String(row[pkColumn] ?? '');
-      if (expandedRowId !== null && pk === expandedRowId) {
+      if (expandedIds.has(pk)) {
         result.push({
           _isDetailRow: true,
           _parentData: row,
@@ -53,25 +55,11 @@ export function useDetailRow({
       }
     }
     return result;
-  }, [sourceData, expandedRowId, pkColumn]);
+  }, [sourceData, expandedIds, pkColumn]);
 
   const isFullWidthRow = useCallback((params: IsFullWidthRowParams) => {
     return params.rowNode.data?._isDetailRow === true;
   }, []);
-
-  const [pendingOpen, setPendingOpen] = useState<string | null>(null);
-
-  // Two-phase open: after close commits to DOM, open the pending row
-  useEffect(() => {
-    if (pendingOpen && expandedRowId === null) {
-      const id = pendingOpen;
-      const t = setTimeout(() => {
-        setPendingOpen(null);
-        setExpandedRowId(id);
-      }, 250);
-      return () => clearTimeout(t);
-    }
-  }, [pendingOpen, expandedRowId]);
 
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
@@ -79,24 +67,22 @@ export function useDetailRow({
 
       const clickedPk = String(event.data?.[pkColumn] ?? '');
 
-      // Same row — toggle off
-      if (expandedRowId === clickedPk) {
-        setPendingOpen(null);
-        setExpandedRowId(null);
-        return;
-      }
-
-      // Different row open — close it, queue the new one
-      if (expandedRowId !== null) {
-        setPendingOpen(clickedPk);
-        setExpandedRowId(null);
-        return;
-      }
-
-      setExpandedRowId(clickedPk);
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(clickedPk)) {
+          next.delete(clickedPk);
+        } else {
+          next.add(clickedPk);
+        }
+        return next;
+      });
     },
-    [pkColumn, expandedRowId],
+    [pkColumn],
   );
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
 
   const getRowId = useCallback(
     (params: GetRowIdParams) => {
@@ -128,6 +114,7 @@ export function useDetailRow({
     fullWidthCellRenderer,
     handleRowClicked,
     getRowId,
-    expandedRowId,
+    expandedCount: expandedIds.size,
+    collapseAll,
   };
 }

@@ -14,7 +14,7 @@ import type {
   SortChangedEvent,
 } from 'ag-grid-community';
 import type { AgGridReact } from 'ag-grid-react';
-import { Columns3, Plus, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, Columns3, Plus, Trash2 } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -120,6 +120,8 @@ export default function AgGridListView({
     fullWidthCellRenderer,
     handleRowClicked: handleDetailRowClicked,
     getRowId,
+    expandedCount,
+    collapseAll,
   } = useDetailRow({
     sourceData: (tableData.data as Record<string, unknown>[]) ?? [],
     pkColumn,
@@ -271,6 +273,16 @@ export default function AgGridListView({
                     onComplete={clearSelection}
                   />
                 )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={expandedCount === 0}
+                  onClick={collapseAll}
+                  data-test="collapse-all-button"
+                >
+                  <ChevronsUpDown className="mr-2 h-4 w-4" />
+                  Collapse ({expandedCount})
+                </Button>
                 <ColumnVisibilityDropdown
                   gridApi={gridApi}
                   colDefs={dataColDefs}
