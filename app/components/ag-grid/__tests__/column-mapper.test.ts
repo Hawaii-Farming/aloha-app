@@ -50,14 +50,14 @@ describe('mapColumnsToColDefs', () => {
     expect(result[0]!.filter).toBe('agNumberColumnFilter');
   });
 
-  it('maps priority=low to hide=true', async () => {
+  it('maps priority=low to hide=false (all columns visible by default)', async () => {
     const { mapColumnsToColDefs } =
       await import('~/components/ag-grid/column-mapper');
     const columns: ColumnConfig[] = [
       { key: 'notes', label: 'Notes', priority: 'low' },
     ];
     const result = mapColumnsToColDefs(columns);
-    expect(result[0]!.hide).toBe(true);
+    expect(result[0]!.hide).toBe(false);
   });
 
   it('maps priority=high to hide=false', async () => {
