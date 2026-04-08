@@ -4,6 +4,7 @@ import type {
   ValueGetterParams,
 } from 'ag-grid-community';
 
+import { BadgeCellRenderer } from '~/components/ag-grid/cell-renderers/badge-cell-renderer';
 import { dateFormatter } from '~/components/ag-grid/cell-renderers/date-formatter';
 import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
@@ -47,6 +48,11 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
         if (!value) return '';
         return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
       };
+    }
+
+    // badge render: categorical values shown as colored badges
+    if (col.render === 'badge') {
+      colDef.cellRenderer = BadgeCellRenderer;
     }
 
     // Badge/workflow columns get StatusBadgeRenderer

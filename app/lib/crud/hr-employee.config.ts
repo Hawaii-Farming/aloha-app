@@ -76,14 +76,20 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     {
       key: 'pay_structure',
       label: 'Pay Structure',
-      render: 'proper_case',
+      render: 'badge',
       priority: 'low',
     },
     { key: 'payroll_id', label: 'Payroll ID', priority: 'low' },
-    { key: 'payroll_processor', label: 'Payroll Processor', priority: 'low' },
+    {
+      key: 'payroll_processor',
+      label: 'Payroll Processor',
+      render: 'badge',
+      priority: 'low',
+    },
     {
       key: 'pay_delivery_method',
       label: 'Pay Delivery Method',
+      render: 'badge',
       priority: 'low',
     },
     { key: 'housing_site_name', label: 'Housing', priority: 'low' },
