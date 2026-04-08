@@ -70,7 +70,6 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       sortable: true,
       render: 'full_name',
     },
-    { key: 'wc', label: 'WC Code' },
     { key: 'compensation_manager_id_preferred_name', label: 'Manager' },
     { key: 'team_lead_id_preferred_name', label: 'Team Lead' },
     { key: 'overtime_threshold', label: 'OT Threshold' },

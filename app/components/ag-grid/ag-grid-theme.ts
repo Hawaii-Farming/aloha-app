@@ -21,7 +21,7 @@ export function getAgGridTheme() {
         foregroundColor: '#171717',
         headerBackgroundColor: '#f0f0f0',
         headerTextColor: '#171717',
-        borderColor: '#9a9a9a',
+        borderColor: '#e5e5e5',
         accentColor: '#1d9e65',
         rowHoverColor: '#f0f0f0',
         selectedRowBackgroundColor: '#e8f5ee',

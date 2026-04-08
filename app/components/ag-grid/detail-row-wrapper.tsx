@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type {
   GetRowIdParams,
@@ -59,9 +59,15 @@ export function useDetailRow({
     return params.rowNode.data?._isDetailRow === true;
   }, []);
 
+  const pendingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
       if (event.data?._isDetailRow) return;
+      if (pendingRef.current) {
+        clearTimeout(pendingRef.current);
+        pendingRef.current = null;
+      }
 
       const clickedPk = String(event.data?.[pkColumn] ?? '');
 
@@ -71,8 +77,16 @@ export function useDetailRow({
         return;
       }
 
-      // Different row while one is open — just switch directly
-      // (no collapse-then-expand; single state change = single re-render)
+      // Different row open — close first, then open after animation
+      if (expandedRowId !== null) {
+        setExpandedRowId(null);
+        pendingRef.current = setTimeout(() => {
+          setExpandedRowId(clickedPk);
+          pendingRef.current = null;
+        }, 150);
+        return;
+      }
+
       setExpandedRowId(clickedPk);
     },
     [pkColumn, expandedRowId],

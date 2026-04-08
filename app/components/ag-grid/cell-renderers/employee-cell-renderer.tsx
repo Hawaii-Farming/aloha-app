@@ -7,6 +7,7 @@ interface EmployeeRow {
   last_name?: string;
   preferred_name?: string;
   gender?: string;
+  wc?: string;
   hr_department_name?: string;
   hr_work_authorization_name?: string;
 }
@@ -20,6 +21,7 @@ export function EmployeeCellRenderer(props: CustomCellRendererProps) {
     last_name,
     preferred_name,
     gender,
+    wc,
     hr_department_name,
     hr_work_authorization_name,
   } = data;
@@ -52,6 +54,11 @@ export function EmployeeCellRenderer(props: CustomCellRendererProps) {
           >
             {hr_work_authorization_name}
           </Badge>
+        )}
+        {wc && (
+          <span className="text-muted-foreground text-[10px] leading-none">
+            WC:{wc}
+          </span>
         )}
         {gender && (
           <span className="text-muted-foreground text-[10px] leading-none capitalize">
