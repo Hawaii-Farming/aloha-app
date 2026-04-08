@@ -22,7 +22,7 @@ export const loader = async ({ request }: { request: Request }) => {
     const { data, error } = await client
       .from('ops_task_schedule' as never)
       .select(
-        'id, start_time, stop_time, ops_task_id, hr_employee_id, org_id, is_deleted, created_at, hr_employee!inner(hr_department(name), hr_work_authorization(name)), ops_task!inner(name)',
+        'id, start_time, stop_time, ops_task_id, hr_employee_id, org_id, farm_id, is_deleted, created_at, hr_employee!inner(hr_department(name), hr_work_authorization(name)), ops_task!inner(name), org_farm(name)',
       )
       .eq('org_id', orgId)
       .eq('hr_employee_id', employeeId)
@@ -84,6 +84,7 @@ export const loader = async ({ request }: { request: Request }) => {
         | null
         | undefined;
       const task = row.ops_task as Record<string, unknown> | null | undefined;
+      const farm = row.org_farm as Record<string, unknown> | null | undefined;
 
       return {
         ...row,
@@ -95,6 +96,7 @@ export const loader = async ({ request }: { request: Request }) => {
         department_name: (dept?.name as string) ?? '',
         stat: (wa?.name as string) ?? '',
         task_name: (task?.name as string) ?? (row.ops_task_id as string),
+        farm_name: (farm?.name as string) ?? '',
       };
     });
 

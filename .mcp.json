@@ -3,6 +3,10 @@
     "aloha": {
       "command": "node",
       "args": ["packages/mcp-server/build/index.js"]
+    },
+    "ag-mcp": {
+      "command": "npx",
+      "args": ["ag-mcp"]
     }
   }
 }

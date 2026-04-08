@@ -20,28 +20,9 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Columns3,
-  History,
-  Plus,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, History, Plus } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@aloha/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@aloha/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
@@ -256,6 +237,11 @@ function ScheduleDetailRowInner({
                     )}
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1">
+                    {entry.farm_name ? (
+                      <span className="inline-flex items-center rounded border border-emerald-500/30 bg-emerald-500/10 px-1.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                        {String(entry.farm_name)}
+                      </span>
+                    ) : null}
                     {entry.task_name ? (
                       <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 text-[10px] font-medium text-emerald-500">
                         {String(entry.task_name)}
@@ -282,64 +268,6 @@ function ScheduleDetailRowInner({
   );
 }
 
-function ColumnVisibilityDropdown({
-  gridApi,
-  colDefs,
-}: {
-  gridApi: GridApi | null;
-  colDefs: ColDef[];
-}) {
-  const [, forceUpdate] = useState(0);
-
-  const handleToggle = useCallback(
-    (colId: string, visible: boolean) => {
-      if (!gridApi) return;
-      gridApi.setColumnsVisible([colId], visible);
-      forceUpdate((n) => n + 1);
-    },
-    [gridApi],
-  );
-
-  const columnStates = gridApi?.getColumnState();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          data-test="column-visibility-toggle"
-        >
-          <Columns3 className="mr-2 h-4 w-4" />
-          Columns
-        </Button>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end" className="w-48">
-        {colDefs.map((col) => {
-          const colId = col.field ?? col.colId ?? '';
-          if (!colId) return null;
-
-          const state = columnStates?.find((s) => s.colId === colId);
-          const isVisible = state ? !state.hide : !col.hide;
-
-          return (
-            <DropdownMenuCheckboxItem
-              key={colId}
-              checked={isVisible}
-              onCheckedChange={(checked) =>
-                handleToggle(colId, checked as boolean)
-              }
-            >
-              {col.headerName ?? colId}
-            </DropdownMenuCheckboxItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 export default function SchedulerListView(props: ListViewProps) {
   const {
     tableData,
@@ -362,7 +290,6 @@ export default function SchedulerListView(props: ListViewProps) {
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentWeek = searchParams.get('week') ?? getCurrentWeekStart();
-  const currentDept = searchParams.get('dept') ?? '';
 
   const navigateWeek = useCallback(
     (direction: 'prev' | 'next' | 'today') => {
@@ -384,20 +311,6 @@ export default function SchedulerListView(props: ListViewProps) {
     [searchParams, setSearchParams, currentWeek],
   );
 
-  const handleDeptChange = useCallback(
-    (value: string) => {
-      const next = new URLSearchParams(searchParams);
-
-      if (value === 'all') {
-        next.delete('dept');
-      } else {
-        next.set('dept', value);
-      }
-
-      setSearchParams(next, { preventScrollReset: true });
-    },
-    [searchParams, setSearchParams],
-  );
 
   const handlePrev = useCallback(() => navigateWeek('prev'), [navigateWeek]);
   const handleNext = useCallback(() => navigateWeek('next'), [navigateWeek]);
@@ -605,7 +518,6 @@ export default function SchedulerListView(props: ListViewProps) {
 
   const getHistoryRowHeight = useCallback(() => 46, []);
 
-  const departmentOptions = fkOptions.hr_department_id ?? [];
 
   return (
     <>
@@ -669,24 +581,6 @@ export default function SchedulerListView(props: ListViewProps) {
               data-test="scheduler-search"
             />
 
-            <Select
-              value={currentDept || 'all'}
-              onValueChange={handleDeptChange}
-            >
-              <SelectTrigger className="h-8 w-[180px]" data-test="dept-filter">
-                <SelectValue placeholder="All Departments" />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                {departmentOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             <Button
               size="sm"
               variant="outline"
@@ -697,7 +591,6 @@ export default function SchedulerListView(props: ListViewProps) {
               History
             </Button>
 
-            <ColumnVisibilityDropdown gridApi={gridApi} colDefs={dataColDefs} />
             <CsvExportButton gridApi={gridApi} fileName="scheduler" />
 
             <Button

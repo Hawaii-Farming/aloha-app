@@ -10,6 +10,17 @@ function formatDate(value: string): string {
   return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
+function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 11 && digits[0] === '1') {
+    return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+  }
+  return value;
+}
+
 function buildFkKeyMap(
   config: CrudModuleConfig,
   record: Record<string, unknown>,
@@ -196,10 +207,15 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
 
         {/* Row 3: Contact + dates */}
         <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-          {(companyEmail || email) && (
-            <InfoChip icon={Mail} value={companyEmail || email} />
+          {companyEmail && (
+            <InfoChip icon={Mail} label="Work" value={companyEmail} />
           )}
-          {phone && <InfoChip icon={Phone} value={phone} />}
+          {email && (
+            <InfoChip icon={Mail} label="Personal" value={email} />
+          )}
+          {phone && (
+            <InfoChip icon={Phone} value={formatPhone(phone)} />
+          )}
 
           {startDate && (
             <InfoChip icon={Calendar} label="Start" value={startDate} />

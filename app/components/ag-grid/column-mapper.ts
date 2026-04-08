@@ -6,7 +6,8 @@ import type {
 
 import { BadgeCellRenderer } from '~/components/ag-grid/cell-renderers/badge-cell-renderer';
 import { CodeCellRenderer } from '~/components/ag-grid/cell-renderers/code-cell-renderer';
-import { dateFormatter } from '~/components/ag-grid/cell-renderers/date-formatter';
+import { DatePillRenderer } from '~/components/ag-grid/cell-renderers/date-pill-renderer';
+import { EmailPillRenderer } from '~/components/ag-grid/cell-renderers/email-pill-renderer';
 import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
 import type { ColumnConfig } from '~/lib/crud/types';
@@ -25,9 +26,9 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       hide: false,
     };
 
-    // Date columns get dateFormatter
+    // Date columns get pill renderer
     if (col.type === 'date' || col.type === 'datetime') {
-      colDef.valueFormatter = dateFormatter;
+      colDef.cellRenderer = DatePillRenderer;
     }
 
     // full_name render: rich employee cell with name, alias, badges
@@ -74,13 +75,10 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       };
     }
 
-    // email render: lowercase
+    // email render: pill
     if (col.render === 'email') {
-      colDef.valueFormatter = (params: ValueFormatterParams) => {
-        const raw = params.value as string | null;
-        if (!raw) return '';
-        return raw.toLowerCase();
-      };
+      colDef.cellRenderer = EmailPillRenderer;
+      colDef.minWidth = 200;
     }
 
     // code render: monospace text in a dark badge (IDs, codes)

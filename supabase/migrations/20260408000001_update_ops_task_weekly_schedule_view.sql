@@ -29,6 +29,8 @@ SELECT
     e.hr_work_authorization_id,
     wa.name                                                                 AS work_authorization_name,
     t.name                                                                  AS task,
+    sb.farm_id,
+    f.name                                                                  AS farm_name,
 
     -- Day columns — formatted as "HH:MM - HH:MM"; null when employee is not scheduled that day
     MAX(CASE WHEN sb.day_of_week = 0
@@ -96,6 +98,7 @@ JOIN hr_employee e  ON e.id = sb.hr_employee_id
 JOIN ops_task    t  ON t.id = sb.ops_task_id
 LEFT JOIN hr_department d ON d.id = e.hr_department_id
 LEFT JOIN hr_work_authorization wa ON wa.id = e.hr_work_authorization_id
+LEFT JOIN org_farm f ON f.id = sb.farm_id
 WHERE e.is_deleted = false
 GROUP BY
     sb.week_start_date,
@@ -110,7 +113,8 @@ GROUP BY
     e.hr_work_authorization_id,
     wa.name,
     e.overtime_threshold,
-    t.name
+    t.name,
+    f.name
 ORDER BY
     sb.week_start_date,
     e.last_name,
