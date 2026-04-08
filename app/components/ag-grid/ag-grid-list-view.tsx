@@ -9,7 +9,6 @@ import type {
   ColumnVisibleEvent,
   GridApi,
   GridReadyEvent,
-  RowHeightParams,
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
@@ -128,13 +127,13 @@ export default function AgGridListView({
     detailComponent,
   });
 
-  // Detail rows: compact card layout with avatar + info strips
-  const getRowHeight = useCallback((params: RowHeightParams) => {
-    if (params.data?._isDetailRow) {
-      return 140;
-    }
-    return undefined;
-  }, []);
+  const getRowHeight = useCallback(
+    (params: { data?: Record<string, unknown> }) => {
+      if (params.data?._isDetailRow) return 160;
+      return undefined;
+    },
+    [],
+  );
 
   const dataColDefs = useMemo(() => {
     if (config?.agGridColDefs) return config.agGridColDefs;
@@ -321,7 +320,7 @@ export default function AgGridListView({
             getRowHeight={getRowHeight}
             rowSelection="multiple"
             suppressRowClickSelection={true}
-            pagination={true}
+            pagination={expandedCount === 0}
             paginationPageSize={tableData.pageSize}
             onGridReady={handleGridReady}
             onSelectionChanged={handleSelectionChanged}

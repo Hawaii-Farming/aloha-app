@@ -9,28 +9,18 @@ import type {
 } from 'ag-grid-community';
 
 interface UseDetailRowOptions {
-  /** The data array from the server loader */
   sourceData: Record<string, unknown>[];
-  /** Primary key column name (default: 'id') */
   pkColumn?: string;
-  /** React component to render inside the detail row */
   detailComponent: ComponentType<{ data: Record<string, unknown> }>;
 }
 
 interface UseDetailRowReturn {
-  /** Modified rowData with detail rows injected */
   rowData: Record<string, unknown>[];
-  /** Pass to AgGridWrapper.isFullWidthRow */
   isFullWidthRow: (params: IsFullWidthRowParams) => boolean;
-  /** Pass to AgGridWrapper.fullWidthCellRenderer */
   fullWidthCellRenderer: ComponentType<ICellRendererParams>;
-  /** Pass to AgGridWrapper.onRowClicked */
   handleRowClicked: (event: RowClickedEvent) => void;
-  /** Pass to AgGridWrapper.getRowId */
   getRowId: (params: GetRowIdParams) => string;
-  /** Number of currently expanded rows */
   expandedCount: number;
-  /** Collapse all expanded rows */
   collapseAll: () => void;
 }
 
@@ -39,15 +29,15 @@ export function useDetailRow({
   pkColumn = 'id',
   detailComponent: DetailComponent,
 }: UseDetailRowOptions): UseDetailRowReturn {
-  // Use a plain array — React handles array state changes reliably
-  const [expandedIds, setExpandedIds] = useState<string[]>([]);
+  // Single expanded row — proven working pattern
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
   const rowData = useMemo(() => {
     const result: Record<string, unknown>[] = [];
     for (const row of sourceData) {
       result.push(row);
       const pk = String(row[pkColumn] ?? '');
-      if (expandedIds.includes(pk)) {
+      if (expandedRowId !== null && pk === expandedRowId) {
         result.push({
           _isDetailRow: true,
           _parentData: row,
@@ -56,7 +46,7 @@ export function useDetailRow({
       }
     }
     return result;
-  }, [sourceData, expandedIds, pkColumn]);
+  }, [sourceData, expandedRowId, pkColumn]);
 
   const isFullWidthRow = useCallback((params: IsFullWidthRowParams) => {
     return params.rowNode.data?._isDetailRow === true;
@@ -65,21 +55,15 @@ export function useDetailRow({
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
       if (event.data?._isDetailRow) return;
-
       const clickedPk = String(event.data?.[pkColumn] ?? '');
       if (!clickedPk) return;
-
-      setExpandedIds((prev) =>
-        prev.includes(clickedPk)
-          ? prev.filter((id) => id !== clickedPk)
-          : [...prev, clickedPk],
-      );
+      setExpandedRowId((prev) => (prev === clickedPk ? null : clickedPk));
     },
     [pkColumn],
   );
 
   const collapseAll = useCallback(() => {
-    setExpandedIds([]);
+    setExpandedRowId(null);
   }, []);
 
   const getRowId = useCallback(
@@ -112,7 +96,7 @@ export function useDetailRow({
     fullWidthCellRenderer,
     handleRowClicked,
     getRowId,
-    expandedCount: expandedIds.length,
+    expandedCount: expandedRowId !== null ? 1 : 0,
     collapseAll,
   };
 }
