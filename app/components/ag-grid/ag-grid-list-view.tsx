@@ -13,7 +13,7 @@ import type {
   SortChangedEvent,
 } from 'ag-grid-community';
 import type { AgGridReact } from 'ag-grid-react';
-import { ChevronsUpDown, Columns3, Plus, Trash2 } from 'lucide-react';
+import { Columns3, Plus, Trash2 } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -118,12 +118,13 @@ export default function AgGridListView({
     isFullWidthRow,
     fullWidthCellRenderer,
     handleRowClicked: handleDetailRowClicked,
-    expandedCount,
-    collapseAll,
+    getRowId,
+    hasExpandedRow,
   } = useDetailRow({
     sourceData: (tableData.data as Record<string, unknown>[]) ?? [],
     pkColumn,
     detailComponent,
+    gridRef,
   });
 
   const getRowHeight = useCallback(
@@ -271,16 +272,6 @@ export default function AgGridListView({
                     onComplete={clearSelection}
                   />
                 )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={expandedCount === 0}
-                  onClick={collapseAll}
-                  data-test="collapse-all-button"
-                >
-                  <ChevronsUpDown className="mr-2 h-4 w-4" />
-                  Collapse ({expandedCount})
-                </Button>
                 <ColumnVisibilityDropdown
                   gridApi={gridApi}
                   colDefs={dataColDefs}
@@ -315,11 +306,12 @@ export default function AgGridListView({
             onRowClicked={handleDetailRowClicked}
             isFullWidthRow={isFullWidthRow}
             fullWidthCellRenderer={fullWidthCellRenderer}
+            getRowId={getRowId}
             getRowHeight={getRowHeight}
             rowSelection="multiple"
             suppressRowClickSelection={true}
             pagination={true}
-            paginationPageSize={tableData.pageSize}
+            paginationPageSize={tableData.pageSize + (hasExpandedRow ? 1 : 0)}
             onGridReady={handleGridReady}
             onSelectionChanged={handleSelectionChanged}
             onColumnMoved={handleColumnMoved}

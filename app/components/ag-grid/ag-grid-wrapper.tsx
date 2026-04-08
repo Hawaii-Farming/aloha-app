@@ -1,5 +1,5 @@
 import type { ComponentType, RefObject } from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import type {
   ColDef,
@@ -10,6 +10,7 @@ import type {
   GridReadyEvent,
   ICellRendererParams,
   IsFullWidthRowParams,
+  PostSortRowsParams,
   RowClassParams,
   RowClickedEvent,
   RowHeightParams,
@@ -17,13 +18,17 @@ import type {
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
-import { AllCommunityModule } from 'ag-grid-community';
+import { AllCommunityModule, type Module } from 'ag-grid-community';
 import { AgGridProvider, AgGridReact } from 'ag-grid-react';
 import { useTheme } from 'next-themes';
 
 import { ClientOnly } from '@aloha/ui/client-only';
 
 import { getAgGridTheme } from '~/components/ag-grid/ag-grid-theme';
+
+// Module-level constants so references are stable across renders
+const AG_GRID_MODULES: Module[] = [AllCommunityModule];
+const PAGE_SIZE_SELECTOR = [10, 25, 50, 100];
 
 interface AgGridWrapperProps {
   colDefs: ColDef[];
@@ -103,6 +108,32 @@ function AgGridInner({
 
   const effectiveDomLayout = domLayout ?? 'normal';
 
+  // Keep detail rows pinned right after their parent row after sorting
+  const postSortRows = useCallback((params: PostSortRowsParams) => {
+    const nodes = params.nodes;
+    const detailNodes: typeof nodes = [];
+    const parentNodes: typeof nodes = [];
+
+    for (const node of nodes) {
+      if (node.data?._isDetailRow) {
+        detailNodes.push(node);
+      } else {
+        parentNodes.push(node);
+      }
+    }
+
+    if (detailNodes.length === 0) return;
+
+    nodes.length = 0;
+    for (const parent of parentNodes) {
+      nodes.push(parent);
+      const detail = detailNodes.find(
+        (d) => d.data?._parentData === parent.data,
+      );
+      if (detail) nodes.push(detail);
+    }
+  }, []);
+
   // Horizontal scroll indicator — add a visible scrollbar track
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -128,7 +159,7 @@ function AgGridInner({
           : undefined
       }
     >
-      <AgGridProvider modules={[AllCommunityModule]}>
+      <AgGridProvider modules={AG_GRID_MODULES}>
         <AgGridReact
           ref={gridRef}
           theme={theme}
@@ -137,41 +168,16 @@ function AgGridInner({
           defaultColDef={defaultColDef}
           pagination={pagination ?? true}
           paginationPageSize={paginationPageSize ?? 25}
-          paginationPageSizeSelector={[10, 25, 50, 100]}
+          paginationPageSizeSelector={PAGE_SIZE_SELECTOR}
           quickFilterText={quickFilterText}
           cacheQuickFilter={true}
-          animateRows={true}
+          animateRows={false}
           suppressRowClickSelection={suppressRowClickSelection ?? true}
           onRowClicked={onRowClicked}
           isFullWidthRow={isFullWidthRow}
           fullWidthCellRenderer={fullWidthCellRenderer}
           getRowId={getRowId}
-          postSortRows={(params) => {
-            // Keep detail rows pinned right after their parent row
-            const nodes = params.nodes;
-            const detailNodes: typeof nodes = [];
-            const parentNodes: typeof nodes = [];
-
-            for (const node of nodes) {
-              if (node.data?._isDetailRow) {
-                detailNodes.push(node);
-              } else {
-                parentNodes.push(node);
-              }
-            }
-
-            if (detailNodes.length === 0) return;
-
-            nodes.length = 0;
-            for (const parent of parentNodes) {
-              nodes.push(parent);
-              // Match detail row whose _parentData is the same object ref
-              const detail = detailNodes.find(
-                (d) => d.data?._parentData === parent.data,
-              );
-              if (detail) nodes.push(detail);
-            }
-          }}
+          postSortRows={postSortRows}
           rowClassRules={rowClassRules}
           domLayout={effectiveDomLayout}
           getRowHeight={getRowHeight}

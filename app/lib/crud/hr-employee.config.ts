@@ -79,7 +79,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       render: 'badge',
       priority: 'low',
     },
-    { key: 'payroll_id', label: 'Payroll ID', priority: 'low' },
+    { key: 'payroll_id', label: 'Payroll ID', render: 'code', priority: 'low' },
     {
       key: 'payroll_processor',
       label: 'Payroll Processor',

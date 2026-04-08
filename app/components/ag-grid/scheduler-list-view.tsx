@@ -9,7 +9,6 @@ import type {
   ColumnVisibleEvent,
   GridApi,
   GridReadyEvent,
-  SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
 import type { AgGridReact } from 'ag-grid-react';
@@ -21,7 +20,13 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Columns3, Plus } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Columns3,
+  History,
+  Plus,
+} from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import {
@@ -37,12 +42,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@aloha/ui/select';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
-import { BadgeCellRenderer } from '~/components/ag-grid/cell-renderers/badge-cell-renderer';
 import { HoursHeatmapRenderer } from '~/components/ag-grid/cell-renderers/hours-heatmap-renderer';
 import { ScheduleDayRenderer } from '~/components/ag-grid/cell-renderers/schedule-day-renderer';
+import { SchedulerEmployeeRenderer } from '~/components/ag-grid/cell-renderers/scheduler-employee-renderer';
 import {
   restoreColumnState,
   saveColumnState,
@@ -54,18 +60,6 @@ import { CreatePanel } from '~/components/crud/create-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
-
-const CHECKBOX_COL: ColDef = {
-  headerCheckboxSelection: true,
-  checkboxSelection: true,
-  maxWidth: 50,
-  sortable: false,
-  filter: false,
-  resizable: false,
-  suppressMovable: true,
-  pinned: 'left',
-  lockPosition: true,
-};
 
 const AVATAR_COL: ColDef = {
   headerName: '',
@@ -138,29 +132,6 @@ function ScheduleDetailRowInner({
     };
   }, [employeeId, accountSlug]);
 
-  const detailColDefs: ColDef[] = useMemo(
-    () => [
-      { headerName: 'Day', field: 'day_of_week', maxWidth: 70 },
-      { headerName: 'Date', field: 'date', minWidth: 100 },
-      { headerName: 'Dept', field: 'department_name', minWidth: 100 },
-      { headerName: 'Stat', field: 'stat', minWidth: 80 },
-      { headerName: 'Task', field: 'task_name', minWidth: 120 },
-      {
-        headerName: 'Start',
-        field: 'start_time_formatted',
-        maxWidth: 80,
-      },
-      { headerName: 'End', field: 'end_time_formatted', maxWidth: 80 },
-      {
-        headerName: 'Hours',
-        field: 'hours',
-        maxWidth: 70,
-        type: 'numericColumn',
-      },
-    ],
-    [],
-  );
-
   if (loading) {
     return (
       <div className="text-muted-foreground flex items-center justify-center py-4 text-sm">
@@ -169,22 +140,144 @@ function ScheduleDetailRowInner({
     );
   }
 
+  // Group entries by week (Sunday-anchored), fill missing days
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // Build a map of date → entry
+  const byDate = new Map<string, RowData>();
+  for (const row of detailData) {
+    const date = (row.date as string) ?? '';
+    if (date) byDate.set(date, row);
+  }
+
+  // Helper to generate a week of day slots from a Sunday start date
+  function buildWeek(weekStart: Date) {
+    const week: { date: string; dayName: string; entry: RowData | null }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const dayDate = new Date(weekStart);
+      dayDate.setDate(weekStart.getDate() + i);
+      const dayStr = dayDate.toISOString().split('T')[0] ?? '';
+      week.push({
+        date: dayStr,
+        dayName: dayNames[i] ?? '',
+        entry: byDate.get(dayStr) ?? null,
+      });
+    }
+    return week;
+  }
+
+  let recentWeeks: { date: string; dayName: string; entry: RowData | null }[][];
+
   if (detailData.length === 0) {
-    return (
-      <div className="text-muted-foreground flex items-center justify-center py-4 text-sm">
-        No historical schedule entries found
-      </div>
-    );
+    // No data — show current week as all "Off"
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    recentWeeks = [buildWeek(weekStart)];
+  } else {
+    // Find all unique week start dates, then fill 7 days per week
+    const allDates = [...byDate.keys()].sort();
+    const weeks: typeof recentWeeks = [];
+
+    const seen = new Set<string>();
+    for (const date of allDates) {
+      const d = new Date(date + 'T00:00:00');
+      const dow = d.getDay(); // 0=Sun
+      const weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - dow);
+      const weekKey = weekStart.toISOString().split('T')[0] ?? '';
+
+      if (seen.has(weekKey)) continue;
+      seen.add(weekKey);
+
+      weeks.push(buildWeek(weekStart));
+    }
+
+    // Show only the 3 most recent weeks
+    recentWeeks = weeks.slice(-3);
   }
 
   return (
-    <div className="px-2 py-1">
-      <AgGridWrapper
-        colDefs={detailColDefs}
-        rowData={detailData}
-        domLayout="autoHeight"
-        pagination={false}
-      />
+    <div className="overflow-hidden px-4 py-2">
+      {recentWeeks.map((week, wi) => (
+        <div key={wi} className={`${wi > 0 ? 'mt-2' : ''}`}>
+          <div className="grid grid-cols-7 gap-2">
+            {week.map(({ date, dayName, entry }) => {
+              const isWeekend = dayName === 'Sun' || dayName === 'Sat';
+              const isOff = !entry;
+
+              if (isOff) {
+                return (
+                  <div
+                    key={date}
+                    className={`overflow-hidden rounded-lg border border-dashed px-2 py-1.5 opacity-40 ${
+                      isWeekend ? 'border-amber-500/30' : 'border-border'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold">{dayName}</span>
+                      <span className="text-muted-foreground text-[10px]">
+                        {date}
+                      </span>
+                    </div>
+                    <div className="text-muted-foreground mt-1 text-[10px]">
+                      Off
+                    </div>
+                  </div>
+                );
+              }
+
+              const hours = entry.hours as number | null;
+
+              return (
+                <div
+                  key={date}
+                  className={`overflow-hidden rounded-lg border px-2 py-1.5 ${
+                    isWeekend
+                      ? 'border-amber-500/30 bg-amber-500/5'
+                      : 'border-border bg-muted/30'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold">{dayName}</span>
+                    <span className="text-muted-foreground text-[10px]">
+                      {date}
+                    </span>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-muted-foreground text-[10px]">
+                      {(entry.start_time_formatted as string) ?? ''} -{' '}
+                      {(entry.end_time_formatted as string) ?? ''}
+                    </span>
+                    {hours !== null && (
+                      <span className="text-primary ml-1 text-[10px] font-semibold">
+                        {hours}h
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {entry.task_name ? (
+                      <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 text-[10px] font-medium text-emerald-500">
+                        {String(entry.task_name)}
+                      </span>
+                    ) : null}
+                    {entry.department_name ? (
+                      <span className="text-muted-foreground text-[10px]">
+                        {String(entry.department_name)}
+                      </span>
+                    ) : null}
+                    {entry.stat ? (
+                      <span className="text-muted-foreground text-[10px]">
+                        · {String(entry.stat)}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -261,6 +354,7 @@ export default function SchedulerListView(props: ListViewProps) {
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [searchValue, setSearchValue] = useState('');
@@ -345,91 +439,35 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Employee',
         field: 'full_name',
-        minWidth: 160,
+        cellRenderer: SchedulerEmployeeRenderer,
+        minWidth: 220,
         sortable: true,
         filter: true,
         pinned: 'left' as const,
       },
-      {
-        headerName: 'Dept',
-        field: 'department_name',
-        cellRenderer: BadgeCellRenderer,
-        minWidth: 110,
-        sortable: true,
-        filter: true,
-      },
-      {
-        headerName: 'Stat',
-        field: 'work_authorization_name',
-        cellRenderer: BadgeCellRenderer,
-        minWidth: 90,
-        sortable: true,
-        filter: true,
-      },
-      {
-        headerName: 'Task',
-        field: 'task',
-        cellRenderer: BadgeCellRenderer,
-        minWidth: 120,
-        sortable: true,
-        filter: true,
-      },
-      {
-        headerName: 'Sun',
-        field: 'sunday',
+      ...['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({
+        headerName: day,
+        field: [
+          'sunday',
+          'monday',
+          'tuesday',
+          'wednesday',
+          'thursday',
+          'friday',
+          'saturday',
+        ][i],
         cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
-      },
-      {
-        headerName: 'Mon',
-        field: 'monday',
-        cellRenderer: ScheduleDayRenderer,
-        sortable: false,
-        filter: false,
-        minWidth: 100,
-      },
-      {
-        headerName: 'Tue',
-        field: 'tuesday',
-        cellRenderer: ScheduleDayRenderer,
-        sortable: false,
-        filter: false,
-        minWidth: 100,
-      },
-      {
-        headerName: 'Wed',
-        field: 'wednesday',
-        cellRenderer: ScheduleDayRenderer,
-        sortable: false,
-        filter: false,
-        minWidth: 100,
-      },
-      {
-        headerName: 'Thu',
-        field: 'thursday',
-        cellRenderer: ScheduleDayRenderer,
-        sortable: false,
-        filter: false,
-        minWidth: 100,
-      },
-      {
-        headerName: 'Fri',
-        field: 'friday',
-        cellRenderer: ScheduleDayRenderer,
-        sortable: false,
-        filter: false,
-        minWidth: 100,
-      },
-      {
-        headerName: 'Sat',
-        field: 'saturday',
-        cellRenderer: ScheduleDayRenderer,
-        sortable: false,
-        filter: false,
-        minWidth: 100,
-      },
+        cellStyle:
+          i % 2 === 0
+            ? {
+                background:
+                  'repeating-linear-gradient(135deg, rgba(128,128,128,0.06), rgba(128,128,128,0.06) 4px, transparent 4px, transparent 8px)',
+              }
+            : undefined,
+      })),
       {
         headerName: 'Total Hrs',
         field: 'total_hours',
@@ -444,7 +482,7 @@ export default function SchedulerListView(props: ListViewProps) {
 
   // Full column defs including checkbox and avatar
   const colDefs: ColDef[] = useMemo(
-    () => [CHECKBOX_COL, AVATAR_COL, ...dataColDefs],
+    () => [AVATAR_COL, ...dataColDefs],
     [dataColDefs],
   );
 
@@ -524,19 +562,12 @@ export default function SchedulerListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
-  const handleSelectionChanged = useCallback(
-    (_event: SelectionChangedEvent) => {
-      // Capture selected IDs for future bulk actions
-    },
-    [],
-  );
-
   // Create synthetic _rowId for detail row tracking
   const dataWithIds = useMemo(
     () =>
-      (tableData.data as RowData[]).map((row) => ({
+      (tableData.data as RowData[]).map((row, idx) => ({
         ...row,
-        _rowId: `${row.hr_employee_id}_${row.task}_${row.week_start_date}`,
+        _rowId: `${row.hr_employee_id}_${row.task}_${row.week_start_date}_${idx}`,
       })),
     [tableData.data],
   );
@@ -566,7 +597,7 @@ export default function SchedulerListView(props: ListViewProps) {
 
   const getRowHeight = useCallback(
     (params: { data?: Record<string, unknown> }) => {
-      if (params.data?._isDetailRow) return 200;
+      if (params.data?._isDetailRow) return 330;
       return 52;
     },
     [],
@@ -656,6 +687,16 @@ export default function SchedulerListView(props: ListViewProps) {
               </SelectContent>
             </Select>
 
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setHistoryOpen(true)}
+              data-test="history-toggle"
+            >
+              <History className="mr-2 h-4 w-4" />
+              History
+            </Button>
+
             <ColumnVisibilityDropdown gridApi={gridApi} colDefs={dataColDefs} />
             <CsvExportButton gridApi={gridApi} fileName="scheduler" />
 
@@ -671,53 +712,47 @@ export default function SchedulerListView(props: ListViewProps) {
           </div>
         </div>
 
-        {/* Two tables side by side, grids aligned */}
-        <div className="flex min-h-0 flex-1 gap-4">
-          {/* Historical Data — left */}
-          <div className="flex w-[370px] shrink-0 flex-col">
-            <h3 className="pb-2 text-sm font-semibold">Historical Data</h3>
-            <div className="flex min-h-0 flex-1 flex-col">
-              <AgGridWrapper
-                colDefs={historyColDefs}
-                rowData={historyData as unknown as RowData[]}
-                loading={historyLoading}
-                pagination={false}
-                getRowHeight={getHistoryRowHeight}
-                emptyMessage="No schedule history found"
-              />
-            </div>
-          </div>
-
-          {/* Weekly Schedule — right */}
-          <div className="flex min-h-0 flex-1 flex-col">
-            <h3 className="pb-2 text-sm font-semibold">Weekly Schedule</h3>
-            <div className="flex min-h-0 flex-1 flex-col">
-              <AgGridWrapper
-                gridRef={gridRef}
-                colDefs={colDefs}
-                rowData={detailRowData as RowData[]}
-                rowClassRules={otWarningRowClassRules}
-                quickFilterText={searchValue}
-                onRowClicked={handleDetailRowClicked}
-                isFullWidthRow={isFullWidthRow}
-                fullWidthCellRenderer={fullWidthCellRenderer}
-                getRowId={getRowId}
-                getRowHeight={getRowHeight}
-                rowSelection="multiple"
-                suppressRowClickSelection={true}
-                pagination={true}
-                paginationPageSize={25}
-                onGridReady={handleGridReady}
-                onSelectionChanged={handleSelectionChanged}
-                onColumnMoved={handleColumnMoved}
-                onColumnResized={handleColumnResized}
-                onSortChanged={handleSortChanged}
-                onColumnVisible={handleColumnVisible}
-              />
-            </div>
-          </div>
+        {/* Weekly Schedule — full width */}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <AgGridWrapper
+            gridRef={gridRef}
+            colDefs={colDefs}
+            rowData={detailRowData as RowData[]}
+            rowClassRules={otWarningRowClassRules}
+            quickFilterText={searchValue}
+            onRowClicked={handleDetailRowClicked}
+            isFullWidthRow={isFullWidthRow}
+            fullWidthCellRenderer={fullWidthCellRenderer}
+            getRowId={getRowId}
+            getRowHeight={getRowHeight}
+            pagination={false}
+            onGridReady={handleGridReady}
+            onColumnMoved={handleColumnMoved}
+            onColumnResized={handleColumnResized}
+            onSortChanged={handleSortChanged}
+            onColumnVisible={handleColumnVisible}
+          />
         </div>
       </div>
+
+      {/* Historical Data drawer */}
+      <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
+        <SheetContent side="right" className="w-[440px] sm:w-[480px]">
+          <SheetHeader>
+            <SheetTitle>Historical Data</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 h-[calc(100vh-120px)]">
+            <AgGridWrapper
+              colDefs={historyColDefs}
+              rowData={historyData as unknown as RowData[]}
+              loading={historyLoading}
+              pagination={false}
+              getRowHeight={getHistoryRowHeight}
+              emptyMessage="No schedule history found"
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <CreatePanel
         open={createOpen}

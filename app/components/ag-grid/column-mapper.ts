@@ -5,6 +5,7 @@ import type {
 } from 'ag-grid-community';
 
 import { BadgeCellRenderer } from '~/components/ag-grid/cell-renderers/badge-cell-renderer';
+import { CodeCellRenderer } from '~/components/ag-grid/cell-renderers/code-cell-renderer';
 import { dateFormatter } from '~/components/ag-grid/cell-renderers/date-formatter';
 import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
@@ -80,6 +81,11 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
         if (!raw) return '';
         return raw.toLowerCase();
       };
+    }
+
+    // code render: monospace text in a dark badge (IDs, codes)
+    if (col.render === 'code') {
+      colDef.cellRenderer = CodeCellRenderer;
     }
 
     // Badge/workflow columns get StatusBadgeRenderer

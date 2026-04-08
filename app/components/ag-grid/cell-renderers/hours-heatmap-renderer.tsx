@@ -62,7 +62,7 @@ export function HoursHeatmapRenderer(props: CustomCellRendererProps) {
 
   return (
     <div
-      className="-mx-[var(--ag-cell-horizontal-padding)] flex h-full items-center justify-end px-3"
+      className="-mx-[var(--ag-cell-horizontal-padding)] flex h-full items-center justify-center"
       style={{
         backgroundColor: bgColor,
         marginTop: -1,
@@ -71,7 +71,10 @@ export function HoursHeatmapRenderer(props: CustomCellRendererProps) {
         paddingBottom: 1,
       }}
     >
-      <span className="text-sm font-semibold" style={{ color: textColor }}>
+      <span
+        className="font-mono text-sm font-semibold"
+        style={{ color: textColor }}
+      >
         {value}
       </span>
     </div>
