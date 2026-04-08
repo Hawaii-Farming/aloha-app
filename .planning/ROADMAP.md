@@ -31,7 +31,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Clicking a row expands a full-width detail row below it with custom content
   4. A side-panel (Shadcn Sheet) opens for create/edit with form fields, save, and cancel
   5. Status badges, formatted dates/currency, and employee avatars render correctly in grid cells
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Install AG Grid, create theme config and cell renderers/formatters
+- [ ] 01-02-PLAN.md — Create AgGridWrapper component and column mapper utility
+- [ ] 01-03-PLAN.md — Detail row expansion, column state persistence, CSV export, conditional styling
+- [ ] 01-04-PLAN.md — Convert register submodule to AG Grid with visual verification
 **UI hint**: yes
 
 ### Phase 2: Scheduler
@@ -106,7 +112,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. AG Grid Foundation | 0/TBD | Not started | - |
+| 1. AG Grid Foundation | 0/4 | Planning complete | - |
 | 2. Scheduler | 0/TBD | Not started | - |
 | 3. Time Off | 0/TBD | Not started | - |
 | 4. Payroll Views | 0/TBD | Not started | - |
