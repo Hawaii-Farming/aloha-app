@@ -120,7 +120,7 @@ function AgGridInner({
       ref={containerRef}
       data-ag-theme-mode={resolvedTheme === 'dark' ? 'dark' : 'light'}
       data-test="ag-grid-wrapper"
-      className="h-full"
+      className="h-full w-full"
       style={
         effectiveDomLayout === 'normal'
           ? { height: height ?? '100%' }
@@ -134,6 +134,7 @@ function AgGridInner({
           columnDefs={colDefs}
           rowData={rowData}
           defaultColDef={defaultColDef}
+          autoSizeStrategy={{ type: 'fitCellContents' }}
           pagination={pagination ?? true}
           paginationPageSize={paginationPageSize ?? 25}
           paginationPageSizeSelector={[10, 25, 50, 100]}
