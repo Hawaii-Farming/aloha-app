@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 
+import type { ColDef, GridOptions } from 'ag-grid-community';
 import type { z } from 'zod';
 
 export type ListViewType =
@@ -182,4 +183,11 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
     list?: () => Promise<{ default: ComponentType<ListViewProps> }>;
     detail?: () => Promise<{ default: ComponentType<DetailViewProps> }>;
   };
+
+  /** AG Grid-specific column definition overrides. When provided,
+   *  these are used instead of auto-mapped columns from `columns`. */
+  agGridColDefs?: ColDef[];
+
+  /** Additional AG Grid options passed through to AgGridReact. */
+  agGridOptions?: Partial<GridOptions>;
 }
