@@ -44,7 +44,7 @@ export function BadgeCellRenderer(props: CustomCellRendererProps) {
   const accent = dark ? palette.dark : palette.light;
 
   return (
-    <div className="flex h-full items-center">
+    <div className="flex h-full items-center justify-center">
       <span
         className="inline-flex items-center rounded-md text-[11px] font-medium"
         style={{
