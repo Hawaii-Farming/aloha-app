@@ -146,6 +146,32 @@ function AgGridInner({
           isFullWidthRow={isFullWidthRow}
           fullWidthCellRenderer={fullWidthCellRenderer}
           getRowId={getRowId}
+          postSortRows={(params) => {
+            // Keep detail rows pinned right after their parent row
+            const nodes = params.nodes;
+            const detailNodes: typeof nodes = [];
+            const parentNodes: typeof nodes = [];
+
+            for (const node of nodes) {
+              if (node.data?._isDetailRow) {
+                detailNodes.push(node);
+              } else {
+                parentNodes.push(node);
+              }
+            }
+
+            if (detailNodes.length === 0) return;
+
+            nodes.length = 0;
+            for (const parent of parentNodes) {
+              nodes.push(parent);
+              // Match detail row whose _parentData is the same object ref
+              const detail = detailNodes.find(
+                (d) => d.data?._parentData === parent.data,
+              );
+              if (detail) nodes.push(detail);
+            }
+          }}
           rowClassRules={rowClassRules}
           domLayout={effectiveDomLayout}
           getRowHeight={getRowHeight}
