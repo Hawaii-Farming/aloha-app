@@ -2,7 +2,6 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
   useFetcher,
-  useNavigate,
   useRevalidator,
   useSearchParams,
 } from 'react-router';
@@ -14,7 +13,6 @@ import type {
   ColumnVisibleEvent,
   GridApi,
   GridReadyEvent,
-  RowClickedEvent,
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
@@ -49,8 +47,10 @@ import {
   saveColumnState,
 } from '~/components/ag-grid/column-state';
 import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
+import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
+import { InlineDetailRow } from '~/components/ag-grid/inline-detail-row';
 import { CreatePanel } from '~/components/crud/create-panel';
-import type { ListViewProps, WorkflowConfig } from '~/lib/crud/types';
+import type { CrudModuleConfig, ListViewProps, WorkflowConfig } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
 
@@ -79,12 +79,37 @@ export default function AgGridListView({
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const inactive = searchParams.get('inactive') ?? 'false';
 
   const subModuleSlug = config?.tableName ?? 'unknown';
   const pkColumn = config?.pkColumn ?? 'id';
+
+  // Inline detail row — renders record details in an expanded full-width row
+  const detailComponent = useMemo(
+    () =>
+      function DetailRenderer({ data }: { data: Record<string, unknown> }) {
+        return (
+          <InlineDetailRow
+            data={data}
+            config={config as CrudModuleConfig}
+          />
+        );
+      },
+    [config],
+  );
+
+  const {
+    rowData: detailRowData,
+    isFullWidthRow,
+    fullWidthCellRenderer,
+    handleRowClicked: handleDetailRowClicked,
+    getRowId,
+  } = useDetailRow({
+    sourceData: (tableData.data as Record<string, unknown>[]) ?? [],
+    pkColumn,
+    detailComponent,
+  });
 
   const dataColDefs = useMemo(() => {
     if (config?.agGridColDefs) return config.agGridColDefs;
@@ -108,9 +133,9 @@ export default function AgGridListView({
         }
       }
 
-      navigate(`?${next.toString()}`, { preventScrollReset: true });
+      setSearchParams(next, { preventScrollReset: true });
     },
-    [searchParams, navigate],
+    [searchParams, setSearchParams],
   );
 
   const handleGridReady = useCallback(
@@ -175,20 +200,6 @@ export default function AgGridListView({
       setSelectedIds(ids);
     },
     [pkColumn],
-  );
-
-  const handleRowClicked = useCallback(
-    (event: RowClickedEvent) => {
-      const data = event.data as RowData | undefined;
-      if (!data) return;
-      if (data._isDetailRow) return;
-
-      const id = data[pkColumn] as string;
-      if (id) {
-        navigate(id);
-      }
-    },
-    [navigate, pkColumn],
   );
 
   const clearSelection = useCallback(() => {
@@ -265,9 +276,12 @@ export default function AgGridListView({
           <AgGridWrapper
             gridRef={gridRef}
             colDefs={allColDefs}
-            rowData={tableData.data as RowData[]}
+            rowData={detailRowData as RowData[]}
             quickFilterText={searchValue}
-            onRowClicked={handleRowClicked}
+            onRowClicked={handleDetailRowClicked}
+            isFullWidthRow={isFullWidthRow}
+            fullWidthCellRenderer={fullWidthCellRenderer}
+            getRowId={getRowId}
             rowSelection="multiple"
             suppressRowClickSelection={true}
             pagination={true}

@@ -97,16 +97,16 @@ function AgGridInner({
     [],
   );
 
-  const effectiveDomLayout = domLayout ?? 'autoHeight';
+  const effectiveDomLayout = domLayout ?? 'normal';
 
   return (
     <div
       data-ag-theme-mode={resolvedTheme === 'dark' ? 'dark' : 'light'}
       data-test="ag-grid-wrapper"
-      className="w-full"
+      className="h-full w-full"
       style={
         effectiveDomLayout === 'normal'
-          ? { height: height ?? 'auto' }
+          ? { height: height ?? '100%' }
           : undefined
       }
     >
