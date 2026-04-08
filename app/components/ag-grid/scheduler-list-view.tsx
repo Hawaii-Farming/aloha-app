@@ -2,7 +2,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useSearchParams } from 'react-router';
 
-import type { ColDef, RowHeightParams } from 'ag-grid-community';
+import type {
+  ColDef,
+  ColumnMovedEvent,
+  ColumnResizedEvent,
+  ColumnVisibleEvent,
+  GridApi,
+  GridReadyEvent,
+  SelectionChangedEvent,
+  SortChangedEvent,
+} from 'ag-grid-community';
 import type { AgGridReact } from 'ag-grid-react';
 import {
   addDays,
@@ -12,9 +21,22 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, History, Plus } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Columns3,
+  History,
+  Plus,
+} from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
+import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@aloha/ui/dropdown-menu';
 import {
   Select,
   SelectContent,
@@ -25,12 +47,46 @@ import {
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
+import { BadgeCellRenderer } from '~/components/ag-grid/cell-renderers/badge-cell-renderer';
+import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
+import { ScheduleDayRenderer } from '~/components/ag-grid/cell-renderers/schedule-day-renderer';
+import {
+  restoreColumnState,
+  saveColumnState,
+} from '~/components/ag-grid/column-state';
+import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
 import { CreatePanel } from '~/components/crud/create-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
+
+const CHECKBOX_COL: ColDef = {
+  headerCheckboxSelection: true,
+  checkboxSelection: true,
+  maxWidth: 50,
+  sortable: false,
+  filter: false,
+  resizable: false,
+  suppressMovable: true,
+  pinned: 'left',
+  lockPosition: true,
+};
+
+const AVATAR_COL: ColDef = {
+  headerName: '',
+  field: 'profile_photo_url',
+  cellRenderer: AvatarRenderer,
+  maxWidth: 60,
+  minWidth: 60,
+  sortable: false,
+  filter: false,
+  resizable: false,
+  suppressMovable: true,
+  pinned: 'left',
+  lockPosition: true,
+};
 
 function getCurrentWeekStart(): string {
   return format(startOfWeek(new Date(), { weekStartsOn: 0 }), 'yyyy-MM-dd');
@@ -138,6 +194,66 @@ function ScheduleDetailRowInner({
   );
 }
 
+function ColumnVisibilityDropdown({
+  gridApi,
+  colDefs,
+}: {
+  gridApi: GridApi | null;
+  colDefs: ColDef[];
+}) {
+  const [, forceUpdate] = useState(0);
+
+  const handleToggle = useCallback(
+    (colId: string, visible: boolean) => {
+      if (!gridApi) return;
+      gridApi.setColumnsVisible([colId], visible);
+      forceUpdate((n) => n + 1);
+    },
+    [gridApi],
+  );
+
+  const columnStates = gridApi?.getColumnState();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          size="sm"
+          variant="outline"
+          data-test="column-visibility-toggle"
+        >
+          <Columns3 className="mr-2 h-4 w-4" />
+          Columns
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-48">
+        {colDefs.map((col) => {
+          const colId = col.field ?? col.colId ?? '';
+          if (!colId) return null;
+
+          const state = columnStates?.find((s) => s.colId === colId);
+          const isVisible = state ? !state.hide : !col.hide;
+
+          return (
+            <DropdownMenuCheckboxItem
+              key={colId}
+              checked={isVisible}
+              onCheckedChange={(checked) =>
+                handleToggle(colId, checked as boolean)
+              }
+            >
+              {col.headerName ?? colId}
+            </DropdownMenuCheckboxItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+const noop = () => {};
+
 export default function SchedulerListView(props: ListViewProps) {
   const {
     tableData,
@@ -150,10 +266,14 @@ export default function SchedulerListView(props: ListViewProps) {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const gridRef = useRef<AgGridReact>(null);
+  const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'schedule' | 'history'>('schedule');
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentWeek = searchParams.get('week') ?? getCurrentWeekStart();
   const currentDept = searchParams.get('dept') ?? '';
@@ -234,53 +354,30 @@ export default function SchedulerListView(props: ListViewProps) {
     };
   }, [viewMode, accountSlug]);
 
-  // Schedule view column definitions
-  const colDefs: ColDef[] = useMemo(
+  // Data columns (after checkbox + avatar) for column visibility dropdown
+  const dataColDefs: ColDef[] = useMemo(
     () => [
       {
-        headerName: '',
-        field: 'profile_photo_url',
-        cellRenderer: AvatarRenderer,
-        maxWidth: 60,
-        minWidth: 60,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        suppressMovable: true,
-        pinned: 'left' as const,
-      },
-      {
         headerName: 'Employee',
-        field: 'full_name',
+        field: 'first_name',
+        cellRenderer: EmployeeCellRenderer,
+        minWidth: 180,
         sortable: true,
         filter: true,
-        minWidth: 140,
-      },
-      {
-        headerName: 'Department',
-        field: 'department_name',
-        sortable: true,
-        filter: true,
-        minWidth: 120,
-      },
-      {
-        headerName: 'Work Auth',
-        field: 'work_authorization_name',
-        sortable: true,
-        filter: true,
-        minWidth: 100,
-        hide: true,
+        pinned: 'left' as const,
       },
       {
         headerName: 'Task',
         field: 'task',
+        cellRenderer: BadgeCellRenderer,
+        minWidth: 120,
         sortable: true,
         filter: true,
-        minWidth: 120,
       },
       {
         headerName: 'Sun',
         field: 'sunday',
+        cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
@@ -288,6 +385,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Mon',
         field: 'monday',
+        cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
@@ -295,6 +393,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Tue',
         field: 'tuesday',
+        cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
@@ -302,6 +401,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Wed',
         field: 'wednesday',
+        cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
@@ -309,6 +409,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Thu',
         field: 'thursday',
+        cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
@@ -316,6 +417,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Fri',
         field: 'friday',
+        cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
@@ -323,6 +425,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Sat',
         field: 'saturday',
+        cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
         minWidth: 100,
@@ -336,6 +439,12 @@ export default function SchedulerListView(props: ListViewProps) {
       },
     ],
     [],
+  );
+
+  // Full column defs including checkbox and avatar
+  const colDefs: ColDef[] = useMemo(
+    () => [CHECKBOX_COL, AVATAR_COL, ...dataColDefs],
+    [dataColDefs],
   );
 
   // History summary column definitions
@@ -362,6 +471,61 @@ export default function SchedulerListView(props: ListViewProps) {
         minWidth: 110,
       },
     ],
+    [],
+  );
+
+  // Column state persistence
+  const handleGridReady = useCallback((event: GridReadyEvent) => {
+    const api = event.api;
+    setGridApi(api);
+    restoreColumnState('scheduler', api);
+  }, []);
+
+  const debouncedSaveState = useCallback((api: GridApi) => {
+    if (saveDebounceRef.current) {
+      clearTimeout(saveDebounceRef.current);
+    }
+    saveDebounceRef.current = setTimeout(() => {
+      saveColumnState('scheduler', api);
+    }, 300);
+  }, []);
+
+  const handleColumnMoved = useCallback(
+    (event: ColumnMovedEvent) => {
+      if (event.finished && event.api) {
+        debouncedSaveState(event.api);
+      }
+    },
+    [debouncedSaveState],
+  );
+
+  const handleColumnResized = useCallback(
+    (event: ColumnResizedEvent) => {
+      if (event.finished && event.api) {
+        debouncedSaveState(event.api);
+      }
+    },
+    [debouncedSaveState],
+  );
+
+  const handleSortChanged = useCallback(
+    (event: SortChangedEvent) => {
+      debouncedSaveState(event.api);
+    },
+    [debouncedSaveState],
+  );
+
+  const handleColumnVisible = useCallback(
+    (event: ColumnVisibleEvent) => {
+      debouncedSaveState(event.api);
+    },
+    [debouncedSaveState],
+  );
+
+  const handleSelectionChanged = useCallback(
+    (_event: SelectionChangedEvent) => {
+      // Capture selected IDs for future bulk actions
+    },
     [],
   );
 
@@ -398,10 +562,13 @@ export default function SchedulerListView(props: ListViewProps) {
     gridRef,
   });
 
-  const getRowHeight = useCallback((params: RowHeightParams) => {
-    if (params.data?._isDetailRow) return 200;
-    return undefined;
-  }, []);
+  const getRowHeight = useCallback(
+    (params: { data?: Record<string, unknown> }) => {
+      if (params.data?._isDetailRow) return 200;
+      return 52;
+    },
+    [],
+  );
 
   const departmentOptions = fkOptions.hr_department_id ?? [];
 
@@ -411,6 +578,7 @@ export default function SchedulerListView(props: ListViewProps) {
         className="flex min-h-0 flex-1 flex-col"
         data-test="scheduler-list-view"
       >
+        {/* Top row: week navigation + dept filter + history + create */}
         <div className="flex shrink-0 items-center justify-between gap-4 pb-4">
           {viewMode === 'schedule' && (
             <div className="flex items-center gap-2">
@@ -494,6 +662,38 @@ export default function SchedulerListView(props: ListViewProps) {
           </div>
         </div>
 
+        {/* Second row: search + column visibility + CSV export */}
+        {viewMode === 'schedule' && (
+          <div className="shrink-0 overflow-visible pb-4">
+            <DataTableToolbar
+              searchValue={searchValue}
+              onSearchChange={(value) => {
+                setSearchValue(value);
+
+                if (searchDebounceRef.current) {
+                  clearTimeout(searchDebounceRef.current);
+                }
+
+                searchDebounceRef.current = setTimeout(() => {
+                  setSearchValue(value);
+                }, 300);
+              }}
+              searchPlaceholder="Search scheduler..."
+              showInactive={false}
+              onShowInactiveChange={noop}
+              actionSlot={
+                <div className="flex items-center gap-2">
+                  <ColumnVisibilityDropdown
+                    gridApi={gridApi}
+                    colDefs={dataColDefs}
+                  />
+                  <CsvExportButton gridApi={gridApi} fileName="scheduler" />
+                </div>
+              }
+            />
+          </div>
+        )}
+
         <div className="flex min-h-0 flex-1 flex-col">
           {viewMode === 'schedule' ? (
             <AgGridWrapper
@@ -501,13 +701,22 @@ export default function SchedulerListView(props: ListViewProps) {
               colDefs={colDefs}
               rowData={detailRowData as RowData[]}
               rowClassRules={otWarningRowClassRules}
+              quickFilterText={searchValue}
               onRowClicked={handleDetailRowClicked}
               isFullWidthRow={isFullWidthRow}
               fullWidthCellRenderer={fullWidthCellRenderer}
               getRowId={getRowId}
               getRowHeight={getRowHeight}
+              rowSelection="multiple"
+              suppressRowClickSelection={true}
               pagination={true}
               paginationPageSize={25}
+              onGridReady={handleGridReady}
+              onSelectionChanged={handleSelectionChanged}
+              onColumnMoved={handleColumnMoved}
+              onColumnResized={handleColumnResized}
+              onSortChanged={handleSortChanged}
+              onColumnVisible={handleColumnVisible}
             />
           ) : (
             <AgGridWrapper
