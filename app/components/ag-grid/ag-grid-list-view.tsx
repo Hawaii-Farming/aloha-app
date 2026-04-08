@@ -312,7 +312,22 @@ export default function AgGridListView({
             colDefs={allColDefs}
             rowData={detailRowData as RowData[]}
             quickFilterText={searchValue}
-            onRowClicked={handleDetailRowClicked}
+            onRowClicked={useCallback(
+              (e: import('ag-grid-community').RowClickedEvent) => {
+                const viewport = gridRef.current?.api
+                  ? document.querySelector(
+                      '[data-test="ag-grid-list-view"] .ag-body-viewport',
+                    )
+                  : null;
+                const scrollTop = viewport?.scrollTop ?? 0;
+                handleDetailRowClicked(e);
+                // Restore scroll after React re-render
+                requestAnimationFrame(() => {
+                  if (viewport) viewport.scrollTop = scrollTop;
+                });
+              },
+              [handleDetailRowClicked],
+            )}
             isFullWidthRow={isFullWidthRow}
             fullWidthCellRenderer={fullWidthCellRenderer}
             getRowHeight={getRowHeight}
