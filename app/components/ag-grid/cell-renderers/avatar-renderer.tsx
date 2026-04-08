@@ -36,27 +36,26 @@ export function AvatarRenderer(props: CustomCellRendererProps) {
   const initials = getInitials(first_name, last_name);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex h-full items-center justify-center">
       {profile_photo_url ? (
         <img
           src={profile_photo_url}
           alt={displayName}
-          className="h-7 w-7 rounded-full object-cover"
+          className="h-6 w-6 shrink-0 rounded-full object-cover"
           onError={(e) => {
-            // On load failure, replace with initials
             const target = e.currentTarget;
             const parent = target.parentElement;
             if (parent) {
               const fallback = document.createElement('div');
               fallback.className =
-                'bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium';
+                'bg-primary/10 text-primary flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold';
               fallback.textContent = initials;
               parent.replaceChild(fallback, target);
             }
           }}
         />
       ) : (
-        <div className="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
+        <div className="bg-primary/10 text-primary flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
           {initials}
         </div>
       )}

@@ -129,8 +129,7 @@ export default function AgGridListView({
   // Detail rows: compact card layout with avatar + info strips
   const getRowHeight = useCallback((params: RowHeightParams) => {
     if (params.data?._isDetailRow) {
-      // 4 info rows (~18px each) + padding (24px) + avatar height
-      return 120;
+      return 140;
     }
     return undefined;
   }, []);
