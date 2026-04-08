@@ -33,6 +33,8 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
     if (col.render === 'full_name') {
       colDef.cellRenderer = EmployeeCellRenderer;
       colDef.minWidth = 250;
+      colDef.pinned = 'left';
+      colDef.lockPosition = true;
       colDef.valueGetter = (params: ValueGetterParams) => {
         const first = (params.data?.first_name as string) ?? '';
         const last = (params.data?.last_name as string) ?? '';
