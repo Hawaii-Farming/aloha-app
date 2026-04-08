@@ -4,7 +4,6 @@ import type {
   ValueGetterParams,
 } from 'ag-grid-community';
 
-import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import { dateFormatter } from '~/components/ag-grid/cell-renderers/date-formatter';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
 import type { ColumnConfig } from '~/lib/crud/types';
@@ -28,9 +27,8 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       colDef.valueFormatter = dateFormatter;
     }
 
-    // full_name render: show avatar + name using AvatarRenderer
+    // full_name render: concatenate last_name, first_name
     if (col.render === 'full_name') {
-      colDef.cellRenderer = AvatarRenderer;
       colDef.valueGetter = (params: ValueGetterParams) => {
         const first = (params.data?.first_name as string) ?? '';
         const last = (params.data?.last_name as string) ?? '';

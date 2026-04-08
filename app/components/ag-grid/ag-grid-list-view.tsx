@@ -1,10 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import {
-  useFetcher,
-  useRevalidator,
-  useSearchParams,
-} from 'react-router';
+import { useFetcher, useRevalidator, useSearchParams } from 'react-router';
 
 import type {
   ColDef,
@@ -13,6 +9,7 @@ import type {
   ColumnVisibleEvent,
   GridApi,
   GridReadyEvent,
+  RowHeightParams,
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
@@ -41,6 +38,7 @@ import {
 import { Trans } from '@aloha/ui/trans';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
+import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import { mapColumnsToColDefs } from '~/components/ag-grid/column-mapper';
 import {
   restoreColumnState,
@@ -50,7 +48,11 @@ import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { InlineDetailRow } from '~/components/ag-grid/inline-detail-row';
 import { CreatePanel } from '~/components/crud/create-panel';
-import type { CrudModuleConfig, ListViewProps, WorkflowConfig } from '~/lib/crud/types';
+import type {
+  CrudModuleConfig,
+  ListViewProps,
+  WorkflowConfig,
+} from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
 
@@ -58,6 +60,18 @@ const CHECKBOX_COL: ColDef = {
   headerCheckboxSelection: true,
   checkboxSelection: true,
   maxWidth: 50,
+  sortable: false,
+  filter: false,
+  resizable: false,
+  suppressMovable: true,
+};
+
+const AVATAR_COL: ColDef = {
+  headerName: '',
+  field: 'profile_photo_url',
+  cellRenderer: AvatarRenderer,
+  maxWidth: 60,
+  minWidth: 60,
   sortable: false,
   filter: false,
   resizable: false,
@@ -90,10 +104,7 @@ export default function AgGridListView({
     () =>
       function DetailRenderer({ data }: { data: Record<string, unknown> }) {
         return (
-          <InlineDetailRow
-            data={data}
-            config={config as CrudModuleConfig}
-          />
+          <InlineDetailRow data={data} config={config as CrudModuleConfig} />
         );
       },
     [config],
@@ -111,14 +122,33 @@ export default function AgGridListView({
     detailComponent,
   });
 
+  // Give detail rows enough height to render all form fields
+  const getRowHeight = useCallback(
+    (params: RowHeightParams) => {
+      if (params.data?._isDetailRow) {
+        const fieldCount = config?.formFields?.length ?? 10;
+        const cols = 5; // xl:grid-cols-5 in InlineDetailRow
+        const rows = Math.ceil(fieldCount / cols);
+        // ~28px per field row + section headers + audit footer + padding
+        return rows * 32 + 80;
+      }
+      return undefined;
+    },
+    [config?.formFields?.length],
+  );
+
   const dataColDefs = useMemo(() => {
     if (config?.agGridColDefs) return config.agGridColDefs;
     return mapColumnsToColDefs(config?.columns ?? []);
   }, [config?.agGridColDefs, config?.columns]);
 
+  // Show avatar column when data has profile_photo_url
+  const hasAvatar =
+    (tableData.data as RowData[])?.[0]?.profile_photo_url !== undefined;
+
   const allColDefs = useMemo(
-    () => [CHECKBOX_COL, ...dataColDefs],
-    [dataColDefs],
+    () => [CHECKBOX_COL, ...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
+    [dataColDefs, hasAvatar],
   );
 
   const updateParams = useCallback(
@@ -211,11 +241,8 @@ export default function AgGridListView({
 
   return (
     <>
-      <div
-        className="flex flex-1 flex-col overflow-hidden"
-        data-test="sub-module-list"
-      >
-        <div className="shrink-0 pb-4">
+      <div className="flex min-h-0 flex-1 flex-col" data-test="sub-module-list">
+        <div className="shrink-0 overflow-visible pb-4">
           <DataTableToolbar
             searchValue={searchValue}
             onSearchChange={(value) => {
@@ -282,6 +309,7 @@ export default function AgGridListView({
             isFullWidthRow={isFullWidthRow}
             fullWidthCellRenderer={fullWidthCellRenderer}
             getRowId={getRowId}
+            getRowHeight={getRowHeight}
             rowSelection="multiple"
             suppressRowClickSelection={true}
             pagination={true}

@@ -12,6 +12,7 @@ import type {
   IsFullWidthRowParams,
   RowClassParams,
   RowClickedEvent,
+  RowHeightParams,
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
@@ -42,6 +43,7 @@ interface AgGridWrapperProps {
   paginationPageSize?: number;
   pagination?: boolean;
   domLayout?: 'normal' | 'autoHeight' | 'print';
+  getRowHeight?: (params: RowHeightParams) => number | undefined;
   suppressRowClickSelection?: boolean;
   rowSelection?: 'single' | 'multiple';
   onGridReady?: (event: GridReadyEvent) => void;
@@ -76,6 +78,7 @@ function AgGridInner({
   paginationPageSize,
   pagination,
   domLayout,
+  getRowHeight,
   suppressRowClickSelection,
   rowSelection,
   onGridReady,
@@ -130,6 +133,7 @@ function AgGridInner({
           getRowId={getRowId}
           rowClassRules={rowClassRules}
           domLayout={effectiveDomLayout}
+          getRowHeight={getRowHeight}
           loading={loading}
           overlayNoRowsTemplate={emptyMessage ?? 'No records found'}
           rowSelection={rowSelection}

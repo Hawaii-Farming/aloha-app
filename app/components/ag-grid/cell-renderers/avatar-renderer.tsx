@@ -20,9 +20,9 @@ interface EmployeeRow {
 }
 
 /**
- * AG Grid cell renderer that displays an employee avatar with name.
+ * AG Grid cell renderer that displays an employee avatar.
  * Shows profile photo if available, otherwise shows initials fallback.
- * Name is displayed as "Last, First" format beside the avatar.
+ * Designed as a standalone column (no name text — name is in a separate column).
  */
 export function AvatarRenderer(props: CustomCellRendererProps) {
   const data = props.data as EmployeeRow | undefined;
@@ -31,24 +31,35 @@ export function AvatarRenderer(props: CustomCellRendererProps) {
   const { profile_photo_url, first_name, last_name } = data;
   const displayName =
     first_name && last_name
-      ? `${last_name}, ${first_name}`
+      ? `${first_name} ${last_name}`
       : last_name || first_name || '';
   const initials = getInitials(first_name, last_name);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-center">
       {profile_photo_url ? (
         <img
           src={profile_photo_url}
           alt={displayName}
           className="h-7 w-7 rounded-full object-cover"
+          onError={(e) => {
+            // On load failure, replace with initials
+            const target = e.currentTarget;
+            const parent = target.parentElement;
+            if (parent) {
+              const fallback = document.createElement('div');
+              fallback.className =
+                'bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium';
+              fallback.textContent = initials;
+              parent.replaceChild(fallback, target);
+            }
+          }}
         />
       ) : (
         <div className="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
           {initials}
         </div>
       )}
-      <span>{displayName}</span>
     </div>
   );
 }
