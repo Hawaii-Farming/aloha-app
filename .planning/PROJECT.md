@@ -17,11 +17,10 @@ Every HR submodule renders real data from the database and supports full CRUD op
 - CRUD registry pattern (`getModuleConfig`) for sub-module routing
 - Supabase RLS policies on all HR tables
 - Workspace layout with org-scoped navigation
+- AG Grid Community integration as new dependency (replacing TanStack Table for HR module) — Validated in Phase 1: AG Grid Foundation
+- AG Grid themed to DESIGN.md (Supabase-inspired dark/light theme) — Validated in Phase 1: AG Grid Foundation
 
 ### Active
-
-- [ ] AG Grid Community integration as new dependency (replacing TanStack Table for HR module)
-- [ ] AG Grid themed to DESIGN.md (Supabase-inspired dark/light theme)
 - [ ] Scheduler submodule — weekly schedule grid (ops_task_weekly_schedule view) + historical data (ops_task_schedule) + Create form (employee, task, date, start/end time)
 - [ ] Time Off submodule — hr_time_off_request table with status filters (all/pending/approved) + Create form + inline status toggle
 - [ ] Hours Comparison submodule — computed view comparing ops_task_schedule hours vs hr_payroll hours per employee + row-click daily breakdown
@@ -86,4 +85,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after initialization*
+*Last updated: 2026-04-08 after Phase 1 completion*
