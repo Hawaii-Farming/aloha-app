@@ -23,6 +23,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **GRID-12**: Column state persistence to localStorage (widths, order, visibility) across sessions
 - [ ] **GRID-13**: CSV export for data grids (payroll and general)
 - [ ] **GRID-14**: Conditional row styling for OT warnings, variance highlighting, and status-based coloring via `rowClassRules`/`cellClassRules`
+- [ ] **GRID-15**: Convert existing register submodule from TanStack Table to AG Grid as the proof-of-concept integration
 
 ### Scheduler
 
@@ -89,6 +90,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **EREV-03**: Create/edit review form (side panel): employee, year, quarter, productivity (1-3 select), attendance (1-3 select), quality (1-3 select), engagement (1-3 select), notes, lead (employee dropdown), locked (checkbox)
 - [ ] **EREV-04**: Lock flag preventing edits after finalization (`is_locked`)
 - [ ] **EREV-05**: New `hr_employee_review` table migration with RLS policies
+- [ ] **EREV-06**: Row-click full-width detail showing employee review details
 
 ## v2 Requirements
 
@@ -124,68 +126,70 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GRID-01 | Pending | Pending |
-| GRID-02 | Pending | Pending |
-| GRID-03 | Pending | Pending |
-| GRID-04 | Pending | Pending |
-| GRID-05 | Pending | Pending |
-| GRID-06 | Pending | Pending |
-| GRID-07 | Pending | Pending |
-| GRID-08 | Pending | Pending |
-| GRID-09 | Pending | Pending |
-| GRID-10 | Pending | Pending |
-| GRID-11 | Pending | Pending |
-| GRID-12 | Pending | Pending |
-| GRID-13 | Pending | Pending |
-| GRID-14 | Pending | Pending |
-| SCHED-01 | Pending | Pending |
-| SCHED-02 | Pending | Pending |
-| SCHED-03 | Pending | Pending |
-| SCHED-04 | Pending | Pending |
-| SCHED-05 | Pending | Pending |
-| SCHED-06 | Pending | Pending |
-| SCHED-07 | Pending | Pending |
-| SCHED-08 | Pending | Pending |
-| TOFF-01 | Pending | Pending |
-| TOFF-02 | Pending | Pending |
-| TOFF-03 | Pending | Pending |
-| TOFF-04 | Pending | Pending |
-| TOFF-05 | Pending | Pending |
-| HCMP-01 | Pending | Pending |
-| HCMP-02 | Pending | Pending |
-| HCMP-03 | Pending | Pending |
-| HCMP-04 | Pending | Pending |
-| HCMP-05 | Pending | Pending |
-| PCMP-01 | Pending | Pending |
-| PCMP-02 | Pending | Pending |
-| PCMP-03 | Pending | Pending |
-| PCMP-04 | Pending | Pending |
-| PCMP-05 | Pending | Pending |
-| PCMP-06 | Pending | Pending |
-| PMGR-01 | Pending | Pending |
-| PMGR-02 | Pending | Pending |
-| PMGR-03 | Pending | Pending |
-| PMGR-04 | Pending | Pending |
-| PDAT-01 | Pending | Pending |
-| PDAT-02 | Pending | Pending |
-| PDAT-03 | Pending | Pending |
-| PDAT-04 | Pending | Pending |
-| PDAT-05 | Pending | Pending |
-| HOUS-01 | Pending | Pending |
-| HOUS-02 | Pending | Pending |
-| HOUS-03 | Pending | Pending |
-| HOUS-04 | Pending | Pending |
-| EREV-01 | Pending | Pending |
-| EREV-02 | Pending | Pending |
-| EREV-03 | Pending | Pending |
-| EREV-04 | Pending | Pending |
-| EREV-05 | Pending | Pending |
+| GRID-01 | Phase 1 | Pending |
+| GRID-02 | Phase 1 | Pending |
+| GRID-03 | Phase 1 | Pending |
+| GRID-04 | Phase 1 | Pending |
+| GRID-05 | Phase 1 | Pending |
+| GRID-06 | Phase 1 | Pending |
+| GRID-07 | Phase 1 | Pending |
+| GRID-08 | Phase 1 | Pending |
+| GRID-09 | Phase 1 | Pending |
+| GRID-10 | Phase 1 | Pending |
+| GRID-11 | Phase 1 | Pending |
+| GRID-12 | Phase 1 | Pending |
+| GRID-13 | Phase 1 | Pending |
+| GRID-14 | Phase 1 | Pending |
+| GRID-15 | Phase 1 | Pending |
+| SCHED-01 | Phase 2 | Pending |
+| SCHED-02 | Phase 2 | Pending |
+| SCHED-03 | Phase 2 | Pending |
+| SCHED-04 | Phase 2 | Pending |
+| SCHED-05 | Phase 2 | Pending |
+| SCHED-06 | Phase 2 | Pending |
+| SCHED-07 | Phase 2 | Pending |
+| SCHED-08 | Phase 2 | Pending |
+| TOFF-01 | Phase 3 | Pending |
+| TOFF-02 | Phase 3 | Pending |
+| TOFF-03 | Phase 3 | Pending |
+| TOFF-04 | Phase 3 | Pending |
+| TOFF-05 | Phase 3 | Pending |
+| HCMP-01 | Phase 5 | Pending |
+| HCMP-02 | Phase 5 | Pending |
+| HCMP-03 | Phase 5 | Pending |
+| HCMP-04 | Phase 5 | Pending |
+| HCMP-05 | Phase 5 | Pending |
+| PCMP-01 | Phase 4 | Pending |
+| PCMP-02 | Phase 4 | Pending |
+| PCMP-03 | Phase 4 | Pending |
+| PCMP-04 | Phase 4 | Pending |
+| PCMP-05 | Phase 4 | Pending |
+| PCMP-06 | Phase 4 | Pending |
+| PMGR-01 | Phase 4 | Pending |
+| PMGR-02 | Phase 4 | Pending |
+| PMGR-03 | Phase 4 | Pending |
+| PMGR-04 | Phase 4 | Pending |
+| PDAT-01 | Phase 4 | Pending |
+| PDAT-02 | Phase 4 | Pending |
+| PDAT-03 | Phase 4 | Pending |
+| PDAT-04 | Phase 4 | Pending |
+| PDAT-05 | Phase 4 | Pending |
+| HOUS-01 | Phase 6 | Pending |
+| HOUS-02 | Phase 6 | Pending |
+| HOUS-03 | Phase 6 | Pending |
+| HOUS-04 | Phase 6 | Pending |
+| EREV-01 | Phase 6 | Pending |
+| EREV-02 | Phase 6 | Pending |
+| EREV-03 | Phase 6 | Pending |
+| EREV-04 | Phase 6 | Pending |
+| EREV-05 | Phase 6 | Pending |
+| EREV-06 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 53 total
-- Mapped to phases: 0
-- Unmapped: 53
+- v1 requirements: 55 total
+- Mapped to phases: 55
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-07*
-*Last updated: 2026-04-07 after initial definition*
+*Last updated: 2026-04-07 after roadmap creation*
