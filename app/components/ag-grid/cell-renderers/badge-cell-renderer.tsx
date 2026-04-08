@@ -1,16 +1,16 @@
 import type { CustomCellRendererProps } from 'ag-grid-react';
 
 /**
- * Color palettes: [dotColor, borderColor]
- * Matching the AG Grid HR demo style — colored dot + subtle border.
+ * Color palettes: [bg, text]
+ * Solid filled pills like the Create button style.
  */
 const PALETTES = [
-  ['#3ecf8e', '#3ecf8e50'], // emerald
-  ['#7e80e7', '#7e80e751'], // violet
-  ['#f3a23a', '#f3a33a53'], // amber
-  ['#47a8f8', '#47a8f86c'], // blue
-  ['#e879a0', '#e879a060'], // rose
-  ['#87cf2b', '#88cf2b55'], // lime
+  ['#3ecf8e', '#ffffff'], // emerald
+  ['#7e80e7', '#ffffff'], // violet
+  ['#f3a23a', '#ffffff'], // amber
+  ['#47a8f8', '#ffffff'], // blue
+  ['#e879a0', '#ffffff'], // rose
+  ['#87cf2b', '#ffffff'], // lime
 ] as const;
 
 function paletteForValue(value: string) {
@@ -22,38 +22,28 @@ function paletteForValue(value: string) {
 }
 
 /**
- * AG Grid cell renderer — compact tag with colored dot and subtle border.
- * Matches the AG Grid HR demo tag style. Consistent color per value.
+ * AG Grid cell renderer — solid filled pill with white text.
+ * Same visual weight as the Create button. Consistent color per value.
  */
 export function BadgeCellRenderer(props: CustomCellRendererProps) {
   const value = props.value as string | null | undefined;
   if (!value) return null;
 
   const display = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-  const [dot, border] = paletteForValue(value);
+  const [bg, text] = paletteForValue(value);
 
   return (
     <div className="flex h-full items-center">
       <span
-        className="inline-flex items-center rounded-md text-[12px] font-medium"
+        className="inline-flex items-center rounded-md text-[11px] font-medium"
         style={{
-          height: 24,
-          paddingLeft: 4,
+          height: 22,
+          paddingLeft: 8,
           paddingRight: 8,
-          border: `1px solid ${border}`,
-          boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
+          backgroundColor: bg,
+          color: text,
         }}
       >
-        <span
-          className="shrink-0 rounded-full"
-          style={{
-            width: 8,
-            height: 8,
-            backgroundColor: dot,
-            marginRight: 6,
-            marginLeft: 2,
-          }}
-        />
         {display}
       </span>
     </div>
