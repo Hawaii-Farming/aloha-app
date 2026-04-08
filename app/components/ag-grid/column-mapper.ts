@@ -31,7 +31,6 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
     // full_name render: rich employee cell with name, alias, badges
     if (col.render === 'full_name') {
       colDef.cellRenderer = EmployeeCellRenderer;
-      colDef.autoHeight = true;
       colDef.minWidth = 250;
       colDef.valueGetter = (params: ValueGetterParams) => {
         const first = (params.data?.first_name as string) ?? '';
