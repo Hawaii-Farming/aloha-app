@@ -134,7 +134,6 @@ function AgGridInner({
           columnDefs={colDefs}
           rowData={rowData}
           defaultColDef={defaultColDef}
-          autoSizeStrategy={{ type: 'fitCellContents' }}
           pagination={pagination ?? true}
           paginationPageSize={paginationPageSize ?? 25}
           paginationPageSizeSelector={[10, 25, 50, 100]}
