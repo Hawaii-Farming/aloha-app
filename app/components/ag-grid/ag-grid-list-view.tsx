@@ -318,8 +318,8 @@ export default function AgGridListView({
             getRowHeight={getRowHeight}
             rowSelection="multiple"
             suppressRowClickSelection={true}
-            pagination={expandedCount === 0}
-            paginationPageSize={tableData.pageSize}
+            pagination={true}
+            paginationPageSize={expandedCount > 0 ? 99999 : tableData.pageSize}
             onGridReady={handleGridReady}
             onSelectionChanged={handleSelectionChanged}
             onColumnMoved={handleColumnMoved}
