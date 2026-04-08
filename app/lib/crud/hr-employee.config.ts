@@ -64,11 +64,12 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
   },
 
   columns: [
-    { key: 'preferred_name', label: 'Alias' },
-    { key: 'last_name', label: 'Name', sortable: true, render: 'full_name' },
-    { key: 'gender', label: 'Gender', render: 'proper_case' },
-    { key: 'hr_department_name', label: 'Department', sortable: true },
-    { key: 'hr_work_authorization_name', label: 'Status', sortable: true },
+    {
+      key: 'last_name',
+      label: 'Employee',
+      sortable: true,
+      render: 'full_name',
+    },
     { key: 'wc', label: 'WC Code' },
     { key: 'compensation_manager_id_preferred_name', label: 'Manager' },
     { key: 'team_lead_id_preferred_name', label: 'Team Lead' },

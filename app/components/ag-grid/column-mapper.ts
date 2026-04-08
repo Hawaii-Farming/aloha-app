@@ -5,6 +5,7 @@ import type {
 } from 'ag-grid-community';
 
 import { dateFormatter } from '~/components/ag-grid/cell-renderers/date-formatter';
+import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
 import type { ColumnConfig } from '~/lib/crud/types';
 
@@ -27,8 +28,11 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       colDef.valueFormatter = dateFormatter;
     }
 
-    // full_name render: concatenate last_name, first_name
+    // full_name render: rich employee cell with name, alias, badges
     if (col.render === 'full_name') {
+      colDef.cellRenderer = EmployeeCellRenderer;
+      colDef.autoHeight = true;
+      colDef.minWidth = 250;
       colDef.valueGetter = (params: ValueGetterParams) => {
         const first = (params.data?.first_name as string) ?? '';
         const last = (params.data?.last_name as string) ?? '';
