@@ -118,7 +118,6 @@ export default function AgGridListView({
     isFullWidthRow,
     fullWidthCellRenderer,
     handleRowClicked: handleDetailRowClicked,
-    getRowId,
     expandedCount,
     collapseAll,
   } = useDetailRow({
@@ -316,7 +315,6 @@ export default function AgGridListView({
             onRowClicked={handleDetailRowClicked}
             isFullWidthRow={isFullWidthRow}
             fullWidthCellRenderer={fullWidthCellRenderer}
-            getRowId={getRowId}
             getRowHeight={getRowHeight}
             rowSelection="multiple"
             suppressRowClickSelection={true}
