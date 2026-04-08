@@ -1,6 +1,8 @@
 import type { ComponentType } from 'react';
 import { Suspense, lazy } from 'react';
 
+import { format, startOfWeek } from 'date-fns';
+
 import { TableListView } from '~/components/crud/table-list-view';
 import {
   crudBulkDeleteAction,
@@ -9,6 +11,7 @@ import {
 import { loadTableData } from '~/lib/crud/crud-helpers.server';
 import { loadFormOptions } from '~/lib/crud/load-form-options.server';
 import { getModuleConfig } from '~/lib/crud/registry';
+import { castRows, queryUntypedView } from '~/lib/crud/typed-query.server';
 import type { CrudModuleConfig, ListViewProps } from '~/lib/crud/types';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
@@ -16,6 +19,10 @@ import {
   requireModuleAccess,
   requireSubModuleAccess,
 } from '~/lib/workspace/require-module-access.server';
+
+function getCurrentWeekStart(): string {
+  return format(startOfWeek(new Date(), { weekStartsOn: 0 }), 'yyyy-MM-dd');
+}
 
 export const loader = async (args: {
   request: Request;
@@ -48,6 +55,55 @@ export const loader = async (args: {
     config?.columns.find((c) => c.sortable)?.key ?? 'created_at';
 
   const url = new URL(args.request.url);
+
+  // Custom loader path for views that lack is_deleted/end_date columns
+  if (config?.viewType?.list === 'custom') {
+    const weekStart = url.searchParams.get('week') ?? getCurrentWeekStart();
+    const deptFilter = url.searchParams.get('dept') ?? null;
+
+    let query = queryUntypedView(client, viewName)
+      .select('*')
+      .eq('org_id', accountSlug)
+      .eq('week_start_date', weekStart);
+
+    if (deptFilter) {
+      query = query.eq('hr_department_id', deptFilter);
+    }
+
+    query = query.order('full_name');
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Response(error.message, { status: 500 });
+    }
+
+    const rows = castRows(data);
+
+    const { fkOptions, comboboxOptions } = await loadFormOptions({
+      client,
+      config,
+      orgId: accountSlug,
+      subModuleSlug,
+    });
+
+    return {
+      config,
+      moduleAccess,
+      subModuleAccess,
+      accountSlug,
+      tableData: {
+        data: rows,
+        page: 1,
+        pageSize: rows.length,
+        pageCount: 1,
+        totalCount: rows.length,
+      },
+      fkOptions,
+      comboboxOptions,
+    };
+  }
+
   const pageSize = Number(url.searchParams.get('pageSize') ?? '25');
   const tableData = await loadTableData({
     client,
