@@ -10,12 +10,12 @@ Requirements for initial release. Each maps to roadmap phases.
 ### AG Grid Foundation
 
 - [x] **GRID-01**: AG Grid Community v35.x installed as project dependency (`ag-grid-react`)
-- [ ] **GRID-02**: Shared `AgGridWrapper` component with ClientOnly SSR safety, stable props (useMemo/useCallback), and loading/empty state overlays
+- [x] **GRID-02**: Shared `AgGridWrapper` component with ClientOnly SSR safety, stable props (useMemo/useCallback), and loading/empty state overlays
 - [x] **GRID-03**: AG Grid themed to DESIGN.md (Supabase-inspired dark/light) using Theming API v35 (`themeQuartz.withParams()`) bridged to next-themes
 - [ ] **GRID-04**: Full-width detail row component for row-click-to-expand across all submodules
-- [ ] **GRID-05**: Column sorting (multi-column), filtering (text/number/date), and quick-filter search bar on all grids
-- [ ] **GRID-06**: Column resize, reorder, and responsive hiding on narrower screens
-- [ ] **GRID-07**: Pagination on all grids
+- [x] **GRID-05**: Column sorting (multi-column), filtering (text/number/date), and quick-filter search bar on all grids
+- [x] **GRID-06**: Column resize, reorder, and responsive hiding on narrower screens
+- [x] **GRID-07**: Pagination on all grids
 - [ ] **GRID-08**: Side-panel CRUD forms (right-side Shadcn Sheet) matching register pattern for all submodules
 - [x] **GRID-09**: Status badge cell renderer for status columns (pending/approved/denied, etc.)
 - [x] **GRID-10**: Date formatting (locale-aware) and currency formatting ($, 2 decimals) via AG Grid valueFormatters
@@ -127,12 +127,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | GRID-01 | Phase 1 | Complete |
-| GRID-02 | Phase 1 | Pending |
+| GRID-02 | Phase 1 | Complete |
 | GRID-03 | Phase 1 | Complete |
 | GRID-04 | Phase 1 | Pending |
-| GRID-05 | Phase 1 | Pending |
-| GRID-06 | Phase 1 | Pending |
-| GRID-07 | Phase 1 | Pending |
+| GRID-05 | Phase 1 | Complete |
+| GRID-06 | Phase 1 | Complete |
+| GRID-07 | Phase 1 | Complete |
 | GRID-08 | Phase 1 | Pending |
 | GRID-09 | Phase 1 | Complete |
 | GRID-10 | Phase 1 | Complete |

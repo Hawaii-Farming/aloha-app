@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Install AG Grid, create theme config and cell renderers/formatters
-- [ ] 01-02-PLAN.md — Create AgGridWrapper component and column mapper utility
+- [x] 01-02-PLAN.md — Create AgGridWrapper component and column mapper utility
 - [ ] 01-03-PLAN.md — Detail row expansion, column state persistence, CSV export, conditional styling
 - [ ] 01-04-PLAN.md — Convert register submodule to AG Grid with visual verification
 **UI hint**: yes
