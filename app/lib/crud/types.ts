@@ -5,6 +5,7 @@ import type { z } from 'zod';
 
 export type ListViewType =
   | 'table'
+  | 'agGrid'
   | 'kanban'
   | 'calendar'
   | 'dashboard'

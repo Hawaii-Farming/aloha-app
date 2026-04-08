@@ -1,4 +1,5 @@
-import { lazy, Suspense } from 'react';
+import type { ComponentType } from 'react';
+import { Suspense, lazy } from 'react';
 
 import { TableListView } from '~/components/crud/table-list-view';
 import {
@@ -125,15 +126,38 @@ export const action = async (args: {
   return new Response('Invalid action', { status: 400 });
 };
 
+// Lazy-loaded view components — declared at module scope so they are
+// created once and not re-created on every render.
+const LazyAgGridListView = lazy(
+  () => import('~/components/ag-grid/ag-grid-list-view'),
+);
+
+// Cache for custom lazy views keyed by loader reference
+const customViewCache = new Map<
+  () => Promise<{ default: ComponentType<ListViewProps> }>,
+  ComponentType<ListViewProps>
+>();
+
 function resolveListView(config: CrudModuleConfig | undefined) {
   const viewType = config?.viewType?.list ?? 'table';
 
   switch (viewType) {
+    case 'agGrid': {
+      return LazyAgGridListView;
+    }
+
     case 'custom': {
       const loader = config?.customViews?.list;
 
       if (loader) {
-        return lazy(loader);
+        let cached = customViewCache.get(loader);
+
+        if (!cached) {
+          cached = lazy(loader);
+          customViewCache.set(loader, cached);
+        }
+
+        return cached;
       }
 
       return TableListView;
@@ -149,6 +173,8 @@ function resolveListView(config: CrudModuleConfig | undefined) {
   }
 }
 
+// Dynamic view resolution uses module-scope cached lazy components.
+/* eslint-disable react-hooks/static-components */
 export default function SubModulePage(props: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {

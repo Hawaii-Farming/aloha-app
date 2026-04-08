@@ -3,11 +3,17 @@ import { useMemo } from 'react';
 
 import type {
   ColDef,
+  ColumnMovedEvent,
+  ColumnResizedEvent,
+  ColumnVisibleEvent,
   GetRowIdParams,
+  GridReadyEvent,
   ICellRendererParams,
   IsFullWidthRowParams,
   RowClassParams,
   RowClickedEvent,
+  SelectionChangedEvent,
+  SortChangedEvent,
 } from 'ag-grid-community';
 import { AllCommunityModule } from 'ag-grid-community';
 import { AgGridProvider, AgGridReact } from 'ag-grid-react';
@@ -38,6 +44,12 @@ interface AgGridWrapperProps {
   domLayout?: 'normal' | 'autoHeight' | 'print';
   suppressRowClickSelection?: boolean;
   rowSelection?: 'single' | 'multiple';
+  onGridReady?: (event: GridReadyEvent) => void;
+  onSelectionChanged?: (event: SelectionChangedEvent) => void;
+  onColumnMoved?: (event: ColumnMovedEvent) => void;
+  onColumnResized?: (event: ColumnResizedEvent) => void;
+  onSortChanged?: (event: SortChangedEvent) => void;
+  onColumnVisible?: (event: ColumnVisibleEvent) => void;
 }
 
 export function AgGridWrapper(props: AgGridWrapperProps) {
@@ -66,6 +78,12 @@ function AgGridInner({
   domLayout,
   suppressRowClickSelection,
   rowSelection,
+  onGridReady,
+  onSelectionChanged,
+  onColumnMoved,
+  onColumnResized,
+  onSortChanged,
+  onColumnVisible,
 }: AgGridWrapperProps) {
   const { resolvedTheme } = useTheme();
   const theme = useMemo(() => getAgGridTheme(), []);
@@ -115,6 +133,12 @@ function AgGridInner({
           loading={loading}
           overlayNoRowsTemplate={emptyMessage ?? 'No records found'}
           rowSelection={rowSelection}
+          onGridReady={onGridReady}
+          onSelectionChanged={onSelectionChanged}
+          onColumnMoved={onColumnMoved}
+          onColumnResized={onColumnResized}
+          onSortChanged={onSortChanged}
+          onColumnVisible={onColumnVisible}
         />
       </AgGridProvider>
     </div>
