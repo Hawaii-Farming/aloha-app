@@ -13,6 +13,7 @@ import type {
   RowClassParams,
   RowClickedEvent,
   RowHeightParams,
+  RowSelectionOptions,
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
@@ -45,7 +46,7 @@ interface AgGridWrapperProps {
   domLayout?: 'normal' | 'autoHeight' | 'print';
   getRowHeight?: (params: RowHeightParams) => number | undefined;
   suppressRowClickSelection?: boolean;
-  rowSelection?: 'single' | 'multiple';
+  rowSelection?: 'single' | 'multiple' | RowSelectionOptions;
   onGridReady?: (event: GridReadyEvent) => void;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
   onColumnMoved?: (event: ColumnMovedEvent) => void;
