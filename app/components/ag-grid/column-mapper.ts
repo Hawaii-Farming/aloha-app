@@ -57,6 +57,31 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       colDef.cellRenderer = BadgeCellRenderer;
     }
 
+    // phone render: format as (XXX) XXX-XXXX
+    if (col.render === 'phone') {
+      colDef.valueFormatter = (params: ValueFormatterParams) => {
+        const raw = params.value as string | null;
+        if (!raw) return '';
+        const digits = raw.replace(/\D/g, '');
+        if (digits.length === 10) {
+          return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+        }
+        if (digits.length === 11 && digits[0] === '1') {
+          return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+        }
+        return raw;
+      };
+    }
+
+    // email render: lowercase
+    if (col.render === 'email') {
+      colDef.valueFormatter = (params: ValueFormatterParams) => {
+        const raw = params.value as string | null;
+        if (!raw) return '';
+        return raw.toLowerCase();
+      };
+    }
+
     // Badge/workflow columns get StatusBadgeRenderer
     if (col.type === 'badge' || col.type === 'workflow') {
       colDef.cellRenderer = StatusBadgeRenderer;

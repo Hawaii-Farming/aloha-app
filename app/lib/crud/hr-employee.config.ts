@@ -93,7 +93,12 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       priority: 'low',
     },
     { key: 'housing_site_name', label: 'Housing', priority: 'low' },
-    { key: 'company_email', label: 'Company Email', priority: 'low' },
+    {
+      key: 'company_email',
+      label: 'Company Email',
+      render: 'email',
+      priority: 'low',
+    },
     { key: 'hr_title_name', label: 'Title', sortable: true, priority: 'low' },
     {
       key: 'date_of_birth',
@@ -102,8 +107,8 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       sortable: true,
       priority: 'low',
     },
-    { key: 'phone', label: 'Phone', priority: 'low' },
-    { key: 'email', label: 'Email', priority: 'low' },
+    { key: 'phone', label: 'Phone', render: 'phone', priority: 'low' },
+    { key: 'email', label: 'Email', render: 'email', priority: 'low' },
   ],
 
   search: {
