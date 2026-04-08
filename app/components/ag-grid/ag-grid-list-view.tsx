@@ -56,6 +56,18 @@ import type {
 
 type RowData = Record<string, unknown>;
 
+const CHECKBOX_COL: ColDef = {
+  headerCheckboxSelection: true,
+  checkboxSelection: true,
+  maxWidth: 50,
+  sortable: false,
+  filter: false,
+  resizable: false,
+  suppressMovable: true,
+  pinned: 'left',
+  lockPosition: true,
+};
+
 const AVATAR_COL: ColDef = {
   headerName: '',
   field: 'profile_photo_url',
@@ -134,7 +146,7 @@ export default function AgGridListView({
     (tableData.data as RowData[])?.[0]?.profile_photo_url !== undefined;
 
   const allColDefs = useMemo(
-    () => [...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
+    () => [CHECKBOX_COL, ...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
     [dataColDefs, hasAvatar],
   );
 
@@ -307,12 +319,8 @@ export default function AgGridListView({
             fullWidthCellRenderer={fullWidthCellRenderer}
             getRowId={getRowId}
             getRowHeight={getRowHeight}
-            rowSelection={{
-              mode: 'multiRow',
-              checkboxes: true,
-              headerCheckbox: true,
-              enableClickSelection: false,
-            }}
+            rowSelection="multiple"
+            suppressRowClickSelection={true}
             pagination={true}
             paginationPageSize={tableData.pageSize}
             onGridReady={handleGridReady}
