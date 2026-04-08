@@ -20,7 +20,7 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       headerName: col.label,
       sortable: col.sortable ?? true,
       filter: getFilterType(col.type),
-      hide: col.priority === 'low',
+      hide: false,
     };
 
     // Date columns get dateFormatter
