@@ -21,19 +21,23 @@ function parseHours(value: string): number | null {
 }
 
 /**
- * Returns Tailwind class names for the pill based on shift duration.
- * - >= 8 hours: primary (full shift)
- * - < 6 hours: amber (short shift)
- * - 6-7.99 hours: muted (mid shift)
+ * Color palettes matching BadgeCellRenderer's brand style:
+ * translucent fill, colored border + text.
  */
-function pillClasses(hours: number | null): string {
-  if (hours !== null && hours >= 8) {
-    return 'bg-primary/10 text-primary';
-  }
-  if (hours !== null && hours < 6) {
-    return 'bg-amber-500/10 text-amber-600 dark:text-amber-400';
-  }
-  return 'bg-muted text-muted-foreground';
+const FULL_SHIFT = { base: '#3ecf8e', light: '#1a7f54', dark: '#3ecf8e' }; // emerald (>= 8h)
+const MID_SHIFT = { base: '#47a8f8', light: '#1a6fbf', dark: '#6dc0ff' }; // blue (6-8h)
+const SHORT_SHIFT = { base: '#f3a23a', light: '#b06e10', dark: '#f3a23a' }; // amber (< 6h)
+
+function getPalette(hours: number | null) {
+  if (hours !== null && hours >= 8) return FULL_SHIFT;
+  if (hours !== null && hours < 6) return SHORT_SHIFT;
+  return MID_SHIFT;
+}
+
+function isDarkMode(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  const wrapper = el.closest('[data-ag-theme-mode]');
+  return wrapper?.getAttribute('data-ag-theme-mode') === 'dark';
 }
 
 /**
@@ -52,12 +56,22 @@ export function ScheduleDayRenderer(props: CustomCellRendererProps) {
   }
 
   const hours = parseHours(value);
-  const classes = pillClasses(hours);
+  const palette = getPalette(hours);
+  const dark = isDarkMode(props.eGridCell);
+  const accent = dark ? palette.dark : palette.light;
 
   return (
     <div className="flex h-full items-center justify-center">
       <span
-        className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium ${classes}`}
+        className="inline-flex items-center rounded-md text-[11px] font-medium"
+        style={{
+          height: 22,
+          paddingLeft: 8,
+          paddingRight: 8,
+          backgroundColor: `${palette.base}1a`,
+          border: `1px solid ${accent}50`,
+          color: accent,
+        }}
       >
         {value}
       </span>

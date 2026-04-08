@@ -21,16 +21,9 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Columns3,
-  History,
-  Plus,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Columns3, Plus } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
-import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -48,7 +41,7 @@ import {
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import { BadgeCellRenderer } from '~/components/ag-grid/cell-renderers/badge-cell-renderer';
-import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
+import { HoursHeatmapRenderer } from '~/components/ag-grid/cell-renderers/hours-heatmap-renderer';
 import { ScheduleDayRenderer } from '~/components/ag-grid/cell-renderers/schedule-day-renderer';
 import {
   restoreColumnState,
@@ -149,7 +142,9 @@ function ScheduleDetailRowInner({
     () => [
       { headerName: 'Day', field: 'day_of_week', maxWidth: 70 },
       { headerName: 'Date', field: 'date', minWidth: 100 },
-      { headerName: 'Task', field: 'ops_task_id', minWidth: 120 },
+      { headerName: 'Dept', field: 'department_name', minWidth: 100 },
+      { headerName: 'Stat', field: 'stat', minWidth: 80 },
+      { headerName: 'Task', field: 'task_name', minWidth: 120 },
       {
         headerName: 'Start',
         field: 'start_time_formatted',
@@ -252,8 +247,6 @@ function ColumnVisibilityDropdown({
   );
 }
 
-const noop = () => {};
-
 export default function SchedulerListView(props: ListViewProps) {
   const {
     tableData,
@@ -268,9 +261,8 @@ export default function SchedulerListView(props: ListViewProps) {
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'schedule' | 'history'>('schedule');
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -317,17 +309,10 @@ export default function SchedulerListView(props: ListViewProps) {
   const handleNext = useCallback(() => navigateWeek('next'), [navigateWeek]);
   const handleToday = useCallback(() => navigateWeek('today'), [navigateWeek]);
 
-  const handleViewToggle = useCallback(() => {
-    setViewMode((prev) => (prev === 'schedule' ? 'history' : 'schedule'));
-  }, []);
-
-  // Fetch history summary when switching to history mode
-  // Justified: data fetch triggered by view mode change
+  // Fetch history summary on mount
+  // Justified: both tables render simultaneously, history needs its own data
   useEffect(() => {
-    if (viewMode !== 'history') return;
-
     let cancelled = false;
-    setHistoryLoading(true);
 
     async function fetchSummary() {
       try {
@@ -352,19 +337,34 @@ export default function SchedulerListView(props: ListViewProps) {
     return () => {
       cancelled = true;
     };
-  }, [viewMode, accountSlug]);
+  }, [accountSlug]);
 
   // Data columns (after checkbox + avatar) for column visibility dropdown
   const dataColDefs: ColDef[] = useMemo(
     () => [
       {
         headerName: 'Employee',
-        field: 'first_name',
-        cellRenderer: EmployeeCellRenderer,
-        minWidth: 180,
+        field: 'full_name',
+        minWidth: 160,
         sortable: true,
         filter: true,
         pinned: 'left' as const,
+      },
+      {
+        headerName: 'Dept',
+        field: 'department_name',
+        cellRenderer: BadgeCellRenderer,
+        minWidth: 110,
+        sortable: true,
+        filter: true,
+      },
+      {
+        headerName: 'Stat',
+        field: 'work_authorization_name',
+        cellRenderer: BadgeCellRenderer,
+        minWidth: 90,
+        sortable: true,
+        filter: true,
       },
       {
         headerName: 'Task',
@@ -433,9 +433,10 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Total Hrs',
         field: 'total_hours',
+        cellRenderer: HoursHeatmapRenderer,
         sortable: true,
         type: 'numericColumn',
-        minWidth: 90,
+        minWidth: 100,
       },
     ],
     [],
@@ -466,6 +467,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Total Hours',
         field: 'total_hours',
+        cellRenderer: HoursHeatmapRenderer,
         sortable: true,
         type: 'numericColumn',
         minWidth: 110,
@@ -570,6 +572,8 @@ export default function SchedulerListView(props: ListViewProps) {
     [],
   );
 
+  const getHistoryRowHeight = useCallback(() => 46, []);
+
   const departmentOptions = fkOptions.hr_department_id ?? [];
 
   return (
@@ -578,77 +582,82 @@ export default function SchedulerListView(props: ListViewProps) {
         className="flex min-h-0 flex-1 flex-col"
         data-test="scheduler-list-view"
       >
-        {/* Top row: week navigation + dept filter + history + create */}
+        {/* Single toolbar row — spans full width */}
         <div className="flex shrink-0 items-center justify-between gap-4 pb-4">
-          {viewMode === 'schedule' && (
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handlePrev}
-                data-test="week-nav-prev"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleToday}
-                data-test="week-nav-today"
-              >
-                Today
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleNext}
-                data-test="week-nav-next"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-
-              <span className="text-sm font-medium">
-                {formatWeekLabel(currentWeek)}
-              </span>
-            </div>
-          )}
-
-          {viewMode === 'history' && (
-            <div className="text-sm font-medium">Schedule History Summary</div>
-          )}
-
           <div className="flex items-center gap-2">
-            {viewMode === 'schedule' && (
-              <Select
-                value={currentDept || 'all'}
-                onValueChange={handleDeptChange}
-              >
-                <SelectTrigger className="w-[200px]" data-test="dept-filter">
-                  <SelectValue placeholder="All Departments" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  {departmentOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handlePrev}
+              data-test="week-nav-prev"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
 
             <Button
               size="sm"
-              variant={viewMode === 'history' ? 'default' : 'outline'}
-              onClick={handleViewToggle}
-              data-test="history-toggle"
+              variant="outline"
+              onClick={handleToday}
+              data-test="week-nav-today"
             >
-              <History className="mr-2 h-4 w-4" />
-              {viewMode === 'schedule' ? 'History' : 'Schedule'}
+              Today
             </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleNext}
+              data-test="week-nav-next"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+
+            <span className="text-sm font-medium">
+              {formatWeekLabel(currentWeek)}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchValue(value);
+
+                if (searchDebounceRef.current) {
+                  clearTimeout(searchDebounceRef.current);
+                }
+
+                searchDebounceRef.current = setTimeout(() => {
+                  setSearchValue(value);
+                }, 300);
+              }}
+              placeholder="Search scheduler..."
+              className="border-input bg-background placeholder:text-muted-foreground h-8 w-[200px] rounded-md border px-3 text-sm"
+              data-test="scheduler-search"
+            />
+
+            <Select
+              value={currentDept || 'all'}
+              onValueChange={handleDeptChange}
+            >
+              <SelectTrigger className="h-8 w-[180px]" data-test="dept-filter">
+                <SelectValue placeholder="All Departments" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departmentOptions.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <ColumnVisibilityDropdown gridApi={gridApi} colDefs={dataColDefs} />
+            <CsvExportButton gridApi={gridApi} fileName="scheduler" />
 
             <Button
               size="sm"
@@ -662,72 +671,51 @@ export default function SchedulerListView(props: ListViewProps) {
           </div>
         </div>
 
-        {/* Second row: search + column visibility + CSV export */}
-        {viewMode === 'schedule' && (
-          <div className="shrink-0 overflow-visible pb-4">
-            <DataTableToolbar
-              searchValue={searchValue}
-              onSearchChange={(value) => {
-                setSearchValue(value);
-
-                if (searchDebounceRef.current) {
-                  clearTimeout(searchDebounceRef.current);
-                }
-
-                searchDebounceRef.current = setTimeout(() => {
-                  setSearchValue(value);
-                }, 300);
-              }}
-              searchPlaceholder="Search scheduler..."
-              showInactive={false}
-              onShowInactiveChange={noop}
-              actionSlot={
-                <div className="flex items-center gap-2">
-                  <ColumnVisibilityDropdown
-                    gridApi={gridApi}
-                    colDefs={dataColDefs}
-                  />
-                  <CsvExportButton gridApi={gridApi} fileName="scheduler" />
-                </div>
-              }
-            />
+        {/* Two tables side by side, grids aligned */}
+        <div className="flex min-h-0 flex-1 gap-4">
+          {/* Historical Data — left */}
+          <div className="flex w-[370px] shrink-0 flex-col">
+            <h3 className="pb-2 text-sm font-semibold">Historical Data</h3>
+            <div className="flex min-h-0 flex-1 flex-col">
+              <AgGridWrapper
+                colDefs={historyColDefs}
+                rowData={historyData as unknown as RowData[]}
+                loading={historyLoading}
+                pagination={false}
+                getRowHeight={getHistoryRowHeight}
+                emptyMessage="No schedule history found"
+              />
+            </div>
           </div>
-        )}
 
-        <div className="flex min-h-0 flex-1 flex-col">
-          {viewMode === 'schedule' ? (
-            <AgGridWrapper
-              gridRef={gridRef}
-              colDefs={colDefs}
-              rowData={detailRowData as RowData[]}
-              rowClassRules={otWarningRowClassRules}
-              quickFilterText={searchValue}
-              onRowClicked={handleDetailRowClicked}
-              isFullWidthRow={isFullWidthRow}
-              fullWidthCellRenderer={fullWidthCellRenderer}
-              getRowId={getRowId}
-              getRowHeight={getRowHeight}
-              rowSelection="multiple"
-              suppressRowClickSelection={true}
-              pagination={true}
-              paginationPageSize={25}
-              onGridReady={handleGridReady}
-              onSelectionChanged={handleSelectionChanged}
-              onColumnMoved={handleColumnMoved}
-              onColumnResized={handleColumnResized}
-              onSortChanged={handleSortChanged}
-              onColumnVisible={handleColumnVisible}
-            />
-          ) : (
-            <AgGridWrapper
-              colDefs={historyColDefs}
-              rowData={historyData as unknown as RowData[]}
-              loading={historyLoading}
-              pagination={true}
-              paginationPageSize={25}
-              emptyMessage="No schedule history found"
-            />
-          )}
+          {/* Weekly Schedule — right */}
+          <div className="flex min-h-0 flex-1 flex-col">
+            <h3 className="pb-2 text-sm font-semibold">Weekly Schedule</h3>
+            <div className="flex min-h-0 flex-1 flex-col">
+              <AgGridWrapper
+                gridRef={gridRef}
+                colDefs={colDefs}
+                rowData={detailRowData as RowData[]}
+                rowClassRules={otWarningRowClassRules}
+                quickFilterText={searchValue}
+                onRowClicked={handleDetailRowClicked}
+                isFullWidthRow={isFullWidthRow}
+                fullWidthCellRenderer={fullWidthCellRenderer}
+                getRowId={getRowId}
+                getRowHeight={getRowHeight}
+                rowSelection="multiple"
+                suppressRowClickSelection={true}
+                pagination={true}
+                paginationPageSize={25}
+                onGridReady={handleGridReady}
+                onSelectionChanged={handleSelectionChanged}
+                onColumnMoved={handleColumnMoved}
+                onColumnResized={handleColumnResized}
+                onSortChanged={handleSortChanged}
+                onColumnVisible={handleColumnVisible}
+              />
+            </div>
+          </div>
         </div>
       </div>
 

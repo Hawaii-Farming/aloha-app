@@ -22,7 +22,7 @@ export const loader = async ({ request }: { request: Request }) => {
     const { data, error } = await client
       .from('ops_task_schedule' as never)
       .select(
-        'id, start_time, stop_time, ops_task_id, hr_employee_id, org_id, is_deleted, created_at',
+        'id, start_time, stop_time, ops_task_id, hr_employee_id, org_id, is_deleted, created_at, hr_employee!inner(hr_department(name), hr_work_authorization(name)), ops_task!inner(name)',
       )
       .eq('org_id', orgId)
       .eq('hr_employee_id', employeeId)
@@ -74,6 +74,17 @@ export const loader = async ({ request }: { request: Request }) => {
           })
         : '';
 
+      const emp = row.hr_employee as Record<string, unknown> | null | undefined;
+      const dept = emp?.hr_department as
+        | Record<string, unknown>
+        | null
+        | undefined;
+      const wa = emp?.hr_work_authorization as
+        | Record<string, unknown>
+        | null
+        | undefined;
+      const task = row.ops_task as Record<string, unknown> | null | undefined;
+
       return {
         ...row,
         day_of_week: dayOfWeek,
@@ -81,6 +92,9 @@ export const loader = async ({ request }: { request: Request }) => {
         start_time_formatted: startTime,
         end_time_formatted: endTime,
         hours,
+        department_name: (dept?.name as string) ?? '',
+        stat: (wa?.name as string) ?? '',
+        task_name: (task?.name as string) ?? (row.ops_task_id as string),
       };
     });
 

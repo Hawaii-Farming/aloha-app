@@ -17,23 +17,30 @@ interface EmployeeRow {
   profile_photo_url?: string | null;
   first_name?: string;
   last_name?: string;
+  full_name?: string;
 }
 
 /**
  * AG Grid cell renderer that displays an employee avatar.
  * Shows profile photo if available, otherwise shows initials fallback.
- * Designed as a standalone column (no name text — name is in a separate column).
+ * Supports both first_name/last_name (Register) and full_name (Scheduler) fields.
  */
 export function AvatarRenderer(props: CustomCellRendererProps) {
   const data = props.data as EmployeeRow | undefined;
   if (!data) return null;
 
-  const { profile_photo_url, first_name, last_name } = data;
+  const { profile_photo_url, first_name, last_name, full_name } = data;
   const displayName =
     first_name && last_name
       ? `${first_name} ${last_name}`
-      : last_name || first_name || '';
-  const initials = getInitials(first_name, last_name);
+      : full_name || last_name || first_name || '';
+  const initials =
+    first_name || last_name
+      ? getInitials(first_name, last_name)
+      : getInitials(
+          full_name?.split(' ')[0],
+          full_name?.split(' ').slice(1).pop(),
+        );
 
   return (
     <div className="flex h-full items-center justify-center">

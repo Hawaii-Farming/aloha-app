@@ -1,6 +1,8 @@
 import type { ComponentType } from 'react';
 import { Suspense, lazy } from 'react';
 
+import { useParams } from 'react-router';
+
 import { format, startOfWeek } from 'date-fns';
 
 import { TableListView } from '~/components/crud/table-list-view';
@@ -194,8 +196,12 @@ const customViewCache = new Map<
   ComponentType<ListViewProps>
 >();
 
-function resolveListView(config: CrudModuleConfig | undefined) {
-  const viewType = config?.viewType?.list ?? 'table';
+function resolveListView(subModuleSlug: string) {
+  // Re-resolve config from the registry on the client side.
+  // The config from loaderData is serialized over the wire and loses
+  // non-serializable fields like customViews (functions).
+  const freshConfig = getModuleConfig(subModuleSlug);
+  const viewType = freshConfig?.viewType?.list ?? 'table';
 
   switch (viewType) {
     case 'agGrid': {
@@ -203,7 +209,7 @@ function resolveListView(config: CrudModuleConfig | undefined) {
     }
 
     case 'custom': {
-      const loader = config?.customViews?.list;
+      const loader = freshConfig?.customViews?.list;
 
       if (loader) {
         let cached = customViewCache.get(loader);
@@ -244,7 +250,9 @@ export default function SubModulePage(props: {
     comboboxOptions,
   } = props.loaderData;
 
-  const ViewComponent = resolveListView(config);
+  const params = useParams();
+  const subModuleSlug = params.subModule ?? '';
+  const ViewComponent = resolveListView(subModuleSlug);
 
   const viewProps: ListViewProps = {
     data: tableData.data as Record<string, unknown>[],

@@ -1,4 +1,5 @@
-CREATE OR REPLACE VIEW ops_task_weekly_schedule AS
+DROP VIEW IF EXISTS ops_task_weekly_schedule;
+CREATE VIEW ops_task_weekly_schedule AS
 WITH schedule_base AS (
     -- Planned schedule entries only (no tracker linked).
     -- Derives the task date from start_time and the Sunday-anchored week start date.
