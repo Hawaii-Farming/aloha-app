@@ -128,7 +128,7 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
   const gender = resolve('gender');
 
   return (
-    <div className="bg-muted/40 flex gap-5 rounded-sm px-4 pt-3 pb-5">
+    <div className="flex gap-5 px-4 py-4">
       {/* Avatar */}
       <div className="flex shrink-0 flex-col items-center gap-1">
         {photoUrl ? (
