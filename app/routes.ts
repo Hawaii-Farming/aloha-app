@@ -12,6 +12,7 @@ const apiRoutes = [
   route('api/db/webhook', 'routes/api/db/webhook.ts'),
   route('api/ai/chat', 'routes/api/ai/chat.ts'),
   route('api/ai/form-assist', 'routes/api/ai/form-assist.ts'),
+  route('api/schedule-history', 'routes/api/schedule-history.ts'),
 ];
 
 const authLayout = layout('routes/auth/layout.tsx', [
