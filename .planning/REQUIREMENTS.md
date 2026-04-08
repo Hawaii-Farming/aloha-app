@@ -27,12 +27,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Scheduler
 
-- [ ] **SCHED-01**: Weekly schedule grid view using `ops_task_weekly_schedule` SQL view with Sun-Sat day columns
+- [x] **SCHED-01**: Weekly schedule grid view using `ops_task_weekly_schedule` SQL view with Sun-Sat day columns
 - [ ] **SCHED-02**: Week navigation controls (previous/next/current week) filtering by `week_start_date`
-- [ ] **SCHED-03**: Employee name (with photo), department, work authorization, task, and total hours displayed per row
+- [x] **SCHED-03**: Employee name (with photo), department, work authorization, task, and total hours displayed per row
 - [ ] **SCHED-04**: Overtime flag/highlight when employee exceeds OT threshold (`is_over_ot_threshold`)
 - [ ] **SCHED-05**: Row-click full-width detail showing employee historical schedule data (day, dept, stat, task, start time, end time, hours, date)
-- [ ] **SCHED-06**: Create schedule entry form (side panel): employee dropdown (required), task dropdown (required), date (required), start time, end time, hours
+- [x] **SCHED-06**: Create schedule entry form (side panel): employee dropdown (required), task dropdown (required), date (required), start time, end time, hours
 - [ ] **SCHED-07**: Department filter for the schedule grid
 - [ ] **SCHED-08**: Historical data summary view (date, number of employees, number of hours)
 
@@ -141,12 +141,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GRID-13 | Phase 1 | Complete |
 | GRID-14 | Phase 1 | Complete |
 | GRID-15 | Phase 1 | Complete |
-| SCHED-01 | Phase 2 | Pending |
+| SCHED-01 | Phase 2 | Complete |
 | SCHED-02 | Phase 2 | Pending |
-| SCHED-03 | Phase 2 | Pending |
+| SCHED-03 | Phase 2 | Complete |
 | SCHED-04 | Phase 2 | Pending |
 | SCHED-05 | Phase 2 | Pending |
-| SCHED-06 | Phase 2 | Pending |
+| SCHED-06 | Phase 2 | Complete |
 | SCHED-07 | Phase 2 | Pending |
 | SCHED-08 | Phase 2 | Pending |
 | TOFF-01 | Phase 3 | Pending |
