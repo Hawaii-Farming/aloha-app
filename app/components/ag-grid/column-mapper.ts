@@ -33,7 +33,6 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       colDef.cellRenderer = EmployeeCellRenderer;
       colDef.autoHeight = true;
       colDef.minWidth = 250;
-      colDef.flex = 1;
       colDef.valueGetter = (params: ValueGetterParams) => {
         const first = (params.data?.first_name as string) ?? '';
         const last = (params.data?.last_name as string) ?? '';

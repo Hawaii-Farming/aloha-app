@@ -120,7 +120,7 @@ function AgGridInner({
       ref={containerRef}
       data-ag-theme-mode={resolvedTheme === 'dark' ? 'dark' : 'light'}
       data-test="ag-grid-wrapper"
-      className="h-full w-full"
+      className="h-full"
       style={
         effectiveDomLayout === 'normal'
           ? { height: height ?? '100%' }
