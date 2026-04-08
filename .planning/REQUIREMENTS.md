@@ -16,14 +16,14 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **GRID-05**: Column sorting (multi-column), filtering (text/number/date), and quick-filter search bar on all grids
 - [x] **GRID-06**: Column resize, reorder, and responsive hiding on narrower screens
 - [x] **GRID-07**: Pagination on all grids
-- [ ] **GRID-08**: Side-panel CRUD forms (right-side Shadcn Sheet) matching register pattern for all submodules
+- [x] **GRID-08**: Side-panel CRUD forms (right-side Shadcn Sheet) matching register pattern for all submodules
 - [x] **GRID-09**: Status badge cell renderer for status columns (pending/approved/denied, etc.)
 - [x] **GRID-10**: Date formatting (locale-aware) and currency formatting ($, 2 decimals) via AG Grid valueFormatters
 - [x] **GRID-11**: Employee photo/avatar cell renderer using `hr_employee.profile_photo_url`
 - [x] **GRID-12**: Column state persistence to localStorage (widths, order, visibility) across sessions
 - [x] **GRID-13**: CSV export for data grids (payroll and general)
 - [x] **GRID-14**: Conditional row styling for OT warnings, variance highlighting, and status-based coloring via `rowClassRules`/`cellClassRules`
-- [ ] **GRID-15**: Convert existing register submodule from TanStack Table to AG Grid as the proof-of-concept integration
+- [x] **GRID-15**: Convert existing register submodule from TanStack Table to AG Grid as the proof-of-concept integration
 
 ### Scheduler
 
@@ -133,14 +133,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GRID-05 | Phase 1 | Complete |
 | GRID-06 | Phase 1 | Complete |
 | GRID-07 | Phase 1 | Complete |
-| GRID-08 | Phase 1 | Pending |
+| GRID-08 | Phase 1 | Complete |
 | GRID-09 | Phase 1 | Complete |
 | GRID-10 | Phase 1 | Complete |
 | GRID-11 | Phase 1 | Complete |
 | GRID-12 | Phase 1 | Complete |
 | GRID-13 | Phase 1 | Complete |
 | GRID-14 | Phase 1 | Complete |
-| GRID-15 | Phase 1 | Pending |
+| GRID-15 | Phase 1 | Complete |
 | SCHED-01 | Phase 2 | Pending |
 | SCHED-02 | Phase 2 | Pending |
 | SCHED-03 | Phase 2 | Pending |
