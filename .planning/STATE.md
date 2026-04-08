@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-08)
 Phase: 3
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-04-08
+Last activity: 2026-04-08 - Completed quick task 260408-mj6: Scheduler AG Grid with Register-style features
 
 Progress: [██░░░░░░░░] 17%
 
@@ -96,6 +96,12 @@ None yet.
 - Payroll Data (PDAT) needs schema investigation to confirm all hr_payroll columns for column groups
 - hr_employee_review table does not exist yet (Phase 6 migration)
 - org_site may need max_beds column addition (Phase 6 migration)
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260408-mj6 | Scheduler AG Grid with Register-style features | 2026-04-08 | 48b6015 | [260408-mj6-make-scheduler-table-an-aggrid-table-ins](./quick/260408-mj6-make-scheduler-table-an-aggrid-table-ins/) |
 
 ## Session Continuity
 
