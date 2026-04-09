@@ -1,14 +1,4 @@
-# Stage 1: Install dependencies
-FROM node:20-slim AS deps
-RUN corepack enable
-WORKDIR /app
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY tooling/ ./tooling/
-COPY packages/ui/package.json ./packages/ui/
-COPY packages/mcp-server/package.json ./packages/mcp-server/
-RUN pnpm install --frozen-lockfile
-
-# Stage 2: Build
+# Stage 1: Build
 FROM node:20-slim AS build
 RUN corepack enable
 WORKDIR /app
@@ -34,19 +24,23 @@ ARG VITE_DISPLAY_TERMS_AND_CONDITIONS_CHECKBOX=false
 ARG VITE_LOCALES_PATH=public/locales
 ARG VITE_ENABLE_SIDEBAR_TRIGGER=false
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages/ui/node_modules ./packages/ui/node_modules
 COPY . .
+RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
-# Stage 3: Production
+# Stage 2: Production (slim)
 FROM node:20-slim AS production
 RUN corepack enable
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
+
+COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=build /app/tooling ./tooling
+COPY --from=build /app/packages ./packages
 COPY --from=build /app/build ./build
 COPY --from=build /app/public ./public
-COPY --from=build /app/package.json ./
+
+RUN pnpm install --frozen-lockfile --prod
+
 EXPOSE 3000
 CMD ["npx", "react-router-serve", "./build/server/index.js"]
