@@ -185,13 +185,13 @@ export const loader = async (args: {
     if (subModuleSlug === 'payroll_data') {
       const { data: empData } = await client
         .from('hr_employee' as never)
-        .select('id, full_name')
+        .select('id, first_name, last_name')
         .eq('org_id', accountSlug)
         .eq('is_deleted', false)
-        .order('full_name');
+        .order('last_name');
       employees = castRows(empData).map((r) => ({
         value: String(r.id),
-        label: String(r.full_name),
+        label: `${r.first_name ?? ''} ${r.last_name ?? ''}`.trim(),
       }));
     }
 
