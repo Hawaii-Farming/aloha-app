@@ -13,7 +13,7 @@ import type {
   SortChangedEvent,
 } from 'ag-grid-community';
 import type { AgGridReact } from 'ag-grid-react';
-import { Columns3, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -28,12 +28,6 @@ import {
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
 import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@aloha/ui/dropdown-menu';
 import { Trans } from '@aloha/ui/trans';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
@@ -263,10 +257,6 @@ export default function AgGridListView({
                     onComplete={clearSelection}
                   />
                 )}
-                <ColumnVisibilityDropdown
-                  gridApi={gridApi}
-                  colDefs={dataColDefs}
-                />
                 <CsvExportButton
                   gridApi={gridApi}
                   fileName={config?.tableName}
@@ -321,64 +311,6 @@ export default function AgGridListView({
         subModuleDisplayName={subModuleDisplayName}
       />
     </>
-  );
-}
-
-function ColumnVisibilityDropdown({
-  gridApi,
-  colDefs,
-}: {
-  gridApi: GridApi | null;
-  colDefs: ColDef[];
-}) {
-  const [, forceUpdate] = useState(0);
-
-  const handleToggle = useCallback(
-    (colId: string, visible: boolean) => {
-      if (!gridApi) return;
-      gridApi.setColumnsVisible([colId], visible);
-      forceUpdate((n) => n + 1);
-    },
-    [gridApi],
-  );
-
-  const columnStates = gridApi?.getColumnState();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          data-test="column-visibility-toggle"
-        >
-          <Columns3 className="mr-2 h-4 w-4" />
-          Columns
-        </Button>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end" className="w-48">
-        {colDefs.map((col) => {
-          const colId = col.field ?? col.colId ?? '';
-          if (!colId) return null;
-
-          const state = columnStates?.find((s) => s.colId === colId);
-          const isVisible = state ? !state.hide : !col.hide;
-
-          return (
-            <DropdownMenuCheckboxItem
-              key={colId}
-              checked={isVisible}
-              onCheckedChange={(checked) =>
-                handleToggle(colId, checked as boolean)
-              }
-            >
-              {col.headerName ?? colId}
-            </DropdownMenuCheckboxItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }
 
