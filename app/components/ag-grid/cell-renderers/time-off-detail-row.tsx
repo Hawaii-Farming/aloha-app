@@ -126,7 +126,7 @@ export function TimeOffDetailRow({ data }: TimeOffDetailRowProps) {
       </div>
 
       {/* Center: Info */}
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         {/* Row 1: Name + badges */}
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold">{fullName}</span>

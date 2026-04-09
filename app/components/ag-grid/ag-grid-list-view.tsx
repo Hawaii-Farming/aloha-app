@@ -144,7 +144,7 @@ export default function AgGridListView({
     gridRef,
   });
 
-  const detailRowHeight = freshConfig?.agGridDetailRow ? 200 : 160;
+  const detailRowHeight = 160;
   const getRowHeight = useCallback(
     (params: { data?: Record<string, unknown> }) => {
       if (params.data?._isDetailRow) return detailRowHeight;
