@@ -123,7 +123,13 @@ Plans:
   4. User can create/edit reviews via side-panel form with 1-3 score selects; locked reviews cannot be edited
   5. Clicking a review row expands to show full review details
   6. hr_employee_review table and org_site.max_beds schema migrations are applied with RLS policies
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — SQL migrations: org_site max_beds, app_hr_housing view, hr_employee_review table + RLS, app_hr_employee_reviews view
+- [ ] 06-02-PLAN.md — Housing CRUD config, detail row with tenant API, registry entry, category auto-resolution
+- [ ] 06-03-PLAN.md — Employee review config, custom list view, Year-Quarter filter, score color coding, lock enforcement
+- [ ] 06-04-PLAN.md — Schema push to hosted Supabase, typecheck, visual verification
 **UI hint**: yes
 
 ## Progress
@@ -138,4 +144,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Time Off | 0/TBD | Not started | - |
 | 4. Payroll Views | 0/4 | Planning complete | - |
 | 5. Hours Comparison | 0/3 | Planning complete | - |
-| 6. Housing & Employee Review | 0/TBD | Not started | - |
+| 6. Housing & Employee Review | 0/4 | Planning complete | - |
