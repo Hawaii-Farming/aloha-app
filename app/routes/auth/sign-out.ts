@@ -7,5 +7,7 @@ export async function action({ request }: { request: Request }) {
 
   await client.auth.signOut();
 
-  return redirect('/auth/sign-in');
+  return redirect('/auth/sign-in', {
+    headers: request.headers,
+  });
 }
