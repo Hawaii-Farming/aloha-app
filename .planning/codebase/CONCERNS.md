@@ -6,7 +6,7 @@
 
 **Soft-delete filtering without comprehensive indexing:**
 - Problem: Over 110 occurrences of `is_deleted` columns across the schema, but only 5 tables have explicit `is_deleted` indexes. Query filters on `is_deleted = false` in `loadTableData()` and `loadDetailData()` will full-table scan on unindexed tables, especially as org data grows.
-- Files: `app/lib/crud/crud-helpers.server.ts` (lines 132, 140), `supabase/migrations/` (all table definitions from `20260401000001_*` onward)
+- Files: `app/lib/crud/crud-helpers.server.ts` (lines 132, 140), `supabase/migrations/` (all table definitions from `20260408000001_*` onward)
 - Cause: Tables created without `CREATE INDEX idx_<table>_active ON <table>(org_id, is_deleted)` pattern. Some tables have it (e.g., `hr_department`, `hr_work_authorization`), but majority don't.
 - Improvement path: 
   1. Audit all migrations and count tables with `is_deleted` but no index
@@ -93,7 +93,7 @@
 
 **Multi-tenant org isolation via RLS + application-layer access checks:**
 - Risk: RLS policies on `hr_employee` and org depend on `auth.uid()` session cookie. If session is hijacked, attacker can read/write any org the victim belongs to.
-- Files: `supabase/migrations/20260401000142_app_views.sql` (lines 39-73, app_navigation view), `app/lib/workspace/org-workspace-loader.server.ts` (lines 44-54)
+- Files: `supabase/migrations/20260408000142_app_views.sql` (lines 39-73, app_navigation view), `app/lib/workspace/org-workspace-loader.server.ts` (lines 44-54)
 - Current mitigation: 
   1. RLS policies use `auth.uid()` from JWT; Supabase session is httpOnly cookie
   2. Application checks `hr_module_access` for can_edit/can_delete before mutations

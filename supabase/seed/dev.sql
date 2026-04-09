@@ -9,5 +9,5 @@
 -- aloha-data-migrations repo (a sibling directory). Run them in numbered
 -- order from that repo against the local Supabase URL.
 --
--- The auto-link trigger (20260401000141_auth_auto_link_employee.sql)
+-- The auto-link trigger (20260408000141_auth_auto_link_employee.sql)
 -- will connect auth.users to hr_employee on first sign-in.

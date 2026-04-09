@@ -223,7 +223,7 @@ docs/processes/YYYYMMDDHHMMSS_workflow_name.md
 
 **Migration scripts and process scripts** live in the separate [`aloha-data-migrations`](../aloha-data-migrations) repo. They follow their own conventions documented in `MIGRATION_CONVENTIONS.md` over there. When schema changes here require updates to data import scripts, coordinate the changes across both repos.
 
-The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260401000001_sys.md`, `20260401000001_sys_uom.sql`).
+The timestamp provides ordering and uniqueness. Each file type shares the same timestamp prefix for related items (e.g. `20260408000001_sys.md`, `20260408000001_sys_uom.sql`).
 
 ---
 
