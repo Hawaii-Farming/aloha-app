@@ -94,7 +94,7 @@ function PayrollDetailInner({ data }: { data: RowData }) {
       style={{
         height: '360px',
         background:
-          'repeating-linear-gradient(0deg, transparent, transparent 27px, var(--color-border) 27px, var(--color-border) 28px)',
+          'repeating-linear-gradient(0deg, transparent, transparent 27px, color-mix(in srgb, var(--color-border) 15%, transparent) 27px, color-mix(in srgb, var(--color-border) 15%, transparent) 28px)',
         backgroundPositionY: '32px',
       }}
     >
@@ -230,13 +230,14 @@ const byDeptColDefs: ColDef[] = [
     headerName: 'Department',
     sortable: true,
     filter: true,
-    minWidth: 220,
+    minWidth: 250,
   },
   {
     field: 'employee_count',
     headerName: 'Employees',
     type: 'numericColumn',
-    minWidth: 130,
+    flex: 1,
+    minWidth: 100,
     cellRenderer: (props: CustomCellRendererProps) => {
       const value = props.value as number | null;
       if (value == null) return null;
@@ -254,28 +255,32 @@ const byDeptColDefs: ColDef[] = [
     headerName: 'Reg Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
-    minWidth: 130,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'overtime_hours',
     headerName: 'OT Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
-    minWidth: 130,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'total_hours',
     headerName: 'Total Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
-    minWidth: 130,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'gross_wage',
     headerName: 'Gross Wage',
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
-    minWidth: 160,
+    flex: 1,
+    minWidth: 120,
   },
   {
     field: 'net_pay',
@@ -283,7 +288,7 @@ const byDeptColDefs: ColDef[] = [
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
     flex: 1,
-    minWidth: 160,
+    minWidth: 120,
   },
 ];
 
@@ -309,7 +314,7 @@ const byEmployeeColDefs: ColDef[] = [
     cellRenderer: EmployeeDeptRenderer,
     sortable: true,
     filter: true,
-    minWidth: 220,
+    minWidth: 250,
     pinned: 'left',
   },
   {
@@ -317,28 +322,32 @@ const byEmployeeColDefs: ColDef[] = [
     headerName: 'Reg Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
-    minWidth: 130,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'overtime_hours',
     headerName: 'OT Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
-    minWidth: 130,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'total_hours',
     headerName: 'Total Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
-    minWidth: 130,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'gross_wage',
     headerName: 'Gross Wage',
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
-    minWidth: 160,
+    flex: 1,
+    minWidth: 120,
   },
   {
     field: 'net_pay',
@@ -346,7 +355,7 @@ const byEmployeeColDefs: ColDef[] = [
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
     flex: 1,
-    minWidth: 160,
+    minWidth: 120,
   },
 ];
 

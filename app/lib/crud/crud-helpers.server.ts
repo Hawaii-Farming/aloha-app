@@ -90,6 +90,9 @@ export interface LoadTableDataParams {
   /** Whitelist of column keys allowed for sort/filter from URL params.
    *  If omitted, sort and filter URL params are ignored entirely. */
   allowedColumns?: string[];
+  /** Skip the `.eq('is_deleted', false)` filter when the view already
+   *  filters deleted rows internally and doesn't expose the column. */
+  skipDeletedFilter?: boolean;
 }
 
 /** Strip PostgREST filter delimiters from search input to prevent
@@ -128,8 +131,11 @@ export async function loadTableData<T = Record<string, unknown>>(
   let query = params.client
     .from(params.viewName as never)
     .select(params.select ?? '*', { count: 'exact' })
-    .eq('org_id', params.orgId)
-    .eq('is_deleted', false);
+    .eq('org_id', params.orgId);
+
+  if (!params.skipDeletedFilter) {
+    query = query.eq('is_deleted', false);
+  }
 
   // Text search (TABLE-05) using PostgREST .or() syntax
   if (search && params.searchColumns?.length) {

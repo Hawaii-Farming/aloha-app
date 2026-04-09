@@ -163,7 +163,7 @@ function PayrollDetailInner({ data }: { data: RowData }) {
       style={{
         height: '360px',
         background:
-          'repeating-linear-gradient(0deg, transparent, transparent 27px, var(--color-border) 27px, var(--color-border) 28px)',
+          'repeating-linear-gradient(0deg, transparent, transparent 27px, color-mix(in srgb, var(--color-border) 15%, transparent) 27px, color-mix(in srgb, var(--color-border) 15%, transparent) 28px)',
         backgroundPositionY: '32px',
       }}
     >
@@ -303,7 +303,7 @@ const colDefs: ColDef[] = [
     cellRenderer: EmployeeDeptRenderer,
     sortable: true,
     filter: true,
-    minWidth: 200,
+    minWidth: 250,
     pinned: 'left',
   },
   {
@@ -311,24 +311,32 @@ const colDefs: ColDef[] = [
     headerName: 'Reg Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'overtime_hours',
     headerName: 'OT Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'total_hours',
     headerName: 'Total Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
+    flex: 1,
+    minWidth: 100,
   },
   {
     field: 'gross_wage',
     headerName: 'Gross Wage',
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
+    flex: 1,
+    minWidth: 120,
   },
   {
     field: 'net_pay',
@@ -336,7 +344,7 @@ const colDefs: ColDef[] = [
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
     flex: 1,
-    minWidth: 140,
+    minWidth: 120,
   },
 ];
 

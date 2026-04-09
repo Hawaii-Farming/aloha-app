@@ -4,11 +4,13 @@ import type {
   ValueGetterParams,
 } from 'ag-grid-community';
 
-import { BadgeCellRenderer } from '~/components/ag-grid/cell-renderers/badge-cell-renderer';
 import { CodeCellRenderer } from '~/components/ag-grid/cell-renderers/code-cell-renderer';
-import { DatePillRenderer } from '~/components/ag-grid/cell-renderers/date-pill-renderer';
-import { EmailPillRenderer } from '~/components/ag-grid/cell-renderers/email-pill-renderer';
 import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
+import {
+  DatePillRenderer,
+  EmailPillRenderer,
+  HashPillRenderer,
+} from '~/components/ag-grid/cell-renderers/pill-renderer';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
 import type { ColumnConfig } from '~/lib/crud/types';
 
@@ -56,7 +58,7 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
 
     // badge render: categorical values shown as colored badges
     if (col.render === 'badge') {
-      colDef.cellRenderer = BadgeCellRenderer;
+      colDef.cellRenderer = HashPillRenderer;
     }
 
     // phone render: format as (XXX) XXX-XXXX

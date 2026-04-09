@@ -2,12 +2,22 @@ import type { ColDef, ColGroupDef } from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
 import { z } from 'zod';
 
-import { DatePillRenderer } from '~/components/ag-grid/cell-renderers/date-pill-renderer';
+import {
+  DatePillRenderer,
+  makePillRenderer,
+} from '~/components/ag-grid/cell-renderers/pill-renderer';
 import {
   CurrencyRenderer,
   hoursFormatter,
 } from '~/components/ag-grid/payroll-formatters';
 import type { CrudModuleConfig } from '~/lib/crud/types';
+
+function PayStructurePillRenderer(props: CustomCellRendererProps) {
+  const value = props.value as string | null;
+  if (!value) return null;
+  const color = value.toLowerCase() === 'salary' ? 'purple' : 'blue';
+  return makePillRenderer(color)(props);
+}
 
 function EmployeeInfoRenderer(props: CustomCellRendererProps) {
   const data = props.data as Record<string, unknown> | undefined;
@@ -60,7 +70,12 @@ const agGridColDefs: (ColDef | ColGroupDef)[] = [
   {
     headerName: 'Employee Info',
     children: [
-      { field: 'pay_structure', headerName: 'Pay Structure', filter: true },
+      {
+        field: 'pay_structure',
+        headerName: 'Pay Structure',
+        filter: true,
+        cellRenderer: PayStructurePillRenderer,
+      },
       {
         field: 'hourly_rate',
         headerName: 'Hourly Rate',
@@ -79,8 +94,18 @@ const agGridColDefs: (ColDef | ColGroupDef)[] = [
   {
     headerName: 'Pay Period',
     children: [
-      { field: 'payroll_id', headerName: 'Payroll ID', filter: true },
-      { field: 'payroll_processor', headerName: 'Processor', filter: true },
+      {
+        field: 'payroll_id',
+        headerName: 'Payroll ID',
+        filter: true,
+        cellRenderer: makePillRenderer('gray'),
+      },
+      {
+        field: 'payroll_processor',
+        headerName: 'Processor',
+        filter: true,
+        cellRenderer: makePillRenderer('emerald'),
+      },
       {
         field: 'check_date',
         headerName: 'Check Date',
@@ -97,7 +122,12 @@ const agGridColDefs: (ColDef | ColGroupDef)[] = [
         headerName: 'Period End',
         cellRenderer: DatePillRenderer,
       },
-      { field: 'invoice_number', headerName: 'Invoice #', filter: true },
+      {
+        field: 'invoice_number',
+        headerName: 'Invoice #',
+        filter: true,
+        cellRenderer: makePillRenderer('gray'),
+      },
     ],
   },
   // Hours group

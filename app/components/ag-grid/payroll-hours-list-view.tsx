@@ -11,7 +11,6 @@ import type {
   GridReadyEvent,
   RowClassParams,
   SortChangedEvent,
-  ValueFormatterParams,
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 
@@ -25,16 +24,53 @@ import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { PayPeriodFilter } from '~/components/ag-grid/pay-period-filter';
 import { hoursFormatter } from '~/components/ag-grid/payroll-formatters';
-import { varianceHighlightCellClassRules } from '~/components/ag-grid/row-class-rules';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
 
-function varianceFormatter(params: ValueFormatterParams): string {
-  const value = params.value as number | null;
-  if (value == null) return '';
+function VariancePillRenderer(props: CustomCellRendererProps) {
+  const value = props.value as number | null;
+  if (value == null) return null;
+
+  if (props.node.rowPinned === 'bottom') {
+    const prefix = value > 0 ? '+' : '';
+    const pillClass =
+      value > 0
+        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
+        : value < 0
+          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+          : 'bg-muted text-muted-foreground border-border';
+    return (
+      <div className="flex h-full items-center justify-end">
+        <span
+          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold tabular-nums ${pillClass}`}
+        >
+          {prefix}
+          {value.toFixed(1)}
+        </span>
+      </div>
+    );
+  }
+
   const prefix = value > 0 ? '+' : '';
-  return `${prefix}${value.toFixed(1)}`;
+  const label = `${prefix}${value.toFixed(1)}`;
+
+  const pillClass =
+    value > 0
+      ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
+      : value < 0
+        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+        : 'bg-muted text-muted-foreground border-border';
+
+  return (
+    <div className="flex h-full items-center justify-end">
+      <span
+        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tabular-nums ${pillClass}`}
+      >
+        {label}
+      </span>
+    </div>
+  );
 }
 
 function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
@@ -268,7 +304,7 @@ const colDefs: ColDef[] = [
     cellRenderer: EmployeeDeptRenderer,
     sortable: true,
     filter: true,
-    minWidth: 200,
+    minWidth: 250,
     pinned: 'left',
   },
   {
@@ -276,19 +312,22 @@ const colDefs: ColDef[] = [
     headerName: 'Scheduled Hrs',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
+    flex: 1,
+    minWidth: 120,
   },
   {
     field: 'payroll_hours',
     headerName: 'Payroll Hrs',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
+    flex: 1,
+    minWidth: 120,
   },
   {
     field: 'variance',
     headerName: 'Variance',
     type: 'numericColumn',
-    valueFormatter: varianceFormatter,
-    cellClassRules: varianceHighlightCellClassRules(4, 0.01),
+    cellRenderer: VariancePillRenderer,
     flex: 1,
     minWidth: 120,
   },

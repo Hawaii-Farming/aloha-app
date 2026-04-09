@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { mapColumnsToColDefs } from '~/components/ag-grid/column-mapper';
-import { HousingDetailRow } from '~/components/ag-grid/housing-detail-row';
 import type { ColumnConfig, CrudModuleConfig } from '~/lib/crud/types';
 
 const hrHousingSchema = z.object({
@@ -42,7 +40,7 @@ export const hrHousingConfig: CrudModuleConfig<typeof hrHousingSchema> = {
       .replace(/^_|_$/g, '');
   },
 
-  viewType: { list: 'agGrid' },
+  viewType: { list: 'custom' },
 
   views: {
     list: 'app_hr_housing',
@@ -50,9 +48,12 @@ export const hrHousingConfig: CrudModuleConfig<typeof hrHousingSchema> = {
   },
 
   columns: housingColumns,
-  agGridColDefs: mapColumnsToColDefs(housingColumns),
-  agGridDetailRow: HousingDetailRow,
   noPagination: true,
+  skipDeletedFilter: true,
+
+  customViews: {
+    list: () => import('~/components/ag-grid/housing-map-view'),
+  },
 
   search: {
     columns: ['name'],

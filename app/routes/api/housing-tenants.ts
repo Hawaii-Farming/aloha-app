@@ -1,7 +1,9 @@
 import { castRows } from '~/lib/crud/typed-query.server';
+import { requireUserLoader } from '~/lib/require-user-loader';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
 export const loader = async ({ request }: { request: Request }) => {
+  await requireUserLoader(request);
   const client = getSupabaseServerClient(request);
   const url = new URL(request.url);
   const siteId = url.searchParams.get('siteId');

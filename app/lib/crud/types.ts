@@ -201,6 +201,10 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
 
   /** Disable server-side pagination — load all records at once. */
   noPagination?: boolean;
+  /** Skip the `.eq('is_deleted', false)` filter in loadTableData.
+   *  Use when the view already filters deleted rows internally
+   *  and does not expose an `is_deleted` column. */
+  skipDeletedFilter?: boolean;
   /** Disable row-click detail expansion in AgGridListView. */
   noDetailRow?: boolean;
 

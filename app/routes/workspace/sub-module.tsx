@@ -197,6 +197,8 @@ export const loader = async (args: {
       if (year) query = query.eq('review_year', parseInt(year, 10));
       if (quarter) query = query.eq('review_quarter', parseInt(quarter, 10));
       query = query.order('full_name');
+    } else if (subModuleSlug === 'housing') {
+      query = query.order('name');
     } else {
       // Generic fallback for future custom views
       query = query.order('created_at', { ascending: false });
@@ -285,6 +287,7 @@ export const loader = async (args: {
     select: config?.select,
     selfJoins: config?.selfJoins,
     allowedColumns: config?.columns.map((c) => c.key),
+    skipDeletedFilter: config?.skipDeletedFilter,
   });
 
   const { fkOptions, comboboxOptions } = await loadFormOptions({
