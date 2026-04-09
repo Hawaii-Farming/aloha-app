@@ -75,5 +75,6 @@ export const opsTaskScheduleConfig: CrudModuleConfig<
     { key: 'stop_time', label: 'End Time', type: 'date' },
   ],
 
+  noPagination: true,
   schema: opsTaskScheduleSchema,
 };

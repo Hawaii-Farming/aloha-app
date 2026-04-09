@@ -247,5 +247,6 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     list: 'agGrid',
   },
 
+  noPagination: true,
   schema: hrEmployeeSchema,
 };
