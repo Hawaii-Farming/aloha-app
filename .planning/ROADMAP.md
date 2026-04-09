@@ -126,7 +126,7 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — SQL migrations: org_site max_beds, app_hr_housing view, hr_employee_review table + RLS, app_hr_employee_reviews view
+- [x] 06-01-PLAN.md — SQL migrations: org_site max_beds, app_hr_housing view, hr_employee_review table + RLS, app_hr_employee_reviews view
 - [ ] 06-02-PLAN.md — Housing CRUD config, detail row with tenant API, registry entry, category auto-resolution
 - [ ] 06-03-PLAN.md — Employee review config, custom list view, Year-Quarter filter, score color coding, lock enforcement
 - [ ] 06-04-PLAN.md — Schema push to hosted Supabase, typecheck, visual verification

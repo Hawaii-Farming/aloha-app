@@ -81,7 +81,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **HOUS-01**: Housing sites grid showing: housing name, max beds, available beds (filtered from `org_site` where category=housing)
 - [ ] **HOUS-02**: Row-click full-width detail showing tenant list (employees assigned to that housing site via `hr_employee.site_id`)
 - [ ] **HOUS-03**: Create/edit housing form (side panel): housing name, max beds, available beds
-- [ ] **HOUS-04**: Schema addition: `max_beds` capacity field on `org_site` (or housing-specific approach)
+- [x] **HOUS-04**: Schema addition: `max_beds` capacity field on `org_site` (or housing-specific approach)
 
 ### Employee Review
 
@@ -89,7 +89,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **EREV-02**: Year-Quarter filter for review periods
 - [ ] **EREV-03**: Create/edit review form (side panel): employee, year, quarter, productivity (1-3 select), attendance (1-3 select), quality (1-3 select), engagement (1-3 select), notes, lead (employee dropdown), locked (checkbox)
 - [ ] **EREV-04**: Lock flag preventing edits after finalization (`is_locked`)
-- [ ] **EREV-05**: New `hr_employee_review` table migration with RLS policies
+- [x] **EREV-05**: New `hr_employee_review` table migration with RLS policies
 - [ ] **EREV-06**: Row-click full-width detail showing employee review details
 
 ## v2 Requirements
@@ -177,12 +177,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HOUS-01 | Phase 6 | Pending |
 | HOUS-02 | Phase 6 | Pending |
 | HOUS-03 | Phase 6 | Pending |
-| HOUS-04 | Phase 6 | Pending |
+| HOUS-04 | Phase 6 | Complete |
 | EREV-01 | Phase 6 | Pending |
 | EREV-02 | Phase 6 | Pending |
 | EREV-03 | Phase 6 | Pending |
 | EREV-04 | Phase 6 | Pending |
-| EREV-05 | Phase 6 | Pending |
+| EREV-05 | Phase 6 | Complete |
 | EREV-06 | Phase 6 | Pending |
 
 **Coverage:**
