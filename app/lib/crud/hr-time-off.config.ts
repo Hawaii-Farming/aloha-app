@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { SchedulerEmployeeRenderer } from '~/components/ag-grid/cell-renderers/scheduler-employee-renderer';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
 import { TimeOffActionsRenderer } from '~/components/ag-grid/cell-renderers/time-off-actions-renderer';
+import { TimeOffDetailRow } from '~/components/ag-grid/cell-renderers/time-off-detail-row';
 import { mapColumnsToColDefs } from '~/components/ag-grid/column-mapper';
 import type { ColumnConfig, CrudModuleConfig } from '~/lib/crud/types';
 
@@ -133,6 +134,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   columns: timeOffColumns,
 
   agGridColDefs: timeOffColDefs,
+  agGridDetailRow: TimeOffDetailRow,
 
   search: {
     columns: ['full_name', 'request_reason', 'notes'],

@@ -110,15 +110,24 @@ export default function AgGridListView({
   const subModuleSlug = params.subModule ?? config?.tableName ?? 'unknown';
   const pkColumn = config?.pkColumn ?? 'id';
 
-  // Inline detail row — renders record details in an expanded full-width row
+  // Re-resolve config from registry to recover non-serializable fields
+  // (cellRenderer functions are lost during React Router loader serialization)
+  const freshConfig = useMemo(
+    () => getModuleConfig(subModuleSlug) ?? config,
+    [subModuleSlug, config],
+  );
+
+  // Inline detail row — use custom detail component from config if available
+  const CustomDetail = freshConfig?.agGridDetailRow;
   const detailComponent = useMemo(
     () =>
       function DetailRenderer({ data }: { data: Record<string, unknown> }) {
+        if (CustomDetail) return <CustomDetail data={data} />;
         return (
           <InlineDetailRow data={data} config={config as CrudModuleConfig} />
         );
       },
-    [config],
+    [config, CustomDetail],
   );
 
   const {
@@ -141,13 +150,6 @@ export default function AgGridListView({
       return undefined;
     },
     [],
-  );
-
-  // Re-resolve config from registry to recover non-serializable fields
-  // (cellRenderer functions are lost during React Router loader serialization)
-  const freshConfig = useMemo(
-    () => getModuleConfig(subModuleSlug) ?? config,
-    [subModuleSlug, config],
   );
 
   const dataColDefs = useMemo(() => {

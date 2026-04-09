@@ -195,6 +195,10 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
    *  these are used instead of auto-mapped columns from `columns`. */
   agGridColDefs?: ColDef[];
 
+  /** Custom detail row component for AG Grid row expansion.
+   *  When provided, replaces the default InlineDetailRow. */
+  agGridDetailRow?: ComponentType<{ data: Record<string, unknown> }>;
+
   /** Additional AG Grid options passed through to AgGridReact. */
   agGridOptions?: Partial<GridOptions>;
 }
