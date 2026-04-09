@@ -111,6 +111,19 @@ pnpm format:fix && pnpm lint:fix  # Run when task is complete
 - **API errors**: Return `new Response(null, { status: 500 })`
 - **Database**: Check `.error` on Supabase result, throw/redirect on failure
 
+## Data Tables
+
+**Always use AG Grid Community** for data tables — never TanStack Table, HTML tables, or other table libraries.
+
+- **Standard CRUD grids**: Use `AgGridListView` (drop-in, handles search, CSV export, column visibility, pagination)
+- **Custom grids** (filters, toggles, pinned rows): Compose `AgGridWrapper` directly for full toolbar control
+- **Theming**: AG Grid is themed to DESIGN.md via `ag-grid-theme.ts` (dark/light, Supabase-inspired)
+- **Detail rows**: Use `useDetailRow` hook for row-click-to-expand (full-width detail rows)
+- **Column mapping**: `mapColumnsToColDefs()` converts `CrudModuleConfig` columns to AG Grid `ColDef[]`
+- **Cell renderers**: `PillRenderer`, `StatusBadgeRenderer`, `EmployeeCellRenderer`, `DatePillRenderer` — reuse existing renderers
+- **Column state**: Persisted to localStorage via `saveColumnState`/`restoreColumnState`
+- **MCP docs**: Use the `ag-mcp` MCP server for AG Grid API reference
+
 ## Design System
 
 The current project is a comprehensive retheme adopting a Supabase-inspired design system. **`DESIGN.md` is the source of truth** for all visual decisions — colors, typography, spacing, component styling, and theme tokens. Read it before any UI/CSS work.
