@@ -103,7 +103,7 @@ CREATE OR REPLACE FUNCTION create_test_employee(
 RETURNS VOID LANGUAGE plpgsql AS $$
 BEGIN
   INSERT INTO public.hr_employee (id, org_id, user_id, first_name, last_name, sys_access_level_id)
-  VALUES (p_id, p_org_id, p_user_uuid, 'Test', 'Employee', p_access_level_id)
+  VALUES (p_id, p_org_id, p_user_uuid, 'Test-' || p_id, 'Emp-' || p_org_id, p_access_level_id)
   ON CONFLICT (id) DO NOTHING;
 END;
 $$;

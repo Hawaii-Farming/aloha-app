@@ -33,14 +33,15 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Employees for test 3 (multi-org link)
 INSERT INTO public.hr_employee (id, org_id, first_name, last_name, company_email, sys_access_level_id)
-VALUES ('emp-trigger-03a', 'acme-farms', 'Multi', 'User', 'multi@test.com', 'employee')
+VALUES ('emp-trigger-03a', 'acme-farms', 'Multi', 'UserAcme', 'multi@test.com', 'employee')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.hr_employee (id, org_id, first_name, last_name, company_email, sys_access_level_id)
-VALUES ('emp-trigger-03b', 'kona-coffee', 'Multi', 'User', 'multi@test.com', 'employee')
+VALUES ('emp-trigger-03b', 'kona-coffee', 'Multi', 'UserKona', 'multi@test.com', 'employee')
 ON CONFLICT (id) DO NOTHING;
 
 -- Employee for test 5 (already linked — backfill safety)
+SELECT create_test_user('deadbeef-dead-beef-dead-beefdeadbeef'::uuid, 'taken-user@test.com');
 INSERT INTO public.hr_employee (id, org_id, first_name, last_name, company_email, user_id, sys_access_level_id)
 VALUES ('emp-trigger-05', 'acme-farms', 'Taken', 'User', 'taken@test.com', 'deadbeef-dead-beef-dead-beefdeadbeef'::uuid, 'employee')
 ON CONFLICT (id) DO NOTHING;
