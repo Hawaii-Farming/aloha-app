@@ -124,6 +124,27 @@ export const loader = async (args: {
         query = query.eq('compensation_manager_id', managerId);
       }
       query = query.order('full_name');
+    } else if (subModuleSlug === 'payroll_hours') {
+      let periodStart = url.searchParams.get('period_start');
+      let periodEnd = url.searchParams.get('period_end');
+
+      // Default to most recent pay period when none selected
+      if (!periodStart && !periodEnd && payPeriods.length > 0) {
+        const defaultPeriod = payPeriods[0] as Record<string, unknown>;
+        const defStart = String(defaultPeriod.pay_period_start ?? '');
+        const defEnd = String(defaultPeriod.pay_period_end ?? '');
+        if (defStart && defEnd) {
+          periodStart = defStart;
+          periodEnd = defEnd;
+        }
+      }
+
+      if (periodStart && periodEnd) {
+        query = query
+          .eq('pay_period_start', periodStart)
+          .eq('pay_period_end', periodEnd);
+      }
+      query = query.order('full_name');
     } else if (subModuleSlug === 'payroll_data') {
       let periodStart = url.searchParams.get('period_start');
       let periodEnd = url.searchParams.get('period_end');

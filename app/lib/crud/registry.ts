@@ -9,6 +9,7 @@ import { hrEmployeeConfig } from './hr-employee.config';
 import { hrPayrollCompManagerConfig } from './hr-payroll-comp-manager.config';
 import { hrPayrollComparisonConfig } from './hr-payroll-comparison.config';
 import { hrPayrollDataConfig } from './hr-payroll-data.config';
+import { hrPayrollHoursConfig } from './hr-payroll-hours.config';
 import { hrPayrollConfig } from './hr-payroll.config';
 import { hrTimeOffConfig } from './hr-time-off.config';
 import { invntItemConfig } from './invnt-item.config';
@@ -35,6 +36,7 @@ const registry = new Map<string, CrudModuleConfig>([
   ['payroll_comparison', hrPayrollComparisonConfig],
   ['payroll_comp_manager', hrPayrollCompManagerConfig],
   ['payroll_data', hrPayrollDataConfig],
+  ['payroll_hours', hrPayrollHoursConfig],
   ['products', invntItemConfig],
   ['stock_counts', invntOnhandConfig],
   ['warehouses', orgSiteConfig],
