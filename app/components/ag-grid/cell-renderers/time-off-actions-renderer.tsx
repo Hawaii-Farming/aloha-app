@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { useFetcher, useRevalidator } from 'react-router';
 
 import type { CustomCellRendererProps } from 'ag-grid-react';
-import { Check, X } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import { Label } from '@aloha/ui/label';
@@ -74,32 +74,36 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex h-full items-center justify-center gap-1">
       <Button
-        size="sm"
+        size="icon"
         variant="ghost"
+        className="h-7 w-7 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-300"
         disabled={isSubmitting}
         onClick={handleApprove}
         data-test="approve-time-off"
       >
-        <Check className="h-4 w-4" />
+        <CheckCircle2 className="h-4 w-4" />
       </Button>
 
       <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
         <PopoverTrigger asChild>
           <Button
-            size="sm"
+            size="icon"
             variant="ghost"
+            className="h-7 w-7 text-red-500 hover:bg-red-500/10 hover:text-red-400 dark:text-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
             disabled={isSubmitting}
             data-test="deny-time-off"
           >
-            <X className="h-4 w-4" />
+            <XCircle className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
 
         <PopoverContent className="w-72" align="end">
           <div className="flex flex-col gap-3">
-            <Label htmlFor="denial-reason">Denial Reason</Label>
+            <Label htmlFor="denial-reason" className="text-sm font-medium">
+              Denial Reason
+            </Label>
             <Textarea
               id="denial-reason"
               value={denialReason}
