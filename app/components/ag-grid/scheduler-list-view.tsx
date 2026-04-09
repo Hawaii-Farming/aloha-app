@@ -311,7 +311,6 @@ export default function SchedulerListView(props: ListViewProps) {
     [searchParams, setSearchParams, currentWeek],
   );
 
-
   const handlePrev = useCallback(() => navigateWeek('prev'), [navigateWeek]);
   const handleNext = useCallback(() => navigateWeek('next'), [navigateWeek]);
   const handleToday = useCallback(() => navigateWeek('today'), [navigateWeek]);
@@ -517,7 +516,6 @@ export default function SchedulerListView(props: ListViewProps) {
   );
 
   const getHistoryRowHeight = useCallback(() => 46, []);
-
 
   return (
     <>

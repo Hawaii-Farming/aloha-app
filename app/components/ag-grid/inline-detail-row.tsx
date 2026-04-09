@@ -210,12 +210,8 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
           {companyEmail && (
             <InfoChip icon={Mail} label="Work" value={companyEmail} />
           )}
-          {email && (
-            <InfoChip icon={Mail} label="Personal" value={email} />
-          )}
-          {phone && (
-            <InfoChip icon={Phone} value={formatPhone(phone)} />
-          )}
+          {email && <InfoChip icon={Mail} label="Personal" value={email} />}
+          {phone && <InfoChip icon={Phone} value={formatPhone(phone)} />}
 
           {startDate && (
             <InfoChip icon={Calendar} label="Start" value={startDate} />

@@ -1,8 +1,8 @@
 'use client';
 
-import { JwtPayload } from '@supabase/supabase-js';
-
 import { useNavigate } from 'react-router';
+
+import { JwtPayload } from '@supabase/supabase-js';
 
 import { Building2, Check, LogOut } from 'lucide-react';
 
@@ -69,7 +69,7 @@ export function UserProfileDropdown(props: {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <button className="focus-visible:ring-ring flex items-center rounded-full focus:outline-none focus-visible:ring-2">
           <Avatar className="h-8 w-8">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
@@ -92,8 +92,8 @@ export function UserProfileDropdown(props: {
               <DropdownMenuSubTrigger>
                 <Building2 className="mr-2 h-4 w-4" />
                 <span>
-                  {accounts.find((a) => a.value === props.accountSlug)
-                    ?.label ?? props.accountSlug}
+                  {accounts.find((a) => a.value === props.accountSlug)?.label ??
+                    props.accountSlug}
                 </span>
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
@@ -106,9 +106,7 @@ export function UserProfileDropdown(props: {
                       <Check className="mr-2 h-4 w-4" />
                     )}
                     <span
-                      className={
-                        org.value !== props.accountSlug ? 'ml-6' : ''
-                      }
+                      className={org.value !== props.accountSlug ? 'ml-6' : ''}
                     >
                       {org.label ?? org.value}
                     </span>

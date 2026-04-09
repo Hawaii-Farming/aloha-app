@@ -53,7 +53,12 @@ export const orgSiteConfig: CrudModuleConfig<typeof orgSiteSchema> = {
   },
 
   filters: [
-    { key: 'zone', label: 'Zone', type: 'select', options: ['zone_1', 'zone_2', 'zone_3', 'zone_4'] },
+    {
+      key: 'zone',
+      label: 'Zone',
+      type: 'select',
+      options: ['zone_1', 'zone_2', 'zone_3', 'zone_4'],
+    },
   ],
 
   formFields: [

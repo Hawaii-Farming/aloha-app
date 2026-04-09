@@ -45,10 +45,7 @@ export function UpdatePasswordForm(params: {
 
   if (updateUser.error && isErrorWithCode(updateUser.error)) {
     return (
-      <ErrorState
-        error={updateUser.error}
-        onRetry={() => updateUser.reset()}
-      />
+      <ErrorState error={updateUser.error} onRetry={() => updateUser.reset()} />
     );
   }
 

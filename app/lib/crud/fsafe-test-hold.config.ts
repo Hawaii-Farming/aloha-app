@@ -13,81 +13,90 @@ const fsafeTestHoldSchema = z.object({
   delivered_to_lab_on: z.string().optional(),
 });
 
-export const fsafeTestHoldConfig: CrudModuleConfig<
-  typeof fsafeTestHoldSchema
-> = {
-  tableName: 'fsafe_test_hold',
-  pkType: 'uuid',
-  pkColumn: 'id',
-  orgScoped: true,
+export const fsafeTestHoldConfig: CrudModuleConfig<typeof fsafeTestHoldSchema> =
+  {
+    tableName: 'fsafe_test_hold',
+    pkType: 'uuid',
+    pkColumn: 'id',
+    orgScoped: true,
 
-  views: {
-    list: 'fsafe_test_hold',
-    detail: 'fsafe_test_hold',
-  },
+    views: {
+      list: 'fsafe_test_hold',
+      detail: 'fsafe_test_hold',
+    },
 
-  columns: [
-    { key: 'farm_id', label: 'Farm', sortable: true },
-    { key: 'pack_lot_id', label: 'Pack Lot', sortable: true },
-    { key: 'fsafe_lab_id', label: 'Lab', priority: 'low' },
-    { key: 'lab_test_id', label: 'Lab Test', priority: 'low' },
-    {
-      key: 'delivered_to_lab_on',
-      label: 'Delivered to Lab',
-      type: 'date',
-      sortable: true,
-      priority: 'low',
-    },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
-  ],
+    columns: [
+      { key: 'farm_id', label: 'Farm', sortable: true },
+      { key: 'pack_lot_id', label: 'Pack Lot', sortable: true },
+      { key: 'fsafe_lab_id', label: 'Lab', priority: 'low' },
+      { key: 'lab_test_id', label: 'Lab Test', priority: 'low' },
+      {
+        key: 'delivered_to_lab_on',
+        label: 'Delivered to Lab',
+        type: 'date',
+        sortable: true,
+        priority: 'low',
+      },
+      {
+        key: 'created_at',
+        label: 'Created',
+        type: 'datetime',
+        sortable: true,
+        priority: 'low',
+      },
+    ],
 
-  search: {
-    columns: ['farm_id', 'notes'],
-    placeholder: 'Search incidents...',
-  },
+    search: {
+      columns: ['farm_id', 'notes'],
+      placeholder: 'Search incidents...',
+    },
 
-  formFields: [
-    {
-      key: 'farm_id',
-      label: 'Farm',
-      type: 'fk',
-      required: true,
-      fkTable: 'org_farm',
-      fkLabelColumn: 'name',
-    },
-    {
-      key: 'pack_lot_id',
-      label: 'Pack Lot',
-      type: 'fk',
-      required: true,
-      fkTable: 'pack_lot',
-      fkLabelColumn: 'id',
-    },
-    {
-      key: 'sales_customer_group_id',
-      label: 'Customer Group',
-      type: 'fk',
-      fkTable: 'sales_customer_group',
-      fkLabelColumn: 'name',
-    },
-    {
-      key: 'sales_customer_id',
-      label: 'Customer',
-      type: 'fk',
-      fkTable: 'sales_customer',
-      fkLabelColumn: 'name',
-    },
-    {
-      key: 'fsafe_lab_id',
-      label: 'Lab',
-      type: 'fk',
-      fkTable: 'fsafe_lab',
-      fkLabelColumn: 'name',
-    },
-    { key: 'lab_test_id', label: 'Lab Test', type: 'text' },
-    { key: 'notes', label: 'Notes', type: 'textarea' },
-    { key: 'delivered_to_lab_on', label: 'Delivered to Lab On', type: 'date' },
-  ],
+    formFields: [
+      {
+        key: 'farm_id',
+        label: 'Farm',
+        type: 'fk',
+        required: true,
+        fkTable: 'org_farm',
+        fkLabelColumn: 'name',
+      },
+      {
+        key: 'pack_lot_id',
+        label: 'Pack Lot',
+        type: 'fk',
+        required: true,
+        fkTable: 'pack_lot',
+        fkLabelColumn: 'id',
+      },
+      {
+        key: 'sales_customer_group_id',
+        label: 'Customer Group',
+        type: 'fk',
+        fkTable: 'sales_customer_group',
+        fkLabelColumn: 'name',
+      },
+      {
+        key: 'sales_customer_id',
+        label: 'Customer',
+        type: 'fk',
+        fkTable: 'sales_customer',
+        fkLabelColumn: 'name',
+      },
+      {
+        key: 'fsafe_lab_id',
+        label: 'Lab',
+        type: 'fk',
+        fkTable: 'fsafe_lab',
+        fkLabelColumn: 'name',
+      },
+      { key: 'lab_test_id', label: 'Lab Test', type: 'text' },
+      { key: 'notes', label: 'Notes', type: 'textarea' },
+      {
+        key: 'delivered_to_lab_on',
+        label: 'Delivered to Lab On',
+        type: 'date',
+      },
+    ],
 
-  schema: fsafeTestHoldSchema,
-};
+    schema: fsafeTestHoldSchema,
+  };

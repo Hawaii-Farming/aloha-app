@@ -38,8 +38,20 @@ export const fsafeResultConfig: CrudModuleConfig<typeof fsafeResultSchema> = {
     { key: 'result_pass', label: 'Pass', type: 'boolean' },
     { key: 'result_numeric', label: 'Result', type: 'number', priority: 'low' },
     { key: 'farm_id', label: 'Farm', sortable: true, priority: 'low' },
-    { key: 'sampled_at', label: 'Sampled', type: 'datetime', sortable: true, priority: 'low' },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
+    {
+      key: 'sampled_at',
+      label: 'Sampled',
+      type: 'datetime',
+      sortable: true,
+      priority: 'low',
+    },
+    {
+      key: 'created_at',
+      label: 'Created',
+      type: 'datetime',
+      sortable: true,
+      priority: 'low',
+    },
   ],
 
   search: {

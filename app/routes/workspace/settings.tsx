@@ -1,6 +1,5 @@
 import { getI18n } from 'react-i18next';
 
-
 import { PageBody } from '@aloha/ui/page';
 import { Trans } from '@aloha/ui/trans';
 

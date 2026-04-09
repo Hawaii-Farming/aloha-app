@@ -30,12 +30,39 @@ export const growHarvestWeightConfig: CrudModuleConfig<
 
   columns: [
     { key: 'grow_seed_batch_id', label: 'Seed Batch', sortable: true },
-    { key: 'harvest_date', label: 'Harvest Date', type: 'date', sortable: true },
-    { key: 'gross_weight', label: 'Gross Weight', type: 'number', sortable: true },
-    { key: 'net_weight', label: 'Net Weight', type: 'number', sortable: true, priority: 'low' },
+    {
+      key: 'harvest_date',
+      label: 'Harvest Date',
+      type: 'date',
+      sortable: true,
+    },
+    {
+      key: 'gross_weight',
+      label: 'Gross Weight',
+      type: 'number',
+      sortable: true,
+    },
+    {
+      key: 'net_weight',
+      label: 'Net Weight',
+      type: 'number',
+      sortable: true,
+      priority: 'low',
+    },
     { key: 'weight_uom', label: 'UOM', priority: 'low' },
-    { key: 'number_of_containers', label: 'Containers', type: 'number', priority: 'low' },
-    { key: 'created_at', label: 'Created', type: 'datetime', sortable: true, priority: 'low' },
+    {
+      key: 'number_of_containers',
+      label: 'Containers',
+      type: 'number',
+      priority: 'low',
+    },
+    {
+      key: 'created_at',
+      label: 'Created',
+      type: 'datetime',
+      sortable: true,
+      priority: 'low',
+    },
   ],
 
   search: {
@@ -76,7 +103,12 @@ export const growHarvestWeightConfig: CrudModuleConfig<
       fkTable: 'grow_grade',
       fkLabelColumn: 'name',
     },
-    { key: 'harvest_date', label: 'Harvest Date', type: 'date', required: true },
+    {
+      key: 'harvest_date',
+      label: 'Harvest Date',
+      type: 'date',
+      required: true,
+    },
     {
       key: 'grow_harvest_container_id',
       label: 'Container',
@@ -99,7 +131,12 @@ export const growHarvestWeightConfig: CrudModuleConfig<
       fkTable: 'sys_uom',
       fkLabelColumn: 'id',
     },
-    { key: 'gross_weight', label: 'Gross Weight', type: 'number', required: true },
+    {
+      key: 'gross_weight',
+      label: 'Gross Weight',
+      type: 'number',
+      required: true,
+    },
     { key: 'net_weight', label: 'Net Weight', type: 'number', required: true },
   ],
 

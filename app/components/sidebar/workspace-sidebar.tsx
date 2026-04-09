@@ -2,14 +2,13 @@ import type { JwtPayload } from '@supabase/supabase-js';
 
 import { ChevronsLeft } from 'lucide-react';
 
-import { cn } from '@aloha/ui/utils';
-
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   useSidebar,
 } from '@aloha/ui/shadcn-sidebar';
+import { cn } from '@aloha/ui/utils';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
 import { SidebarProfileMenu } from '~/components/sidebar/sidebar-profile-menu';
@@ -28,7 +27,7 @@ function SidebarEdgeToggle() {
     <button
       onClick={toggleSidebar}
       className={cn(
-        'bg-sidebar border-sidebar-border text-muted-foreground hover:text-foreground absolute -right-3 top-4 z-30 hidden h-6 w-6 items-center justify-center rounded-full border shadow-sm transition-colors md:flex',
+        'bg-sidebar border-sidebar-border text-muted-foreground hover:text-foreground absolute top-4 -right-3 z-30 hidden h-6 w-6 items-center justify-center rounded-full border shadow-sm transition-colors md:flex',
       )}
     >
       <ChevronsLeft

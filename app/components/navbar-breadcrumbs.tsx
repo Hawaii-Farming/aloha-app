@@ -3,9 +3,7 @@ import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router';
 
 const unslugify = (slug: string) =>
-  slug
-    .replace(/[_-]/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  slug.replace(/[_-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 export function NavbarBreadcrumbs() {
   const pathname = useLocation().pathname;

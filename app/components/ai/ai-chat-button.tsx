@@ -11,7 +11,7 @@ export function AiChatButton() {
     <Button
       size="icon"
       variant="outline"
-      className="size-8 rounded-full text-muted-foreground"
+      className="text-muted-foreground size-8 rounded-full"
       onClick={() => setOpen(!open)}
       aria-label={open ? 'Close AI assistant' : 'Open AI assistant'}
       data-test="ai-chat-button"

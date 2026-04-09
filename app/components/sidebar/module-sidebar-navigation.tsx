@@ -7,8 +7,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@aloha/ui/collapsible';
-import { cn } from '@aloha/ui/utils';
-
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -18,11 +16,9 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from '@aloha/ui/shadcn-sidebar';
+import { cn } from '@aloha/ui/utils';
 
-import {
-  getModuleIcon,
-  getSubModuleIcon,
-} from '~/config/module-icons.config';
+import { getModuleIcon, getSubModuleIcon } from '~/config/module-icons.config';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 interface ModuleSidebarNavigationProps {
@@ -91,7 +87,10 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
               <SidebarGroup>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    <Collapsible open={isOpen} onOpenChange={() => toggleModule(mod.module_slug)}>
+                    <Collapsible
+                      open={isOpen}
+                      onOpenChange={() => toggleModule(mod.module_slug)}
+                    >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton
@@ -144,7 +143,10 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
 
             {/* Expanded mode — hidden when sidebar is icon mode */}
             <div className="group-data-[collapsible=icon]:hidden">
-              <Collapsible open={isOpen} onOpenChange={() => toggleModule(mod.module_slug)}>
+              <Collapsible
+                open={isOpen}
+                onOpenChange={() => toggleModule(mod.module_slug)}
+              >
                 <SidebarGroup>
                   <CollapsibleTrigger asChild>
                     <SidebarGroupLabel

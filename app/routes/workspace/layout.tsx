@@ -53,7 +53,7 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
 
       <main className="flex h-svh flex-1 flex-col overflow-hidden">
         {/* Mobile header: hamburger menu to open sidebar sheet */}
-        <div className="flex h-12 shrink-0 items-center border-b bg-background px-3 md:hidden">
+        <div className="bg-background flex h-12 shrink-0 items-center border-b px-3 md:hidden">
           <SidebarTrigger className="text-muted-foreground h-5 w-5" />
         </div>
 

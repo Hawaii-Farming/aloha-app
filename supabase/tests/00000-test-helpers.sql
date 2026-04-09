@@ -145,6 +145,16 @@ $$;
 -- Shared seed data (persists across test files)
 -- ============================================================
 
+-- Access levels (referenced by hr_employee FK)
+INSERT INTO public.sys_access_level (id, name, level, display_order)
+VALUES
+  ('employee', 'Employee', 1, 1),
+  ('team_lead', 'Team Lead', 2, 2),
+  ('manager', 'Manager', 3, 3),
+  ('admin', 'Admin', 4, 4),
+  ('owner', 'Owner', 5, 5)
+ON CONFLICT (id) DO NOTHING;
+
 -- Orgs used by all RLS tests
 SELECT create_test_org('acme-farms', 'Acme Farms');
 SELECT create_test_org('kona-coffee', 'Kona Coffee');

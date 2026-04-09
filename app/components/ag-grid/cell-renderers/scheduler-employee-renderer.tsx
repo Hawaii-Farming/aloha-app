@@ -18,8 +18,13 @@ export function SchedulerEmployeeRenderer(props: CustomCellRendererProps) {
   const data = props.data as SchedulerRow | undefined;
   if (!data) return null;
 
-  const { full_name, department_name, work_authorization_name, task, farm_name } =
-    data;
+  const {
+    full_name,
+    department_name,
+    work_authorization_name,
+    task,
+    farm_name,
+  } = data;
 
   return (
     <div className="flex h-full flex-col justify-center gap-0.5 overflow-hidden py-1">
