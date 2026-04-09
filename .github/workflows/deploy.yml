@@ -11,7 +11,8 @@ concurrency:
 env:
   GCP_REGION: us-west1
   SERVICE_NAME: aloha-app
-  IMAGE_NAME: us-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/aloha/aloha-app
+  GCP_PROJECT_ID: aloha-96743
+  IMAGE_NAME: us-west1-docker.pkg.dev/aloha-96743/aloha/aloha-app
 
 jobs:
   deploy:
@@ -79,13 +80,13 @@ jobs:
             --set-env-vars="GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" \
             --set-env-vars="MAILER_PROVIDER=nodemailer" \
             --set-env-vars="EMAIL_SENDER=${{ secrets.EMAIL_SENDER }}" \
-            --project=${{ secrets.GCP_PROJECT_ID }}
+            --project=aloha-96743
 
       - name: Show deployment URL
         run: |
           URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
             --region=${{ env.GCP_REGION }} \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --project=aloha-96743 \
             --format="value(status.url)")
           echo "## Deployed to Cloud Run" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** $URL" >> $GITHUB_STEP_SUMMARY
