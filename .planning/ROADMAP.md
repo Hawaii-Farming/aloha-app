@@ -109,7 +109,7 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — SQL view (app_hr_hours_comparison) and schedule-by-period API route
 - [x] 05-02-PLAN.md — CRUD config, registry, loader branch, and custom list view component
-- [ ] 05-03-PLAN.md — Schema reset and visual verification
+- [x] 05-03-PLAN.md — Schema reset and visual verification
 **UI hint**: yes
 
 ### Phase 6: Housing & Employee Review
