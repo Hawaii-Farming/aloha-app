@@ -24,13 +24,20 @@ This app uses a **dual multi-tenant model** during the foundation phase:
 
 Long-term goal: merge template auth into aloha's org/hr_employee model. For now, both coexist.
 
+## Supabase: Hosted (NOT Local Docker)
+
+This project uses **hosted Supabase** — there is no local Docker instance. Do NOT run `pnpm supabase:start`, `pnpm supabase:reset`, or any command that assumes a local Supabase container.
+
+- **Apply migrations**: `supabase db push` (pushes to hosted)
+- **Generate types**: `npx supabase gen types --lang typescript --linked > app/lib/database.types.ts`
+- **Create migration**: `pnpm supabase db diff`
+
 ## Essential Commands
 
 ```bash
 pnpm dev                    # Start app (port 5173)
-pnpm supabase:start         # Start Supabase locally
-pnpm supabase:reset         # Reset with latest schema
-pnpm supabase:typegen       # Generate TypeScript types → app/lib/database.types.ts
+supabase db push            # Push migrations to hosted Supabase
+npx supabase gen types --lang typescript --linked > app/lib/database.types.ts  # Regenerate types from hosted
 pnpm supabase db diff       # Create migration diff
 pnpm typecheck              # Run regularly during work
 pnpm format:fix && pnpm lint:fix  # Run when task is complete
@@ -127,19 +134,7 @@ The current project is a comprehensive retheme adopting a Supabase-inspired desi
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
-**HR Module Submodules**
-
-Wire up all HR submodules in the Aloha ERP app with AG Grid Community tables, side-panel CRUD forms, and row-click detail views. The register submodule is already built as the base pattern; this project replicates and adapts that pattern across 7 remaining HR submodules backed by existing Supabase schema tables and views.
-
-**Core Value:** Every HR submodule renders real data from the database and supports full CRUD operations through AG Grid tables styled to the Supabase-inspired design system.
-
-### Constraints
-
-- **UI Library**: AG Grid Community (free) only — no Enterprise modules
-- **Design**: Must follow DESIGN.md color tokens, typography, spacing for both dark and light themes
-- **Pattern**: Replicate register submodule pattern (loader + action + component) with AG Grid replacing TanStack Table
-- **Schema**: Use existing tables/views where possible; only create hr_employee_review migration
-- **Stack**: React Router 7 SSR, Supabase, TypeScript, Tailwind CSS 4, Shadcn UI — no new UI libraries beyond AG Grid
+See `.planning/PROJECT.md` for current milestone scope, requirements, and constraints.
 <!-- GSD:project-end -->
 
 <!-- GSD:stack-start source:codebase/STACK.md -->
