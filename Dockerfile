@@ -40,7 +40,7 @@ COPY --from=build /app/packages ./packages
 COPY --from=build /app/build ./build
 COPY --from=build /app/public ./public
 
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 EXPOSE 3000
 CMD ["npx", "react-router-serve", "./build/server/index.js"]
