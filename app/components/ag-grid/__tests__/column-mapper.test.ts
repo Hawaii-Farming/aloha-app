@@ -3,12 +3,22 @@ import { describe, expect, it, vi } from 'vitest';
 import type { ColumnConfig } from '~/lib/crud/types';
 
 // Mock cell renderer dependencies
-vi.mock('~/components/ag-grid/cell-renderers/date-formatter', () => ({
-  dateFormatter: vi.fn(),
+vi.mock('~/components/ag-grid/cell-renderers/pill-renderer', () => ({
+  DatePillRenderer: vi.fn(),
+  EmailPillRenderer: vi.fn(),
+  HashPillRenderer: vi.fn(),
 }));
 
 vi.mock('~/components/ag-grid/cell-renderers/status-badge-renderer', () => ({
   StatusBadgeRenderer: vi.fn(),
+}));
+
+vi.mock('~/components/ag-grid/cell-renderers/employee-cell-renderer', () => ({
+  EmployeeCellRenderer: vi.fn(),
+}));
+
+vi.mock('~/components/ag-grid/cell-renderers/code-cell-renderer', () => ({
+  CodeCellRenderer: vi.fn(),
 }));
 
 describe('mapColumnsToColDefs', () => {
@@ -26,9 +36,9 @@ describe('mapColumnsToColDefs', () => {
     expect(col.sortable).toBe(true);
   });
 
-  it('maps type=date to agDateColumnFilter with dateFormatter', async () => {
-    const { dateFormatter } =
-      await import('~/components/ag-grid/cell-renderers/date-formatter');
+  it('maps type=date to agDateColumnFilter with DatePillRenderer', async () => {
+    const { DatePillRenderer } =
+      await import('~/components/ag-grid/cell-renderers/pill-renderer');
     const { mapColumnsToColDefs } =
       await import('~/components/ag-grid/column-mapper');
     const columns: ColumnConfig[] = [
@@ -37,7 +47,7 @@ describe('mapColumnsToColDefs', () => {
     const result = mapColumnsToColDefs(columns);
     const col = result[0]!;
     expect(col.filter).toBe('agDateColumnFilter');
-    expect(col.valueFormatter).toBe(dateFormatter);
+    expect(col.cellRenderer).toBe(DatePillRenderer);
   });
 
   it('maps type=number to agNumberColumnFilter', async () => {
