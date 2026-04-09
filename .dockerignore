@@ -1,0 +1,12 @@
+node_modules
+.planning
+.claude
+.git
+.env
+.env.*
+build
+e2e
+docs
+supabase/tests
+*.md
+!README.md
