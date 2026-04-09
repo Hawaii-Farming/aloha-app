@@ -23,13 +23,15 @@ export function PayPeriodFilter({ periods }: PayPeriodFilterProps) {
 
   const handleChange = (value: string) => {
     const next = new URLSearchParams(searchParams);
-    const [start, end] = value.split('|');
-    if (start && end) {
-      next.set('period_start', start);
-      next.set('period_end', end);
-    } else {
+    if (value === 'all') {
       next.delete('period_start');
       next.delete('period_end');
+    } else {
+      const [start, end] = value.split('|');
+      if (start && end) {
+        next.set('period_start', start);
+        next.set('period_end', end);
+      }
     }
     setSearchParams(next, { preventScrollReset: true });
   };
@@ -43,11 +45,12 @@ export function PayPeriodFilter({ periods }: PayPeriodFilterProps) {
   };
 
   return (
-    <Select value={currentValue} onValueChange={handleChange}>
+    <Select value={currentValue || 'all'} onValueChange={handleChange}>
       <SelectTrigger className="h-8 w-[260px]" data-test="pay-period-filter">
         <SelectValue placeholder="Select pay period" />
       </SelectTrigger>
       <SelectContent>
+        <SelectItem value="all">All Pay Periods</SelectItem>
         {periods.map((p) => {
           const start = String(p.pay_period_start ?? '');
           const end = String(p.pay_period_end ?? '');

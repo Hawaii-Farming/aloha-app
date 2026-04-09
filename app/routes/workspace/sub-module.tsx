@@ -64,7 +64,10 @@ export const loader = async (args: {
     // Pre-load pay periods for all payroll submodules (needed before query
     // for payroll_data default period selection)
     let payPeriods: Record<string, unknown>[] = [];
-    if (subModuleSlug.startsWith('payroll_')) {
+    if (
+      subModuleSlug.startsWith('payroll_') ||
+      subModuleSlug === 'payroll_comp'
+    ) {
       const { data: periodData } = await queryUntypedView(client, 'hr_payroll')
         .select('pay_period_start, pay_period_end')
         .eq('org_id', accountSlug)
@@ -92,13 +95,12 @@ export const loader = async (args: {
         query = query.eq('hr_department_id', deptFilter);
       }
       query = query.order('full_name');
-    } else if (subModuleSlug === 'payroll_comparison') {
-      const view = url.searchParams.get('view') ?? 'by_task';
-      const actualView =
-        view === 'by_employee'
-          ? 'app_hr_payroll_by_employee'
-          : 'app_hr_payroll_by_task';
-      query = queryUntypedView(client, actualView)
+    } else if (
+      subModuleSlug === 'payroll_comparison' ||
+      subModuleSlug === 'payroll_comp'
+    ) {
+      // Both views use detail data for client-side grouping + inline detail tables
+      query = queryUntypedView(client, 'app_hr_payroll_detail')
         .select('*')
         .eq('org_id', accountSlug);
       const periodStart = url.searchParams.get('period_start');
@@ -108,9 +110,7 @@ export const loader = async (args: {
           .eq('pay_period_start', periodStart)
           .eq('pay_period_end', periodEnd);
       }
-      query = query.order(
-        view === 'by_employee' ? 'full_name' : 'department_name',
-      );
+      query = query.order('employee_name');
     } else if (subModuleSlug === 'payroll_comp_manager') {
       const periodStart = url.searchParams.get('period_start');
       const periodEnd = url.searchParams.get('period_end');

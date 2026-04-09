@@ -201,6 +201,8 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
 
   /** Disable server-side pagination — load all records at once. */
   noPagination?: boolean;
+  /** Disable row-click detail expansion in AgGridListView. */
+  noDetailRow?: boolean;
 
   /** Additional AG Grid options passed through to AgGridReact. */
   agGridOptions?: Partial<GridOptions>;

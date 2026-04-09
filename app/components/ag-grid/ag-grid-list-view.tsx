@@ -104,6 +104,8 @@ export default function AgGridListView({
     [subModuleSlug, config],
   );
 
+  const noDetailRow = freshConfig?.noDetailRow === true;
+
   // Inline detail row — use custom detail component from config if available
   const CustomDetail = freshConfig?.agGridDetailRow;
   const detailComponent = useMemo(
@@ -140,18 +142,24 @@ export default function AgGridListView({
     [detailRowHeight],
   );
 
+  const hasCustomColDefs = Boolean(freshConfig?.agGridColDefs);
+
   const dataColDefs = useMemo(() => {
     if (freshConfig?.agGridColDefs) return freshConfig.agGridColDefs;
     return mapColumnsToColDefs(freshConfig?.columns ?? []);
   }, [freshConfig]);
 
-  // Show avatar column when data has profile_photo_url
+  // Show avatar column when data has profile_photo_url (skip when custom colDefs manage their own layout)
   const hasAvatar =
+    !hasCustomColDefs &&
     (tableData.data as RowData[])?.[0]?.profile_photo_url !== undefined;
 
   const allColDefs = useMemo(
-    () => [CHECKBOX_COL, ...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
-    [dataColDefs, hasAvatar],
+    () =>
+      hasCustomColDefs
+        ? dataColDefs
+        : [CHECKBOX_COL, ...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
+    [dataColDefs, hasAvatar, hasCustomColDefs],
   );
 
   const handleGridReady = useCallback(
@@ -284,15 +292,21 @@ export default function AgGridListView({
           <AgGridWrapper
             gridRef={gridRef}
             colDefs={allColDefs}
-            rowData={detailRowData as RowData[]}
+            rowData={
+              noDetailRow
+                ? (tableData.data as RowData[])
+                : (detailRowData as RowData[])
+            }
             quickFilterText={searchValue}
-            onRowClicked={handleDetailRowClicked}
-            isFullWidthRow={isFullWidthRow}
-            fullWidthCellRenderer={fullWidthCellRenderer}
-            getRowId={getRowId}
-            getRowHeight={getRowHeight}
-            rowSelection="multiple"
-            suppressRowClickSelection={true}
+            onRowClicked={noDetailRow ? undefined : handleDetailRowClicked}
+            isFullWidthRow={noDetailRow ? undefined : isFullWidthRow}
+            fullWidthCellRenderer={
+              noDetailRow ? undefined : fullWidthCellRenderer
+            }
+            getRowId={noDetailRow ? undefined : getRowId}
+            getRowHeight={noDetailRow ? undefined : getRowHeight}
+            rowSelection={noDetailRow ? undefined : 'multiple'}
+            suppressRowClickSelection={noDetailRow ? undefined : true}
             pagination={false}
             onGridReady={handleGridReady}
             onSelectionChanged={handleSelectionChanged}

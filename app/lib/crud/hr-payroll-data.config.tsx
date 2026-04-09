@@ -1,61 +1,71 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community';
+import type { CustomCellRendererProps } from 'ag-grid-react';
 import { z } from 'zod';
 
-import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import { DatePillRenderer } from '~/components/ag-grid/cell-renderers/date-pill-renderer';
 import {
-  currencyFormatter,
+  CurrencyRenderer,
   hoursFormatter,
 } from '~/components/ag-grid/payroll-formatters';
 import type { CrudModuleConfig } from '~/lib/crud/types';
 
+function EmployeeInfoRenderer(props: CustomCellRendererProps) {
+  const data = props.data as Record<string, unknown> | undefined;
+  if (!data) return null;
+  const name = String(data.employee_name ?? '');
+  const dept = data.department_name ? String(data.department_name) : '';
+  const wa = data.work_authorization_name
+    ? String(data.work_authorization_name)
+    : '';
+
+  return (
+    <div className="flex h-full items-center gap-2">
+      <div className="flex flex-col justify-center leading-tight">
+        <span className="text-sm font-medium">{name}</span>
+        <div className="flex items-center gap-1.5">
+          {dept && (
+            <span className="text-muted-foreground text-xs">{dept}</span>
+          )}
+          {wa && (
+            <span className="inline-flex items-center rounded bg-blue-500/10 px-1 py-0 text-[10px] font-medium text-blue-600 dark:text-blue-400">
+              {wa}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const schema = z.object({});
 
 const agGridColDefs: (ColDef | ColGroupDef)[] = [
-  // Avatar column (not in a group)
+  // Employee pinned group
   {
     headerName: '',
-    field: 'profile_photo_url',
-    cellRenderer: AvatarRenderer,
-    maxWidth: 60,
-    minWidth: 60,
-    sortable: false,
-    filter: false,
-    resizable: false,
-    suppressMovable: true,
-    pinned: 'left',
-    lockPosition: true,
-  },
-  // Employee Info group
+    marryChildren: true,
+    children: [
+      {
+        field: 'employee_name',
+        headerName: 'Employee',
+        cellRenderer: EmployeeInfoRenderer,
+        sortable: true,
+        filter: true,
+        minWidth: 240,
+        pinned: 'left',
+      },
+    ],
+  } as ColGroupDef,
+  // Employee Info group (remaining fields)
   {
     headerName: 'Employee Info',
     children: [
-      {
-        field: 'full_name',
-        headerName: 'Employee',
-        sortable: true,
-        filter: true,
-        minWidth: 180,
-        pinned: 'left',
-      },
-      {
-        field: 'department_name',
-        headerName: 'Department',
-        sortable: true,
-        filter: true,
-      },
-      {
-        field: 'work_authorization_name',
-        headerName: 'Work Auth',
-        sortable: true,
-        filter: true,
-      },
       { field: 'pay_structure', headerName: 'Pay Structure', filter: true },
       {
         field: 'hourly_rate',
         headerName: 'Hourly Rate',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'overtime_threshold',
@@ -152,73 +162,73 @@ const agGridColDefs: (ColDef | ColGroupDef)[] = [
         field: 'regular_pay',
         headerName: 'Regular',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'overtime_pay',
         headerName: 'Overtime',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'holiday_pay',
         headerName: 'Holiday',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'pto_pay',
         headerName: 'PTO',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'sick_pay',
         headerName: 'Sick',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'funeral_pay',
         headerName: 'Funeral',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'other_pay',
         headerName: 'Other',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'bonus_pay',
         headerName: 'Bonus',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'auto_allowance',
         headerName: 'Auto Allow',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'per_diem',
         headerName: 'Per Diem',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'salary',
         headerName: 'Salary',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'gross_wage',
         headerName: 'Gross Wage',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
     ],
   },
@@ -230,67 +240,67 @@ const agGridColDefs: (ColDef | ColGroupDef)[] = [
         field: 'fit',
         headerName: 'FIT',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'sit',
         headerName: 'SIT',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'social_security',
         headerName: 'SS',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'medicare',
         headerName: 'Medicare',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'comp_plus',
         headerName: 'Comp Plus',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'hds_dental',
         headerName: 'HDS Dental',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'pre_tax_401k',
         headerName: '401k',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'auto_deduction',
         headerName: 'Auto Ded',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'child_support',
         headerName: 'Child Supp',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'program_fees',
         headerName: 'Program Fees',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'net_pay',
         headerName: 'Net Pay',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
     ],
   },
@@ -302,61 +312,61 @@ const agGridColDefs: (ColDef | ColGroupDef)[] = [
         field: 'labor_tax',
         headerName: 'Labor Tax',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'other_tax',
         headerName: 'Other Tax',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'workers_compensation',
         headerName: 'Workers Comp',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'health_benefits',
         headerName: 'Health',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'other_health_charges',
         headerName: 'Other Health',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'admin_fees',
         headerName: 'Admin Fees',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'hawaii_get',
         headerName: 'HI GET',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'other_charges',
         headerName: 'Other',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'tdi',
         headerName: 'TDI',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
       {
         field: 'total_cost',
         headerName: 'Total Cost',
         type: 'numericColumn',
-        valueFormatter: currencyFormatter,
+        cellRenderer: CurrencyRenderer,
       },
     ],
   },
@@ -374,7 +384,7 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
   },
 
   columns: [
-    { key: 'full_name', label: 'Employee', sortable: true },
+    { key: 'employee_name', label: 'Employee', sortable: true },
     { key: 'department_name', label: 'Department', sortable: true },
     { key: 'check_date', label: 'Check Date', type: 'date', sortable: true },
     { key: 'gross_wage', label: 'Gross Wage', type: 'number' },
@@ -383,7 +393,7 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
   ],
 
   search: {
-    columns: ['full_name', 'department_name'],
+    columns: ['employee_name', 'department_name'],
     placeholder: 'Search payroll data...',
   },
 
@@ -396,4 +406,5 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
     list: () => import('~/components/ag-grid/ag-grid-list-view'),
   },
   noPagination: true,
+  noDetailRow: true,
 };

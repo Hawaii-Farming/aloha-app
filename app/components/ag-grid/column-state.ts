@@ -1,7 +1,7 @@
 import type { GridApi } from 'ag-grid-community';
 
 const STORAGE_PREFIX = 'ag-grid-state-';
-const STATE_VERSION = 4;
+const STATE_VERSION = 5;
 
 interface StoredState {
   version: number;
