@@ -1,16 +1,12 @@
 'use client';
 
 import { Input } from '../shadcn/input';
-import { Label } from '../shadcn/label';
-import { Switch } from '../shadcn/switch';
 import { Trans } from './trans';
 
 interface DataTableToolbarProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
-  showInactive: boolean;
-  onShowInactiveChange: (value: boolean) => void;
   filterSlot?: React.ReactNode;
   actionSlot?: React.ReactNode;
   selectedCount?: number;
@@ -32,18 +28,6 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
         />
 
         {props.filterSlot}
-
-        <div className="flex items-center gap-1.5">
-          <Switch
-            checked={props.showInactive}
-            onCheckedChange={props.onShowInactiveChange}
-            id="show-inactive"
-          />
-
-          <Label htmlFor="show-inactive" className="text-xs">
-            <Trans i18nKey="common:showInactive" defaults="Show Inactive" />
-          </Label>
-        </div>
       </div>
 
       <div className="flex items-center gap-2">

@@ -15,6 +15,7 @@ export async function crudCreateAction(
     schema: z.ZodType;
     pkType: 'text' | 'uuid';
     generatePk?: (data: Record<string, unknown>) => string;
+    additionalFields?: Record<string, 'currentEmployee' | 'currentOrg'>;
   },
 ) {
   const parsed = params.schema.safeParse(params.data);
@@ -32,6 +33,16 @@ export async function crudCreateAction(
 
   if (params.generatePk) {
     insertData.id = params.generatePk(parsed.data as Record<string, unknown>);
+  }
+
+  if (params.additionalFields) {
+    for (const [field, value] of Object.entries(params.additionalFields)) {
+      if (value === 'currentEmployee') {
+        insertData[field] = params.employeeId;
+      } else if (value === 'currentOrg') {
+        insertData[field] = params.orgId;
+      }
+    }
   }
 
   const { data, error } = await params.client
@@ -133,6 +144,7 @@ export async function crudBulkTransitionAction(
     statusColumn: string;
     newStatus: string;
     transitionFields?: Record<string, 'now' | 'currentEmployee'>;
+    extraFields?: Record<string, unknown>;
   },
 ) {
   const updateData: Record<string, unknown> = {
@@ -148,6 +160,10 @@ export async function crudBulkTransitionAction(
         updateData[field] = params.employeeId;
       }
     }
+  }
+
+  if (params.extraFields) {
+    Object.assign(updateData, params.extraFields);
   }
 
   const { error } = await params.client
@@ -170,6 +186,7 @@ export async function crudTransitionAction(
     statusColumn: string;
     newStatus: string;
     transitionFields?: Record<string, 'now' | 'currentEmployee'>;
+    extraFields?: Record<string, unknown>;
   },
 ) {
   const updateData: Record<string, unknown> = {
@@ -186,6 +203,10 @@ export async function crudTransitionAction(
         updateData[field] = params.employeeId;
       }
     }
+  }
+
+  if (params.extraFields) {
+    Object.assign(updateData, params.extraFields);
   }
 
   const { error } = await params.client

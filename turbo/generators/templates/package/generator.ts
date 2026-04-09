@@ -1,5 +1,6 @@
 import type { PlopTypes } from '@turbo/gen';
 import { execSync } from 'node:child_process';
+
 import { getPackageVersion } from '../../utils';
 
 export function createPackageGenerator(plop: PlopTypes.NodePlopAPI) {
@@ -75,9 +76,7 @@ export function createPackageGenerator(plop: PlopTypes.NodePlopAPI) {
           stdio: 'inherit',
         });
 
-        execSync(
-          `pnpm run format:fix`,
-        );
+        execSync(`pnpm run format:fix`);
 
         return 'Package scaffolded';
       },

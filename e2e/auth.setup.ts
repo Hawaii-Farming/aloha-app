@@ -1,15 +1,11 @@
-import { chromium, type FullConfig } from '@playwright/test';
-import path from 'node:path';
+import { type FullConfig, chromium } from '@playwright/test';
 import fs from 'node:fs';
+import path from 'node:path';
 
 const AUTH_DIR = path.join(__dirname, '.auth');
 const STORAGE_STATE_PATH = path.join(AUTH_DIR, 'user.json');
 
-const EMPTY_STATE = JSON.stringify(
-  { cookies: [], origins: [] },
-  null,
-  2,
-);
+const EMPTY_STATE = JSON.stringify({ cookies: [], origins: [] }, null, 2);
 
 export default async function globalSetup(config: FullConfig) {
   const email = process.env.E2E_USER_EMAIL;
@@ -24,8 +20,7 @@ export default async function globalSetup(config: FullConfig) {
     return;
   }
 
-  const baseURL =
-    config.projects[0]?.use?.baseURL ?? 'http://localhost:5173';
+  const baseURL = config.projects[0]?.use?.baseURL ?? 'http://localhost:5173';
 
   const browser = await chromium.launch();
   const context = await browser.newContext({ baseURL });

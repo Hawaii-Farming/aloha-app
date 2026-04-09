@@ -1,9 +1,6 @@
 import { redirect } from 'react-router';
 
-import {
-  castRows,
-  queryUntypedView,
-} from '~/lib/crud/typed-query.server';
+import { castRows, queryUntypedView } from '~/lib/crud/typed-query.server';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { requireModuleAccess } from '~/lib/workspace/require-module-access.server';
 

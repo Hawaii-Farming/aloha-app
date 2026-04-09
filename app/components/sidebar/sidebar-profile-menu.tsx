@@ -1,8 +1,8 @@
 'use client';
 
-import type { JwtPayload } from '@supabase/supabase-js';
-
 import { useNavigate } from 'react-router';
+
+import type { JwtPayload } from '@supabase/supabase-js';
 
 import { Building2, Check, ChevronsUpDown, LogOut } from 'lucide-react';
 
@@ -106,9 +106,8 @@ export function SidebarProfileMenu(props: {
                   <DropdownMenuSubTrigger>
                     <Building2 className="mr-2 h-4 w-4" />
                     <span>
-                      {props.accounts.find(
-                        (a) => a.value === props.accountSlug,
-                      )?.label ?? props.accountSlug}
+                      {props.accounts.find((a) => a.value === props.accountSlug)
+                        ?.label ?? props.accountSlug}
                     </span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>

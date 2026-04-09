@@ -3,9 +3,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { castRow } from '~/lib/crud/typed-query.server';
 import type { Database } from '~/lib/database.types';
 import type {
+  AppNavigationRow,
   AppNavModule as NavModule,
   AppNavSubModule as NavSubModule,
-  AppNavigationRow,
 } from '~/lib/workspace/types';
 
 /**

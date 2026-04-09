@@ -49,7 +49,7 @@ export function FormFieldGrid({
         <div key={section.title ?? sectionIndex}>
           {section.title && (
             <div className="mb-3 border-b pb-2">
-              <h3 className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+              <h3 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 {section.title}
               </h3>
             </div>

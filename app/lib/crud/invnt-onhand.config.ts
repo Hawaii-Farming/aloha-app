@@ -26,9 +26,19 @@ export const invntOnhandConfig: CrudModuleConfig<typeof invntOnhandSchema> = {
   columns: [
     { key: 'invnt_item_id', label: 'Item', sortable: true },
     { key: 'onhand_date', label: 'Date', sortable: true, type: 'date' },
-    { key: 'onhand_quantity', label: 'Quantity', sortable: true, type: 'number' },
+    {
+      key: 'onhand_quantity',
+      label: 'Quantity',
+      sortable: true,
+      type: 'number',
+    },
     { key: 'onhand_uom', label: 'UOM', priority: 'low' },
-    { key: 'burn_per_onhand', label: 'Burn Rate', type: 'number', priority: 'low' },
+    {
+      key: 'burn_per_onhand',
+      label: 'Burn Rate',
+      type: 'number',
+      priority: 'low',
+    },
     {
       key: 'created_at',
       label: 'Created',
@@ -55,7 +65,12 @@ export const invntOnhandConfig: CrudModuleConfig<typeof invntOnhandSchema> = {
       fkLabelColumn: 'name',
     },
     { key: 'onhand_date', label: 'Date', type: 'date', required: true },
-    { key: 'onhand_quantity', label: 'Quantity', type: 'number', required: true },
+    {
+      key: 'onhand_quantity',
+      label: 'Quantity',
+      type: 'number',
+      required: true,
+    },
     {
       key: 'onhand_uom',
       label: 'Unit of Measure',

@@ -1,0 +1,92 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GCP_REGION: us-west1
+  SERVICE_NAME: aloha-app
+  GCP_PROJECT_ID: aloha-96743
+  IMAGE_NAME: us-west1-docker.pkg.dev/aloha-96743/aloha/aloha-app
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-west1-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg VITE_SITE_URL=${{ secrets.VITE_SITE_URL }} \
+            --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
+            --build-arg VITE_SUPABASE_PUBLIC_KEY=${{ secrets.VITE_SUPABASE_PUBLIC_KEY }} \
+            --build-arg VITE_PRODUCT_NAME=Aloha \
+            --build-arg VITE_SITE_TITLE="Aloha Agricultural ERP" \
+            --build-arg VITE_AUTH_PASSWORD=true \
+            --build-arg VITE_ENABLE_THEME_TOGGLE=true \
+            --build-arg VITE_ENABLE_TEAM_ACCOUNTS=true \
+            --build-arg VITE_ENABLE_TEAM_ACCOUNTS_CREATION=true \
+            --build-arg VITE_ENABLE_TEAM_ACCOUNTS_DELETION=true \
+            --build-arg VITE_LANGUAGE_PRIORITY=application \
+            --build-arg VITE_DEFAULT_THEME_MODE=light \
+            -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.IMAGE_NAME }}:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image=${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --region=${{ env.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=3000 \
+            --memory=512Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=3 \
+            --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY }}" \
+            --set-env-vars="ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" \
+            --set-env-vars="SUPABASE_DB_WEBHOOK_SECRET=${{ secrets.SUPABASE_DB_WEBHOOK_SECRET }}" \
+            --set-env-vars="GOOGLE_OAUTH_CLIENT_ID=${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}" \
+            --set-env-vars="GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" \
+            --set-env-vars="MAILER_PROVIDER=nodemailer" \
+            --set-env-vars="EMAIL_SENDER=${{ secrets.EMAIL_SENDER }}" \
+            --project=aloha-96743
+
+      - name: Show deployment URL
+        run: |
+          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.GCP_REGION }} \
+            --project=aloha-96743 \
+            --format="value(status.url)")
+          echo "## Deployed to Cloud Run" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** $URL" >> $GITHUB_STEP_SUMMARY

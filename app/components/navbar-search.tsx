@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { Search } from 'lucide-react';
+
 import {
   CommandDialog,
   CommandEmpty,
@@ -9,7 +11,6 @@ import {
   CommandList,
 } from '@aloha/ui/command';
 import { Kbd } from '@aloha/ui/kbd';
-import { Search } from 'lucide-react';
 
 export function NavbarSearch() {
   const [open, setOpen] = useState(false);

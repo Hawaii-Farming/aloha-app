@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+/** Treat empty strings as undefined so `VAR=` in .env works with `.optional()` */
+const optionalEnv = z.preprocess(
+  (v) => (v === '' ? undefined : v),
+  z.string().min(1).optional(),
+);
+
 const serverEnvSchema = z
   .object({
     NODE_ENV: z
@@ -8,23 +14,23 @@ const serverEnvSchema = z
 
     // Supabase (at least one anon/public key required)
     VITE_SUPABASE_URL: z.string().url(),
-    VITE_SUPABASE_ANON_KEY: z.string().min(1).optional(),
-    VITE_SUPABASE_PUBLIC_KEY: z.string().min(1).optional(),
-    SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-    SUPABASE_SECRET_KEY: z.string().min(1).optional(),
+    VITE_SUPABASE_ANON_KEY: optionalEnv,
+    VITE_SUPABASE_PUBLIC_KEY: optionalEnv,
+    SUPABASE_SERVICE_ROLE_KEY: optionalEnv,
+    SUPABASE_SECRET_KEY: optionalEnv,
 
     // AI (optional)
-    ANTHROPIC_API_KEY: z.string().min(1).optional(),
+    ANTHROPIC_API_KEY: optionalEnv,
 
     // Webhooks (optional)
-    SUPABASE_DB_WEBHOOK_SECRET: z.string().min(1).optional(),
+    SUPABASE_DB_WEBHOOK_SECRET: optionalEnv,
 
     // Email (optional)
-    EMAIL_SENDER: z.string().min(1).optional(),
-    EMAIL_HOST: z.string().min(1).optional(),
+    EMAIL_SENDER: optionalEnv,
+    EMAIL_HOST: optionalEnv,
     EMAIL_PORT: z.coerce.number().optional(),
-    EMAIL_USER: z.string().min(1).optional(),
-    EMAIL_PASSWORD: z.string().min(1).optional(),
+    EMAIL_USER: optionalEnv,
+    EMAIL_PASSWORD: optionalEnv,
   })
   .refine(
     (d) => d.VITE_SUPABASE_ANON_KEY || d.VITE_SUPABASE_PUBLIC_KEY,

@@ -127,6 +127,8 @@
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
-    "@fontsource-variable/geist-mono": "^5.2.7"
+    "@fontsource-variable/geist-mono": "^5.2.7",
+    "ag-grid-community": "^35.2.1",
+    "ag-grid-react": "^35.2.1"
   }
 }

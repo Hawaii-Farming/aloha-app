@@ -26,12 +26,12 @@ import { WorkflowStatusBadge } from '@aloha/ui/workflow-status-badge';
 import { WorkflowTransitionButtons } from '@aloha/ui/workflow-transition';
 
 import { EditPanel } from '~/components/crud/edit-panel';
-import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
 import type {
   CrudModuleConfig,
   DetailViewProps,
   FormFieldConfig,
 } from '~/lib/crud/types';
+import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
 import { AccessGate } from '~/lib/workspace/access-gate';
 
 function formatDate(value: string): string {
@@ -183,7 +183,6 @@ function buildSections(formFields: FormFieldConfig[]): FieldSection[] {
   return sections;
 }
 
-
 export function CardDetailView({
   record,
   config,
@@ -207,17 +206,11 @@ export function CardDetailView({
   const handleTransition = useCallback(
     (newStatus: string) => {
       if (!workflowConfig) return;
-      const payload: Record<
-        string,
-        | string
-        | Record<string, string>
-        | null
-      > = {
+      const payload: Record<string, string | Record<string, string> | null> = {
         intent: 'transition',
         statusColumn: workflowConfig.statusColumn,
         newStatus,
-        transitionFields:
-          workflowConfig.transitionFields?.[newStatus] ?? null,
+        transitionFields: workflowConfig.transitionFields?.[newStatus] ?? null,
       };
       fetcher.submit(payload, {
         method: 'POST',
@@ -349,7 +342,7 @@ export function CardDetailView({
                         {i > 0 && <Separator className="mb-6" />}
 
                         {section.title && (
-                          <h3 className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+                          <h3 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
                             {section.title}
                           </h3>
                         )}

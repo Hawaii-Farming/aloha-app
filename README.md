@@ -23,7 +23,8 @@ Pricing is managed with three tiers of specificity -- default prices by product 
 | Database | Supabase (PostgreSQL + Auth + Storage) |
 | Language | TypeScript 5.9 |
 | Build | Vite 7, Turborepo |
-| Testing | Playwright (E2E), pgTAP (database) |
+| Data Tables | AG Grid Community v35 |
+| Testing | Playwright (E2E), Vitest (unit) |
 
 ## Supabase Project
 
@@ -53,19 +54,21 @@ pnpm dev       # Start dev server at http://localhost:5173
 ### Essential Commands
 
 ```bash
-pnpm dev                    # Start all apps
-pnpm dev       # Main app only
+pnpm dev                    # Start dev server at http://localhost:5173
 pnpm typecheck              # Type-check all packages
+pnpm test:unit              # Run Vitest unit tests
 pnpm format:fix             # Format code
 pnpm lint:fix               # Lint code
 ```
 
-### Database Commands
+### Database Commands (Hosted Supabase)
+
+This project uses **hosted Supabase** — there is no local Docker instance.
 
 ```bash
-pnpm supabase:typegen   # Regenerate TypeScript types from Supabase schema
-pnpm supabase:start     # Start local Supabase (requires Docker)
-pnpm supabase:reset     # Reset local Supabase with latest schema
+pnpm supabase db diff            # Create migration diff (local file only)
+supabase db push                 # Push migrations to hosted (human only)
+npx supabase gen types --lang typescript --linked > app/lib/database.types.ts  # Regenerate types
 ```
 
 ### Test Users
@@ -98,70 +101,8 @@ Login with any of these users to see how the sidebar navigation adapts based on 
 | `.gitignore` | Ignores for `node_modules`, build artifacts, `.env` files, and IDE configs. |
 | `CLAUDE.md` | Instructions for Claude Code when working in this repository. |
 | `SCHEMA_CONVENTIONS.md` | Schema design rules followed across all SQL migrations. Read before making schema changes. |
-
-### Directory Map
-
-```
-aloha-app/
-  .claude/
-    agents/                   # AI agents (code-quality-reviewer)
-    commands/                 # Slash commands (feature-builder)
-    skills/                   # Dev skills (playwright-e2e, postgres-expert, react-form-builder, server-action-builder, service-builder)
-    evals/                    # Evaluation criteria for implementation quality
-  apps/
-    web/                      # Main React Router 7 SSR application
-      app/routes/             # File-based routes (auth, home, api, join)
-      components/             # Shared app-level components
-      config/                 # App configuration (auth, paths, feature flags)
-      lib/                    # App-level utilities (i18n, database types, require-user)
-      public/                 # Static assets and locale JSON files
-      styles/                 # Global CSS (Tailwind entry point)
-      supabase/
-        schemas/              # SQL schema files (00-20) for auth, views, seed data
-        migrations/           # Deployable migrations
-        config.toml           # Supabase CLI project config
-        seed.sql              # Local development seed data
-    e2e/                      # Playwright end-to-end tests
-      tests/                  # Test files organized by feature
-      playwright.config.ts    # Browser, base URL, and timeout config
-  packages/
-    features/
-      auth/                   # Sign in, sign up, password reset, magic link
-      access-control/         # Role-based access control, route guards
-      team-accounts/          # Org settings, member list, role updates, ownership transfer
-      crud/                   # Schema-driven CRUD (list, detail, form views)
-      ai/                     # AI chat and form-assist
-    supabase/                 # Supabase client factory, generated types, SSR cookies
-    ui/                       # Shadcn UI components + custom kit (data tables, forms, nav)
-    shared/                   # Registry pattern, Pino logger, React hooks
-    i18n/                     # i18next with lazy locale loading and language detection
-    mailers/                  # Email abstraction (Nodemailer dev, Resend prod)
-    policies/                 # Business rule engine (ALL/ANY operators, LRU caching)
-    otp/                      # One-time password for sensitive operations
-    utils/                    # CSRF protection via @edge-csrf/core
-    mcp-server/               # Model Context Protocol server for AI tools
-    database-webhooks/        # Supabase database webhook handlers
-  tooling/
-    eslint/                   # ESLint 9 flat config (typescript-eslint, react, react-hooks)
-    prettier/                 # Prettier config (import sorting, Tailwind class sorting)
-    tailwind/                 # Tailwind CSS 4 config exported as Vite plugin
-    typescript/               # Shared tsconfigs (base, React, Node)
-    scripts/                  # Build and dev shell scripts
-  turbo/
-    generators/               # Turborepo code generators for scaffolding new packages
-  docs/
-    schemas/                  # 11 schema docs with tables, columns, constraints, mermaid ERDs
-    processes/                # 10 workflow docs with mermaid flow diagrams
-  supabase/
-    migrations/               # Original 91 SQL migration files (schema design source of truth)
-  scripts/
-    python/
-      process_payroll.py      # ETL for importing payroll from external processor
-      requirements.txt        # Python dependencies
-    sql/
-      deploy-views-and-seed.sql  # Creates view contracts + seeds system data (run in SQL Editor)
-      seed-test-data.sql      # Creates test users and links to hr_employee records
-```
+| `DESIGN.md` | Supabase-inspired design system — colors, typography, spacing, component styling for dark/light themes. |
+| `.mcp.json` | MCP server config — `aloha` (project schema/components) and `ag-mcp` (AG Grid API docs). |
 
 ### Apps
 
@@ -365,7 +306,7 @@ See [SCHEMA_CONVENTIONS.md](SCHEMA_CONVENTIONS.md) for the full set of schema de
 - **invnt_onhand** — On-hand inventory snapshots per item with burn unit conversion
 - **invnt_item_summary** (view) — Computed on-hand, on-order, weeks-on-hand, and next-order-date per item
 
-## Human Resources Module (9 tables) — [Docs](docs/schemas/20260401000004_hr.md)
+## Human Resources Module (10 tables) — [Docs](docs/schemas/20260401000004_hr.md)
 
 - **hr_department** — Org-specific department lookup for classifying employees (e.g. GH, PH, Lettuce). TEXT PK derived from name.
 - **hr_work_authorization** — Org-specific work authorization type lookup (e.g. Local, FURTE, WFE, H1B). TEXT PK derived from name.
@@ -376,6 +317,23 @@ See [SCHEMA_CONVENTIONS.md](SCHEMA_CONVENTIONS.md) for the full set of schema de
 - **hr_travel_request** — Employee travel requests with trip details and approval workflow (pending → approved/denied)
 - **hr_disciplinary_warning** — Employee disciplinary warning records with acknowledgment and review workflow
 - **hr_payroll** — Merged payroll data imported from external processor; one row per employee per check date with snapshotted employee fields
+- **hr_employee_review** — Quarterly employee performance reviews with productivity, attendance, quality, and engagement scores (1-3), DB-computed average, review lead, and lock flag
+
+### HR Submodules (AG Grid)
+
+All HR submodules use AG Grid Community tables with side-panel CRUD forms and detail row expansion:
+
+| Submodule | Data Source | Key Features |
+|-----------|------------|--------------|
+| Register | `hr_employee` | Employee list with photo, dept, status badges |
+| Scheduler | `ops_task_weekly_schedule` view | Week navigation, dept filter, OT highlighting, history |
+| Time Off | `app_hr_time_off_requests` view | Status filter tabs, inline approve/deny, denial reason |
+| Payroll Comparison | `app_hr_payroll_by_task/employee` views | By-task/by-employee toggle, pay period filter, pinned totals |
+| Payroll Comp Manager | `app_hr_payroll_by_manager` view | Manager selector, pay period filter, summary totals |
+| Payroll Data | `hr_payroll` | Column groups (Hours/Earnings/Deductions/Costs), employee/period filters |
+| Hours Comparison | `app_hr_hours_comparison` view | Scheduled vs payroll variance highlighting, daily drill-down |
+| Housing | `app_hr_housing` view | Occupancy grid, tenant detail rows via API |
+| Employee Review | `app_hr_employee_reviews` view | Score color coding (1=red/2=amber/3=green), Year-Quarter filter, lock enforcement |
 
 ## Operations Module (14 tables, includes 1 view) — [Docs](docs/schemas/20260401000005_ops.md)
 

@@ -5,11 +5,18 @@ import { fsafeTestHoldConfig } from './fsafe-test-hold.config';
 import { growHarvestWeightConfig } from './grow-harvest-weight.config';
 import { growSeedBatchConfig } from './grow-seed-batch.config';
 import { hrDepartmentConfig } from './hr-department.config';
+import { hrEmployeeReviewConfig } from './hr-employee-review.config';
 import { hrEmployeeConfig } from './hr-employee.config';
+import { hrHousingConfig } from './hr-housing.config';
+import { hrPayrollCompManagerConfig } from './hr-payroll-comp-manager.config';
+import { hrPayrollComparisonConfig } from './hr-payroll-comparison.config';
+import { hrPayrollDataConfig } from './hr-payroll-data.config';
+import { hrPayrollHoursConfig } from './hr-payroll-hours.config';
 import { hrPayrollConfig } from './hr-payroll.config';
 import { hrTimeOffConfig } from './hr-time-off.config';
 import { invntItemConfig } from './invnt-item.config';
 import { invntOnhandConfig } from './invnt-onhand.config';
+import { opsTaskScheduleConfig } from './ops-task-schedule.config';
 import { opsTaskTrackerConfig } from './ops-task-tracker.config';
 import { opsTemplateConfig } from './ops-template.config';
 import { orgSiteConfig } from './org-site.config';
@@ -27,6 +34,11 @@ const registry = new Map<string, CrudModuleConfig>([
   ['employees', hrEmployeeConfig],
   ['time_off', hrTimeOffConfig],
   ['payroll', hrPayrollConfig],
+  ['payroll_comp', hrPayrollComparisonConfig],
+  ['payroll_comparison', hrPayrollComparisonConfig],
+  ['payroll_comp_manager', hrPayrollCompManagerConfig],
+  ['payroll_data', hrPayrollDataConfig],
+  ['hours_comp', hrPayrollHoursConfig],
   ['products', invntItemConfig],
   ['stock_counts', invntOnhandConfig],
   ['warehouses', orgSiteConfig],
@@ -34,8 +46,11 @@ const registry = new Map<string, CrudModuleConfig>([
   ['harvests', growHarvestWeightConfig],
   ['inspections', fsafeResultConfig],
   ['incidents', fsafeTestHoldConfig],
+  ['scheduler', opsTaskScheduleConfig],
   ['task_tracking', opsTaskTrackerConfig],
   ['checklists', opsTemplateConfig],
+  ['housing', hrHousingConfig],
+  ['employee_review', hrEmployeeReviewConfig],
 ]);
 
 export function getModuleConfig(

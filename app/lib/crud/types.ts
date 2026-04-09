@@ -1,9 +1,11 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
+import type { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community';
 import type { z } from 'zod';
 
 export type ListViewType =
   | 'table'
+  | 'agGrid'
   | 'kanban'
   | 'calendar'
   | 'dashboard'
@@ -25,6 +27,7 @@ export interface ListViewProps {
   comboboxOptions: Record<string, string[]>;
   subModuleDisplayName: string;
   accountSlug: string;
+  filterSlot?: ReactNode;
 }
 
 export interface DetailViewProps {
@@ -182,4 +185,29 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
     list?: () => Promise<{ default: ComponentType<ListViewProps> }>;
     detail?: () => Promise<{ default: ComponentType<DetailViewProps> }>;
   };
+
+  /** Auto-set fields on create. Maps field name to value type.
+   *  'currentEmployee' sets to the logged-in employee's hr_employee_id.
+   *  'currentOrg' sets to the current org_id. */
+  additionalCreateFields?: Record<string, 'currentEmployee' | 'currentOrg'>;
+
+  /** AG Grid-specific column definition overrides. When provided,
+   *  these are used instead of auto-mapped columns from `columns`. */
+  agGridColDefs?: (ColDef | ColGroupDef)[];
+
+  /** Custom detail row component for AG Grid row expansion.
+   *  When provided, replaces the default InlineDetailRow. */
+  agGridDetailRow?: ComponentType<{ data: Record<string, unknown> }>;
+
+  /** Disable server-side pagination — load all records at once. */
+  noPagination?: boolean;
+  /** Skip the `.eq('is_deleted', false)` filter in loadTableData.
+   *  Use when the view already filters deleted rows internally
+   *  and does not expose an `is_deleted` column. */
+  skipDeletedFilter?: boolean;
+  /** Disable row-click detail expansion in AgGridListView. */
+  noDetailRow?: boolean;
+
+  /** Additional AG Grid options passed through to AgGridReact. */
+  agGridOptions?: Partial<GridOptions>;
 }

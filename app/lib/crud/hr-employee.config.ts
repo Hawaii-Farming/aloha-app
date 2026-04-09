@@ -36,8 +36,12 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
   orgScoped: true,
 
   generatePk: (data) => {
-    const last = String(data.last_name ?? '').toLowerCase().replace(/\s+/g, '_');
-    const first = String(data.first_name ?? '').toLowerCase().replace(/\s+/g, '_');
+    const last = String(data.last_name ?? '')
+      .toLowerCase()
+      .replace(/\s+/g, '_');
+    const first = String(data.first_name ?? '')
+      .toLowerCase()
+      .replace(/\s+/g, '_');
     return `${last}_${first}`;
   },
 
@@ -60,25 +64,51 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
   },
 
   columns: [
-    { key: 'preferred_name', label: 'Alias' },
-    { key: 'last_name', label: 'Name', sortable: true, render: 'full_name' },
-    { key: 'gender', label: 'Gender', render: 'proper_case' },
-    { key: 'hr_department_name', label: 'Department', sortable: true },
-    { key: 'hr_work_authorization_name', label: 'Status', sortable: true },
-    { key: 'wc', label: 'WC Code' },
+    {
+      key: 'last_name',
+      label: 'Employee',
+      sortable: true,
+      render: 'full_name',
+    },
     { key: 'compensation_manager_id_preferred_name', label: 'Manager' },
     { key: 'team_lead_id_preferred_name', label: 'Team Lead' },
     { key: 'overtime_threshold', label: 'OT Threshold' },
-    { key: 'pay_structure', label: 'Pay Structure', render: 'proper_case', priority: 'low' },
-    { key: 'payroll_id', label: 'Payroll ID', priority: 'low' },
-    { key: 'payroll_processor', label: 'Payroll Processor', priority: 'low' },
-    { key: 'pay_delivery_method', label: 'Pay Delivery Method', priority: 'low' },
+    {
+      key: 'pay_structure',
+      label: 'Pay Structure',
+      render: 'badge',
+      priority: 'low',
+    },
+    { key: 'payroll_id', label: 'Payroll ID', render: 'code', priority: 'low' },
+    {
+      key: 'payroll_processor',
+      label: 'Payroll Processor',
+      render: 'badge',
+      priority: 'low',
+    },
+    {
+      key: 'pay_delivery_method',
+      label: 'Pay Delivery Method',
+      render: 'badge',
+      priority: 'low',
+    },
     { key: 'housing_site_name', label: 'Housing', priority: 'low' },
-    { key: 'company_email', label: 'Company Email', priority: 'low' },
+    {
+      key: 'company_email',
+      label: 'Company Email',
+      render: 'email',
+      priority: 'low',
+    },
     { key: 'hr_title_name', label: 'Title', sortable: true, priority: 'low' },
-    { key: 'date_of_birth', label: 'DOB', type: 'date', sortable: true, priority: 'low' },
-    { key: 'phone', label: 'Phone', priority: 'low' },
-    { key: 'email', label: 'Email', priority: 'low' },
+    {
+      key: 'date_of_birth',
+      label: 'DOB',
+      type: 'date',
+      sortable: true,
+      priority: 'low',
+    },
+    { key: 'phone', label: 'Phone', render: 'phone', priority: 'low' },
+    { key: 'email', label: 'Email', render: 'email', priority: 'low' },
   ],
 
   search: {
@@ -90,7 +120,13 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
 
   formFields: [
     // --- Personal ---
-    { key: 'first_name', label: 'First Name', type: 'text', required: true, section: 'Personal' },
+    {
+      key: 'first_name',
+      label: 'First Name',
+      type: 'text',
+      required: true,
+      section: 'Personal',
+    },
     { key: 'last_name', label: 'Last Name', type: 'text', required: true },
     { key: 'preferred_name', label: 'Alias', type: 'text' },
     { key: 'is_minority', label: 'Minority', type: 'boolean' },
@@ -110,7 +146,12 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     { key: 'email', label: 'Personal Email', type: 'text' },
 
     // --- App Access & Role ---
-    { key: 'company_email', label: 'Company Email', type: 'text', section: 'App Access' },
+    {
+      key: 'company_email',
+      label: 'Company Email',
+      type: 'text',
+      section: 'App Access',
+    },
     {
       key: 'sys_access_level_id',
       label: 'Access Level',
@@ -160,7 +201,12 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     },
 
     // --- Employment ---
-    { key: 'start_date', label: 'Start Date', type: 'date', section: 'Employment' },
+    {
+      key: 'start_date',
+      label: 'Start Date',
+      type: 'date',
+      section: 'Employment',
+    },
     { key: 'end_date', label: 'End Date', type: 'date' },
 
     // --- Compensation ---
@@ -174,11 +220,19 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       ],
       section: 'Compensation',
     },
-    { key: 'overtime_threshold', label: 'OT Threshold (hrs/week)', type: 'combobox' },
+    {
+      key: 'overtime_threshold',
+      label: 'OT Threshold (hrs/week)',
+      type: 'combobox',
+    },
     { key: 'wc', label: 'WC Code', type: 'combobox' },
     { key: 'payroll_id', label: 'Payroll ID', type: 'text' },
     { key: 'payroll_processor', label: 'Payroll Processor', type: 'combobox' },
-    { key: 'pay_delivery_method', label: 'Pay Check Delivery', type: 'combobox' },
+    {
+      key: 'pay_delivery_method',
+      label: 'Pay Check Delivery',
+      type: 'combobox',
+    },
     {
       key: 'site_id',
       label: 'Housing',
@@ -189,5 +243,10 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     },
   ],
 
+  viewType: {
+    list: 'agGrid',
+  },
+
+  noPagination: true,
   schema: hrEmployeeSchema,
 };

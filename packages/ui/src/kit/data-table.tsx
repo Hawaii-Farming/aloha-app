@@ -18,14 +18,7 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../shadcn/table';
+import { Table } from '../shadcn/table';
 import {
   DataTablePagination,
   useNavigateToNewPage,
