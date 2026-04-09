@@ -27,10 +27,10 @@ Every HR submodule renders real data from the database and supports full CRUD op
 - [x] Payroll Comparison submodule — hr_payroll aggregated by task and by employee (2 table views) — Validated in Phase 4
 - [x] Payroll Comp Manager submodule — hr_payroll data filtered/grouped by compensation_manager_id — Validated in Phase 4
 - [x] Payroll Data submodule — detailed hr_payroll records (full payroll line items per employee per pay period) — Validated in Phase 4
-- [ ] Housing submodule — org_site (category=housing) with max beds/available beds + row-click tenant details (hr_employee where site_id = housing)
-- [ ] Employee Review submodule — new table (hr_employee_review) with quarterly scores (productivity, attendance, quality, engagement 1-3), average, notes, lead, locked flag + filter by Year-Quarter
-- [ ] Full-width detail rows in AG Grid Community for all row-click-to-expand interactions
-- [ ] Side-panel forms for Create/Edit following register pattern (right-side panel with form fields, save/cancel)
+- [x] Housing submodule — org_site (category=housing) with max beds/available beds + row-click tenant details (hr_employee where site_id = housing) — Validated in Phase 6
+- [x] Employee Review submodule — new table (hr_employee_review) with quarterly scores (productivity, attendance, quality, engagement 1-3), average, notes, lead, locked flag + filter by Year-Quarter — Validated in Phase 6
+- [x] Full-width detail rows in AG Grid Community for all row-click-to-expand interactions — Validated in Phase 6
+- [x] Side-panel forms for Create/Edit following register pattern (right-side panel with form fields, save/cancel) — Validated in Phase 6
 
 ### Out of Scope
 
@@ -86,4 +86,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after Phase 5 completion*
+*Last updated: 2026-04-09 after Phase 6 completion*
