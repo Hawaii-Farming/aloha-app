@@ -85,12 +85,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Employee Review
 
-- [ ] **EREV-01**: Employee review grid showing: photo + full name, dept, stat, start date, quarter, productivity (1-3), attendance (1-3), quality (1-3), engagement (1-3), average, notes, lead, locked
-- [ ] **EREV-02**: Year-Quarter filter for review periods
-- [ ] **EREV-03**: Create/edit review form (side panel): employee, year, quarter, productivity (1-3 select), attendance (1-3 select), quality (1-3 select), engagement (1-3 select), notes, lead (employee dropdown), locked (checkbox)
-- [ ] **EREV-04**: Lock flag preventing edits after finalization (`is_locked`)
+- [x] **EREV-01**: Employee review grid showing: photo + full name, dept, stat, start date, quarter, productivity (1-3), attendance (1-3), quality (1-3), engagement (1-3), average, notes, lead, locked
+- [x] **EREV-02**: Year-Quarter filter for review periods
+- [x] **EREV-03**: Create/edit review form (side panel): employee, year, quarter, productivity (1-3 select), attendance (1-3 select), quality (1-3 select), engagement (1-3 select), notes, lead (employee dropdown), locked (checkbox)
+- [x] **EREV-04**: Lock flag preventing edits after finalization (`is_locked`)
 - [x] **EREV-05**: New `hr_employee_review` table migration with RLS policies
-- [ ] **EREV-06**: Row-click full-width detail showing employee review details
+- [x] **EREV-06**: Row-click full-width detail showing employee review details
 
 ## v2 Requirements
 
@@ -178,12 +178,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HOUS-02 | Phase 6 | Complete |
 | HOUS-03 | Phase 6 | Complete |
 | HOUS-04 | Phase 6 | Complete |
-| EREV-01 | Phase 6 | Pending |
-| EREV-02 | Phase 6 | Pending |
-| EREV-03 | Phase 6 | Pending |
-| EREV-04 | Phase 6 | Pending |
+| EREV-01 | Phase 6 | Complete |
+| EREV-02 | Phase 6 | Complete |
+| EREV-03 | Phase 6 | Complete |
+| EREV-04 | Phase 6 | Complete |
 | EREV-05 | Phase 6 | Complete |
-| EREV-06 | Phase 6 | Pending |
+| EREV-06 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 55 total
