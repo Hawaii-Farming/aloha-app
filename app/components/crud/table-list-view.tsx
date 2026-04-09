@@ -183,9 +183,7 @@ function buildExpandColumn(
                   ? 'bg-primary/10 text-primary hover:bg-primary/20'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
-              aria-label={
-                expanded ? 'Hide extra columns' : 'Show more columns'
-              }
+              aria-label={expanded ? 'Hide extra columns' : 'Show more columns'}
               data-test="expand-columns-toggle"
             >
               <Columns3 className="h-4 w-4" />
@@ -232,8 +230,6 @@ export function TableListView({
   const sort = searchParams.get('sort') ?? 'id';
   const dir = searchParams.get('dir') ?? 'asc';
   const q = searchParams.get('q') ?? '';
-  const inactive = searchParams.get('inactive') ?? 'false';
-
   const [searchValue, setSearchValue] = useState(q);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -320,10 +316,6 @@ export function TableListView({
             searchPlaceholder={
               config?.search?.placeholder ??
               `Search ${subModuleDisplayName.toLowerCase()}...`
-            }
-            showInactive={inactive === 'true'}
-            onShowInactiveChange={(value) =>
-              updateParams({ inactive: value ? 'true' : 'false', page: 1 })
             }
             actionSlot={
               <div className="flex items-center gap-2">
@@ -425,6 +417,7 @@ function BulkActions({
   // Watch fetcher state for completion. When the submit finishes (state goes
   // back to 'idle' and we have data), revalidate the loader and clear selection.
   // The ref guards against re-running on every render once handled.
+  /* eslint-disable react-hooks/refs */
   if (
     fetcher.state === 'idle' &&
     fetcher.data !== undefined &&
@@ -434,6 +427,7 @@ function BulkActions({
     revalidator.revalidate();
     onComplete();
   }
+  /* eslint-enable react-hooks/refs */
 
   const handleBulkDelete = useCallback(() => {
     hasHandledCompletion.current = false;

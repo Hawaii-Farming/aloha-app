@@ -1,11 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import {
-  useFetcher,
-  useParams,
-  useRevalidator,
-  useSearchParams,
-} from 'react-router';
+import { useFetcher, useParams, useRevalidator } from 'react-router';
 
 import type {
   ColDef,
@@ -103,8 +98,6 @@ export default function AgGridListView({
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const inactive = searchParams.get('inactive') ?? 'false';
   const params = useParams();
 
   const subModuleSlug = params.subModule ?? config?.tableName ?? 'unknown';
@@ -165,23 +158,6 @@ export default function AgGridListView({
   const allColDefs = useMemo(
     () => [CHECKBOX_COL, ...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
     [dataColDefs, hasAvatar],
-  );
-
-  const updateParams = useCallback(
-    (updates: Record<string, string | number>) => {
-      const next = new URLSearchParams(searchParams);
-
-      for (const [key, value] of Object.entries(updates)) {
-        if (value === '' || value === null || value === undefined) {
-          next.delete(key);
-        } else {
-          next.set(key, String(value));
-        }
-      }
-
-      setSearchParams(next, { preventScrollReset: true });
-    },
-    [searchParams, setSearchParams],
   );
 
   const handleGridReady = useCallback(
@@ -275,10 +251,6 @@ export default function AgGridListView({
             searchPlaceholder={
               config?.search?.placeholder ??
               `Search ${subModuleDisplayName.toLowerCase()}...`
-            }
-            showInactive={inactive === 'true'}
-            onShowInactiveChange={(value) =>
-              updateParams({ inactive: value ? 'true' : 'false', page: 1 })
             }
             filterSlot={filterSlot}
             actionSlot={

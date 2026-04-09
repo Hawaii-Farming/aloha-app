@@ -131,15 +131,6 @@ export async function loadTableData<T = Record<string, unknown>>(
     .eq('org_id', params.orgId)
     .eq('is_deleted', false);
 
-  // Active/Inactive filter: toggle between active (no end_date) and inactive (has end_date)
-  const showInactive = params.searchParams.get('inactive') === 'true';
-
-  if (showInactive) {
-    query = query.not('end_date', 'is', null);
-  } else {
-    query = query.is('end_date', null);
-  }
-
   // Text search (TABLE-05) using PostgREST .or() syntax
   if (search && params.searchColumns?.length) {
     const searchFilter = params.searchColumns
