@@ -68,7 +68,12 @@ Plans:
   3. User can approve or deny a request inline and the status updates immediately in the row
   4. Denying a request requires entering a denial reason before the action completes
   5. User can create a new time off request via the side-panel form
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — SQL view (app_hr_time_off_requests) and RLS policies
+- [ ] 03-02-PLAN.md — CRUD config updates, Zod schema, and action infrastructure extensions
+- [ ] 03-03-PLAN.md — Actions cell renderer, create route wiring, schema reset, visual verification
 **UI hint**: yes
 
 ### Phase 4: Payroll Views
