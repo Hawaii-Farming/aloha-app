@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
 import type { ColDef, GridOptions } from 'ag-grid-community';
 import type { z } from 'zod';
@@ -27,6 +27,7 @@ export interface ListViewProps {
   comboboxOptions: Record<string, string[]>;
   subModuleDisplayName: string;
   accountSlug: string;
+  filterSlot?: ReactNode;
 }
 
 export interface DetailViewProps {

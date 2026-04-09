@@ -87,6 +87,7 @@ export default function AgGridListView({
   fkOptions,
   comboboxOptions,
   subModuleDisplayName,
+  filterSlot,
 }: ListViewProps) {
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
@@ -119,7 +120,7 @@ export default function AgGridListView({
     fullWidthCellRenderer,
     handleRowClicked: handleDetailRowClicked,
     getRowId,
-    hasExpandedRow,
+    hasExpandedRow: _hasExpandedRow,
   } = useDetailRow({
     sourceData: (tableData.data as Record<string, unknown>[]) ?? [],
     pkColumn,
@@ -262,6 +263,7 @@ export default function AgGridListView({
             onShowInactiveChange={(value) =>
               updateParams({ inactive: value ? 'true' : 'false', page: 1 })
             }
+            filterSlot={filterSlot}
             actionSlot={
               <div className="flex items-center gap-2">
                 {selectedCount > 0 && (
@@ -310,8 +312,7 @@ export default function AgGridListView({
             getRowHeight={getRowHeight}
             rowSelection="multiple"
             suppressRowClickSelection={true}
-            pagination={true}
-            paginationPageSize={tableData.pageSize + (hasExpandedRow ? 1 : 0)}
+            pagination={false}
             onGridReady={handleGridReady}
             onSelectionChanged={handleSelectionChanged}
             onColumnMoved={handleColumnMoved}

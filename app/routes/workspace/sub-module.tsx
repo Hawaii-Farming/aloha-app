@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 
 import { format, startOfWeek } from 'date-fns';
 
+import { StatusFilterTabs } from '~/components/ag-grid/status-filter-tabs';
 import { TableListView } from '~/components/crud/table-list-view';
 import {
   crudBulkDeleteAction,
@@ -255,14 +256,19 @@ export default function SubModulePage(props: {
   const subModuleSlug = params.subModule ?? '';
   const ViewComponent = resolveListView(subModuleSlug);
 
+  const typedConfig = config as CrudModuleConfig;
+
   const viewProps: ListViewProps = {
     data: tableData.data as Record<string, unknown>[],
-    config: config as CrudModuleConfig,
+    config: typedConfig,
     tableData,
     fkOptions,
     comboboxOptions,
     subModuleDisplayName: subModuleAccess.display_name,
     accountSlug,
+    filterSlot: typedConfig.workflow ? (
+      <StatusFilterTabs workflow={typedConfig.workflow} />
+    ) : undefined,
   };
 
   return (
