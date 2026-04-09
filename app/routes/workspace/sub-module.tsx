@@ -66,7 +66,8 @@ export const loader = async (args: {
     let payPeriods: Record<string, unknown>[] = [];
     if (
       subModuleSlug.startsWith('payroll_') ||
-      subModuleSlug === 'payroll_comp'
+      subModuleSlug === 'payroll_comp' ||
+      subModuleSlug === 'hours_comp'
     ) {
       const { data: periodData } = await queryUntypedView(client, 'hr_payroll')
         .select('pay_period_start, pay_period_end')
@@ -124,7 +125,7 @@ export const loader = async (args: {
         query = query.eq('compensation_manager_id', managerId);
       }
       query = query.order('full_name');
-    } else if (subModuleSlug === 'payroll_hours') {
+    } else if (subModuleSlug === 'hours_comp') {
       let periodStart = url.searchParams.get('period_start');
       let periodEnd = url.searchParams.get('period_end');
 

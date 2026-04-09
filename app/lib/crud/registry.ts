@@ -36,7 +36,7 @@ const registry = new Map<string, CrudModuleConfig>([
   ['payroll_comparison', hrPayrollComparisonConfig],
   ['payroll_comp_manager', hrPayrollCompManagerConfig],
   ['payroll_data', hrPayrollDataConfig],
-  ['payroll_hours', hrPayrollHoursConfig],
+  ['hours_comp', hrPayrollHoursConfig],
   ['products', invntItemConfig],
   ['stock_counts', invntOnhandConfig],
   ['warehouses', orgSiteConfig],
