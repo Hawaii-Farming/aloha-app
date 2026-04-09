@@ -42,5 +42,6 @@ COPY --from=build /app/public ./public
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
-EXPOSE 3000
+ENV PORT=8080
+EXPOSE 8080
 CMD ["npx", "react-router-serve", "./build/server/index.js"]
