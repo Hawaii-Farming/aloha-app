@@ -17,38 +17,43 @@ Every HR submodule renders real data from the database and supports full CRUD op
 - CRUD registry pattern (`getModuleConfig`) for sub-module routing
 - Supabase RLS policies on all HR tables
 - Workspace layout with org-scoped navigation
-- AG Grid Community integration as new dependency (replacing TanStack Table for HR module) — Validated in Phase 1: AG Grid Foundation
-- AG Grid themed to DESIGN.md (Supabase-inspired dark/light theme) — Validated in Phase 1: AG Grid Foundation
+- ✓ AG Grid Community integration as new dependency (replacing TanStack Table for HR module) — v1.0
+- ✓ AG Grid themed to DESIGN.md (Supabase-inspired dark/light theme) — v1.0
+- ✓ Scheduler submodule — weekly schedule grid with week navigation, dept filter, OT highlights, history, create form — v1.0
+- ✓ Time Off submodule — status filter tabs, inline approve/deny with denial reason, create form — v1.0
+- ✓ Hours Comparison submodule — scheduled vs payroll hours with variance highlighting, daily drill-down — v1.0
+- ✓ Payroll Comparison submodule — by-task/by-employee toggle with pay period filter and pinned totals — v1.0
+- ✓ Payroll Comp Manager submodule — manager selector, pay period filter, summary totals — v1.0
+- ✓ Payroll Data submodule — full payroll line items with column groups, employee/period filters, CSV export — v1.0
+- ✓ Housing submodule — occupancy grid with tenant detail rows, auto-resolved category on create — v1.0
+- ✓ Employee Review submodule — quarterly scores with color coding, Year-Quarter filter, lock enforcement — v1.0
+- ✓ Full-width detail rows in AG Grid Community for all row-click-to-expand interactions — v1.0
+- ✓ Side-panel forms for Create/Edit following register pattern — v1.0
 
 ### Active
-- [x] Scheduler submodule — weekly schedule grid (ops_task_weekly_schedule view) + historical data (ops_task_schedule) + Create form (employee, task, date, start/end time) — Validated in Phase 2
-- [x] Time Off submodule — hr_time_off_request table with status filters (all/pending/approved) + Create form + inline status toggle — Validated in Phase 3
-- [x] Hours Comparison submodule — computed view comparing ops_task_schedule hours vs hr_payroll hours per employee + row-click daily breakdown — Validated in Phase 5
-- [x] Payroll Comparison submodule — hr_payroll aggregated by task and by employee (2 table views) — Validated in Phase 4
-- [x] Payroll Comp Manager submodule — hr_payroll data filtered/grouped by compensation_manager_id — Validated in Phase 4
-- [x] Payroll Data submodule — detailed hr_payroll records (full payroll line items per employee per pay period) — Validated in Phase 4
-- [x] Housing submodule — org_site (category=housing) with max beds/available beds + row-click tenant details (hr_employee where site_id = housing) — Validated in Phase 6
-- [x] Employee Review submodule — new table (hr_employee_review) with quarterly scores (productivity, attendance, quality, engagement 1-3), average, notes, lead, locked flag + filter by Year-Quarter — Validated in Phase 6
-- [x] Full-width detail rows in AG Grid Community for all row-click-to-expand interactions — Validated in Phase 6
-- [x] Side-panel forms for Create/Edit following register pattern (right-side panel with form fields, save/cancel) — Validated in Phase 6
+
+(None — all v1 requirements shipped. Next milestone will define new requirements.)
 
 ### Out of Scope
 
-- AG Grid Enterprise features — using Community (free) tier only
-- Mobile-specific layouts — web-first
-- Real-time collaboration / live updates — standard request/response
+- AG Grid Enterprise features — using Community (free) tier only; all described UX achieved with Community
+- Mobile-specific layouts — web-first; AG Grid responsive column hiding covers basic needs
+- Real-time collaboration / live updates — standard request/response model sufficient
 - Payroll import/processing — hr_payroll is imported externally, this project only displays it
 - Approval workflow automation — status changes are manual toggles in the row
+- Inline cell editing in grids — side-panel forms are safer and more consistent
+- Chart/graph visualizations — AG Grid Charts is Enterprise-only; tabular data sufficient
 
 ## Context
 
-- **Existing pattern**: The register submodule (`sub-module.tsx`) uses `getModuleConfig()` registry, `loadTableData()`, and `TableListView` component. AG Grid replaces this for HR submodules.
-- **Database**: All HR tables exist except `hr_employee_review` (needs migration). Scheduler uses ops_task_schedule + ops_task_tracker tables and ops_task_weekly_schedule view. Housing uses org_site with category filtering.
-- **Design**: DESIGN.md defines Supabase-inspired theme with dark-mode-native colors, emerald green accents, Geist font. AG Grid must be themed to match (ag-theme-quartz as base, custom CSS overrides).
-- **AG Grid reference**: https://www.ag-grid.com/example-hr/ adapted to our design system. Using full-width detail rows (Community feature) instead of Enterprise Master/Detail for row expansion.
-- **Dual tenant model**: Template auth (accounts/memberships) coexists with business auth (org/hr_employee). All data queries are org-scoped via hr_employee membership.
-- **Payroll submodules**: All three payroll views (Comparison, Comp Manager, Data) implemented in Phase 4 with SQL aggregation views, custom list views, and pinned totals.
-- **Hours Comparison**: Scheduled vs payroll hours comparison with `app_hr_hours_comparison` SQL view (FULL OUTER JOIN), variance highlighting, and detail row daily breakdown via `/api/schedule-by-period` — implemented in Phase 5.
+Shipped v1.0 with 6 phases, 21 plans across 199 commits (283 files changed, +31,810/-12,692 lines). Timeline: 3 days (2026-04-07 → 2026-04-09).
+
+- **AG Grid**: v35.2.1 Community with custom Supabase-themed dark/light config via `themeQuartz.withParams()`. AgGridWrapper provides SSR safety, column mapping, detail rows, CSV export, and column state persistence.
+- **8 HR submodules**: Register (converted from TanStack Table), Scheduler, Time Off, Payroll Comparison, Payroll Comp Manager, Payroll Data, Hours Comparison, Housing, Employee Review — all with AG Grid tables and side-panel CRUD forms.
+- **SQL views**: 10+ custom views for aggregation (payroll by task/employee/manager, hours comparison FULL OUTER JOIN, housing occupancy, employee reviews, time off requests, weekly schedule).
+- **Migrations pushed**: org_site max_beds, app_hr_housing, hr_employee_review table + RLS, app_hr_employee_reviews view — all on hosted Supabase.
+- **Design**: DESIGN.md Supabase-inspired theme with dark-mode-native colors, emerald green accents, Geist font. AG Grid themed via ag-theme-quartz base.
+- **Dual tenant model**: Template auth (accounts/memberships) coexists with business auth (org/hr_employee). All data queries org-scoped.
 
 ## Constraints
 
@@ -62,11 +67,16 @@ Every HR submodule renders real data from the database and supports full CRUD op
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| AG Grid Community over Enterprise | Free tier covers all described UX; Enterprise features (Master/Detail, Row Grouping) not needed | -- Pending |
-| Full-width detail rows for row expansion | Community alternative to Enterprise Master/Detail; achieves same click-to-expand UX | -- Pending |
-| AG Grid replaces TanStack Table for HR | HR demo reference requires AG Grid; TanStack Table remains for other modules | -- Pending |
-| Side-panel forms (not modals) | Matches existing register pattern; consistent UX across all submodules | -- Pending |
-| Manual status toggle for approvals | Time off pending/approved is toggled in-row; no automated workflow | -- Pending |
+| AG Grid Community over Enterprise | Free tier covers all described UX; Enterprise features (Master/Detail, Row Grouping) not needed | ✓ Good — all 55 requirements met without Enterprise |
+| Full-width detail rows for row expansion | Community alternative to Enterprise Master/Detail; achieves same click-to-expand UX | ✓ Good — works across all 8 submodules |
+| AG Grid replaces TanStack Table for HR | HR demo reference requires AG Grid; TanStack Table remains for other modules | ✓ Good — clean separation, register converted successfully |
+| Side-panel forms (not modals) | Matches existing register pattern; consistent UX across all submodules | ✓ Good — consistent create/edit UX |
+| Manual status toggle for approvals | Time off pending/approved is toggled in-row; no automated workflow | ✓ Good — simple and predictable |
+| autoHeight domLayout for AG Grid | Natural page flow without fixed grid height | ✓ Good — no scroll-within-scroll issues |
+| URL searchParams for filter state | Enables loader revalidation on filter changes without local state | ✓ Good — used in scheduler, payroll, hours comparison |
+| FULL OUTER JOIN for hours comparison | Shows employees with schedule-only or payroll-only entries | ✓ Good — catches discrepancies both ways |
+| GENERATED ALWAYS AS STORED for review avg | DB-computed average prevents client-side tampering | ✓ Good — data integrity enforced at schema level |
+| Server-side category/lock enforcement | Housing category and review lock checks in action, not client | ✓ Good — prevents form tampering |
 
 ## Evolution
 
@@ -86,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after Phase 6 completion*
+*Last updated: 2026-04-09 after v1.0 milestone*
