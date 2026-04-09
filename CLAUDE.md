@@ -28,19 +28,20 @@ Long-term goal: merge template auth into aloha's org/hr_employee model. For now,
 
 This project uses **hosted Supabase** — there is no local Docker instance. Do NOT run `pnpm supabase:start`, `pnpm supabase:reset`, or any command that assumes a local Supabase container.
 
-- **Apply migrations**: `supabase db push` (pushes to hosted)
+**NEVER directly modify, create, or delete tables/schemas on the hosted database.** All schema changes must go through migration files (`supabase/migrations/`). Only a human runs `supabase db push` to apply migrations to hosted — Claude must never run this command.
+
+- **Create migration**: `pnpm supabase db diff` (creates a local migration file)
 - **Generate types**: `npx supabase gen types --lang typescript --linked > app/lib/database.types.ts`
-- **Create migration**: `pnpm supabase db diff`
 
 ## Essential Commands
 
 ```bash
 pnpm dev                    # Start app (port 5173)
-supabase db push            # Push migrations to hosted Supabase
-npx supabase gen types --lang typescript --linked > app/lib/database.types.ts  # Regenerate types from hosted
-pnpm supabase db diff       # Create migration diff
+pnpm supabase db diff       # Create migration diff (local file only)
 pnpm typecheck              # Run regularly during work
 pnpm format:fix && pnpm lint:fix  # Run when task is complete
+# supabase db push          # HUMAN ONLY — pushes migrations to hosted Supabase
+# npx supabase gen types --lang typescript --linked  # HUMAN ONLY — regenerate types from hosted
 ```
 
 ## Coding Preferences

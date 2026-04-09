@@ -115,8 +115,10 @@ $$;
 -- Check if the current user has access to a specific org.
 -- Tests reference this but it was never created in migrations.
 CREATE OR REPLACE FUNCTION user_has_org_access(p_org_id TEXT)
-RETURNS BOOLEAN LANGUAGE sql STABLE AS $$
-  SELECT p_org_id = ANY(public.get_user_org_ids());
+RETURNS BOOLEAN LANGUAGE plpgsql STABLE AS $$
+BEGIN
+  RETURN p_org_id = ANY(public.get_user_org_ids());
+END;
 $$;
 
 -- Get the employee ID for the current user in a specific org
