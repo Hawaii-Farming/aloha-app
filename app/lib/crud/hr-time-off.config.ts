@@ -87,7 +87,6 @@ const timeOffColDefs = [
     sortable: true,
     filter: 'agTextColumnFilter',
     minWidth: 200,
-    autoHeight: true,
   },
   ...mapColumnsToColDefs(
     timeOffColumns.filter((c) => c.key !== 'full_name' && c.key !== 'status'),
