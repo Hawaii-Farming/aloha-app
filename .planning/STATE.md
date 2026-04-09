@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-04-09T04:58:44.801Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-09T05:04:29.392Z"
 last_activity: 2026-04-09
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 21
-  completed_plans: 18
+  completed_plans: 19
   percent: 17
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-08)
 ## Current Position
 
 Phase: 06 (housing-employee-review) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-09
 
@@ -70,6 +70,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 05-hours-comparison P02 | 3min | 2 tasks | 4 files |
 | Phase 05-hours-comparison P03 | 1min | 2 tasks | 0 files |
 | Phase 06 P01 | 2min | 2 tasks | 4 files |
+| Phase 06 P02 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,9 @@ Recent decisions affecting current work:
 - [Phase 05-hours-comparison]: Used supabase db push (hosted) instead of supabase:reset (Docker unavailable)
 - [Phase 06]: GENERATED ALWAYS AS STORED for average column prevents client-side tampering
 - [Phase 06]: Named FK constraints for hr_employee_review_employee and hr_employee_review_lead for PostgREST disambiguation
+- [Phase 06]: generatePk slugifies housing name for org_site text PK
+- [Phase 06]: Server-side org_site_category_id resolution in sub-module-create action prevents client tampering
+- [Phase 06]: HousingDetailRow fetches tenants via API on expand (same pattern as HoursDetailInner)
 
 ### Pending Todos
 
@@ -138,6 +142,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T04:58:44.799Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-04-09T05:04:29.390Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

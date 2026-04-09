@@ -78,9 +78,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Housing
 
-- [ ] **HOUS-01**: Housing sites grid showing: housing name, max beds, available beds (filtered from `org_site` where category=housing)
-- [ ] **HOUS-02**: Row-click full-width detail showing tenant list (employees assigned to that housing site via `hr_employee.site_id`)
-- [ ] **HOUS-03**: Create/edit housing form (side panel): housing name, max beds, available beds
+- [x] **HOUS-01**: Housing sites grid showing: housing name, max beds, available beds (filtered from `org_site` where category=housing)
+- [x] **HOUS-02**: Row-click full-width detail showing tenant list (employees assigned to that housing site via `hr_employee.site_id`)
+- [x] **HOUS-03**: Create/edit housing form (side panel): housing name, max beds, available beds
 - [x] **HOUS-04**: Schema addition: `max_beds` capacity field on `org_site` (or housing-specific approach)
 
 ### Employee Review
@@ -174,9 +174,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PDAT-03 | Phase 4 | Complete |
 | PDAT-04 | Phase 4 | Complete |
 | PDAT-05 | Phase 4 | Complete |
-| HOUS-01 | Phase 6 | Pending |
-| HOUS-02 | Phase 6 | Pending |
-| HOUS-03 | Phase 6 | Pending |
+| HOUS-01 | Phase 6 | Complete |
+| HOUS-02 | Phase 6 | Complete |
+| HOUS-03 | Phase 6 | Complete |
 | HOUS-04 | Phase 6 | Complete |
 | EREV-01 | Phase 6 | Pending |
 | EREV-02 | Phase 6 | Pending |
