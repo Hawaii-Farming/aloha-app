@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { SchedulerEmployeeRenderer } from '~/components/ag-grid/cell-renderers/scheduler-employee-renderer';
 import { TimeOffActionsRenderer } from '~/components/ag-grid/cell-renderers/time-off-actions-renderer';
 import { mapColumnsToColDefs } from '~/components/ag-grid/column-mapper';
 import type { ColumnConfig, CrudModuleConfig } from '~/lib/crud/types';
@@ -18,12 +19,6 @@ const hrTimeOffSchema = z.object({
 
 const timeOffColumns: ColumnConfig[] = [
   { key: 'full_name', label: 'Employee', sortable: true },
-  { key: 'department_name', label: 'Dept', sortable: true },
-  {
-    key: 'work_authorization_name',
-    label: 'Work Auth',
-    sortable: true,
-  },
   {
     key: 'compensation_manager_name',
     label: 'Comp Manager',
@@ -80,7 +75,16 @@ const timeOffColumns: ColumnConfig[] = [
 ];
 
 const timeOffColDefs = [
-  ...mapColumnsToColDefs(timeOffColumns),
+  {
+    headerName: 'Employee',
+    field: 'full_name',
+    cellRenderer: SchedulerEmployeeRenderer,
+    sortable: true,
+    filter: 'agTextColumnFilter',
+    minWidth: 200,
+    autoHeight: true,
+  },
+  ...mapColumnsToColDefs(timeOffColumns.filter((c) => c.key !== 'full_name')),
   {
     headerName: 'Actions',
     field: 'id',
