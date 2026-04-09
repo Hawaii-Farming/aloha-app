@@ -7,30 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
@@ -326,6 +306,34 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_fsafe_result_sampled_by"
+            columns: ["sampled_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_fsafe_result_sampled_by"
+            columns: ["sampled_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_fsafe_result_verified_by"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_fsafe_result_verified_by"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
             foreignKeyName: "fsafe_result_farm_id_fkey"
             columns: ["farm_id"]
             isOneToOne: false
@@ -368,39 +376,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fsafe_result_sampled_by_fkey"
-            columns: ["sampled_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fsafe_result_sampled_by_fkey"
-            columns: ["sampled_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
             foreignKeyName: "fsafe_result_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fsafe_result_verified_by_fkey"
-            columns: ["verified_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fsafe_result_verified_by_fkey"
-            columns: ["verified_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -2555,15 +2535,43 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "hr_disciplinary_warning_hr_employee_id_fkey"
+            foreignKeyName: "fk_hr_disciplinary_warning_employee"
             columns: ["hr_employee_id"]
             isOneToOne: false
             referencedRelation: "hr_employee"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_disciplinary_warning_hr_employee_id_fkey"
+            foreignKeyName: "fk_hr_disciplinary_warning_employee"
             columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_disciplinary_warning_reported_by"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_disciplinary_warning_reported_by"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_disciplinary_warning_reviewed_by"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_disciplinary_warning_reviewed_by"
+            columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "ops_task_weekly_schedule"
             referencedColumns: ["hr_employee_id"]
@@ -2574,34 +2582,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_disciplinary_warning_reported_by_fkey"
-            columns: ["reported_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_disciplinary_warning_reported_by_fkey"
-            columns: ["reported_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_disciplinary_warning_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_disciplinary_warning_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -2716,15 +2696,29 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "hr_employee_compensation_manager_id_fkey"
+            foreignKeyName: "fk_hr_employee_compensation_manager"
             columns: ["compensation_manager_id"]
             isOneToOne: false
             referencedRelation: "hr_employee"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_employee_compensation_manager_id_fkey"
+            foreignKeyName: "fk_hr_employee_compensation_manager"
             columns: ["compensation_manager_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_team_lead"
+            columns: ["team_lead_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_team_lead"
+            columns: ["team_lead_id"]
             isOneToOne: false
             referencedRelation: "ops_task_weekly_schedule"
             referencedColumns: ["hr_employee_id"]
@@ -2770,20 +2764,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sys_access_level"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_employee_team_lead_id_fkey"
-            columns: ["team_lead_id"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_employee_team_lead_id_fkey"
-            columns: ["team_lead_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -2854,6 +2834,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_module_access_org_module_id_fkey"
+            columns: ["org_module_id"]
+            isOneToOne: false
+            referencedRelation: "app_navigation"
+            referencedColumns: ["module_id"]
           },
           {
             foreignKeyName: "hr_module_access_org_module_id_fkey"
@@ -3170,15 +3157,43 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "hr_time_off_request_hr_employee_id_fkey"
+            foreignKeyName: "fk_hr_time_off_request_employee"
             columns: ["hr_employee_id"]
             isOneToOne: false
             referencedRelation: "hr_employee"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_time_off_request_hr_employee_id_fkey"
+            foreignKeyName: "fk_hr_time_off_request_employee"
             columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_reviewed_by"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_reviewed_by"
+            columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "ops_task_weekly_schedule"
             referencedColumns: ["hr_employee_id"]
@@ -3189,34 +3204,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_time_off_request_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_time_off_request_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_time_off_request_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_time_off_request_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -3336,15 +3323,43 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "hr_travel_request_hr_employee_id_fkey"
+            foreignKeyName: "fk_hr_travel_request_employee"
             columns: ["hr_employee_id"]
             isOneToOne: false
             referencedRelation: "hr_employee"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_travel_request_hr_employee_id_fkey"
+            foreignKeyName: "fk_hr_travel_request_employee"
             columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_travel_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_travel_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_travel_request_reviewed_by"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_travel_request_reviewed_by"
+            columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "ops_task_weekly_schedule"
             referencedColumns: ["hr_employee_id"]
@@ -3355,34 +3370,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_travel_request_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_travel_request_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_travel_request_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_travel_request_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -4293,6 +4280,34 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_maint_request_fixer"
+            columns: ["fixer_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_maint_request_fixer"
+            columns: ["fixer_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_maint_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_maint_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
             foreignKeyName: "maint_request_equipment_id_fkey"
             columns: ["equipment_id"]
             isOneToOne: false
@@ -4307,39 +4322,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "maint_request_fixer_id_fkey"
-            columns: ["fixer_id"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maint_request_fixer_id_fkey"
-            columns: ["fixer_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
             foreignKeyName: "maint_request_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maint_request_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maint_request_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
           {
             foreignKeyName: "maint_request_site_id_fkey"
@@ -4557,6 +4544,7 @@ export type Database = {
           created_by: string | null
           due_date: string | null
           farm_id: string | null
+          fsafe_pest_result_id: string | null
           fsafe_result_id: string | null
           id: string
           is_deleted: boolean
@@ -4580,6 +4568,7 @@ export type Database = {
           created_by?: string | null
           due_date?: string | null
           farm_id?: string | null
+          fsafe_pest_result_id?: string | null
           fsafe_result_id?: string | null
           id?: string
           is_deleted?: boolean
@@ -4603,6 +4592,7 @@ export type Database = {
           created_by?: string | null
           due_date?: string | null
           farm_id?: string | null
+          fsafe_pest_result_id?: string | null
           fsafe_result_id?: string | null
           id?: string
           is_deleted?: boolean
@@ -4621,15 +4611,29 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "ops_corrective_action_taken_assigned_to_fkey"
+            foreignKeyName: "fk_ops_corrective_action_taken_assigned_to"
             columns: ["assigned_to"]
             isOneToOne: false
             referencedRelation: "hr_employee"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "ops_corrective_action_taken_assigned_to_fkey"
+            foreignKeyName: "fk_ops_corrective_action_taken_assigned_to"
             columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_ops_corrective_action_taken_verified_by"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ops_corrective_action_taken_verified_by"
+            columns: ["verified_by"]
             isOneToOne: false
             referencedRelation: "ops_task_weekly_schedule"
             referencedColumns: ["hr_employee_id"]
@@ -4639,6 +4643,13 @@ export type Database = {
             columns: ["farm_id"]
             isOneToOne: false
             referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ops_corrective_action_taken_fsafe_pest_result_id_fkey"
+            columns: ["fsafe_pest_result_id"]
+            isOneToOne: false
+            referencedRelation: "fsafe_pest_result"
             referencedColumns: ["id"]
           },
           {
@@ -4675,20 +4686,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ops_corrective_action_taken_verified_by_fkey"
-            columns: ["verified_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ops_corrective_action_taken_verified_by_fkey"
-            columns: ["verified_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -5077,6 +5074,13 @@ export type Database = {
             foreignKeyName: "ops_template_org_module_id_fkey"
             columns: ["org_module_id"]
             isOneToOne: false
+            referencedRelation: "app_navigation"
+            referencedColumns: ["module_id"]
+          },
+          {
+            foreignKeyName: "ops_template_org_module_id_fkey"
+            columns: ["org_module_id"]
+            isOneToOne: false
             referencedRelation: "org_module"
             referencedColumns: ["id"]
           },
@@ -5186,7 +5190,7 @@ export type Database = {
           is_deleted: boolean
           ops_task_tracker_id: string
           ops_template_id: string
-          ops_template_question_id: string | null
+          ops_template_question_id: string
           org_id: string
           response_boolean: boolean | null
           response_enum: string | null
@@ -5205,7 +5209,7 @@ export type Database = {
           is_deleted?: boolean
           ops_task_tracker_id: string
           ops_template_id: string
-          ops_template_question_id?: string | null
+          ops_template_question_id: string
           org_id: string
           response_boolean?: boolean | null
           response_enum?: string | null
@@ -5224,7 +5228,7 @@ export type Database = {
           is_deleted?: boolean
           ops_task_tracker_id?: string
           ops_template_id?: string
-          ops_template_question_id?: string | null
+          ops_template_question_id?: string
           org_id?: string
           response_boolean?: boolean | null
           response_enum?: string | null
@@ -5407,6 +5411,34 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_ops_training_trainer"
+            columns: ["trainer_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ops_training_trainer"
+            columns: ["trainer_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_ops_training_verified_by"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ops_training_verified_by"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
             foreignKeyName: "ops_training_farm_id_fkey"
             columns: ["farm_id"]
             isOneToOne: false
@@ -5426,34 +5458,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ops_training_trainer_id_fkey"
-            columns: ["trainer_id"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ops_training_trainer_id_fkey"
-            columns: ["trainer_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "ops_training_verified_by_fkey"
-            columns: ["verified_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ops_training_verified_by_fkey"
-            columns: ["verified_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -5903,6 +5907,13 @@ export type Database = {
             foreignKeyName: "org_module_sys_module_id_fkey"
             columns: ["sys_module_id"]
             isOneToOne: false
+            referencedRelation: "app_navigation"
+            referencedColumns: ["module_slug"]
+          },
+          {
+            foreignKeyName: "org_module_sys_module_id_fkey"
+            columns: ["sys_module_id"]
+            isOneToOne: false
             referencedRelation: "sys_module"
             referencedColumns: ["id"]
           },
@@ -5980,6 +5991,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_org_site_category"
+            columns: ["org_site_category_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_org_site_subcategory"
+            columns: ["org_site_subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_category"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "org_site_farm_id_fkey"
             columns: ["farm_id"]
             isOneToOne: false
@@ -5991,20 +6016,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "org_site_org_site_category_id_fkey"
-            columns: ["org_site_category_id"]
-            isOneToOne: false
-            referencedRelation: "org_site_category"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "org_site_org_site_subcategory_id_fkey"
-            columns: ["org_site_subcategory_id"]
-            isOneToOne: false
-            referencedRelation: "org_site_category"
             referencedColumns: ["id"]
           },
           {
@@ -6128,8 +6139,22 @@ export type Database = {
             foreignKeyName: "org_sub_module_sys_module_id_fkey"
             columns: ["sys_module_id"]
             isOneToOne: false
+            referencedRelation: "app_navigation"
+            referencedColumns: ["module_slug"]
+          },
+          {
+            foreignKeyName: "org_sub_module_sys_module_id_fkey"
+            columns: ["sys_module_id"]
+            isOneToOne: false
             referencedRelation: "sys_module"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_sub_module_sys_sub_module_id_fkey"
+            columns: ["sys_sub_module_id"]
+            isOneToOne: false
+            referencedRelation: "app_navigation"
+            referencedColumns: ["sub_module_slug"]
           },
           {
             foreignKeyName: "org_sub_module_sys_sub_module_id_fkey"
@@ -7592,15 +7617,29 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "sales_po_approved_by_fkey"
+            foreignKeyName: "fk_sales_po_approved_by"
             columns: ["approved_by"]
             isOneToOne: false
             referencedRelation: "hr_employee"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "sales_po_approved_by_fkey"
+            foreignKeyName: "fk_sales_po_approved_by"
             columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_sales_po_qb_uploaded_by"
+            columns: ["qb_uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sales_po_qb_uploaded_by"
+            columns: ["qb_uploaded_by"]
             isOneToOne: false
             referencedRelation: "ops_task_weekly_schedule"
             referencedColumns: ["hr_employee_id"]
@@ -7611,20 +7650,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sales_po_qb_uploaded_by_fkey"
-            columns: ["qb_uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sales_po_qb_uploaded_by_fkey"
-            columns: ["qb_uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
           },
           {
             foreignKeyName: "sales_po_sales_customer_group_id_fkey"
@@ -8262,6 +8287,13 @@ export type Database = {
             foreignKeyName: "sys_sub_module_sys_module_id_fkey"
             columns: ["sys_module_id"]
             isOneToOne: false
+            referencedRelation: "app_navigation"
+            referencedColumns: ["module_slug"]
+          },
+          {
+            foreignKeyName: "sys_sub_module_sys_module_id_fkey"
+            columns: ["sys_module_id"]
+            isOneToOne: false
             referencedRelation: "sys_module"
             referencedColumns: ["id"]
           },
@@ -8302,6 +8334,114 @@ export type Database = {
       }
     }
     Views: {
+      app_hr_time_off_requests: {
+        Row: {
+          compensation_manager_name: string | null
+          created_at: string | null
+          denial_reason: string | null
+          department_name: string | null
+          end_date: string | null
+          full_name: string | null
+          hr_employee_id: string | null
+          id: string | null
+          is_deleted: boolean | null
+          non_pto_days: number | null
+          notes: string | null
+          org_id: string | null
+          preferred_name: string | null
+          profile_photo_url: string | null
+          pto_days: number | null
+          request_reason: string | null
+          requested_at: string | null
+          requested_by: string | null
+          requested_by_name: string | null
+          return_date: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewed_by_name: string | null
+          sick_leave_days: number | null
+          start_date: string | null
+          status: string | null
+          updated_at: string | null
+          work_authorization_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_hr_time_off_request_employee"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_employee"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_requested_by"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_reviewed_by"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_time_off_request_reviewed_by"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_time_off_request_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_navigation: {
+        Row: {
+          can_delete: boolean | null
+          can_edit: boolean | null
+          can_verify: boolean | null
+          module_display_name: string | null
+          module_display_order: number | null
+          module_id: string | null
+          module_slug: string | null
+          org_id: string | null
+          sub_module_display_name: string | null
+          sub_module_display_order: number | null
+          sub_module_id: string | null
+          sub_module_slug: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_module_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grow_spray_restriction: {
         Row: {
           end_time: string | null
@@ -8408,6 +8548,9 @@ export type Database = {
       }
       ops_task_weekly_schedule: {
         Row: {
+          department_name: string | null
+          farm_id: string | null
+          farm_name: string | null
           friday: string | null
           full_name: string | null
           hr_department_id: string | null
@@ -8417,6 +8560,7 @@ export type Database = {
           monday: string | null
           org_id: string | null
           ot_threshold_weekly: number | null
+          profile_photo_url: string | null
           saturday: string | null
           sunday: string | null
           task: string | null
@@ -8425,6 +8569,7 @@ export type Database = {
           tuesday: string | null
           wednesday: string | null
           week_start_date: string | null
+          work_authorization_name: string | null
         }
         Relationships: [
           {
@@ -8442,6 +8587,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ops_task_schedule_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "ops_task_schedule_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -8452,544 +8604,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_user_org_ids: { Args: never; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      buckets_analytics: {
-        Row: {
-          created_at: string
-          deleted_at: string | null
-          format: string
-          id: string
-          name: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      buckets_vectors: {
-        Row: {
-          created_at: string
-          id: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      iceberg_namespaces: {
-        Row: {
-          bucket_name: string
-          catalog_id: string
-          created_at: string
-          id: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_name: string
-          catalog_id: string
-          created_at?: string
-          id?: string
-          metadata?: Json
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_name?: string
-          catalog_id?: string
-          created_at?: string
-          id?: string
-          metadata?: Json
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "iceberg_namespaces_catalog_id_fkey"
-            columns: ["catalog_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_analytics"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      iceberg_tables: {
-        Row: {
-          bucket_name: string
-          catalog_id: string
-          created_at: string
-          id: string
-          location: string
-          name: string
-          namespace_id: string
-          remote_table_id: string | null
-          shard_id: string | null
-          shard_key: string | null
-          updated_at: string
-        }
-        Insert: {
-          bucket_name: string
-          catalog_id: string
-          created_at?: string
-          id?: string
-          location: string
-          name: string
-          namespace_id: string
-          remote_table_id?: string | null
-          shard_id?: string | null
-          shard_key?: string | null
-          updated_at?: string
-        }
-        Update: {
-          bucket_name?: string
-          catalog_id?: string
-          created_at?: string
-          id?: string
-          location?: string
-          name?: string
-          namespace_id?: string
-          remote_table_id?: string | null
-          shard_id?: string | null
-          shard_key?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "iceberg_tables_catalog_id_fkey"
-            columns: ["catalog_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_analytics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "iceberg_tables_namespace_id_fkey"
-            columns: ["namespace_id"]
-            isOneToOne: false
-            referencedRelation: "iceberg_namespaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          user_metadata: Json | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          owner_id: string | null
-          upload_signature: string
-          user_metadata: Json | null
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          owner_id?: string | null
-          upload_signature: string
-          user_metadata?: Json | null
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          owner_id?: string | null
-          upload_signature?: string
-          user_metadata?: Json | null
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vector_indexes: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id: string
-          metadata_configuration: Json | null
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id?: string
-          metadata_configuration?: Json | null
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          data_type?: string
-          dimension?: number
-          distance_metric?: string
-          id?: string
-          metadata_configuration?: Json | null
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vector_indexes_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_vectors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      can_insert_object: {
-        Args: { bucketid: string; metadata: Json; name: string; owner: string }
-        Returns: undefined
-      }
-      extension: { Args: { name: string }; Returns: string }
-      filename: { Args: { name: string }; Returns: string }
-      foldername: { Args: { name: string }; Returns: string[] }
-      get_common_prefix: {
-        Args: { p_delimiter: string; p_key: string; p_prefix: string }
-        Returns: string
-      }
-      get_size_by_bucket: {
-        Args: never
-        Returns: {
-          bucket_id: string
-          size: number
-        }[]
-      }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-          prefix_param: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-        }[]
-      }
-      list_objects_with_delimiter: {
-        Args: {
-          _bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_token?: string
-          prefix_param: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      operation: { Args: never; Returns: string }
-      search: {
-        Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
-          prefix: string
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_by_timestamp: {
-        Args: {
-          p_bucket_id: string
-          p_level: number
-          p_limit: number
-          p_prefix: string
-          p_sort_column: string
-          p_sort_column_after: string
-          p_sort_order: string
-          p_start_after: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_v2: {
-        Args: {
-          bucket_name: string
-          levels?: number
-          limits?: number
-          prefix: string
-          sort_column?: string
-          sort_column_after?: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-    }
-    Enums: {
-      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -9115,16 +8733,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
-  storage: {
-    Enums: {
-      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
-    },
-  },
 } as const
-
