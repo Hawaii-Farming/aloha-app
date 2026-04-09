@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useFetcher, useRevalidator } from 'react-router';
 
@@ -66,7 +66,10 @@ export function EditPanel({
 
   const isSubmitting = fetcher.state !== 'idle';
 
-  if (fetcher.state === 'idle' && !hasHandledSuccess.current) {
+  // Handle fetcher response — refs must be read in useEffect, not render
+  useEffect(() => {
+    if (fetcher.state !== 'idle' || hasHandledSuccess.current) return;
+
     if (fetcherData !== undefined && !fetcherData.success) {
       toast.error(fetcherData.error ?? 'Validation failed');
       hasHandledSuccess.current = true;
@@ -75,21 +78,31 @@ export function EditPanel({
       onOpenChange(false);
       revalidator.revalidate();
     }
-  }
+  }, [fetcher.state, fetcherData, onOpenChange, revalidator]);
 
-  if (open && hasHandledSuccess.current && fetcher.state === 'idle') {
-    hasHandledSuccess.current = false;
-  }
+  // Reset tracking ref when panel reopens
+  useEffect(() => {
+    if (open && fetcher.state === 'idle') {
+      hasHandledSuccess.current = false;
+    }
+  }, [open, fetcher.state]);
 
   const onSubmit = useCallback(
     (data: Record<string, unknown>) => {
       hasHandledSuccess.current = false;
-      fetcher.submit(
-        JSON.stringify({ intent: 'update', data }),
-        { method: 'POST', encType: 'application/json' },
-      );
+      fetcher.submit(JSON.stringify({ intent: 'update', data }), {
+        method: 'POST',
+        encType: 'application/json',
+      });
     },
     [fetcher],
+  );
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      form.handleSubmit(onSubmit)(e);
+    },
+    [form, onSubmit],
   );
 
   const handleOpenChange = useCallback(
@@ -118,7 +131,7 @@ export function EditPanel({
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit}
             className="flex flex-1 flex-col overflow-hidden"
             data-test="edit-panel-form"
           >

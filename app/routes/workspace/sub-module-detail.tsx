@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 
 import { redirect } from 'react-router';
 
@@ -173,26 +173,22 @@ export const action = async (args: {
   return new Response('Invalid action', { status: 400 });
 };
 
+const detailViewCache = new Map<string, React.ComponentType<DetailViewProps>>();
+
 function resolveDetailView(config: CrudModuleConfig | undefined) {
   const viewType = config?.viewType?.detail ?? 'card';
 
-  switch (viewType) {
-    case 'custom': {
-      const loader = config?.customViews?.detail;
-
-      if (loader) {
-        return lazy(loader);
-      }
-
-      return CardDetailView;
-    }
-
-    // Future view types will be added here:
-    // case 'workspace':
-
-    default:
-      return CardDetailView;
+  if (viewType !== 'custom' || !config?.customViews?.detail) {
+    return CardDetailView;
   }
+
+  const cacheKey = config.tableName ?? 'default';
+  const cached = detailViewCache.get(cacheKey);
+  if (cached) return cached;
+
+  const component = lazy(config.customViews.detail);
+  detailViewCache.set(cacheKey, component);
+  return component;
 }
 
 export default function SubModuleDetailPage(props: {
@@ -234,6 +230,7 @@ export default function SubModuleDetailPage(props: {
         </div>
       }
     >
+      {/* eslint-disable-next-line react-hooks/static-components -- cached lazy component */}
       <ViewComponent {...viewProps} />
     </Suspense>
   );

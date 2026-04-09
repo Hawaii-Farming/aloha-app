@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useFetcher, useRevalidator } from 'react-router';
 
@@ -64,16 +64,15 @@ export function CreatePanel({
 
   const isSubmitting = fetcher.state !== 'idle';
 
-  // Handle fetcher response inline (no useEffect)
-  // The create action returns redirect() on success, which useFetcher swallows
-  // (fetcherData stays undefined). On error, it returns { success: false, error }.
-  if (fetcher.state === 'idle' && !hasHandledSuccess.current) {
+  // Handle fetcher response — refs must be read in useEffect, not render
+  useEffect(() => {
+    if (fetcher.state !== 'idle' || hasHandledSuccess.current) return;
+
     if (fetcherData !== undefined && !fetcherData.success) {
       toast.error(fetcherData.error ?? 'Validation failed');
       hasHandledSuccess.current = true;
     } else if (
       fetcher.data === undefined &&
-      fetcher.state === 'idle' &&
       form.formState.submitCount > 0 &&
       form.formState.isSubmitSuccessful
     ) {
@@ -83,12 +82,22 @@ export function CreatePanel({
       form.reset(buildDefaultValues(formFields, null));
       revalidator.revalidate();
     }
-  }
+  }, [
+    fetcher.state,
+    fetcher.data,
+    fetcherData,
+    form,
+    formFields,
+    onOpenChange,
+    revalidator,
+  ]);
 
   // Reset tracking ref when panel reopens
-  if (open && hasHandledSuccess.current && fetcher.state === 'idle') {
-    hasHandledSuccess.current = false;
-  }
+  useEffect(() => {
+    if (open && fetcher.state === 'idle') {
+      hasHandledSuccess.current = false;
+    }
+  }, [open, fetcher.state]);
 
   const onSubmit = useCallback(
     (data: Record<string, string | number | boolean | null>) => {
@@ -100,6 +109,13 @@ export function CreatePanel({
       });
     },
     [fetcher],
+  );
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      form.handleSubmit(onSubmit)(e);
+    },
+    [form, onSubmit],
   );
 
   const handleOpenChange = useCallback(
@@ -119,7 +135,7 @@ export function CreatePanel({
         className="flex h-full w-[90%] flex-col gap-0 p-0 sm:max-w-2xl"
         data-test="create-panel"
       >
-        <SheetHeader className="px-6 pt-6 pb-4 border-b">
+        <SheetHeader className="border-b px-6 pt-6 pb-4">
           <SheetTitle>
             <Trans i18nKey="common:create" /> {subModuleDisplayName}
           </SheetTitle>
@@ -127,7 +143,7 @@ export function CreatePanel({
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={handleSubmit}
             className="flex flex-1 flex-col overflow-hidden"
             data-test="create-panel-form"
           >

@@ -108,6 +108,61 @@ BEGIN
 END;
 $$;
 
+-- ============================================================
+-- Convenience functions used by tests
+-- ============================================================
+
+-- Check if the current user has access to a specific org.
+-- Tests reference this but it was never created in migrations.
+CREATE OR REPLACE FUNCTION user_has_org_access(p_org_id TEXT)
+RETURNS BOOLEAN LANGUAGE sql STABLE AS $$
+  SELECT p_org_id = ANY(public.get_user_org_ids());
+$$;
+
+-- Get the employee ID for the current user in a specific org
+CREATE OR REPLACE FUNCTION get_user_employee_id(p_org_id TEXT)
+RETURNS TEXT LANGUAGE sql STABLE AS $$
+  SELECT e.id FROM public.hr_employee e
+  WHERE e.org_id = p_org_id
+    AND e.user_id = auth.uid()
+    AND e.is_deleted = false
+  LIMIT 1;
+$$;
+
+-- Get the access level for the current user in a specific org
+CREATE OR REPLACE FUNCTION get_user_access_level(p_org_id TEXT)
+RETURNS TEXT LANGUAGE sql STABLE AS $$
+  SELECT e.sys_access_level_id FROM public.hr_employee e
+  WHERE e.org_id = p_org_id
+    AND e.user_id = auth.uid()
+    AND e.is_deleted = false
+  LIMIT 1;
+$$;
+
+-- ============================================================
+-- Shared seed data (persists across test files)
+-- ============================================================
+
+-- Orgs used by all RLS tests
+SELECT create_test_org('acme-farms', 'Acme Farms');
+SELECT create_test_org('kona-coffee', 'Kona Coffee');
+
+-- Seed user: member of both orgs
+SELECT create_test_user(
+  'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid,
+  'seed-user@test.com'
+);
+SELECT create_test_employee(
+  'emp-seed-acme', 'acme-farms',
+  'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid,
+  'owner'
+);
+SELECT create_test_employee(
+  'emp-seed-kona', 'kona-coffee',
+  'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid,
+  'owner'
+);
+
 -- Minimal TAP output so pg_prove doesn't complain
 SELECT plan(1);
 SELECT pass('Test helpers loaded successfully');
