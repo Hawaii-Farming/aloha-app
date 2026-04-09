@@ -178,6 +178,7 @@ export const action = async (args: {
       statusColumn: body.statusColumn,
       newStatus: body.newStatus,
       transitionFields: body.transitionFields,
+      extraFields: body.extraFields,
     });
   }
 

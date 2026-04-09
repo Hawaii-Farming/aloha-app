@@ -8,13 +8,12 @@ import { useForm } from 'react-hook-form';
 import type { ZodObject, ZodRawShape } from 'zod';
 import { z } from 'zod';
 
-
 import { Button } from '@aloha/ui/button';
 import { Card, CardContent } from '@aloha/ui/card';
-import { Separator } from '@aloha/ui/separator';
 import { Form } from '@aloha/ui/form';
 import { If } from '@aloha/ui/if';
 import { PageBody, PageHeader } from '@aloha/ui/page';
+import { Separator } from '@aloha/ui/separator';
 import { toast } from '@aloha/ui/sonner';
 import { Trans } from '@aloha/ui/trans';
 
@@ -153,6 +152,7 @@ export const action = async (args: {
       schema,
       pkType,
       generatePk: config?.generatePk,
+      additionalFields: config?.additionalCreateFields,
     });
 
     if (!result.success) return result;
@@ -216,8 +216,7 @@ export default function SubModuleCreatePage(props: {
       <PageHeader
         title={title}
         description={`${moduleAccess.display_name} > ${subModuleAccess.display_name}`}
-      >
-      </PageHeader>
+      ></PageHeader>
 
       <PageBody>
         <Card className="mx-auto max-w-2xl">
@@ -248,11 +247,7 @@ export default function SubModuleCreatePage(props: {
                 <Separator />
 
                 <div className="flex items-center gap-3">
-                  <Button
-                    type="submit"
-                    variant="brand"
-                    disabled={isSubmitting}
-                  >
+                  <Button type="submit" variant="brand" disabled={isSubmitting}>
                     <If condition={isSubmitting}>
                       <Trans i18nKey="common:loading" />
                     </If>
