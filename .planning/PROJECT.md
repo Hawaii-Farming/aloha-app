@@ -22,7 +22,7 @@ Every HR submodule renders real data from the database and supports full CRUD op
 
 ### Active
 - [x] Scheduler submodule — weekly schedule grid (ops_task_weekly_schedule view) + historical data (ops_task_schedule) + Create form (employee, task, date, start/end time) — Validated in Phase 2
-- [ ] Time Off submodule — hr_time_off_request table with status filters (all/pending/approved) + Create form + inline status toggle
+- [x] Time Off submodule — hr_time_off_request table with status filters (all/pending/approved) + Create form + inline status toggle — Validated in Phase 3
 - [ ] Hours Comparison submodule — computed view comparing ops_task_schedule hours vs hr_payroll hours per employee + row-click daily breakdown
 - [ ] Payroll Comparison submodule — hr_payroll aggregated by task and by employee (2 table views)
 - [ ] Payroll Comp Manager submodule — hr_payroll data filtered/grouped by compensation_manager_id (to be confirmed from schema investigation)
@@ -85,4 +85,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-08 after Phase 2 completion*
+*Last updated: 2026-04-09 after Phase 3 completion*
