@@ -86,7 +86,13 @@ Plans:
   3. Payroll Data submodule displays all hr_payroll columns organized into column groups (Hours/Earnings/Deductions/Employer Costs) with pay period and employee filters
   4. CSV export works on payroll data grids
   5. All three payroll submodules filter by pay period
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — SQL views, payroll formatters, infrastructure extensions, configs, registry, loader generalization
+- [ ] 04-02-PLAN.md — Payroll Comparison custom list view with toggle, period filter, pinned totals
+- [ ] 04-03-PLAN.md — Payroll Comp Manager custom list view with manager selector, period filter, pinned totals
+- [ ] 04-04-PLAN.md — Payroll Data filter bar, Create button hiding, schema reset, visual verification
 **UI hint**: yes
 
 ### Phase 5: Hours Comparison
@@ -125,6 +131,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. AG Grid Foundation | 0/4 | Planning complete | - |
 | 2. Scheduler | 0/3 | Planning complete | - |
 | 3. Time Off | 0/TBD | Not started | - |
-| 4. Payroll Views | 0/TBD | Not started | - |
+| 4. Payroll Views | 0/4 | Planning complete | - |
 | 5. Hours Comparison | 0/TBD | Not started | - |
 | 6. Housing & Employee Review | 0/TBD | Not started | - |
