@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import type { CrudModuleConfig } from '~/lib/crud/types';
+import { TimeOffActionsRenderer } from '~/components/ag-grid/cell-renderers/time-off-actions-renderer';
+import { mapColumnsToColDefs } from '~/components/ag-grid/column-mapper';
+import type { ColumnConfig, CrudModuleConfig } from '~/lib/crud/types';
 
 const hrTimeOffSchema = z.object({
   hr_employee_id: z.string().min(1, 'Employee is required'),
@@ -13,6 +15,84 @@ const hrTimeOffSchema = z.object({
   notes: z.string().optional(),
   status: z.string().optional(),
 });
+
+const timeOffColumns: ColumnConfig[] = [
+  { key: 'full_name', label: 'Employee', sortable: true },
+  { key: 'department_name', label: 'Dept', sortable: true },
+  {
+    key: 'work_authorization_name',
+    label: 'Work Auth',
+    sortable: true,
+  },
+  {
+    key: 'compensation_manager_name',
+    label: 'Comp Manager',
+    sortable: true,
+  },
+  {
+    key: 'start_date',
+    label: 'Start Date',
+    type: 'date',
+    sortable: true,
+  },
+  {
+    key: 'return_date',
+    label: 'Return Date',
+    type: 'date',
+    priority: 'low',
+  },
+  {
+    key: 'pto_days',
+    label: 'PTO Days',
+    type: 'number',
+    priority: 'low',
+  },
+  {
+    key: 'non_pto_days',
+    label: 'Request Off',
+    type: 'number',
+    priority: 'low',
+  },
+  {
+    key: 'sick_leave_days',
+    label: 'Sick Days',
+    type: 'number',
+    priority: 'low',
+  },
+  { key: 'request_reason', label: 'Reason', priority: 'low' },
+  { key: 'denial_reason', label: 'Denial Reason', priority: 'low' },
+  {
+    key: 'requested_by_name',
+    label: 'Requested By',
+    priority: 'low',
+  },
+  {
+    key: 'reviewed_by_name',
+    label: 'Reviewed By',
+    priority: 'low',
+  },
+  {
+    key: 'status',
+    label: 'Status',
+    type: 'workflow',
+    sortable: true,
+  },
+];
+
+const timeOffColDefs = [
+  ...mapColumnsToColDefs(timeOffColumns),
+  {
+    headerName: 'Actions',
+    field: 'id',
+    cellRenderer: TimeOffActionsRenderer,
+    sortable: false,
+    filter: false,
+    resizable: false,
+    maxWidth: 120,
+    minWidth: 100,
+    pinned: 'right' as const,
+  },
+];
 
 export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   tableName: 'hr_time_off_request',
@@ -29,68 +109,9 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
     detail: 'app_hr_time_off_requests',
   },
 
-  columns: [
-    { key: 'full_name', label: 'Employee', sortable: true },
-    { key: 'department_name', label: 'Dept', sortable: true },
-    {
-      key: 'work_authorization_name',
-      label: 'Status',
-      sortable: true,
-    },
-    {
-      key: 'compensation_manager_name',
-      label: 'Comp Manager',
-      sortable: true,
-    },
-    {
-      key: 'start_date',
-      label: 'Start Date',
-      type: 'date',
-      sortable: true,
-    },
-    {
-      key: 'return_date',
-      label: 'Return Date',
-      type: 'date',
-      priority: 'low',
-    },
-    {
-      key: 'pto_days',
-      label: 'PTO Days',
-      type: 'number',
-      priority: 'low',
-    },
-    {
-      key: 'non_pto_days',
-      label: 'Request Off',
-      type: 'number',
-      priority: 'low',
-    },
-    {
-      key: 'sick_leave_days',
-      label: 'Sick Days',
-      type: 'number',
-      priority: 'low',
-    },
-    { key: 'request_reason', label: 'Reason', priority: 'low' },
-    { key: 'denial_reason', label: 'Denial Reason', priority: 'low' },
-    {
-      key: 'requested_by_name',
-      label: 'Requested By',
-      priority: 'low',
-    },
-    {
-      key: 'reviewed_by_name',
-      label: 'Reviewed By',
-      priority: 'low',
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      type: 'workflow',
-      sortable: true,
-    },
-  ],
+  columns: timeOffColumns,
+
+  agGridColDefs: timeOffColDefs,
 
   search: {
     columns: ['full_name', 'request_reason', 'notes'],
