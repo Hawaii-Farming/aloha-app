@@ -13,6 +13,7 @@ const apiRoutes = [
   route('api/ai/chat', 'routes/api/ai/chat.ts'),
   route('api/ai/form-assist', 'routes/api/ai/form-assist.ts'),
   route('api/schedule-history', 'routes/api/schedule-history.ts'),
+  route('api/schedule-by-period', 'routes/api/schedule-by-period.ts'),
 ];
 
 const authLayout = layout('routes/auth/layout.tsx', [
