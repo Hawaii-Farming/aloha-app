@@ -54,11 +54,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Payroll Comparison
 
-- [ ] **PCMP-01**: Aggregated by task view showing payroll data grouped by department/task
-- [ ] **PCMP-02**: Aggregated by employee view showing total compensation per employee
-- [ ] **PCMP-03**: Toggle between the two table views (task vs employee)
-- [ ] **PCMP-04**: Pay period filter for both views
-- [ ] **PCMP-05**: Pinned totals row (bottom) with grand totals
+- [x] **PCMP-01**: Aggregated by task view showing payroll data grouped by department/task
+- [x] **PCMP-02**: Aggregated by employee view showing total compensation per employee
+- [x] **PCMP-03**: Toggle between the two table views (task vs employee)
+- [x] **PCMP-04**: Pay period filter for both views
+- [x] **PCMP-05**: Pinned totals row (bottom) with grand totals
 - [x] **PCMP-06**: New SQL views for payroll-by-task and payroll-by-employee aggregations
 
 ### Payroll Comp Manager
@@ -159,11 +159,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HCMP-03 | Phase 5 | Pending |
 | HCMP-04 | Phase 5 | Pending |
 | HCMP-05 | Phase 5 | Pending |
-| PCMP-01 | Phase 4 | Pending |
-| PCMP-02 | Phase 4 | Pending |
-| PCMP-03 | Phase 4 | Pending |
-| PCMP-04 | Phase 4 | Pending |
-| PCMP-05 | Phase 4 | Pending |
+| PCMP-01 | Phase 4 | Complete |
+| PCMP-02 | Phase 4 | Complete |
+| PCMP-03 | Phase 4 | Complete |
+| PCMP-04 | Phase 4 | Complete |
+| PCMP-05 | Phase 4 | Complete |
 | PCMP-06 | Phase 4 | Complete |
 | PMGR-01 | Phase 4 | Pending |
 | PMGR-02 | Phase 4 | Pending |
