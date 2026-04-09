@@ -73,7 +73,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — SQL view (app_hr_time_off_requests) and RLS policies
 - [x] 03-02-PLAN.md — CRUD config updates, Zod schema, and action infrastructure extensions
-- [ ] 03-03-PLAN.md — Actions cell renderer, create route wiring, schema reset, visual verification
+- [x] 03-03-PLAN.md — Actions cell renderer, create route wiring, schema reset, visual verification
 **UI hint**: yes
 
 ### Phase 4: Payroll Views

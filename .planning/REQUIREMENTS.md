@@ -39,9 +39,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Time Off
 
 - [x] **TOFF-01**: Time off request grid displaying: photo + full name, dept, stat, comp manager, start date, return date, PTO days, request off, sick leave, reason, justification, requested by, updated by, pending, approved
-- [ ] **TOFF-02**: Status filter tabs (All / Pending / Approved / Denied) filtering `hr_time_off_request.status`
-- [ ] **TOFF-03**: Inline status toggle (approve/deny) updating `status`, `reviewed_by`, `reviewed_at` in row
-- [ ] **TOFF-04**: Denial reason field displayed/required when denying a request
+- [x] **TOFF-02**: Status filter tabs (All / Pending / Approved / Denied) filtering `hr_time_off_request.status`
+- [x] **TOFF-03**: Inline status toggle (approve/deny) updating `status`, `reviewed_by`, `reviewed_at` in row
+- [x] **TOFF-04**: Denial reason field displayed/required when denying a request
 - [x] **TOFF-05**: Create time off request form (side panel): employee dropdown (required), leave start date (required), PTO days (int, optional), request off days (int, optional), sick leave days (int, optional), request reason (required)
 
 ### Hours Comparison
@@ -150,9 +150,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-07 | Phase 2 | Complete |
 | SCHED-08 | Phase 2 | Complete |
 | TOFF-01 | Phase 3 | Complete |
-| TOFF-02 | Phase 3 | Pending |
-| TOFF-03 | Phase 3 | Pending |
-| TOFF-04 | Phase 3 | Pending |
+| TOFF-02 | Phase 3 | Complete |
+| TOFF-03 | Phase 3 | Complete |
+| TOFF-04 | Phase 3 | Complete |
 | TOFF-05 | Phase 3 | Complete |
 | HCMP-01 | Phase 5 | Pending |
 | HCMP-02 | Phase 5 | Pending |
