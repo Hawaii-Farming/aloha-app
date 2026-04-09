@@ -34,7 +34,7 @@ SELECT create_test_employee(
 -- Test 1: Seed user returns both orgs
 SELECT test_as_user('a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid);
 SELECT ok(
-  (SELECT get_user_org_ids() @> ARRAY['acme-farms', 'kona-coffee']),
+  (SELECT ARRAY(SELECT get_user_org_ids()) @> ARRAY['acme-farms', 'kona-coffee']),
   'get_user_org_ids: seed user returns both orgs'
 );
 RESET ROLE;
@@ -42,7 +42,7 @@ RESET ROLE;
 -- Test 2: Isolated user returns only kona-coffee
 SELECT test_as_user('b2c3d4e5-f6a7-8901-bcde-f12345678901'::uuid);
 SELECT ok(
-  (SELECT get_user_org_ids() = ARRAY['kona-coffee']),
+  (SELECT ARRAY(SELECT get_user_org_ids()) = ARRAY['kona-coffee']),
   'get_user_org_ids: isolated user returns one org'
 );
 RESET ROLE;
@@ -50,7 +50,7 @@ RESET ROLE;
 -- Test 3: Unknown user returns empty array
 SELECT test_as_user('00000000-0000-0000-0000-000000000001'::uuid);
 SELECT ok(
-  (SELECT get_user_org_ids() = '{}'::text[]),
+  (SELECT ARRAY(SELECT get_user_org_ids()) = '{}'::text[]),
   'get_user_org_ids: unknown user returns empty array'
 );
 RESET ROLE;

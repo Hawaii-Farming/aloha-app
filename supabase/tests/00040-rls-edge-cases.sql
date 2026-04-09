@@ -58,7 +58,7 @@ RESET ROLE;
 -- Test 3: Deleted employee gets empty org_ids
 SELECT test_as_user('c3d4e5f6-a7b8-9012-cdef-123456789012'::uuid);
 SELECT ok(
-  (SELECT get_user_org_ids() = '{}'::text[]),
+  (SELECT ARRAY(SELECT get_user_org_ids()) = '{}'::text[]),
   'DELETED: soft-deleted employee get_user_org_ids returns empty'
 );
 RESET ROLE;

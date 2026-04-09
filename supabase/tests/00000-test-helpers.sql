@@ -115,10 +115,8 @@ $$;
 -- Check if the current user has access to a specific org.
 -- Tests reference this but it was never created in migrations.
 CREATE OR REPLACE FUNCTION user_has_org_access(p_org_id TEXT)
-RETURNS BOOLEAN LANGUAGE plpgsql STABLE AS $$
-BEGIN
-  RETURN p_org_id = ANY(public.get_user_org_ids());
-END;
+RETURNS BOOLEAN LANGUAGE sql STABLE AS $$
+  SELECT p_org_id IN (SELECT public.get_user_org_ids());
 $$;
 
 -- Get the employee ID for the current user in a specific org
@@ -174,6 +172,46 @@ SELECT create_test_employee(
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid,
   'owner'
 );
+
+-- Business data: 5 departments per org
+INSERT INTO public.hr_department (id, org_id, name) VALUES
+  ('dept-a1', 'acme-farms', 'Operations'), ('dept-a2', 'acme-farms', 'Finance'),
+  ('dept-a3', 'acme-farms', 'HR'), ('dept-a4', 'acme-farms', 'Sales'),
+  ('dept-a5', 'acme-farms', 'Logistics'),
+  ('dept-k1', 'kona-coffee', 'Roasting'), ('dept-k2', 'kona-coffee', 'Packaging'),
+  ('dept-k3', 'kona-coffee', 'QA'), ('dept-k4', 'kona-coffee', 'Retail'),
+  ('dept-k5', 'kona-coffee', 'Warehouse')
+ON CONFLICT (id) DO NOTHING;
+
+-- 5 inventory categories per org
+INSERT INTO public.invnt_category (id, org_id, category_name) VALUES
+  ('cat-a1', 'acme-farms', 'Seeds'), ('cat-a2', 'acme-farms', 'Fertilizer'),
+  ('cat-a3', 'acme-farms', 'Equipment'), ('cat-a4', 'acme-farms', 'Packaging'),
+  ('cat-a5', 'acme-farms', 'Chemicals')
+ON CONFLICT (id) DO NOTHING;
+
+-- 5 inventory items per org
+INSERT INTO public.invnt_item (id, org_id, name) VALUES
+  ('item-a1', 'acme-farms', 'Tomato Seeds'), ('item-a2', 'acme-farms', 'NPK Mix'),
+  ('item-a3', 'acme-farms', 'Tractor'), ('item-a4', 'acme-farms', 'Boxes'),
+  ('item-a5', 'acme-farms', 'Pesticide')
+ON CONFLICT (id) DO NOTHING;
+
+-- System modules (referenced by org_module FK)
+INSERT INTO public.sys_module (id, name, display_order) VALUES
+  ('mod-hr', 'HR', 1), ('mod-inv', 'Inventory', 2), ('mod-ops', 'Operations', 3),
+  ('mod-sales', 'Sales', 4), ('mod-fin', 'Finance', 5)
+ON CONFLICT (id) DO NOTHING;
+
+-- 5 org_module rows per org
+INSERT INTO public.org_module (id, org_id, sys_module_id, display_name, display_order) VALUES
+  ('om-a1', 'acme-farms', 'mod-hr', 'HR', 1), ('om-a2', 'acme-farms', 'mod-inv', 'Inventory', 2),
+  ('om-a3', 'acme-farms', 'mod-ops', 'Operations', 3), ('om-a4', 'acme-farms', 'mod-sales', 'Sales', 4),
+  ('om-a5', 'acme-farms', 'mod-fin', 'Finance', 5),
+  ('om-k1', 'kona-coffee', 'mod-hr', 'HR', 1), ('om-k2', 'kona-coffee', 'mod-inv', 'Inventory', 2),
+  ('om-k3', 'kona-coffee', 'mod-ops', 'Operations', 3), ('om-k4', 'kona-coffee', 'mod-sales', 'Sales', 4),
+  ('om-k5', 'kona-coffee', 'mod-fin', 'Finance', 5)
+ON CONFLICT (id) DO NOTHING;
 
 -- Minimal TAP output so pg_prove doesn't complain
 SELECT plan(1);
