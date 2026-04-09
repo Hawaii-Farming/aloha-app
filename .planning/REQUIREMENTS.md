@@ -72,9 +72,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **PDAT-01**: Full payroll line items grid displaying all `hr_payroll` columns
 - [x] **PDAT-02**: Column groups organizing 40+ fields into Hours / Earnings / Deductions / Employer Costs sections
-- [ ] **PDAT-03**: Pay period filter
-- [ ] **PDAT-04**: Employee filter
-- [ ] **PDAT-05**: CSV export for payroll data
+- [x] **PDAT-03**: Pay period filter
+- [x] **PDAT-04**: Employee filter
+- [x] **PDAT-05**: CSV export for payroll data
 
 ### Housing
 
@@ -171,9 +171,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PMGR-04 | Phase 4 | Complete |
 | PDAT-01 | Phase 4 | Complete |
 | PDAT-02 | Phase 4 | Complete |
-| PDAT-03 | Phase 4 | Pending |
-| PDAT-04 | Phase 4 | Pending |
-| PDAT-05 | Phase 4 | Pending |
+| PDAT-03 | Phase 4 | Complete |
+| PDAT-04 | Phase 4 | Complete |
+| PDAT-05 | Phase 4 | Complete |
 | HOUS-01 | Phase 6 | Pending |
 | HOUS-02 | Phase 6 | Pending |
 | HOUS-03 | Phase 6 | Pending |

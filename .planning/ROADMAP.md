@@ -92,7 +92,7 @@ Plans:
 - [x] 04-01-PLAN.md — SQL views, payroll formatters, infrastructure extensions, configs, registry, loader generalization
 - [x] 04-02-PLAN.md — Payroll Comparison custom list view with toggle, period filter, pinned totals
 - [x] 04-03-PLAN.md — Payroll Comp Manager custom list view with manager selector, period filter, pinned totals
-- [ ] 04-04-PLAN.md — Payroll Data filter bar, Create button hiding, schema reset, visual verification
+- [x] 04-04-PLAN.md — Payroll Data filter bar, Create button hiding, schema reset, visual verification
 **UI hint**: yes
 
 ### Phase 5: Hours Comparison
