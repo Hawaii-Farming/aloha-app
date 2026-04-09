@@ -129,6 +129,19 @@ export const action = async (args: {
     request: args.request,
   });
 
+  // Auto-resolve housing category ID for org_site creates
+  if (!recordId && subModuleSlug === 'housing') {
+    const { data: catData } = await client
+      .from('org_site_category' as never)
+      .select('id')
+      .eq('category_name', 'housing')
+      .is('sub_category_name', null)
+      .single();
+    if (catData) {
+      formData.org_site_category_id = (catData as Record<string, unknown>).id;
+    }
+  }
+
   if (recordId) {
     const result = await crudUpdateAction({
       client,

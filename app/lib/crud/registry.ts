@@ -6,6 +6,7 @@ import { growHarvestWeightConfig } from './grow-harvest-weight.config';
 import { growSeedBatchConfig } from './grow-seed-batch.config';
 import { hrDepartmentConfig } from './hr-department.config';
 import { hrEmployeeConfig } from './hr-employee.config';
+import { hrHousingConfig } from './hr-housing.config';
 import { hrPayrollCompManagerConfig } from './hr-payroll-comp-manager.config';
 import { hrPayrollComparisonConfig } from './hr-payroll-comparison.config';
 import { hrPayrollDataConfig } from './hr-payroll-data.config';
@@ -47,6 +48,7 @@ const registry = new Map<string, CrudModuleConfig>([
   ['scheduler', opsTaskScheduleConfig],
   ['task_tracking', opsTaskTrackerConfig],
   ['checklists', opsTemplateConfig],
+  ['housing', hrHousingConfig],
 ]);
 
 export function getModuleConfig(
