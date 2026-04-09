@@ -27,6 +27,21 @@ export function varianceHighlightCellClassRules(
   };
 }
 
+/** Cell text color based on score value (1-3 scale) */
+export function scoreColorCellClassRules(): Record<
+  string,
+  (params: CellClassParams) => boolean
+> {
+  return {
+    'text-red-600 dark:text-red-400 font-semibold': (params) =>
+      Number(params.value) === 1,
+    'text-amber-600 dark:text-amber-400': (params) =>
+      Number(params.value) === 2,
+    'text-green-600 dark:text-green-400': (params) =>
+      Number(params.value) === 3,
+  };
+}
+
 /** Cell text color based on status value */
 export const statusCellClassRules: Record<
   string,

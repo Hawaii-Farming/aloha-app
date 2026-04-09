@@ -5,6 +5,7 @@ import { fsafeTestHoldConfig } from './fsafe-test-hold.config';
 import { growHarvestWeightConfig } from './grow-harvest-weight.config';
 import { growSeedBatchConfig } from './grow-seed-batch.config';
 import { hrDepartmentConfig } from './hr-department.config';
+import { hrEmployeeReviewConfig } from './hr-employee-review.config';
 import { hrEmployeeConfig } from './hr-employee.config';
 import { hrHousingConfig } from './hr-housing.config';
 import { hrPayrollCompManagerConfig } from './hr-payroll-comp-manager.config';
@@ -49,6 +50,7 @@ const registry = new Map<string, CrudModuleConfig>([
   ['task_tracking', opsTaskTrackerConfig],
   ['checklists', opsTemplateConfig],
   ['housing', hrHousingConfig],
+  ['employee_review', hrEmployeeReviewConfig],
 ]);
 
 export function getModuleConfig(

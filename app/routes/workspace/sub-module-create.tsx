@@ -142,6 +142,21 @@ export const action = async (args: {
     }
   }
 
+  // Prevent editing locked employee reviews (T-06-09)
+  if (recordId && subModuleSlug === 'employee_review') {
+    const { data: existing } = await client
+      .from('hr_employee_review' as never)
+      .select('is_locked')
+      .eq('id', recordId)
+      .single();
+    if ((existing as unknown as Record<string, unknown>)?.is_locked === true) {
+      return {
+        success: false,
+        error: 'This review is locked and cannot be edited.',
+      };
+    }
+  }
+
   if (recordId) {
     const result = await crudUpdateAction({
       client,

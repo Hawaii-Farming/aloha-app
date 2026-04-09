@@ -83,6 +83,26 @@ export const loader = async (args: {
       });
     }
 
+    // Load distinct review years for YearQuarterFilter
+    let reviewYears: number[] = [];
+    if (subModuleSlug === 'employee_review') {
+      const { data: yearData } = await queryUntypedView(
+        client,
+        'app_hr_employee_reviews',
+      )
+        .select('review_year')
+        .eq('org_id', accountSlug);
+      const yearSet = new Set<number>();
+      castRows(yearData).forEach((r) => {
+        const y = Number(r.review_year);
+        if (y) yearSet.add(y);
+      });
+      reviewYears = Array.from(yearSet).sort((a, b) => b - a);
+      if (reviewYears.length === 0) {
+        reviewYears = [new Date().getFullYear()];
+      }
+    }
+
     let query = queryUntypedView(client, viewName)
       .select('*')
       .eq('org_id', accountSlug);
@@ -171,6 +191,12 @@ export const loader = async (args: {
         query = query.eq('hr_employee_id', employeeId);
       }
       query = query.order('full_name');
+    } else if (subModuleSlug === 'employee_review') {
+      const year = url.searchParams.get('year');
+      const quarter = url.searchParams.get('quarter');
+      if (year) query = query.eq('review_year', parseInt(year, 10));
+      if (quarter) query = query.eq('review_quarter', parseInt(quarter, 10));
+      query = query.order('full_name');
     } else {
       // Generic fallback for future custom views
       query = query.order('created_at', { ascending: false });
@@ -241,6 +267,7 @@ export const loader = async (args: {
       payPeriods,
       managers,
       employees,
+      reviewYears,
     };
   }
 
