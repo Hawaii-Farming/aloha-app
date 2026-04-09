@@ -107,7 +107,9 @@ export const loader = async (args: {
     };
   }
 
-  const pageSize = Number(url.searchParams.get('pageSize') ?? '25');
+  const pageSize = config?.noPagination
+    ? 10000
+    : Number(url.searchParams.get('pageSize') ?? '25');
   const tableData = await loadTableData({
     client,
     viewName,

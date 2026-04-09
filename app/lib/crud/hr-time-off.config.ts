@@ -135,6 +135,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
 
   agGridColDefs: timeOffColDefs,
   agGridDetailRow: TimeOffDetailRow,
+  noPagination: true,
 
   search: {
     columns: ['full_name', 'request_reason', 'notes'],

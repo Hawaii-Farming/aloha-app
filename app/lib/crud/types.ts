@@ -199,6 +199,9 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
    *  When provided, replaces the default InlineDetailRow. */
   agGridDetailRow?: ComponentType<{ data: Record<string, unknown> }>;
 
+  /** Disable server-side pagination — load all records at once. */
+  noPagination?: boolean;
+
   /** Additional AG Grid options passed through to AgGridReact. */
   agGridOptions?: Partial<GridOptions>;
 }
