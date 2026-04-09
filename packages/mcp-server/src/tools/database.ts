@@ -179,7 +179,7 @@ export class DatabaseTool {
         sourceFile:
           fileMapping[`${func.schema_name}.${func.function_name}`] || 'unknown',
       }));
-    } catch (error) {
+    } catch {
       console.error(
         'Error querying database functions, falling back to file parsing:',
         error.message,
@@ -348,7 +348,7 @@ export class DatabaseTool {
 
     try {
       return await readFile(filePath, 'utf8');
-    } catch (error) {
+    } catch {
       throw new Error(`Schema file "${fileName}" not found`);
     }
   }
@@ -445,7 +445,7 @@ export class DatabaseTool {
       // Fallback to schema files
       const enumContent = await this.getSchemaContent('01-enums.sql');
       return this.parseEnums(enumContent);
-    } catch (error) {
+    } catch {
       return {};
     }
   }
@@ -554,7 +554,7 @@ export class DatabaseTool {
         referencedTable: col.referenced_table,
         referencedColumn: col.referenced_column,
       }));
-    } catch (error) {
+    } catch {
       console.error(error);
       return [];
     }
@@ -589,7 +589,7 @@ export class DatabaseTool {
         GROUP BY tc.constraint_name, ccu.table_name, rc.delete_rule, rc.update_rule
       `;
 
-      return foreignKeys.map((fk: any) => ({
+      return foreignKeys.map((fk: Record<string, string>) => ({
         name: fk.constraint_name,
         columns: fk.columns.split(','),
         referencedTable: fk.foreign_table_name,
@@ -597,7 +597,7 @@ export class DatabaseTool {
         onDelete: fk.delete_rule,
         onUpdate: fk.update_rule,
       }));
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -635,7 +635,7 @@ export class DatabaseTool {
         type: 'btree', // Default, could be enhanced
         definition: idx.indexdef,
       }));
-    } catch (error) {
+    } catch {
       console.error(error);
       return [];
     }
@@ -664,7 +664,7 @@ export class DatabaseTool {
         };
       }
       return result;
-    } catch (error) {
+    } catch {
       return {};
     }
   }
@@ -1485,7 +1485,7 @@ function createGetTableInfoTool(server: McpServer) {
             },
           ],
         };
-      } catch (error) {
+      } catch {
         return {
           content: [
             {
@@ -1532,7 +1532,7 @@ function createGetEnumInfoTool(server: McpServer) {
             },
           ],
         };
-      } catch (error) {
+      } catch {
         return {
           content: [
             {
@@ -1562,7 +1562,7 @@ function createGetAllEnumsTool(server: McpServer) {
             },
           ],
         };
-      } catch (error) {
+      } catch {
         return {
           content: [
             {
