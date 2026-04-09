@@ -17,6 +17,8 @@ const apiRoutes = [
   route('api/housing-tenants', 'routes/api/housing-tenants.ts'),
 ];
 
+const authRoutes = [route('auth/sign-out', 'routes/auth/sign-out.ts')];
+
 const authLayout = layout('routes/auth/layout.tsx', [
   route('auth/sign-in', 'routes/auth/sign-in.tsx'),
   route('auth/password-reset', 'routes/auth/password-reset.tsx'),
@@ -49,6 +51,7 @@ const workspaceLayout = layout('routes/workspace/layout.tsx', [
 export default [
   ...rootRoutes,
   ...apiRoutes,
+  ...authRoutes,
   authLayout,
   workspaceLayout,
 ] satisfies RouteConfig;
