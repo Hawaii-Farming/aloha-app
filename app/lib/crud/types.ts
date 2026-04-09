@@ -185,6 +185,11 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
     detail?: () => Promise<{ default: ComponentType<DetailViewProps> }>;
   };
 
+  /** Auto-set fields on create. Maps field name to value type.
+   *  'currentEmployee' sets to the logged-in employee's hr_employee_id.
+   *  'currentOrg' sets to the current org_id. */
+  additionalCreateFields?: Record<string, 'currentEmployee' | 'currentOrg'>;
+
   /** AG Grid-specific column definition overrides. When provided,
    *  these are used instead of auto-mapped columns from `columns`. */
   agGridColDefs?: ColDef[];
