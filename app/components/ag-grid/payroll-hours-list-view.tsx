@@ -305,7 +305,7 @@ export default function PayrollHoursListView(props: ListViewProps) {
         full_name: 'TOTAL',
         scheduled_hours: totalScheduled,
         payroll_hours: totalPayroll,
-        variance: totalScheduled - totalPayroll,
+        variance: totalPayroll - totalScheduled,
       },
     ];
   }, [rawRows]);
