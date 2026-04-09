@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 3 plans verified
-last_updated: "2026-04-09T00:13:24.809Z"
-last_activity: "2026-04-08 - Completed quick task 260408-mj6: Scheduler AG Grid with Register-style features"
+status: executing
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-09T00:16:31.969Z"
+last_activity: 2026-04-09
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 10
-  completed_plans: 7
+  completed_plans: 8
   percent: 17
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-08)
 
 **Core value:** Every HR submodule renders real data from the database and supports full CRUD operations through AG Grid tables styled to the Supabase-inspired design system.
-**Current focus:** Phase 02 — scheduler
+**Current focus:** Phase 03 — time-off
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-08 - Completed quick task 260408-mj6: Scheduler AG Grid with Register-style features
+Phase: 03 (time-off) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-09
 
 Progress: [██░░░░░░░░] 17%
 
@@ -59,6 +59,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02-scheduler P01 | 2min | 1 tasks | 5 files |
 | Phase 02-scheduler P02 | 3min | 2 tasks | 2 files |
 | Phase 02-scheduler P03 | 3min | 3 tasks | 3 files |
+| Phase 03-time-off P01 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,8 @@ Recent decisions affecting current work:
 - [Phase 02-scheduler]: SchedulerListView composes AgGridWrapper directly (not AgGridListView) for full toolbar control
 - [Phase 02-scheduler]: Week/dept filter state via URL searchParams for loader revalidation, no local state
 - [Phase 02-scheduler]: Schedule history API uses mode param (detail/summary) for two data shapes from one endpoint
+- [Phase 03-time-off]: LEFT JOIN for nullable FKs, INNER JOIN for non-null FKs in time off view
+- [Phase 03-time-off]: NULL::DATE AS end_date in time off view for loadTableData compatibility
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T00:13:24.807Z
-Stopped at: Phase 3 plans verified
-Resume file: .planning/phases/03-time-off/03-01-PLAN.md
+Last session: 2026-04-09T00:16:31.967Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
