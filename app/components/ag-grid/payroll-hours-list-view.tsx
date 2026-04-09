@@ -352,7 +352,16 @@ export default function PayrollHoursListView(props: ListViewProps) {
 
   const getRowHeight = useCallback((params: { data?: RowData }) => {
     if (params.data?._isDetailRow) {
-      return 400;
+      const parent = params.data._parentData as RowData | undefined;
+      const start = parent?.pay_period_start as string | undefined;
+      const end = parent?.pay_period_end as string | undefined;
+      if (start && end) {
+        const days =
+          (new Date(end).getTime() - new Date(start).getTime()) / 86400000 + 1;
+        const weeks = Math.ceil(days / 7);
+        return weeks * 80 + 24;
+      }
+      return 200;
     }
     return 52;
   }, []);
