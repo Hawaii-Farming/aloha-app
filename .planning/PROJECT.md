@@ -24,9 +24,9 @@ Every HR submodule renders real data from the database and supports full CRUD op
 - [x] Scheduler submodule — weekly schedule grid (ops_task_weekly_schedule view) + historical data (ops_task_schedule) + Create form (employee, task, date, start/end time) — Validated in Phase 2
 - [x] Time Off submodule — hr_time_off_request table with status filters (all/pending/approved) + Create form + inline status toggle — Validated in Phase 3
 - [ ] Hours Comparison submodule — computed view comparing ops_task_schedule hours vs hr_payroll hours per employee + row-click daily breakdown
-- [ ] Payroll Comparison submodule — hr_payroll aggregated by task and by employee (2 table views)
-- [ ] Payroll Comp Manager submodule — hr_payroll data filtered/grouped by compensation_manager_id (to be confirmed from schema investigation)
-- [ ] Payroll Data submodule — detailed hr_payroll records (full payroll line items per employee per pay period)
+- [x] Payroll Comparison submodule — hr_payroll aggregated by task and by employee (2 table views) — Validated in Phase 4
+- [x] Payroll Comp Manager submodule — hr_payroll data filtered/grouped by compensation_manager_id — Validated in Phase 4
+- [x] Payroll Data submodule — detailed hr_payroll records (full payroll line items per employee per pay period) — Validated in Phase 4
 - [ ] Housing submodule — org_site (category=housing) with max beds/available beds + row-click tenant details (hr_employee where site_id = housing)
 - [ ] Employee Review submodule — new table (hr_employee_review) with quarterly scores (productivity, attendance, quality, engagement 1-3), average, notes, lead, locked flag + filter by Year-Quarter
 - [ ] Full-width detail rows in AG Grid Community for all row-click-to-expand interactions
@@ -47,7 +47,7 @@ Every HR submodule renders real data from the database and supports full CRUD op
 - **Design**: DESIGN.md defines Supabase-inspired theme with dark-mode-native colors, emerald green accents, Geist font. AG Grid must be themed to match (ag-theme-quartz as base, custom CSS overrides).
 - **AG Grid reference**: https://www.ag-grid.com/example-hr/ adapted to our design system. Using full-width detail rows (Community feature) instead of Enterprise Master/Detail for row expansion.
 - **Dual tenant model**: Template auth (accounts/memberships) coexists with business auth (org/hr_employee). All data queries are org-scoped via hr_employee membership.
-- **Undetermined submodules**: Payroll Comp Manager and Payroll Data need schema investigation during research phase to confirm exact data shape and UI requirements.
+- **Payroll submodules**: All three payroll views (Comparison, Comp Manager, Data) implemented in Phase 4 with SQL aggregation views, custom list views, and pinned totals.
 
 ## Constraints
 
@@ -85,4 +85,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after Phase 3 completion*
+*Last updated: 2026-04-09 after Phase 4 completion*
