@@ -59,19 +59,19 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PCMP-03**: Toggle between the two table views (task vs employee)
 - [ ] **PCMP-04**: Pay period filter for both views
 - [ ] **PCMP-05**: Pinned totals row (bottom) with grand totals
-- [ ] **PCMP-06**: New SQL views for payroll-by-task and payroll-by-employee aggregations
+- [x] **PCMP-06**: New SQL views for payroll-by-task and payroll-by-employee aggregations
 
 ### Payroll Comp Manager
 
 - [ ] **PMGR-01**: Payroll data filtered by compensation manager (`hr_employee.compensation_manager_id`)
 - [ ] **PMGR-02**: Manager selector/filter to switch between compensation managers
 - [ ] **PMGR-03**: Summary totals per manager (pinned bottom row or header section)
-- [ ] **PMGR-04**: New SQL view aggregating payroll data by compensation manager
+- [x] **PMGR-04**: New SQL view aggregating payroll data by compensation manager
 
 ### Payroll Data
 
-- [ ] **PDAT-01**: Full payroll line items grid displaying all `hr_payroll` columns
-- [ ] **PDAT-02**: Column groups organizing 40+ fields into Hours / Earnings / Deductions / Employer Costs sections
+- [x] **PDAT-01**: Full payroll line items grid displaying all `hr_payroll` columns
+- [x] **PDAT-02**: Column groups organizing 40+ fields into Hours / Earnings / Deductions / Employer Costs sections
 - [ ] **PDAT-03**: Pay period filter
 - [ ] **PDAT-04**: Employee filter
 - [ ] **PDAT-05**: CSV export for payroll data
@@ -164,13 +164,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PCMP-03 | Phase 4 | Pending |
 | PCMP-04 | Phase 4 | Pending |
 | PCMP-05 | Phase 4 | Pending |
-| PCMP-06 | Phase 4 | Pending |
+| PCMP-06 | Phase 4 | Complete |
 | PMGR-01 | Phase 4 | Pending |
 | PMGR-02 | Phase 4 | Pending |
 | PMGR-03 | Phase 4 | Pending |
-| PMGR-04 | Phase 4 | Pending |
-| PDAT-01 | Phase 4 | Pending |
-| PDAT-02 | Phase 4 | Pending |
+| PMGR-04 | Phase 4 | Complete |
+| PDAT-01 | Phase 4 | Complete |
+| PDAT-02 | Phase 4 | Complete |
 | PDAT-03 | Phase 4 | Pending |
 | PDAT-04 | Phase 4 | Pending |
 | PDAT-05 | Phase 4 | Pending |
