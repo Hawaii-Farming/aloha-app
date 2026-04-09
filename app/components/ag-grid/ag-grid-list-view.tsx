@@ -1,6 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useFetcher, useRevalidator, useSearchParams } from 'react-router';
+import {
+  useFetcher,
+  useParams,
+  useRevalidator,
+  useSearchParams,
+} from 'react-router';
 
 import type {
   ColDef,
@@ -47,6 +52,7 @@ import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { InlineDetailRow } from '~/components/ag-grid/inline-detail-row';
 import { CreatePanel } from '~/components/crud/create-panel';
+import { getModuleConfig } from '~/lib/crud/registry';
 import type {
   CrudModuleConfig,
   ListViewProps,
@@ -99,8 +105,9 @@ export default function AgGridListView({
 
   const [searchParams, setSearchParams] = useSearchParams();
   const inactive = searchParams.get('inactive') ?? 'false';
+  const params = useParams();
 
-  const subModuleSlug = config?.tableName ?? 'unknown';
+  const subModuleSlug = params.subModule ?? config?.tableName ?? 'unknown';
   const pkColumn = config?.pkColumn ?? 'id';
 
   // Inline detail row — renders record details in an expanded full-width row
@@ -136,10 +143,17 @@ export default function AgGridListView({
     [],
   );
 
+  // Re-resolve config from registry to recover non-serializable fields
+  // (cellRenderer functions are lost during React Router loader serialization)
+  const freshConfig = useMemo(
+    () => getModuleConfig(subModuleSlug) ?? config,
+    [subModuleSlug, config],
+  );
+
   const dataColDefs = useMemo(() => {
-    if (config?.agGridColDefs) return config.agGridColDefs;
-    return mapColumnsToColDefs(config?.columns ?? []);
-  }, [config?.agGridColDefs, config?.columns]);
+    if (freshConfig?.agGridColDefs) return freshConfig.agGridColDefs;
+    return mapColumnsToColDefs(freshConfig?.columns ?? []);
+  }, [freshConfig]);
 
   // Show avatar column when data has profile_photo_url
   const hasAvatar =
