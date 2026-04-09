@@ -64,7 +64,7 @@ export function createCsrfProtect() {
       const base64Secret = utoa(secret);
       const serializedCookie = await setCsrfTokenCookie(base64Secret);
 
-      request.headers.set('Set-Cookie', serializedCookie);
+      request.headers.append('Set-Cookie', serializedCookie);
     } else {
       secret = atou(secretStr);
     }

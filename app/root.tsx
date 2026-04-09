@@ -48,6 +48,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   const { language } = i18n;
   const className = getClassName(theme);
 
+  // Extract only Set-Cookie headers for the response.
+  // Passing request.headers directly leaks request-only headers (Cookie,
+  // Host, etc.) into the response, which can confuse reverse proxies.
+  const responseHeaders = new Headers();
+
+  for (const cookie of request.headers.getSetCookie()) {
+    responseHeaders.append('Set-Cookie', cookie);
+  }
+
   return data(
     {
       language,
@@ -56,7 +65,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       csrfToken,
     },
     {
-      headers: request.headers,
+      headers: responseHeaders,
     },
   );
 }
