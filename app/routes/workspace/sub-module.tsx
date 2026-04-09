@@ -61,6 +61,24 @@ export const loader = async (args: {
 
   // Custom loader path for views that need non-standard query logic
   if (config?.viewType?.list === 'custom') {
+    // Pre-load pay periods for all payroll submodules (needed before query
+    // for payroll_data default period selection)
+    let payPeriods: Record<string, unknown>[] = [];
+    if (subModuleSlug.startsWith('payroll_')) {
+      const { data: periodData } = await queryUntypedView(client, 'hr_payroll')
+        .select('pay_period_start, pay_period_end')
+        .eq('org_id', accountSlug)
+        .eq('is_deleted', false)
+        .order('pay_period_start', { ascending: false });
+      const seen = new Set<string>();
+      payPeriods = castRows(periodData).filter((r) => {
+        const key = `${r.pay_period_start}|${r.pay_period_end}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
     let query = queryUntypedView(client, viewName)
       .select('*')
       .eq('org_id', accountSlug);
@@ -107,9 +125,21 @@ export const loader = async (args: {
       }
       query = query.order('full_name');
     } else if (subModuleSlug === 'payroll_data') {
-      const periodStart = url.searchParams.get('period_start');
-      const periodEnd = url.searchParams.get('period_end');
+      let periodStart = url.searchParams.get('period_start');
+      let periodEnd = url.searchParams.get('period_end');
       const employeeId = url.searchParams.get('employee');
+
+      // Default to most recent pay period when none selected
+      if (!periodStart && !periodEnd && payPeriods.length > 0) {
+        const defaultPeriod = payPeriods[0] as Record<string, unknown>;
+        const defStart = String(defaultPeriod.pay_period_start ?? '');
+        const defEnd = String(defaultPeriod.pay_period_end ?? '');
+        if (defStart && defEnd) {
+          periodStart = defStart;
+          periodEnd = defEnd;
+        }
+      }
+
       if (periodStart && periodEnd) {
         query = query
           .eq('pay_period_start', periodStart)
@@ -132,23 +162,6 @@ export const loader = async (args: {
 
     const rows = castRows(data);
 
-    // Load pay periods for payroll submodules
-    let payPeriods: Record<string, unknown>[] = [];
-    if (subModuleSlug.startsWith('payroll_')) {
-      const { data: periodData } = await queryUntypedView(client, 'hr_payroll')
-        .select('pay_period_start, pay_period_end')
-        .eq('org_id', accountSlug)
-        .eq('is_deleted', false)
-        .order('pay_period_start', { ascending: false });
-      const seen = new Set<string>();
-      payPeriods = castRows(periodData).filter((r) => {
-        const key = `${r.pay_period_start}|${r.pay_period_end}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-    }
-
     // Load distinct managers for payroll_comp_manager
     let managers: Record<string, unknown>[] = [];
     if (subModuleSlug === 'payroll_comp_manager') {
@@ -165,6 +178,21 @@ export const loader = async (args: {
         mgrSeen.add(id);
         return true;
       });
+    }
+
+    // Load employee options for payroll_data employee filter
+    let employees: Array<{ value: string; label: string }> = [];
+    if (subModuleSlug === 'payroll_data') {
+      const { data: empData } = await client
+        .from('hr_employee' as never)
+        .select('id, full_name')
+        .eq('org_id', accountSlug)
+        .eq('is_deleted', false)
+        .order('full_name');
+      employees = castRows(empData).map((r) => ({
+        value: String(r.id),
+        label: String(r.full_name),
+      }));
     }
 
     const { fkOptions, comboboxOptions } = await loadFormOptions({
@@ -190,6 +218,7 @@ export const loader = async (args: {
       comboboxOptions,
       payPeriods,
       managers,
+      employees,
     };
   }
 
@@ -280,6 +309,12 @@ const LazyAgGridListView = lazy(
   () => import('~/components/ag-grid/ag-grid-list-view'),
 );
 
+const LazyPayrollDataFilterBar = lazy(() =>
+  import('~/components/ag-grid/payroll-data-filter-bar').then((m) => ({
+    default: m.PayrollDataFilterBar,
+  })),
+);
+
 // Cache for custom lazy views keyed by loader reference
 const customViewCache = new Map<
   () => Promise<{ default: ComponentType<ListViewProps> }>,
@@ -356,6 +391,10 @@ export default function SubModulePage(props: {
     accountSlug,
     filterSlot: typedConfig.workflow ? (
       <StatusFilterTabs workflow={typedConfig.workflow} />
+    ) : subModuleSlug === 'payroll_data' ? (
+      <Suspense fallback={null}>
+        <LazyPayrollDataFilterBar />
+      </Suspense>
     ) : undefined,
   };
 

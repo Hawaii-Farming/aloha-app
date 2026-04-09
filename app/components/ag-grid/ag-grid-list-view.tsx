@@ -261,15 +261,17 @@ export default function AgGridListView({
                   gridApi={gridApi}
                   fileName={config?.tableName}
                 />
-                <Button
-                  size="sm"
-                  variant="brand"
-                  onClick={() => setCreateOpen(true)}
-                  data-test="sub-module-create-button"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  <Trans i18nKey="common:create" />
-                </Button>
+                {(config?.formFields?.length ?? 0) > 0 && (
+                  <Button
+                    size="sm"
+                    variant="brand"
+                    onClick={() => setCreateOpen(true)}
+                    data-test="sub-module-create-button"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    <Trans i18nKey="common:create" />
+                  </Button>
+                )}
               </div>
             }
           />
@@ -302,14 +304,16 @@ export default function AgGridListView({
         </div>
       </div>
 
-      <CreatePanel
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        config={config}
-        fkOptions={fkOptions}
-        comboboxOptions={comboboxOptions}
-        subModuleDisplayName={subModuleDisplayName}
-      />
+      {(config?.formFields?.length ?? 0) > 0 && (
+        <CreatePanel
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          config={config}
+          fkOptions={fkOptions}
+          comboboxOptions={comboboxOptions}
+          subModuleDisplayName={subModuleDisplayName}
+        />
+      )}
     </>
   );
 }
