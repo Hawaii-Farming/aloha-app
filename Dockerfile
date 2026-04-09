@@ -30,14 +30,12 @@ RUN pnpm build
 
 # Stage 2: Production
 FROM node:20-slim AS production
+RUN corepack enable
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
 
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/build ./build
-COPY --from=build /app/public ./public
-COPY --from=build /app/package.json ./
+COPY --from=build /app ./
 
 EXPOSE 8080
-CMD ["node", "node_modules/@react-router/serve/dist/cli.js", "./build/server/index.js"]
+CMD ["pnpm", "start"]
