@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       fsafe_lab: {
@@ -211,6 +236,13 @@ export type Database = {
             foreignKeyName: "fsafe_pest_result_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fsafe_pest_result_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -373,6 +405,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fsafe_result_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -961,6 +1000,13 @@ export type Database = {
             foreignKeyName: "grow_fertigation_recipe_site_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_fertigation_recipe_site_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -1212,6 +1258,13 @@ export type Database = {
             foreignKeyName: "grow_harvest_weight_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_harvest_weight_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -1418,6 +1471,13 @@ export type Database = {
             foreignKeyName: "grow_monitoring_result_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_monitoring_result_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -1545,6 +1605,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_scout_result_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -1708,6 +1775,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sys_uom"
             referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "grow_seed_batch_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "grow_seed_batch_site_id_fkey"
@@ -2755,6 +2829,13 @@ export type Database = {
             foreignKeyName: "hr_employee_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_employee_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -2764,6 +2845,133 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sys_access_level"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      hr_employee_review: {
+        Row: {
+          attendance: number
+          average: number | null
+          created_at: string
+          created_by: string | null
+          engagement: number
+          hr_employee_id: string
+          id: string
+          is_deleted: boolean
+          is_locked: boolean
+          lead_id: string | null
+          notes: string | null
+          org_id: string
+          productivity: number
+          quality: number
+          review_quarter: number
+          review_year: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          attendance: number
+          average?: number | null
+          created_at?: string
+          created_by?: string | null
+          engagement: number
+          hr_employee_id: string
+          id?: string
+          is_deleted?: boolean
+          is_locked?: boolean
+          lead_id?: string | null
+          notes?: string | null
+          org_id: string
+          productivity: number
+          quality: number
+          review_quarter: number
+          review_year: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          attendance?: number
+          average?: number | null
+          created_at?: string
+          created_by?: string | null
+          engagement?: number
+          hr_employee_id?: string
+          id?: string
+          is_deleted?: boolean
+          is_locked?: boolean
+          lead_id?: string | null
+          notes?: string | null
+          org_id?: string
+          productivity?: number
+          quality?: number
+          review_quarter?: number
+          review_year?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_hr_employee_review_employee"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_review_employee"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_review_lead"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_review_lead"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
           },
         ]
       }
@@ -3660,6 +3868,13 @@ export type Database = {
             foreignKeyName: "invnt_item_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invnt_item_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -4332,6 +4547,13 @@ export type Database = {
             foreignKeyName: "maint_request_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maint_request_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -4993,6 +5215,13 @@ export type Database = {
             foreignKeyName: "ops_task_tracker_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ops_task_tracker_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -5279,6 +5508,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ops_template_result_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -5779,6 +6015,13 @@ export type Database = {
             foreignKeyName: "org_equipment_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
+            referencedRelation: "app_hr_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_equipment_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -5932,6 +6175,7 @@ export type Database = {
           is_deleted: boolean
           latitude: number | null
           longitude: number | null
+          max_beds: number | null
           monitoring_stations: Json
           name: string
           notes: string | null
@@ -5955,6 +6199,7 @@ export type Database = {
           is_deleted?: boolean
           latitude?: number | null
           longitude?: number | null
+          max_beds?: number | null
           monitoring_stations?: Json
           name: string
           notes?: string | null
@@ -5978,6 +6223,7 @@ export type Database = {
           is_deleted?: boolean
           latitude?: number | null
           longitude?: number | null
+          max_beds?: number | null
           monitoring_stations?: Json
           name?: string
           notes?: string | null
@@ -6016,6 +6262,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_site_site_id_parent_fkey"
+            columns: ["site_id_parent"]
+            isOneToOne: false
+            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -6292,6 +6545,13 @@ export type Database = {
             columns: ["pack_dryer_result_id_original"]
             isOneToOne: false
             referencedRelation: "pack_dryer_result"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pack_dryer_result_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -6762,6 +7022,13 @@ export type Database = {
             columns: ["sales_product_id"]
             isOneToOne: false
             referencedRelation: "sales_product"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pack_shelf_life_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -8334,6 +8601,372 @@ export type Database = {
       }
     }
     Views: {
+      app_hr_employee_reviews: {
+        Row: {
+          attendance: number | null
+          average: number | null
+          created_at: string | null
+          created_by: string | null
+          department_name: string | null
+          engagement: number | null
+          full_name: string | null
+          hr_employee_id: string | null
+          id: string | null
+          is_deleted: boolean | null
+          is_locked: boolean | null
+          lead_id: string | null
+          lead_name: string | null
+          notes: string | null
+          org_id: string | null
+          productivity: number | null
+          profile_photo_url: string | null
+          quality: number | null
+          quarter_label: string | null
+          review_quarter: number | null
+          review_year: number | null
+          start_date: string | null
+          updated_at: string | null
+          updated_by: string | null
+          work_authorization_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_hr_employee_review_employee"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_review_employee"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_review_lead"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_review_lead"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_employee_review_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+        ]
+      }
+      app_hr_hours_comparison: {
+        Row: {
+          department_name: string | null
+          full_name: string | null
+          hr_employee_id: string | null
+          org_id: string | null
+          pay_period_end: string | null
+          pay_period_start: string | null
+          payroll_hours: number | null
+          profile_photo_url: string | null
+          scheduled_hours: number | null
+          variance: number | null
+        }
+        Relationships: []
+      }
+      app_hr_housing: {
+        Row: {
+          available_beds: number | null
+          id: string | null
+          is_active: boolean | null
+          max_beds: number | null
+          name: string | null
+          notes: string | null
+          org_id: string | null
+          tenant_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_site_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_hr_payroll_by_comp_manager: {
+        Row: {
+          check_date: string | null
+          compensation_manager_id: string | null
+          compensation_manager_name: string | null
+          department_name: string | null
+          full_name: string | null
+          gross_wage: number | null
+          hr_employee_id: string | null
+          id: string | null
+          net_pay: number | null
+          org_id: string | null
+          overtime_hours: number | null
+          pay_period_end: string | null
+          pay_period_start: string | null
+          preferred_name: string | null
+          profile_photo_url: string | null
+          regular_hours: number | null
+          total_hours: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_hr_employee_compensation_manager"
+            columns: ["compensation_manager_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_hr_employee_compensation_manager"
+            columns: ["compensation_manager_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_hr_payroll_by_employee: {
+        Row: {
+          department_name: string | null
+          full_name: string | null
+          hr_employee_id: string | null
+          org_id: string | null
+          pay_period_end: string | null
+          pay_period_start: string | null
+          preferred_name: string | null
+          profile_photo_url: string | null
+          total_gross_wage: number | null
+          total_hours: number | null
+          total_net_pay: number | null
+          total_overtime_hours: number | null
+          total_regular_hours: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_hr_payroll_by_task: {
+        Row: {
+          department_name: string | null
+          employee_count: number | null
+          hr_department_id: string | null
+          org_id: string | null
+          pay_period_end: string | null
+          pay_period_start: string | null
+          total_gross_wage: number | null
+          total_hours: number | null
+          total_net_pay: number | null
+          total_overtime_hours: number | null
+          total_regular_hours: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_payroll_hr_department_id_fkey"
+            columns: ["hr_department_id"]
+            isOneToOne: false
+            referencedRelation: "hr_department"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_hr_payroll_detail: {
+        Row: {
+          admin_fees: number | null
+          auto_allowance: number | null
+          auto_deduction: number | null
+          bonus_pay: number | null
+          check_date: string | null
+          child_support: number | null
+          comp_plus: number | null
+          created_at: string | null
+          department_name: string | null
+          employee_name: string | null
+          fit: number | null
+          full_name: string | null
+          funeral_hours: number | null
+          funeral_pay: number | null
+          gross_wage: number | null
+          hawaii_get: number | null
+          hds_dental: number | null
+          health_benefits: number | null
+          holiday_hours: number | null
+          holiday_pay: number | null
+          hourly_rate: number | null
+          hr_department_id: string | null
+          hr_employee_id: string | null
+          hr_work_authorization_id: string | null
+          id: string | null
+          invoice_number: string | null
+          is_deleted: boolean | null
+          is_standard: boolean | null
+          labor_tax: number | null
+          medicare: number | null
+          net_pay: number | null
+          org_id: string | null
+          other_charges: number | null
+          other_health_charges: number | null
+          other_pay: number | null
+          other_tax: number | null
+          overtime_hours: number | null
+          overtime_pay: number | null
+          overtime_threshold: number | null
+          pay_period_end: string | null
+          pay_period_start: string | null
+          pay_structure: string | null
+          payroll_id: string | null
+          payroll_processor: string | null
+          per_diem: number | null
+          pre_tax_401k: number | null
+          preferred_name: string | null
+          profile_photo_url: string | null
+          program_fees: number | null
+          pto_hours: number | null
+          pto_hours_accrued: number | null
+          pto_pay: number | null
+          regular_hours: number | null
+          regular_pay: number | null
+          salary: number | null
+          sick_hours: number | null
+          sick_pay: number | null
+          sit: number | null
+          social_security: number | null
+          tdi: number | null
+          total_cost: number | null
+          total_hours: number | null
+          updated_at: string | null
+          wc: string | null
+          work_authorization_name: string | null
+          workers_compensation: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_payroll_hr_department_id_fkey"
+            columns: ["hr_department_id"]
+            isOneToOne: false
+            referencedRelation: "hr_department"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_work_authorization_id_fkey"
+            columns: ["hr_work_authorization_id"]
+            isOneToOne: false
+            referencedRelation: "hr_work_authorization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_hr_time_off_requests: {
         Row: {
           compensation_manager_name: string | null
@@ -8613,6 +9246,456 @@ export type Database = {
       [_ in never]: never
     }
   }
+  storage: {
+    Tables: {
+      buckets: {
+        Row: {
+          allowed_mime_types: string[] | null
+          avif_autodetection: boolean | null
+          created_at: string | null
+          file_size_limit: number | null
+          id: string
+          name: string
+          owner: string | null
+          owner_id: string | null
+          public: boolean | null
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string | null
+        }
+        Insert: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id: string
+          name: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string | null
+        }
+        Update: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id?: string
+          name?: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      buckets_analytics: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          format: string
+          id: string
+          name: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      buckets_vectors: {
+        Row: {
+          created_at: string
+          id: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      migrations: {
+        Row: {
+          executed_at: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Insert: {
+          executed_at?: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Update: {
+          executed_at?: string | null
+          hash?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      objects: {
+        Row: {
+          bucket_id: string | null
+          created_at: string | null
+          id: string
+          last_accessed_at: string | null
+          metadata: Json | null
+          name: string | null
+          owner: string | null
+          owner_id: string | null
+          path_tokens: string[] | null
+          updated_at: string | null
+          user_metadata: Json | null
+          version: string | null
+        }
+        Insert: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Update: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objects_bucketId_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          metadata: Json | null
+          owner_id: string | null
+          upload_signature: string
+          user_metadata: Json | null
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          metadata?: Json | null
+          owner_id?: string | null
+          upload_signature: string
+          user_metadata?: Json | null
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          metadata?: Json | null
+          owner_id?: string | null
+          upload_signature?: string
+          user_metadata?: Json | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "s3_multipart_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vector_indexes: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id: string
+          metadata_configuration: Json | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id?: string
+          metadata_configuration?: Json | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          data_type?: string
+          dimension?: number
+          distance_metric?: string
+          id?: string
+          metadata_configuration?: Json | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vector_indexes_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets_vectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      allow_any_operation: {
+        Args: { expected_operations: string[] }
+        Returns: boolean
+      }
+      allow_only_operation: {
+        Args: { expected_operation: string }
+        Returns: boolean
+      }
+      can_insert_object: {
+        Args: { bucketid: string; metadata: Json; name: string; owner: string }
+        Returns: undefined
+      }
+      extension: { Args: { name: string }; Returns: string }
+      filename: { Args: { name: string }; Returns: string }
+      foldername: { Args: { name: string }; Returns: string[] }
+      get_common_prefix: {
+        Args: { p_delimiter: string; p_key: string; p_prefix: string }
+        Returns: string
+      }
+      get_size_by_bucket: {
+        Args: never
+        Returns: {
+          bucket_id: string
+          size: number
+        }[]
+      }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+          prefix_param: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          _bucket_id: string
+          delimiter_param: string
+          max_keys?: number
+          next_token?: string
+          prefix_param: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      operation: { Args: never; Returns: string }
+      search: {
+        Args: {
+          bucketname: string
+          levels?: number
+          limits?: number
+          offsets?: number
+          prefix: string
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_by_timestamp: {
+        Args: {
+          p_bucket_id: string
+          p_level: number
+          p_limit: number
+          p_prefix: string
+          p_sort_column: string
+          p_sort_column_after: string
+          p_sort_order: string
+          p_start_after: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_v2: {
+        Args: {
+          bucket_name: string
+          levels?: number
+          limits?: number
+          prefix: string
+          sort_column?: string
+          sort_column_after?: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+    }
+    Enums: {
+      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
@@ -8733,7 +9816,15 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
+  },
+  storage: {
+    Enums: {
+      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
+    },
   },
 } as const
