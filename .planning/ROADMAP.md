@@ -104,7 +104,12 @@ Plans:
   2. User can select a pay period to scope the comparison
   3. Variance cells are highlighted with conditional styling (red/amber) when hours mismatch
   4. Clicking a row expands to show daily schedule breakdown (day, dept, task, start/end time, hours)
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — SQL view (app_hr_hours_comparison) and schedule-by-period API route
+- [ ] 05-02-PLAN.md — CRUD config, registry, loader branch, and custom list view component
+- [ ] 05-03-PLAN.md — Schema reset and visual verification
 **UI hint**: yes
 
 ### Phase 6: Housing & Employee Review
@@ -132,5 +137,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Scheduler | 0/3 | Planning complete | - |
 | 3. Time Off | 0/TBD | Not started | - |
 | 4. Payroll Views | 0/4 | Planning complete | - |
-| 5. Hours Comparison | 0/TBD | Not started | - |
+| 5. Hours Comparison | 0/3 | Planning complete | - |
 | 6. Housing & Employee Review | 0/TBD | Not started | - |
