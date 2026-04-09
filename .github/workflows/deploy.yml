@@ -73,6 +73,17 @@ jobs:
             --min-instances=0 \
             --max-instances=3 \
             --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" \
+            --set-env-vars="VITE_SUPABASE_PUBLIC_KEY=${{ secrets.VITE_SUPABASE_PUBLIC_KEY }}" \
+            --set-env-vars="VITE_SITE_URL=${{ secrets.VITE_SITE_URL }}" \
+            --set-env-vars="VITE_PRODUCT_NAME=Aloha" \
+            --set-env-vars="VITE_AUTH_PASSWORD=true" \
+            --set-env-vars="VITE_ENABLE_THEME_TOGGLE=true" \
+            --set-env-vars="VITE_ENABLE_TEAM_ACCOUNTS=true" \
+            --set-env-vars="VITE_ENABLE_TEAM_ACCOUNTS_CREATION=true" \
+            --set-env-vars="VITE_ENABLE_TEAM_ACCOUNTS_DELETION=true" \
+            --set-env-vars="VITE_LANGUAGE_PRIORITY=application" \
+            --set-env-vars="VITE_DEFAULT_THEME_MODE=light" \
             --set-env-vars="SUPABASE_SECRET_KEY=${{ secrets.SUPABASE_SECRET_KEY }}" \
             --set-env-vars="ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" \
             --set-env-vars="SUPABASE_DB_WEBHOOK_SECRET=${{ secrets.SUPABASE_DB_WEBHOOK_SECRET }}" \
