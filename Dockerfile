@@ -28,20 +28,16 @@ COPY . .
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
-# Stage 2: Production (slim)
+# Stage 2: Production
 FROM node:20-slim AS production
-RUN corepack enable
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=8080
 
-COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build /app/tooling ./tooling
-COPY --from=build /app/packages ./packages
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/build ./build
 COPY --from=build /app/public ./public
+COPY --from=build /app/package.json ./
 
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
-
-ENV PORT=8080
 EXPOSE 8080
-CMD ["npx", "react-router-serve", "./build/server/index.js"]
+CMD ["node", "node_modules/@react-router/serve/dist/cli.js", "./build/server/index.js"]
