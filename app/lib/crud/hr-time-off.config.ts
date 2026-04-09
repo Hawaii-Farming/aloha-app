@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { SchedulerEmployeeRenderer } from '~/components/ag-grid/cell-renderers/scheduler-employee-renderer';
+import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
 import { TimeOffActionsRenderer } from '~/components/ag-grid/cell-renderers/time-off-actions-renderer';
 import { mapColumnsToColDefs } from '~/components/ag-grid/column-mapper';
 import type { ColumnConfig, CrudModuleConfig } from '~/lib/crud/types';
@@ -87,7 +88,20 @@ const timeOffColDefs = [
     minWidth: 200,
     autoHeight: true,
   },
-  ...mapColumnsToColDefs(timeOffColumns.filter((c) => c.key !== 'full_name')),
+  ...mapColumnsToColDefs(
+    timeOffColumns.filter((c) => c.key !== 'full_name' && c.key !== 'status'),
+  ),
+  {
+    headerName: 'Status',
+    field: 'status',
+    cellRenderer: StatusBadgeRenderer,
+    sortable: true,
+    filter: false,
+    resizable: false,
+    maxWidth: 110,
+    minWidth: 100,
+    pinned: 'right' as const,
+  },
   {
     headerName: 'Actions',
     field: 'id',
