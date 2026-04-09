@@ -1,5 +1,7 @@
 import { redirect } from 'react-router';
 
+import { parseCookieHeader } from '@supabase/ssr';
+
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
 export async function action({ request }: { request: Request }) {
@@ -7,14 +9,20 @@ export async function action({ request }: { request: Request }) {
 
   await client.auth.signOut();
 
-  // Build a clean response Headers with only Set-Cookie values.
-  // Passing the full request.headers object leaks request-only headers
-  // (Cookie, Host, etc.) into the response, which can confuse proxies
-  // (e.g. Google Cloud Run load balancer) and prevent cookie clearing.
+  // Manually expire every Supabase auth cookie so the browser deletes them.
+  // We cannot rely on the SDK's setAll() + getSetCookie() pipeline because
+  // the appended Set-Cookie headers on request.headers are not reliably
+  // propagated to the HTTP response on Cloud Run.
   const responseHeaders = new Headers();
+  const cookies = parseCookieHeader(request.headers.get('Cookie') ?? '');
 
-  for (const cookie of request.headers.getSetCookie()) {
-    responseHeaders.append('Set-Cookie', cookie);
+  for (const { name } of cookies) {
+    if (name.startsWith('sb-')) {
+      responseHeaders.append(
+        'Set-Cookie',
+        `${name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`,
+      );
+    }
   }
 
   return redirect('/auth/sign-in', {

@@ -12,16 +12,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     redirectPath: pathsConfig.app.home,
   });
 
-  // Extract only Set-Cookie headers for the response.
-  // Passing request.headers directly leaks request-only headers (Cookie,
-  // Host, etc.) into the response, which can confuse reverse proxies.
-  const responseHeaders = new Headers();
-
-  for (const cookie of request.headers.getSetCookie()) {
-    responseHeaders.append('Set-Cookie', cookie);
-  }
-
   return redirect(nextPath, {
-    headers: responseHeaders,
+    headers: request.headers,
   });
 }
