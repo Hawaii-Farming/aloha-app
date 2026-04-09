@@ -63,9 +63,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Payroll Comp Manager
 
-- [ ] **PMGR-01**: Payroll data filtered by compensation manager (`hr_employee.compensation_manager_id`)
-- [ ] **PMGR-02**: Manager selector/filter to switch between compensation managers
-- [ ] **PMGR-03**: Summary totals per manager (pinned bottom row or header section)
+- [x] **PMGR-01**: Payroll data filtered by compensation manager (`hr_employee.compensation_manager_id`)
+- [x] **PMGR-02**: Manager selector/filter to switch between compensation managers
+- [x] **PMGR-03**: Summary totals per manager (pinned bottom row or header section)
 - [x] **PMGR-04**: New SQL view aggregating payroll data by compensation manager
 
 ### Payroll Data
@@ -165,9 +165,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PCMP-04 | Phase 4 | Complete |
 | PCMP-05 | Phase 4 | Complete |
 | PCMP-06 | Phase 4 | Complete |
-| PMGR-01 | Phase 4 | Pending |
-| PMGR-02 | Phase 4 | Pending |
-| PMGR-03 | Phase 4 | Pending |
+| PMGR-01 | Phase 4 | Complete |
+| PMGR-02 | Phase 4 | Complete |
+| PMGR-03 | Phase 4 | Complete |
 | PMGR-04 | Phase 4 | Complete |
 | PDAT-01 | Phase 4 | Complete |
 | PDAT-02 | Phase 4 | Complete |
