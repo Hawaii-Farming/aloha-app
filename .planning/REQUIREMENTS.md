@@ -48,9 +48,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **HCMP-01**: Comparison grid showing: photo + full name, scheduled hours (from `ops_task_schedule`), payroll hours (from `hr_payroll`), variance (diff)
 - [ ] **HCMP-02**: Pay period selector to scope the comparison
-- [ ] **HCMP-03**: Row-click full-width detail showing daily schedule breakdown (day of week, dept, stat, task, start time, end time, hours, date)
+- [x] **HCMP-03**: Row-click full-width detail showing daily schedule breakdown (day of week, dept, stat, task, start time, end time, hours, date)
 - [ ] **HCMP-04**: Variance highlighting with conditional cell styling (red/amber when hours mismatch)
-- [ ] **HCMP-05**: New SQL view joining `ops_task_schedule` aggregated hours with `hr_payroll.total_hours` per employee per pay period
+- [x] **HCMP-05**: New SQL view joining `ops_task_schedule` aggregated hours with `hr_payroll.total_hours` per employee per pay period
 
 ### Payroll Comparison
 
@@ -156,9 +156,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOFF-05 | Phase 3 | Complete |
 | HCMP-01 | Phase 5 | Pending |
 | HCMP-02 | Phase 5 | Pending |
-| HCMP-03 | Phase 5 | Pending |
+| HCMP-03 | Phase 5 | Complete |
 | HCMP-04 | Phase 5 | Pending |
-| HCMP-05 | Phase 5 | Pending |
+| HCMP-05 | Phase 5 | Complete |
 | PCMP-01 | Phase 4 | Complete |
 | PCMP-02 | Phase 4 | Complete |
 | PCMP-03 | Phase 4 | Complete |
