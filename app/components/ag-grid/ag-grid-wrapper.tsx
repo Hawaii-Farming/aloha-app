@@ -60,6 +60,7 @@ interface AgGridWrapperProps {
   onColumnResized?: (event: ColumnResizedEvent) => void;
   onSortChanged?: (event: SortChangedEvent) => void;
   onColumnVisible?: (event: ColumnVisibleEvent) => void;
+  getRowStyle?: (params: RowClassParams) => Record<string, string> | undefined;
 }
 
 export function AgGridWrapper(props: AgGridWrapperProps) {
@@ -96,6 +97,7 @@ function AgGridInner({
   onColumnResized,
   onSortChanged,
   onColumnVisible,
+  getRowStyle,
 }: AgGridWrapperProps) {
   const { resolvedTheme } = useTheme();
   const theme = useMemo(() => getAgGridTheme(), []);
@@ -185,6 +187,7 @@ function AgGridInner({
           rowClassRules={rowClassRules}
           domLayout={effectiveDomLayout}
           getRowHeight={getRowHeight}
+          getRowStyle={getRowStyle}
           loading={loading}
           overlayNoRowsTemplate={emptyMessage ?? 'No records found'}
           rowSelection={rowSelection}
