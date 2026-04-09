@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode } from 'react';
 
-import type { ColDef, GridOptions } from 'ag-grid-community';
+import type { ColDef, ColGroupDef, GridOptions } from 'ag-grid-community';
 import type { z } from 'zod';
 
 export type ListViewType =
@@ -193,7 +193,7 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
 
   /** AG Grid-specific column definition overrides. When provided,
    *  these are used instead of auto-mapped columns from `columns`. */
-  agGridColDefs?: ColDef[];
+  agGridColDefs?: (ColDef | ColGroupDef)[];
 
   /** Custom detail row component for AG Grid row expansion.
    *  When provided, replaces the default InlineDetailRow. */

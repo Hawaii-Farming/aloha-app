@@ -59,21 +59,70 @@ export const loader = async (args: {
 
   const url = new URL(args.request.url);
 
-  // Custom loader path for views that lack is_deleted/end_date columns
+  // Custom loader path for views that need non-standard query logic
   if (config?.viewType?.list === 'custom') {
-    const weekStart = url.searchParams.get('week') ?? getCurrentWeekStart();
-    const deptFilter = url.searchParams.get('dept') ?? null;
-
     let query = queryUntypedView(client, viewName)
       .select('*')
-      .eq('org_id', accountSlug)
-      .eq('week_start_date', weekStart);
+      .eq('org_id', accountSlug);
 
-    if (deptFilter) {
-      query = query.eq('hr_department_id', deptFilter);
+    // Slug-specific query params
+    if (subModuleSlug === 'scheduler') {
+      const weekStart = url.searchParams.get('week') ?? getCurrentWeekStart();
+      query = query.eq('week_start_date', weekStart);
+      const deptFilter = url.searchParams.get('dept') ?? null;
+      if (deptFilter) {
+        query = query.eq('hr_department_id', deptFilter);
+      }
+      query = query.order('full_name');
+    } else if (subModuleSlug === 'payroll_comparison') {
+      const view = url.searchParams.get('view') ?? 'by_task';
+      const actualView =
+        view === 'by_employee'
+          ? 'app_hr_payroll_by_employee'
+          : 'app_hr_payroll_by_task';
+      query = queryUntypedView(client, actualView)
+        .select('*')
+        .eq('org_id', accountSlug);
+      const periodStart = url.searchParams.get('period_start');
+      const periodEnd = url.searchParams.get('period_end');
+      if (periodStart && periodEnd) {
+        query = query
+          .eq('pay_period_start', periodStart)
+          .eq('pay_period_end', periodEnd);
+      }
+      query = query.order(
+        view === 'by_employee' ? 'full_name' : 'department_name',
+      );
+    } else if (subModuleSlug === 'payroll_comp_manager') {
+      const periodStart = url.searchParams.get('period_start');
+      const periodEnd = url.searchParams.get('period_end');
+      const managerId = url.searchParams.get('manager');
+      if (periodStart && periodEnd) {
+        query = query
+          .eq('pay_period_start', periodStart)
+          .eq('pay_period_end', periodEnd);
+      }
+      if (managerId) {
+        query = query.eq('compensation_manager_id', managerId);
+      }
+      query = query.order('full_name');
+    } else if (subModuleSlug === 'payroll_data') {
+      const periodStart = url.searchParams.get('period_start');
+      const periodEnd = url.searchParams.get('period_end');
+      const employeeId = url.searchParams.get('employee');
+      if (periodStart && periodEnd) {
+        query = query
+          .eq('pay_period_start', periodStart)
+          .eq('pay_period_end', periodEnd);
+      }
+      if (employeeId) {
+        query = query.eq('hr_employee_id', employeeId);
+      }
+      query = query.order('full_name');
+    } else {
+      // Generic fallback for future custom views
+      query = query.order('created_at', { ascending: false });
     }
-
-    query = query.order('full_name');
 
     const { data, error } = await query;
 
@@ -82,6 +131,41 @@ export const loader = async (args: {
     }
 
     const rows = castRows(data);
+
+    // Load pay periods for payroll submodules
+    let payPeriods: Record<string, unknown>[] = [];
+    if (subModuleSlug.startsWith('payroll_')) {
+      const { data: periodData } = await queryUntypedView(client, 'hr_payroll')
+        .select('pay_period_start, pay_period_end')
+        .eq('org_id', accountSlug)
+        .eq('is_deleted', false)
+        .order('pay_period_start', { ascending: false });
+      const seen = new Set<string>();
+      payPeriods = castRows(periodData).filter((r) => {
+        const key = `${r.pay_period_start}|${r.pay_period_end}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    // Load distinct managers for payroll_comp_manager
+    let managers: Record<string, unknown>[] = [];
+    if (subModuleSlug === 'payroll_comp_manager') {
+      const { data: mgrData } = await queryUntypedView(
+        client,
+        'app_hr_payroll_by_comp_manager',
+      )
+        .select('compensation_manager_id, compensation_manager_name')
+        .eq('org_id', accountSlug);
+      const mgrSeen = new Set<string>();
+      managers = castRows(mgrData).filter((r) => {
+        const id = r.compensation_manager_id as string;
+        if (!id || mgrSeen.has(id)) return false;
+        mgrSeen.add(id);
+        return true;
+      });
+    }
 
     const { fkOptions, comboboxOptions } = await loadFormOptions({
       client,
@@ -104,6 +188,8 @@ export const loader = async (args: {
       },
       fkOptions,
       comboboxOptions,
+      payPeriods,
+      managers,
     };
   }
 

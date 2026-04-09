@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import type {
   ColDef,
+  ColGroupDef,
   ColumnMovedEvent,
   ColumnResizedEvent,
   ColumnVisibleEvent,
@@ -31,8 +32,9 @@ const AG_GRID_MODULES: Module[] = [AllCommunityModule];
 const PAGE_SIZE_SELECTOR = [10, 25, 50, 100];
 
 interface AgGridWrapperProps {
-  colDefs: ColDef[];
+  colDefs: (ColDef | ColGroupDef)[];
   rowData: Record<string, unknown>[];
+  pinnedBottomRowData?: Record<string, unknown>[];
   quickFilterText?: string;
   onRowClicked?: (event: RowClickedEvent) => void;
   isFullWidthRow?: (params: IsFullWidthRowParams) => boolean;
@@ -71,6 +73,7 @@ export function AgGridWrapper(props: AgGridWrapperProps) {
 function AgGridInner({
   colDefs,
   rowData,
+  pinnedBottomRowData,
   quickFilterText,
   onRowClicked,
   isFullWidthRow,
@@ -165,6 +168,7 @@ function AgGridInner({
           theme={theme}
           columnDefs={colDefs}
           rowData={rowData}
+          pinnedBottomRowData={pinnedBottomRowData}
           defaultColDef={defaultColDef}
           pagination={pagination ?? true}
           paginationPageSize={paginationPageSize ?? 25}
