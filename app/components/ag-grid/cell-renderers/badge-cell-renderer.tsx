@@ -35,10 +35,14 @@ function isDarkMode(el: HTMLElement | null): boolean {
  * Consistent color per value (hash-based).
  */
 export function BadgeCellRenderer(props: CustomCellRendererProps) {
-  const value = props.value as string | null | undefined;
-  if (!value) return null;
+  const raw = props.value as string | number | null | undefined;
+  if (raw == null || raw === '') return null;
 
-  const display = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  const value = String(raw);
+  const display =
+    typeof raw === 'number'
+      ? value
+      : value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
   const palette = paletteForValue(value);
   const dark = isDarkMode(props.eGridCell);
   const accent = dark ? palette.dark : palette.light;
