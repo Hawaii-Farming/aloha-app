@@ -116,113 +116,132 @@ function HoursDetailInner({ data, accountSlug }: HoursDetailInnerProps) {
     );
   }
 
-  if (detailData.length === 0) {
-    return (
-      <div className="text-muted-foreground px-6 py-4 text-sm">
-        No schedule records found.
-      </div>
-    );
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const byDate = new Map<string, RowData>();
+  for (const row of detailData) {
+    const date = (row.date as string) ?? '';
+    if (date) byDate.set(date, row);
   }
 
-  const totalHours = detailData.reduce(
-    (sum, r) => sum + (Number(r.hours) || 0),
-    0,
-  );
+  function buildWeek(weekStart: Date) {
+    const week: { date: string; dayName: string; entry: RowData | null }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const dayDate = new Date(weekStart);
+      dayDate.setDate(weekStart.getDate() + i);
+      const dayStr = dayDate.toISOString().split('T')[0] ?? '';
+      week.push({
+        date: dayStr,
+        dayName: dayNames[i] ?? '',
+        entry: byDate.get(dayStr) ?? null,
+      });
+    }
+    return week;
+  }
+
+  let recentWeeks: { date: string; dayName: string; entry: RowData | null }[][];
+
+  if (detailData.length === 0) {
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    recentWeeks = [buildWeek(weekStart)];
+  } else {
+    const allDates = [...byDate.keys()].sort();
+    const weeks: typeof recentWeeks = [];
+    const seen = new Set<string>();
+
+    for (const date of allDates) {
+      const d = new Date(date + 'T00:00:00');
+      const dow = d.getDay();
+      const weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - dow);
+      const weekKey = weekStart.toISOString().split('T')[0] ?? '';
+
+      if (seen.has(weekKey)) continue;
+      seen.add(weekKey);
+      weeks.push(buildWeek(weekStart));
+    }
+
+    recentWeeks = weeks;
+  }
 
   return (
-    <div
-      className="border-border/40 mx-4 mt-2 mb-4 overflow-y-auto rounded-lg border"
-      style={{
-        height: '360px',
-        background:
-          'repeating-linear-gradient(0deg, transparent, transparent 27px, var(--color-border) 27px, var(--color-border) 28px)',
-        backgroundPositionY: '32px',
-      }}
-    >
-      <table
-        className="w-full text-xs"
-        style={{ borderCollapse: 'separate', borderSpacing: 0 }}
-      >
-        <thead className="sticky top-0 z-10">
-          <tr className="bg-muted/90 text-muted-foreground border-border/40 border-b text-[11px] tracking-wider uppercase backdrop-blur-sm">
-            <th className="border-border/15 w-[100px] border-r px-3 py-2 text-left font-semibold">
-              Date
-            </th>
-            <th className="border-border/15 w-[60px] border-r px-3 py-2 text-left font-semibold">
-              Day
-            </th>
-            <th className="border-border/15 w-[140px] border-r px-3 py-2 text-left font-semibold">
-              Department
-            </th>
-            <th className="border-border/15 w-[140px] border-r px-3 py-2 text-left font-semibold">
-              Task
-            </th>
-            <th className="border-border/15 w-[90px] border-r px-3 py-2 text-right font-semibold">
-              Start Time
-            </th>
-            <th className="border-border/15 w-[90px] border-r px-3 py-2 text-right font-semibold">
-              End Time
-            </th>
-            <th className="w-[80px] px-3 py-2 text-right font-semibold">
-              Hours
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {detailData.map((row, i) => {
-            const isEven = i % 2 === 0;
-            return (
-              <tr
-                key={`${row.date}-${row.start_time_formatted}-${String(i)}`}
-                className="group transition-colors"
-                style={{
-                  background: isEven
-                    ? 'transparent'
-                    : 'var(--color-muted, rgba(128,128,128,0.06))',
-                }}
-              >
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5">
-                  <span className="inline-block rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-600 shadow-sm dark:text-emerald-400">
-                    {String(row.date ?? '')}
-                  </span>
-                </td>
-                <td className="text-muted-foreground border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5">
-                  {String(row.day_of_week ?? '')}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5">
-                  {String(row.department_name ?? '')}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5">
-                  {String(row.task_name ?? '')}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5 text-right tabular-nums">
-                  {String(row.start_time_formatted ?? '')}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5 text-right tabular-nums">
-                  {String(row.end_time_formatted ?? '')}
-                </td>
-                <td className="group-hover:bg-primary/5 px-3 py-1.5 text-right font-semibold tabular-nums">
-                  {row.hours != null ? Number(row.hours).toFixed(2) : ''}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-        <tfoot className="sticky bottom-0 z-10">
-          <tr className="bg-muted/90 border-border/40 border-t font-semibold backdrop-blur-sm">
-            <td
-              className="border-border/15 border-r px-3 py-2 text-[11px] tracking-wider uppercase"
-              colSpan={6}
-            >
-              <span className="text-primary">{detailData.length}</span> record
-              {detailData.length !== 1 ? 's' : ''}
-            </td>
-            <td className="px-3 py-2 text-right tabular-nums">
-              {totalHours.toFixed(2)}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+    <div className="overflow-hidden px-4 py-2">
+      {recentWeeks.map((week, wi) => (
+        <div key={wi} className={`${wi > 0 ? 'mt-2' : ''}`}>
+          <div className="grid grid-cols-7 gap-2">
+            {week.map(({ date, dayName, entry }) => {
+              const isWeekend = dayName === 'Sun' || dayName === 'Sat';
+              const isOff = !entry;
+
+              if (isOff) {
+                return (
+                  <div
+                    key={date}
+                    className={`overflow-hidden rounded-lg border border-dashed px-2 py-1.5 opacity-40 ${
+                      isWeekend ? 'border-amber-500/30' : 'border-border'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold">{dayName}</span>
+                      <span className="text-muted-foreground text-[10px]">
+                        {date}
+                      </span>
+                    </div>
+                    <div className="text-muted-foreground mt-1 text-[10px]">
+                      Off
+                    </div>
+                  </div>
+                );
+              }
+
+              const hours = entry.hours as number | null;
+
+              return (
+                <div
+                  key={date}
+                  className={`overflow-hidden rounded-lg border px-2 py-1.5 ${
+                    isWeekend
+                      ? 'border-amber-500/30 bg-amber-500/5'
+                      : 'border-border bg-muted/30'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold">{dayName}</span>
+                    <span className="text-muted-foreground text-[10px]">
+                      {date}
+                    </span>
+                  </div>
+                  <div className="mt-1">
+                    <span className="text-muted-foreground text-[10px]">
+                      {(entry.start_time_formatted as string) ?? ''} -{' '}
+                      {(entry.end_time_formatted as string) ?? ''}
+                    </span>
+                    {hours !== null && (
+                      <span className="text-primary ml-1 text-[10px] font-semibold">
+                        {hours}h
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {entry.task_name ? (
+                      <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 text-[10px] font-medium text-emerald-500">
+                        {String(entry.task_name)}
+                      </span>
+                    ) : null}
+                    {entry.department_name ? (
+                      <span className="text-muted-foreground text-[10px]">
+                        {String(entry.department_name)}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
