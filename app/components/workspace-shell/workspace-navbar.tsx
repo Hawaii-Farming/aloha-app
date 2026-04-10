@@ -1,19 +1,50 @@
-import { Command, Search } from 'lucide-react';
+import type { JwtPayload } from '@supabase/supabase-js';
 
-import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
+import { Command, PanelLeft, Search } from 'lucide-react';
+
+import { useSidebar } from '@aloha/ui/shadcn-sidebar';
 import { cn } from '@aloha/ui/utils';
 
-import { NavbarSearch } from '~/components/navbar-search';
+import {
+  NavbarSearch,
+  type NavbarSearchItem,
+} from '~/components/navbar-search';
+import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 import { AlohaLogoSquare } from './aloha-logo-square';
+import { WorkspaceNavbarProfileMenu } from './workspace-navbar-profile-menu';
 
 interface WorkspaceNavbarProps {
-  user: { email?: string | null };
+  account: string;
+  user: JwtPayload;
+  navigation: {
+    modules: AppNavModule[];
+    subModules: AppNavSubModule[];
+  };
   className?: string;
 }
 
-export function WorkspaceNavbar({ user, className }: WorkspaceNavbarProps) {
-  const initial = user.email?.[0]?.toUpperCase() ?? 'U';
+export function WorkspaceNavbar({
+  account,
+  user,
+  navigation,
+  className,
+}: WorkspaceNavbarProps) {
+  const { toggleSidebar } = useSidebar();
+
+  const searchItems: NavbarSearchItem[] = [
+    ...navigation.modules.map((mod) => ({
+      path: `/home/${account}/${mod.module_slug}`,
+      label: mod.display_name,
+      group: 'Modules',
+    })),
+    ...navigation.subModules.map((sm) => ({
+      path: `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`,
+      label: sm.display_name,
+      group: 'Pages',
+    })),
+  ];
+
   return (
     <header
       data-test="workspace-navbar"
@@ -22,12 +53,23 @@ export function WorkspaceNavbar({ user, className }: WorkspaceNavbarProps) {
         className,
       )}
     >
+      <button
+        type="button"
+        onClick={toggleSidebar}
+        data-test="workspace-navbar-sidebar-toggle"
+        aria-label="Toggle sidebar"
+        className="text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
+      >
+        <PanelLeft className="h-5 w-5" />
+      </button>
+
       <div className="flex items-center gap-3">
         <AlohaLogoSquare size="md" />
         <span className="text-foreground text-lg font-semibold">Aloha</span>
       </div>
 
       <NavbarSearch
+        items={searchItems}
         renderTrigger={({ open }) => (
           <button
             type="button"
@@ -46,9 +88,7 @@ export function WorkspaceNavbar({ user, className }: WorkspaceNavbarProps) {
         )}
       />
 
-      <Avatar size="md" data-test="workspace-navbar-avatar">
-        <AvatarFallback>{initial}</AvatarFallback>
-      </Avatar>
+      <WorkspaceNavbarProfileMenu user={user} />
     </header>
   );
 }
