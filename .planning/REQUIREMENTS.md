@@ -30,7 +30,7 @@
 - [x] **SIDEBAR-02**: The active module renders a gradient pill (green-500→emerald-600 with `shadow-green-500/25`) on the nav button.
 - [x] **SIDEBAR-03**: Sub-items expand in an accordion under the active module with a green-50 active chip and a green-200 left rail; inactive sub-items use slate tones.
 - [x] **SIDEBAR-04**: A `PanelLeft` toggle button collapses/expands the sidebar, and the collapsed state is persisted using the existing cookie mechanism — no changes to loader contracts.
-- [ ] **SIDEBAR-05**: Below the mobile breakpoint, the desktop sidebar is hidden and the mobile drawer takes over.
+- [x] **SIDEBAR-05**: Below the mobile breakpoint, the desktop sidebar is hidden and the mobile drawer takes over.
 
 ### Mobile Drawer (DRAWER)
 
