@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 import { Search } from 'lucide-react';
 
@@ -12,7 +12,11 @@ import {
 } from '@aloha/ui/command';
 import { Kbd } from '@aloha/ui/kbd';
 
-export function NavbarSearch() {
+interface NavbarSearchProps {
+  renderTrigger?: (props: { open: () => void; isMac: boolean }) => ReactNode;
+}
+
+export function NavbarSearch({ renderTrigger }: NavbarSearchProps = {}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -33,16 +37,20 @@ export function NavbarSearch() {
 
   return (
     <>
-      <button
-        data-test="navbar-search-trigger"
-        onClick={() => setOpen(true)}
-        className="border-border bg-muted/50 text-muted-foreground hover:bg-muted flex h-7 w-56 items-center gap-2 rounded-md border px-2 text-xs transition-colors"
-        aria-label="Open search"
-      >
-        <Search className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1 text-left">Search...</span>
-        <Kbd>{isMac ? '⌘K' : 'Ctrl K'}</Kbd>
-      </button>
+      {renderTrigger ? (
+        renderTrigger({ open: () => setOpen(true), isMac })
+      ) : (
+        <button
+          data-test="navbar-search-trigger"
+          onClick={() => setOpen(true)}
+          className="border-border bg-muted/50 text-muted-foreground hover:bg-muted flex h-7 w-56 items-center gap-2 rounded-md border px-2 text-xs transition-colors"
+          aria-label="Open search"
+        >
+          <Search className="h-3.5 w-3.5 shrink-0" />
+          <span className="flex-1 text-left">Search...</span>
+          <Kbd>{isMac ? '⌘K' : 'Ctrl K'}</Kbd>
+        </button>
+      )}
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />
