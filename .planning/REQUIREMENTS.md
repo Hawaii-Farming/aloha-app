@@ -82,8 +82,32 @@ Deferred to later milestones (not this scope):
 
 ## Traceability
 
-_Filled by roadmapper when phases are created._
-
-| REQ-ID | Phase | Plan |
-|--------|-------|------|
-| _(pending)_ | | |
+| REQ-ID    | Phase    | Plan |
+|-----------|----------|------|
+| DESIGN-01 | Phase 7  | TBD  |
+| DESIGN-02 | Phase 7  | TBD  |
+| DESIGN-03 | Phase 7  | TBD  |
+| DESIGN-04 | Phase 7  | TBD  |
+| DARK-01   | Phase 7  | TBD  |
+| PRIM-01   | Phase 8  | TBD  |
+| PRIM-02   | Phase 8  | TBD  |
+| PRIM-03   | Phase 8  | TBD  |
+| PRIM-04   | Phase 8  | TBD  |
+| PRIM-05   | Phase 8  | TBD  |
+| PRIM-06   | Phase 8  | TBD  |
+| NAVBAR-01 | Phase 9  | TBD  |
+| NAVBAR-02 | Phase 9  | TBD  |
+| NAVBAR-03 | Phase 9  | TBD  |
+| NAVBAR-04 | Phase 9  | TBD  |
+| SIDEBAR-01| Phase 9  | TBD  |
+| SIDEBAR-02| Phase 9  | TBD  |
+| SIDEBAR-03| Phase 9  | TBD  |
+| SIDEBAR-04| Phase 9  | TBD  |
+| SIDEBAR-05| Phase 9  | TBD  |
+| DRAWER-01 | Phase 9  | TBD  |
+| DRAWER-02 | Phase 9  | TBD  |
+| DRAWER-03 | Phase 9  | TBD  |
+| DRAWER-04 | Phase 9  | TBD  |
+| DRAWER-05 | Phase 9  | TBD  |
+| GRID-01   | Phase 10 | TBD  |
+| DARK-02   | Phase 10 | TBD  |

@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Aloha Design System Retheme
-status: defining_requirements
-stopped_at: Milestone v2.0 started
+status: ready_to_plan
+stopped_at: Roadmap created for v2.0 — ready to plan Phase 7
 last_updated: "2026-04-10T00:00:00.000Z"
 last_activity: 2026-04-10
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Every module renders real data from the database and supports full CRUD operations through a polished, consistent shell and design system.
-**Current focus:** v2.0 Aloha Design System Retheme — defining requirements
+**Current focus:** v2.0 Aloha Design System Retheme — Phase 7: Design Foundations
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 7 — Design Foundations
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-10 — Milestone v2.0 started
+Status: Ready to plan
+Last activity: 2026-04-10 — Roadmap created for v2.0 (Phases 7-10)
 
-Progress: [                    ] 0%
+Progress: [                    ] 0% (0/4 v2.0 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed (v2.0): 0
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -44,7 +44,10 @@ Progress: [                    ] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 7. Design Foundations | 0 | - | - |
+| 8. Shared Primitives | 0 | - | - |
+| 9. App Shell — Navbar, Sidebar, Drawer | 0 | - | - |
+| 10. AG Grid Theme & Dark Mode Verification | 0 | - | - |
 
 **Recent Trend:**
 
@@ -52,6 +55,9 @@ Progress: [                    ] 0%
 - Trend: -
 
 *Updated after each plan completion*
+
+### v1.0 Historical Velocity
+
 | Phase 01 P01 | 7min | 2 tasks | 12 files |
 | Phase 01 P02 | 5min | 2 tasks | 5 files |
 | Phase 01 P03 | 4min | 2 tasks | 7 files |
@@ -79,54 +85,22 @@ Progress: [                    ] 0%
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+
+**v2.0 constraints carried into Phase 7:**
+
+- Light mode is canonical; dark mode is derived (not hand-tuned).
+- Shell chrome + design tokens only — no feature changes, no new pages, no role/device switching.
+- Preserve Shadcn/Radix, Tailwind 4, AG Grid Community — no new UI libraries.
+- No breaking changes to component props, route loaders, actions, i18n, CSRF, or CRUD flows.
+- Source of truth for visuals is `/Users/jmr/GitHub/JJB/HawaiiFarming/aloha-design/prototype/src/`, NOT the existing Supabase-themed code.
+- WCAG AA contrast verified on every token pair used in shell chrome and primitives in both themes.
+
+**v1.0 decisions (reference):**
 
 - AG Grid Community (not Enterprise) for all HR grids
 - Full-width detail rows as Community alternative to Enterprise Master/Detail
 - Side-panel forms (Shadcn Sheet) for all CRUD, matching register pattern
-- [Phase 01]: Used success/warning Badge variants for approved/pending statuses (semantic match)
-- [Phase 01]: Added ag-grid-community as explicit dep for pnpm strict hoisting
-- [Phase 01]: Used headerTextColor (not headerForegroundColor) per AG Grid v35 types
-- [Phase 01]: AgGridWrapper uses autoHeight domLayout by default for natural page flow
-- [Phase 01]: useDetailRow injects synthetic _isDetailRow rows into data array with useMemo for accordion expand/collapse
-- [Phase 01]: Column state uses versioned JSON format (STATE_VERSION=1) with automatic cleanup on version mismatch or corruption
-- [Phase 01]: AgGridListView uses same ListViewProps interface as TableListView for drop-in compatibility
-- [Phase 01]: Column visibility implemented via custom Shadcn DropdownMenu (AG Grid Community lacks Enterprise ColumnsToolPanel)
-- [Phase 01]: Cached lazy components at module scope to satisfy React Compiler static-components lint rule
-- [Phase 02-scheduler]: LEFT JOIN for department/work_authorization in weekly schedule view (employees may lack assignments)
-- [Phase 02-scheduler]: Stub SchedulerListView created for lazy import resolution; Plan 02 replaces with full implementation
-- [Phase 02-scheduler]: Custom loader branch in sub-module.tsx uses queryUntypedView for views lacking is_deleted/end_date
-- [Phase 02-scheduler]: SchedulerListView composes AgGridWrapper directly (not AgGridListView) for full toolbar control
-- [Phase 02-scheduler]: Week/dept filter state via URL searchParams for loader revalidation, no local state
-- [Phase 02-scheduler]: Schedule history API uses mode param (detail/summary) for two data shapes from one endpoint
-- [Phase 03-time-off]: LEFT JOIN for nullable FKs, INNER JOIN for non-null FKs in time off view
-- [Phase 03-time-off]: NULL::DATE AS end_date in time off view for loadTableData compatibility
-- [Phase 03-time-off]: additionalCreateFields config pattern for auto-setting server-side fields on create (currentEmployee, currentOrg)
-- [Phase 03-time-off]: extraFields on transition actions for arbitrary key-value data (denial_reason)
-- [Phase 03-time-off]: StatusFilterTabs uses searchParams filter_status for server-side filtering via existing loadTableData mechanism
-- [Phase 03-time-off]: filterSlot prop on ListViewProps enables reusable toolbar customization for any submodule
-- [Phase 03-time-off]: Inline action renderers use useFetcher with bulk_transition for row-level mutations
-- [Phase 04]: app_hr_payroll_by_task groups by department since hr_payroll lacks task FK
-- [Phase 04]: Stub list views created for typecheck; Plans 02-03 replace them
-- [Phase 04]: Slug-based custom loader branching in sub-module.tsx for payroll period/manager filtering
-- [Phase 04-payroll-views]: Custom views access extra loader fields via useLoaderData() cast to Record
-- [Phase 04-payroll-views]: getRowStyle added to AgGridWrapper for pinned bottom row bold styling
-- [Phase 04-payroll-views]: ManagerFilter defined as local component (not exported) since only used in comp manager view
-- [Phase 04-payroll-views]: Employee options loaded directly in loader when formFields is empty
-- [Phase 04-payroll-views]: Create button hidden via formFields.length check for read-only submodules
-- [Phase 04-payroll-views]: PayPeriods loaded before query construction for default period support
-- [Phase 05-hours-comparison]: FULL OUTER JOIN between schedule_agg and payroll_agg CTEs for cross-source comparison
-- [Phase 05-hours-comparison]: varianceHighlightCellClassRules(4, 0.01) for red >=4h and amber >0h variance thresholds
-- [Phase 05-hours-comparison]: HoursDetailInner fetches /api/schedule-by-period on mount with canFetch guard for lint compliance
-- [Phase 05-hours-comparison]: Used supabase db push (hosted) instead of supabase:reset (Docker unavailable)
-- [Phase 06]: GENERATED ALWAYS AS STORED for average column prevents client-side tampering
-- [Phase 06]: Named FK constraints for hr_employee_review_employee and hr_employee_review_lead for PostgREST disambiguation
-- [Phase 06]: generatePk slugifies housing name for org_site text PK
-- [Phase 06]: Server-side org_site_category_id resolution in sub-module-create action prevents client tampering
-- [Phase 06]: HousingDetailRow fetches tenants via API on expand (same pattern as HoursDetailInner)
-- [Phase 06]: Inline detail row in list view (not separate import) for employee review since data already available
-- [Phase 06]: Server-side is_locked check in sub-module-create action prevents locked review tampering (T-06-09)
-- [Phase 06]: Used npx supabase gen types --linked for hosted Supabase typegen (Docker unavailable)
+- AG Grid themed via `themeQuartz.withParams()` — single theme config file inherited by all grids
 
 ### Pending Todos
 
@@ -134,7 +108,7 @@ None yet.
 
 ### Blockers/Concerns
 
-(All resolved in v1.0 — cleared for next milestone)
+None.
 
 ### Quick Tasks Completed
 
@@ -144,6 +118,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T05:15:45.735Z
-Stopped at: Completed 06-04-PLAN.md
+Last session: 2026-04-10T00:00:00.000Z
+Stopped at: Roadmap created for v2.0 (Phases 7-10)
 Resume file: None
+Next action: `/gsd-plan-phase 7`
