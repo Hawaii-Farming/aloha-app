@@ -4,7 +4,7 @@
 * Global styles for the entire application
  */
 
-@import '@fontsource-variable/geist/wght.css';
+@import '@fontsource-variable/inter/wght.css';
 @import '@fontsource-variable/geist-mono/wght.css';
 
 /* Tailwind CSS */
@@ -45,24 +45,6 @@
   input::placeholder,
   textarea::placeholder {
     color: theme(--color-muted-foreground);
-  }
-
-  :root {
-    --shadow: none;
-    --shadow-sm: none;
-    --shadow-md: none;
-    --shadow-lg: none;
-    --shadow-xl: none;
-    --shadow-2xl: none;
-  }
-
-  .dark {
-    --shadow: none;
-    --shadow-sm: none;
-    --shadow-md: none;
-    --shadow-lg: none;
-    --shadow-xl: none;
-    --shadow-2xl: none;
   }
 }
 
