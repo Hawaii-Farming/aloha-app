@@ -1,11 +1,16 @@
-import { Outlet } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+
+import { Outlet, useLocation } from 'react-router';
 
 import { z } from 'zod';
 
 import { PageLayoutStyle } from '@aloha/ui/page';
-import { SidebarProvider, SidebarTrigger } from '@aloha/ui/shadcn-sidebar';
+import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
+import { WorkspaceMobileDrawer } from '~/components/workspace-shell/workspace-mobile-drawer';
+import { WorkspaceMobileHeader } from '~/components/workspace-shell/workspace-mobile-header';
+import { WorkspaceNavbar } from '~/components/workspace-shell/workspace-navbar';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
@@ -40,27 +45,63 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
   }));
 
   const user = workspace.user;
+  const userForShell = { email: user.email ?? null };
+
+  const location = useLocation();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement | null>(null);
+
+  // Auto-close drawer on route change — justified useEffect per CLAUDE.md
+  // (no event fires for internal React Router navigation; observing
+  // useLocation is the canonical pattern). Guarded with a ref so the
+  // setState only fires on an actual pathname change, avoiding the
+  // React Compiler "cascading render" warning for unconditional sets.
+  const lastPathRef = useRef(location.pathname);
+  useEffect(() => {
+    if (lastPathRef.current !== location.pathname) {
+      lastPathRef.current = location.pathname;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- route-change side effect; no event fires for internal React Router navigation
+      setDrawerOpen(false);
+    }
+  }, [location.pathname]);
 
   return (
     <SidebarProvider defaultOpen={layoutState.open}>
-      <WorkspaceSidebar
-        account={accountSlug}
-        navigation={workspace.navigation}
-        user={user}
-        accounts={accounts}
-        accessLevelId={workspace.currentOrg.access_level_id}
-      />
+      <div className="flex h-svh w-full flex-col">
+        <WorkspaceNavbar user={userForShell} className="hidden md:flex" />
+        <WorkspaceMobileHeader
+          user={userForShell}
+          onOpenDrawer={() => setDrawerOpen(true)}
+          drawerOpen={drawerOpen}
+          hamburgerRef={hamburgerRef}
+        />
 
-      <main className="flex h-svh flex-1 flex-col overflow-hidden">
-        {/* Mobile header: hamburger menu to open sidebar sheet */}
-        <div className="bg-background flex h-12 shrink-0 items-center border-b px-3 md:hidden">
-          <SidebarTrigger className="text-muted-foreground h-5 w-5" />
+        <div className="flex flex-1 overflow-hidden">
+          <div className="hidden md:block">
+            <WorkspaceSidebar
+              account={accountSlug}
+              navigation={workspace.navigation}
+              user={user}
+              accounts={accounts}
+              accessLevelId={workspace.currentOrg.access_level_id}
+            />
+          </div>
+
+          <main className="flex-1 overflow-y-auto">
+            <div className="flex flex-1 flex-col p-4">
+              <Outlet />
+            </div>
+          </main>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-hidden p-4">
-          <Outlet />
-        </div>
-      </main>
+        <WorkspaceMobileDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          account={accountSlug}
+          navigation={workspace.navigation}
+          hamburgerRef={hamburgerRef}
+        />
+      </div>
     </SidebarProvider>
   );
 }
