@@ -1,6 +1,6 @@
 import { createElement, useState } from 'react';
 
-import { useLocation } from 'react-router';
+import { Link, useLocation } from 'react-router';
 
 import {
   Collapsible,
@@ -138,14 +138,14 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                       : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent',
                                   )}
                                 >
-                                  <a
-                                    href={subModulePath}
+                                  <Link
+                                    to={subModulePath}
                                     onClick={() => onNavigate?.()}
                                   >
                                     {createElement(SubModuleIcon, {
                                       className: 'h-4 w-4 shrink-0',
                                     })}
-                                  </a>
+                                  </Link>
                                 </SidebarMenuButton>
                               );
                             })}
@@ -228,8 +228,8 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                       : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent',
                                   )}
                                 >
-                                  <a
-                                    href={subModulePath}
+                                  <Link
+                                    to={subModulePath}
                                     onClick={() => onNavigate?.()}
                                   >
                                     {createElement(SubModuleIcon, {
@@ -238,7 +238,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                     <span className="truncate capitalize">
                                       {sm.display_name}
                                     </span>
-                                  </a>
+                                  </Link>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
                             );
