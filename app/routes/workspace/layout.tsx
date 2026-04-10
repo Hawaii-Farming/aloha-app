@@ -75,7 +75,7 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
           hamburgerRef={hamburgerRef}
         />
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex min-h-0 flex-1 overflow-hidden">
           <div className="hidden md:block">
             <WorkspaceSidebar
               account={accountSlug}
@@ -83,8 +83,8 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
             />
           </div>
 
-          <main className="flex-1 overflow-y-auto">
-            <div className="flex flex-1 flex-col p-4">
+          <main className="flex min-h-0 flex-1 flex-col">
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
               <Outlet />
             </div>
           </main>

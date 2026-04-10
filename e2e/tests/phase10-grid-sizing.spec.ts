@@ -25,8 +25,6 @@ const HR_MODULE_PATHS: ReadonlyArray<{ name: string; path: string }> = [
 test.describe('@phase10 @grid-sizing — HR grids fill their container', () => {
   for (const mod of HR_MODULE_PATHS) {
     test(`${mod.name} grid height > 300px`, async ({ page }) => {
-      test.fail(true, 'Wave 0 red — GRID-02 not yet fixed');
-
       await page.goto(`/home/${ACCOUNT_SLUG}/${mod.path}`);
       const grid = page
         .locator('[data-test="ag-grid-wrapper"], .ag-root-wrapper')
