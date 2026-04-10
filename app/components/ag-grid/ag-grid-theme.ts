@@ -1,58 +1,60 @@
+// Font: Inter Variable (matches Phase 7 app-wide migration — supersedes CONTEXT D-02)
 import { themeQuartz } from 'ag-grid-community';
 
 /**
- * Returns an AG Grid theme configured with DESIGN.md color tokens
- * for both light and dark modes. Uses the AG Grid v35 Theming API
- * (themeQuartz.withParams) -- no separate CSS override files needed.
+ * Returns an AG Grid theme configured with Aloha/Phase-7 Supabase-inspired
+ * design tokens for both light and dark modes. Uses the AG Grid v35 Theming
+ * API (`themeQuartz.withParams`) — literal hex values only. AG Grid's
+ * `withParams` does NOT resolve `var(--...)` references, so values are hard
+ * coded to the Aloha palette.
  *
- * Light mode maps to the Supabase Studio light palette (oklch tokens).
- * Dark mode maps to the Supabase dark-mode-native palette.
+ * Font is unified with the rest of the app on Inter Variable (Phase 7
+ * migration); AG Grid was the final divergent surface on Geist Variable.
+ *
+ * Contract asserted by `app/components/ag-grid/__tests__/ag-grid-theme.test.ts`.
  */
+const shared = {
+  fontFamily:
+    "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  fontSize: 14,
+  headerFontSize: 13,
+  headerFontWeight: 500,
+  checkboxBorderRadius: 4,
+  rowVerticalPaddingScale: 1.6,
+  columnBorder: true,
+} as const;
+
 export function getAgGridTheme() {
   return themeQuartz
     .withParams(
       {
-        fontFamily:
-          "'Geist Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        fontSize: 14,
-        headerFontSize: 13,
-        headerFontWeight: 500,
-        backgroundColor: '#fafafa',
-        foregroundColor: '#171717',
-        headerBackgroundColor: '#f0f0f0',
-        headerTextColor: '#171717',
-        borderColor: '#e5e5e5',
-        accentColor: '#1d9e65',
-        rowHoverColor: '#f0f0f0',
-        selectedRowBackgroundColor: '#e8f5ee',
-        oddRowBackgroundColor: '#f5f5f5',
-        checkboxBorderRadius: 999,
-        rowVerticalPaddingScale: 1.6,
-        columnBorder: true,
+        ...shared,
         browserColorScheme: 'light',
+        backgroundColor: '#ffffff',
+        foregroundColor: '#0f172a',
+        headerBackgroundColor: '#f1f5f9',
+        headerTextColor: '#475569',
+        borderColor: '#e2e8f0',
+        accentColor: '#22c55e',
+        rowHoverColor: '#f1f5f9',
+        selectedRowBackgroundColor: '#f0fdf4',
+        oddRowBackgroundColor: '#f8fafc',
       },
       'light',
     )
     .withParams(
       {
-        fontFamily:
-          "'Geist Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        fontSize: 14,
-        headerFontSize: 13,
-        headerFontWeight: 500,
-        backgroundColor: '#262626',
-        foregroundColor: '#e8e8e8',
-        headerBackgroundColor: '#2e2e2e',
-        headerTextColor: '#e8e8e8',
-        borderColor: '#404040',
-        accentColor: '#3ecf8e',
-        rowHoverColor: '#2e2e2e',
-        selectedRowBackgroundColor: '#1a3a2a',
-        oddRowBackgroundColor: '#2a2a2a',
-        checkboxBorderRadius: 999,
-        rowVerticalPaddingScale: 1.6,
-        columnBorder: true,
+        ...shared,
         browserColorScheme: 'dark',
+        backgroundColor: '#1e293b',
+        foregroundColor: '#f8fafc',
+        headerBackgroundColor: '#0f172a',
+        headerTextColor: '#cbd5e1',
+        borderColor: '#334155',
+        accentColor: '#4ade80',
+        rowHoverColor: '#334155',
+        selectedRowBackgroundColor: 'rgba(34, 197, 94, 0.15)',
+        oddRowBackgroundColor: '#1e293b',
       },
       'dark',
     );
