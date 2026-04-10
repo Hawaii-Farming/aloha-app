@@ -21,7 +21,7 @@
 
 ### v2.0 Aloha Design System Retheme (Phases 7-10)
 
-- [ ] **Phase 7: Design Foundations** — DESIGN.md rewrite, Tailwind tokens, Inter font, derived dark palette
+- [x] **Phase 7: Design Foundations** — DESIGN.md rewrite, Tailwind tokens, Inter font, derived dark palette (completed 2026-04-10)
 - [ ] **Phase 8: Shared Primitives** — Button, Card, Input/Textarea/Select, Badge, Avatar, Sheet restyle
 - [ ] **Phase 9: App Shell — Navbar, Sidebar, Drawer** — 72px navbar, 220/68px sidebar, mobile drawer + header
 - [ ] **Phase 10: AG Grid Theme & Dark Mode Verification** — AG Grid token adaptation, next-themes smoke pass, WCAG AA audit
@@ -40,7 +40,7 @@
 **Plans**: 3 plans
 - [x] 07-01-PLAN.md — Rewrite DESIGN.md + swap shadcn-ui.css to Aloha palette (light + hand-authored dark)
 - [x] 07-02-PLAN.md — Tailwind @theme Inter fonts + shadow scale + global.css font import + shadow unlock + package.json dep swap
-- [ ] 07-03-PLAN.md — scripts/verify-wcag.mjs (24 assertions) + DESIGN.md WCAG table + manual smoke checkpoint
+- [x] 07-03-PLAN.md — scripts/verify-wcag.mjs (24 assertions) + DESIGN.md WCAG table + manual smoke checkpoint
 **UI hint**: yes
 
 ### Phase 8: Shared Primitives
@@ -91,7 +91,7 @@
 | 4. Payroll Views | v1.0 | 4/4 | Complete | 2026-04-08 |
 | 5. Hours Comparison | v1.0 | 3/3 | Complete | 2026-04-09 |
 | 6. Housing & Employee Review | v1.0 | 4/4 | Complete | 2026-04-09 |
-| 7. Design Foundations | v2.0 | 2/3 | In Progress|  |
+| 7. Design Foundations | v2.0 | 3/3 | Complete   | 2026-04-10 |
 | 8. Shared Primitives | v2.0 | 0/0 | Not started | - |
 | 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 0/0 | Not started | - |
 | 10. AG Grid Theme & Dark Mode Verification | v2.0 | 0/0 | Not started | - |
