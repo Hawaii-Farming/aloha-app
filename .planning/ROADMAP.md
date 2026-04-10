@@ -116,4 +116,4 @@
 | 7. Design Foundations | v2.0 | 3/3 | Complete   | 2026-04-10 |
 | 8. Shared Primitives | v2.0 | 0/0 | Not started | - |
 | 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 5/5 | Complete | 2026-04-10 |
-| 10. AG Grid Theme, Template Parity & Dark Mode | v2.0 | 5/5 | Complete | 2026-04-10 |
+| 10. AG Grid Theme, Template Parity & Dark Mode | v2.0 | 5/5 | Complete    | 2026-04-10 |
