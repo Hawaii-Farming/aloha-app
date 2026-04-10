@@ -54,7 +54,10 @@ export function WorkspaceSidebar(props: {
   const { account, navigation, user, accounts, accessLevelId } = props;
 
   return (
-    <Sidebar collapsible={'icon'} className="bg-card border-border border-r">
+    <Sidebar
+      collapsible={'icon'}
+      className="bg-card border-border border-r md:top-[72px] md:h-[calc(100svh-72px)]"
+    >
       <SidebarEdgeToggle />
 
       <SidebarContent className="mt-2 flex-1 overflow-y-auto">

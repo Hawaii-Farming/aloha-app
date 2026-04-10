@@ -25,7 +25,7 @@ export function WorkspaceMobileHeader({
     <header
       data-test="workspace-mobile-header"
       className={cn(
-        'bg-card border-border flex h-14 shrink-0 items-center gap-3 border-b px-4 md:hidden',
+        'bg-card border-border relative z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 md:hidden',
         className,
       )}
     >

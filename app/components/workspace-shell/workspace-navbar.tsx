@@ -18,7 +18,7 @@ export function WorkspaceNavbar({ user, className }: WorkspaceNavbarProps) {
     <header
       data-test="workspace-navbar"
       className={cn(
-        'bg-card border-border flex h-[72px] shrink-0 items-center gap-4 border-b px-6',
+        'bg-card border-border relative z-20 flex h-[72px] shrink-0 items-center gap-4 border-b px-6',
         className,
       )}
     >
