@@ -18,8 +18,6 @@ test.describe('@phase10 @sidebar-parity — structural sidebar parity', () => {
   test('sidebar contains NAVIGATION + MODULES headers with separator', async ({
     page,
   }) => {
-    test.fail(true, 'Wave 0 red — PARITY-01 not yet implemented');
-
     await page.goto(`/home/${ACCOUNT_SLUG}/`);
     const sidebar = page.locator('aside, [data-sidebar="sidebar"]').first();
     await expect(sidebar.getByText(/^NAVIGATION$/i)).toBeVisible();

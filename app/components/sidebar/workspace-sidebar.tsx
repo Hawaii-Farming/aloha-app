@@ -1,6 +1,14 @@
-import { PanelLeft } from 'lucide-react';
+import { ChevronLeft, LayoutGrid, PanelLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-import { Sidebar, SidebarContent, useSidebar } from '@aloha/ui/shadcn-sidebar';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroupLabel,
+  SidebarSeparator,
+  useSidebar,
+} from '@aloha/ui/shadcn-sidebar';
 import { cn } from '@aloha/ui/utils';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
@@ -35,6 +43,7 @@ export function WorkspaceSidebar(props: {
   };
 }) {
   const { account, navigation } = props;
+  const { t } = useTranslation('common');
 
   return (
     <Sidebar
@@ -44,12 +53,55 @@ export function WorkspaceSidebar(props: {
       <SidebarEdgeToggle />
 
       <SidebarContent className="mt-2 flex-1 overflow-y-auto">
+        {/*
+         * Phase 10 PARITY-01: NAVIGATION + MODULES section headers with a
+         * separator between them, above the module list. Both labels are
+         * rendered (UI-SPEC §Surface 2 + Wave 0 e2e contract). Collapsed
+         * mode hides the labels via group-data selector.
+         */}
+        <SidebarGroupLabel
+          className={cn(
+            'text-muted-foreground px-3 pt-3 pb-2 text-xs font-semibold tracking-wider uppercase',
+            'group-data-[collapsible=icon]:hidden',
+          )}
+        >
+          {t('shell.sidebar.nav_section')}
+        </SidebarGroupLabel>
+        <SidebarSeparator className="mx-0 group-data-[collapsible=icon]:hidden" />
+        <SidebarGroupLabel
+          className={cn(
+            'text-muted-foreground px-3 pt-3 pb-2 text-xs font-semibold tracking-wider uppercase',
+            'group-data-[collapsible=icon]:hidden',
+          )}
+        >
+          {t('shell.sidebar.modules_section')}
+        </SidebarGroupLabel>
+
         <ModuleSidebarNavigation
           account={account}
           modules={navigation.modules}
           subModules={navigation.subModules}
         />
       </SidebarContent>
+
+      {/*
+       * Phase 10 PARITY-01: "Focused" footer placeholder (disabled visual).
+       * CONTEXT D-14 default — no click handler, aria-disabled.
+       */}
+      <SidebarFooter className="border-sidebar-border border-t group-data-[collapsible=icon]:hidden">
+        <button
+          type="button"
+          aria-disabled="true"
+          tabIndex={-1}
+          className="text-muted-foreground flex w-full cursor-not-allowed items-center gap-2 px-3 py-2 text-xs font-medium opacity-60"
+        >
+          <LayoutGrid className="h-4 w-4" />
+          <span className="flex-1 text-left">
+            {t('shell.sidebar.focused_footer')}
+          </span>
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      </SidebarFooter>
     </Sidebar>
   );
 }

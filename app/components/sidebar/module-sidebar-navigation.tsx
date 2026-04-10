@@ -1,3 +1,5 @@
+// Phase 10 D-10: inline collapse affordance is OMITTED — navbar PanelLeft
+// toggle is the single source of truth for sidebar collapse.
 import { createElement, useState } from 'react';
 
 import { Link, useLocation } from 'react-router';
@@ -234,45 +236,50 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                   </SidebarGroupLabel>
                   <CollapsibleContent>
                     <SidebarGroupContent>
-                      <div className="ml-5 border-l-2 border-green-200 pl-3">
-                        <SidebarMenu>
-                          {children.map((sm) => {
-                            const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
-                            const isActive =
-                              currentPath === subModulePath ||
-                              currentPath.startsWith(subModulePath + '/');
-                            const SubModuleIcon = getSubModuleIcon(
-                              sm.sub_module_slug,
-                            );
+                      {/* PARITY-04: vertical separation + dark-mode rail */}
+                      <div
+                        data-sidebar="menu-sub"
+                        className="mt-1 mb-1 ml-5 flex flex-col gap-1 border-l-2 border-green-200 pl-3 dark:border-green-900/60"
+                      >
+                        {children.map((sm, subIndex) => {
+                          const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
+                          const isActive =
+                            currentPath === subModulePath ||
+                            currentPath.startsWith(subModulePath + '/');
+                          const SubModuleIcon = getSubModuleIcon(
+                            sm.sub_module_slug,
+                          );
 
-                            return (
-                              <SidebarMenuItem key={sm.sub_module_id}>
-                                <SidebarMenuButton
-                                  asChild
-                                  isActive={isActive}
-                                  tooltip={sm.display_name}
-                                  className={cn(
-                                    isActive
-                                      ? 'rounded-lg bg-green-50 font-medium text-green-700'
-                                      : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent',
-                                  )}
+                          return (
+                            <SidebarMenuItem
+                              key={sm.sub_module_id}
+                              className={cn(subIndex === 0 && 'mt-1')}
+                            >
+                              <SidebarMenuButton
+                                asChild
+                                isActive={isActive}
+                                tooltip={sm.display_name}
+                                className={cn(
+                                  isActive
+                                    ? 'rounded-lg bg-green-50 font-medium text-green-700 dark:bg-green-900/40 dark:text-green-200'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent',
+                                )}
+                              >
+                                <Link
+                                  to={subModulePath}
+                                  onClick={() => onNavigate?.()}
                                 >
-                                  <Link
-                                    to={subModulePath}
-                                    onClick={() => onNavigate?.()}
-                                  >
-                                    {createElement(SubModuleIcon, {
-                                      className: 'h-4 w-4 shrink-0',
-                                    })}
-                                    <span className="truncate capitalize">
-                                      {sm.display_name}
-                                    </span>
-                                  </Link>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                            );
-                          })}
-                        </SidebarMenu>
+                                  {createElement(SubModuleIcon, {
+                                    className: 'h-4 w-4 shrink-0',
+                                  })}
+                                  <span className="truncate capitalize">
+                                    {sm.display_name}
+                                  </span>
+                                </Link>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          );
+                        })}
                       </div>
                     </SidebarGroupContent>
                   </CollapsibleContent>
