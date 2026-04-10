@@ -751,22 +751,25 @@ export function NavbarSearch({ renderTrigger }: NavbarSearchProps = {}) {
 
 **User confirmation recommended for:** A1 (SSR + framer-motion combo) — worth a 2-minute isolated test in Wave 0 of Plan 09-03 before committing the drawer implementation. A3, A5, A6 are cheap to verify during implementation.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should Plan 09-03 verify framer-motion SSR compat before building the full drawer?**
    - What we know: framer-motion 11+ is SSR-safe per docs; prototype uses same APIs in SPA mode.
    - What's unclear: exact behavior under React Router 7 streaming SSR + React 19 concurrent rendering.
    - Recommendation: Wave 0 of Plan 09-03 = install + add a trivial `<motion.div animate={{ opacity: 1 }}>` on the sign-in page as a smoke test, run `pnpm dev`, confirm no SSR warnings in console, then remove the smoke test and proceed.
+   - **RESOLVED:** framer-motion 12.38.0 SSR compat accepted as documented-safe per `npm view` + framer-motion docs (no `"use client"` needed under RR7 Framework Mode). Inline smoke test deferred — if any SSR warning surfaces during Plan 09-03 execution, executor falls back to a Wave 0 smoke step. No standalone Wave 0 task added; risk is MEDIUM and acceptable.
 
 2. **Does `ModuleSidebarNavigation` need `forceExpanded` or can we rely on `group-data` selector quirks?**
    - What we know: the expanded branch is `<div className="group-data-[collapsible=icon]:hidden">` — hidden only when a parent has `data-collapsible="icon"`.
    - What's unclear: whether the collapsed branch `<div className="hidden group-data-[collapsible=icon]:block">` — which starts `hidden` and only unhides when the parent matches — is correctly hidden by default when no parent matches.
    - Recommendation: `forceExpanded` prop is safer; adds 2 lines; no downside.
+   - **RESOLVED:** `forceExpanded?: boolean` prop adopted. Plan 09-01 Task 2 adds the prop to `ModuleSidebarNavigation`; Plan 09-03 Task 3 passes `forceExpanded={true}` from inside the drawer body. Default is `false` so existing desktop callers are byte-identical.
 
 3. **Focus trap: ship now or defer to Phase 10?**
    - What we know: CONTEXT.md D-27 specifies focus-on-open + focus-return-on-close but not a tab-key cycle trap.
    - What's unclear: whether the Phase 9 a11y bar includes a full trap.
    - Recommendation: defer full trap to Phase 10 a11y sweep; ship with escape + backdrop + open/close focus management this phase.
+   - **RESOLVED:** Full Tab-cycle trap deferred to Phase 10 a11y sweep per CONTEXT.md D-27 scope. Phase 9 ships with: `role="dialog"`, `aria-modal="true"`, escape-key close, backdrop tap close, focus-to-first-nav-item on open, focus-return-to-hamburger on close. Implemented in Plan 09-03 Task 3.
 
 ## Sources
 
@@ -830,10 +833,10 @@ export function NavbarSearch({ renderTrigger }: NavbarSearchProps = {}) {
 | Pitfalls | MEDIUM-HIGH | 2 pitfalls need light smoke verification (closed Sheet, group-data branching) |
 | SSR compat | MEDIUM | Framer Motion SSR documented safe; recommend 2-minute smoke in Plan 09-03 Wave 0 |
 
-### Open Questions
-1. Framer Motion SSR smoke verification before full drawer build (Plan 09-03 Wave 0).
-2. `forceExpanded` prop implementation vs relying on group-data defaults (recommend the prop).
-3. Full focus-trap scope — defer to Phase 10 a11y sweep (recommended).
+### Open Questions (RESOLVED)
+1. **RESOLVED** — Framer Motion SSR smoke verification: deferred. framer-motion 12.38.0 documented SSR-safe under RR7 Framework Mode; no standalone Wave 0 task. If a hydration warning surfaces during Plan 09-03 execution, executor falls back to inline smoke.
+2. **RESOLVED** — `forceExpanded?: boolean` prop adopted. Added to `ModuleSidebarNavigation` in Plan 09-01 Task 2; consumed by drawer in Plan 09-03 Task 3. Default `false` keeps desktop callers byte-identical.
+3. **RESOLVED** — Full Tab-cycle focus trap deferred to Phase 10 a11y sweep per CONTEXT.md D-27 scope. Phase 9 ships with `role="dialog"`, `aria-modal`, escape-key close, backdrop tap close, focus-to-first-nav-item on open, focus-return-to-hamburger on close. Implemented in Plan 09-03 Task 3.
 
 ### Ready for Planning
 Research complete. Planner can create 5 PLAN.md files as outlined in §10.
