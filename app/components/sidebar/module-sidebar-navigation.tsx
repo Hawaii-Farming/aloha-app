@@ -1,6 +1,6 @@
 // Phase 10 D-10: inline collapse affordance is OMITTED — navbar PanelLeft
 // toggle is the single source of truth for sidebar collapse.
-import { createElement, useState } from 'react';
+import { createElement, useMemo, useState } from 'react';
 
 import { Link, useLocation } from 'react-router';
 
@@ -12,7 +12,6 @@ import {
 import {
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -42,37 +41,43 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const subModulesByModule = new Map<string, AppNavSubModule[]>();
+  const subModulesByModule = useMemo(() => {
+    const map = new Map<string, AppNavSubModule[]>();
+    for (const sm of subModules) {
+      const list = map.get(sm.module_slug) ?? [];
+      list.push(sm);
+      map.set(sm.module_slug, list);
+    }
+    return map;
+  }, [subModules]);
 
-  for (const sm of subModules) {
-    const list = subModulesByModule.get(sm.module_slug) ?? [];
-    list.push(sm);
-    subModulesByModule.set(sm.module_slug, list);
-  }
-
-  const sortedModules = [...modules].sort(
-    (a, b) => a.display_order - b.display_order,
+  const sortedModules = useMemo(
+    () => [...modules].sort((a, b) => a.display_order - b.display_order),
+    [modules],
   );
 
-  // Auto-expand the active module
-  const activeModuleSlug = sortedModules.find((mod) =>
-    currentPath.startsWith(`/home/${account}/${mod.module_slug}`),
-  )?.module_slug;
+  // User-driven open/close state. Auto-expand of the active module is
+  // computed derivationally in `openModules` below — no useEffect,
+  // no stale state when the route changes.
+  const [userToggled, setUserToggled] = useState<Set<string>>(new Set());
 
-  const [openModules, setOpenModules] = useState<Set<string>>(
-    () => new Set(activeModuleSlug ? [activeModuleSlug] : []),
-  );
+  const openModules = useMemo(() => {
+    const s = new Set(userToggled);
+    const active = sortedModules.find((m) =>
+      currentPath.startsWith(`/home/${account}/${m.module_slug}`),
+    )?.module_slug;
+    if (active) s.add(active);
+    return s;
+  }, [userToggled, sortedModules, currentPath, account]);
 
   function toggleModule(slug: string) {
-    setOpenModules((prev) => {
+    setUserToggled((prev) => {
       const next = new Set(prev);
-
       if (next.has(slug)) {
         next.delete(slug);
       } else {
         next.add(slug);
       }
-
       return next;
     });
   }
@@ -84,7 +89,9 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
           (a, b) => a.display_order - b.display_order,
         );
         const modulePath = `/home/${account}/${mod.module_slug}`;
-        const isModuleActive = currentPath.startsWith(modulePath);
+        const isModuleActive =
+          currentPath === modulePath ||
+          currentPath.startsWith(`${modulePath}/`);
         const IconComponent = getModuleIcon(mod.module_slug);
         const isOpen = openModules.has(mod.module_slug);
 
@@ -109,16 +116,13 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                             isActive={isModuleActive}
                             className={cn(
                               isModuleActive
-                                ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
+                                ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 dark:from-green-400 dark:to-emerald-500 dark:text-green-950'
                                 : 'text-foreground hover:bg-muted rounded-xl bg-transparent',
                             )}
                           >
                             <Link
                               to={modulePath}
-                              onClick={() => {
-                                if (!isOpen) toggleModule(mod.module_slug);
-                                onNavigate?.();
-                              }}
+                              onClick={() => onNavigate?.()}
                               aria-label={mod.display_name}
                             >
                               {createElement(IconComponent, {
@@ -179,61 +183,61 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                 onOpenChange={() => toggleModule(mod.module_slug)}
               >
                 <SidebarGroup>
-                  <SidebarGroupLabel
-                    className={cn(
-                      'gap-2 p-0 select-none',
-                      isModuleActive
-                        ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
-                        : 'text-foreground rounded-xl bg-transparent',
-                    )}
-                  >
-                    <Link
-                      to={modulePath}
-                      onClick={() => {
-                        if (!isOpen) toggleModule(mod.module_slug);
-                        onNavigate?.();
-                      }}
-                      className={cn(
-                        'flex flex-1 items-center gap-2 rounded-xl px-2 py-1.5',
-                        !isModuleActive && 'hover:bg-muted',
-                      )}
-                    >
-                      {createElement(IconComponent, {
-                        className: 'h-4 w-4 shrink-0',
-                      })}
-                      <span className="flex-1 truncate text-left uppercase">
-                        {mod.display_name}
-                      </span>
-                    </Link>
-                    <CollapsibleTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label={`Toggle ${mod.display_name} sub-items`}
-                        className={cn(
-                          'flex h-6 w-6 shrink-0 items-center justify-center rounded-md px-2',
-                          !isModuleActive && 'hover:bg-muted',
-                        )}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      <SidebarMenuItem className="relative">
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isModuleActive}
                           className={cn(
-                            'h-4 w-4 shrink-0 transition-transform duration-200',
-                            isOpen && 'rotate-180',
+                            'rounded-xl px-3 py-2 pr-9 uppercase',
+                            isModuleActive
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 hover:from-green-500 hover:to-emerald-600 hover:text-white dark:from-green-400 dark:to-emerald-500 dark:text-green-950'
+                              : 'text-foreground hover:bg-muted bg-transparent',
                           )}
                         >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </button>
-                    </CollapsibleTrigger>
-                  </SidebarGroupLabel>
+                          <Link to={modulePath} onClick={() => onNavigate?.()}>
+                            {createElement(IconComponent, {
+                              className: 'h-4 w-4 shrink-0',
+                            })}
+                            <span className="flex-1 truncate text-left">
+                              {mod.display_name}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                        <CollapsibleTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label={`Toggle ${mod.display_name} sub-items`}
+                            className={cn(
+                              'absolute top-1/2 right-2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md',
+                              isModuleActive
+                                ? 'text-white hover:bg-white/10 dark:text-green-950'
+                                : 'text-muted-foreground hover:bg-muted',
+                            )}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className={cn(
+                                'h-4 w-4 shrink-0 transition-transform duration-200',
+                                isOpen && 'rotate-180',
+                              )}
+                            >
+                              <path d="m6 9 6 6 6-6" />
+                            </svg>
+                          </button>
+                        </CollapsibleTrigger>
+                      </SidebarMenuItem>
+                    </SidebarMenu>
+                  </SidebarGroupContent>
                   <CollapsibleContent>
                     <SidebarGroupContent>
                       {/* PARITY-04: vertical separation + dark-mode rail */}

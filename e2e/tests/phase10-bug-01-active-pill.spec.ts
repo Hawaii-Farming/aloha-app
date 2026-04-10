@@ -20,11 +20,6 @@ const ACCOUNT_SLUG = process.env.E2E_ACCOUNT_SLUG ?? 'acme-farms';
 
 test.describe('@phase10 @bug-01-active-pill — module row navigates + highlights', () => {
   test('clicking a module row changes the URL', async ({ page }) => {
-    test.fail(
-      true,
-      'Wave 0 red — BUG-01: expanded-mode module click is a no-op',
-    );
-
     await page.goto(`/home/${ACCOUNT_SLUG}/`);
     const sidebar = page.locator('aside, [data-sidebar="sidebar"]').first();
     const moduleRow = sidebar
@@ -39,8 +34,6 @@ test.describe('@phase10 @bug-01-active-pill — module row navigates + highlight
   test('module row shows gradient pill immediately when URL matches', async ({
     page,
   }) => {
-    test.fail(true, 'Wave 0 red — BUG-01: expanded-mode gradient not visible');
-
     await page.goto(`/home/${ACCOUNT_SLUG}/hr/hr_employee_register`);
     const sidebar = page.locator('aside, [data-sidebar="sidebar"]').first();
     const activeModuleRow = sidebar
