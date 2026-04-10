@@ -23,7 +23,7 @@
 
 - [x] **Phase 7: Design Foundations** — DESIGN.md rewrite, Tailwind tokens, Inter font, derived dark palette (completed 2026-04-10)
 - [x] **Phase 8: Shared Primitives** — Button, Card, Input/Textarea/Select, Badge, Avatar, Sheet restyle (completed 2026-04-10)
-- [ ] **Phase 9: App Shell — Navbar, Sidebar, Drawer** — 72px navbar, 220/68px sidebar, mobile drawer + header
+- [x] **Phase 9: App Shell — Navbar, Sidebar, Drawer** — 72px navbar, 220/68px sidebar, mobile drawer + header (completed 2026-04-10)
 - [ ] **Phase 10: AG Grid Theme & Dark Mode Verification** — AG Grid token adaptation, next-themes smoke pass, WCAG AA audit
 
 ## Phase Details
@@ -77,7 +77,7 @@
 - [x] 09-02-PLAN.md — NavbarSearch renderTrigger seam + WorkspaceNavbar + AlohaLogoSquare [Wave 2]
 - [x] 09-03-PLAN.md — framer-motion install + WorkspaceMobileHeader + WorkspaceMobileDrawer [Wave 2]
 - [x] 09-04-PLAN.md — layout.tsx shell integration + mobile-navigation.tsx delete [Wave 3]
-- [ ] 09-05-PLAN.md — Phase verification smoke + a11y audit + STATE/ROADMAP update [Wave 4]
+- [x] 09-05-PLAN.md — Phase verification smoke + a11y audit + STATE/ROADMAP update [Wave 4]
 **UI hint**: yes
 
 ### Phase 10: AG Grid Theme & Dark Mode Verification
@@ -104,5 +104,5 @@
 | 6. Housing & Employee Review | v1.0 | 4/4 | Complete | 2026-04-09 |
 | 7. Design Foundations | v2.0 | 3/3 | Complete   | 2026-04-10 |
 | 8. Shared Primitives | v2.0 | 0/0 | Not started | - |
-| 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 0/0 | Not started | - |
+| 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 5/5 | Complete | 2026-04-10 |
 | 10. AG Grid Theme & Dark Mode Verification | v2.0 | 0/0 | Not started | - |
