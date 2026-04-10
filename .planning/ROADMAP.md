@@ -39,7 +39,7 @@
   4. Existing routes still render (no token-name regressions) and layout/spacing remain intact at the shell level even before primitives are restyled.
 **Plans**: 3 plans
 - [x] 07-01-PLAN.md — Rewrite DESIGN.md + swap shadcn-ui.css to Aloha palette (light + hand-authored dark)
-- [ ] 07-02-PLAN.md — Tailwind @theme Inter fonts + shadow scale + global.css font import + shadow unlock + package.json dep swap
+- [x] 07-02-PLAN.md — Tailwind @theme Inter fonts + shadow scale + global.css font import + shadow unlock + package.json dep swap
 - [ ] 07-03-PLAN.md — scripts/verify-wcag.mjs (24 assertions) + DESIGN.md WCAG table + manual smoke checkpoint
 **UI hint**: yes
 
@@ -91,7 +91,7 @@
 | 4. Payroll Views | v1.0 | 4/4 | Complete | 2026-04-08 |
 | 5. Hours Comparison | v1.0 | 3/3 | Complete | 2026-04-09 |
 | 6. Housing & Employee Review | v1.0 | 4/4 | Complete | 2026-04-09 |
-| 7. Design Foundations | v2.0 | 1/3 | In Progress|  |
+| 7. Design Foundations | v2.0 | 2/3 | In Progress|  |
 | 8. Shared Primitives | v2.0 | 0/0 | Not started | - |
 | 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 0/0 | Not started | - |
 | 10. AG Grid Theme & Dark Mode Verification | v2.0 | 0/0 | Not started | - |

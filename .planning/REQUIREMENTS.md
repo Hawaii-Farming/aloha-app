@@ -14,7 +14,7 @@
 
 - [x] **DESIGN-01**: `DESIGN.md` is rewritten as the Aloha theme source of truth — Inter 16px base, slate neutrals, green-500→emerald-600 gradient primary, rounded-2xl radius scale, shadow tokens, light-first.
 - [x] **DESIGN-02**: Tailwind 4 `@theme` block in the app CSS is updated with the Aloha palette, font family, radius, and shadow tokens (replacing Supabase tokens), matching `DESIGN.md`.
-- [ ] **DESIGN-03**: Inter variable font is loaded via `@fontsource-variable/inter`, replacing Geist as the body font across the app.
+- [x] **DESIGN-03**: Inter variable font is loaded via `@fontsource-variable/inter`, replacing Geist as the body font across the app.
 - [x] **DESIGN-04**: Light mode is canonical and dark mode is derived, with WCAG AA contrast verified on every token pair used in shell chrome and primitives.
 
 ### Top Navbar (NAVBAR)
