@@ -15,8 +15,6 @@ test.describe('@phase10 @toolbar-search — CRUD toolbar search rounded-md', () 
   test('search input border-radius equals 6px (rounded-md)', async ({
     page,
   }) => {
-    test.fail(true, 'Wave 0 red — GRID-03 not yet fixed');
-
     await page.goto(`/home/${ACCOUNT_SLUG}/hr/hr_employee_register`);
     const search = page
       .locator(

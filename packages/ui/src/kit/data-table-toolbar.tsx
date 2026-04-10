@@ -23,7 +23,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
           value={props.searchValue}
           onChange={(e) => props.onSearchChange(e.target.value)}
           placeholder={props.searchPlaceholder}
-          className="h-8 w-full sm:w-[250px]"
+          className="h-8 w-full rounded-md sm:w-[250px]"
           data-test="table-search"
         />
 
