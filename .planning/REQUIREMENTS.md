@@ -66,7 +66,7 @@
 Parity with the reference prototype at `../aloha-design/prototype`.
 
 - [x] **PARITY-01**: The desktop sidebar structurally matches the prototype — NAVIGATION/MODULES section headers, inline collapse affordance, separator line between sections, chevron dropdown buttons on module rows, and the "Focused" footer control — ported onto the existing Shadcn sidebar primitive (no new UI libraries).
-- [ ] **PARITY-02**: The sidebar expand/collapse toggle lives on the navbar **before** the Aloha logo square (leftmost control), replacing the current detached edge toggle.
+- [x] **PARITY-02**: The sidebar expand/collapse toggle lives on the navbar **before** the Aloha logo square (leftmost control), replacing the current detached edge toggle.
 - [x] **PARITY-03**: The navbar avatar fallback renders the current org's initials (e.g., "HF" for Hawaii Farming) instead of a static "A", derived from the loaded org context.
 - [x] **PARITY-04**: Sub-module list items have visible vertical separation from the parent module row in the sidebar (matches prototype spacing).
 - [x] **PARITY-05**: Scrollbars on the sidebar and main content areas match the prototype styling in both light and dark modes (thin, themed thumb, no OS default).
@@ -127,15 +127,15 @@ Deferred to later milestones (not this scope):
 | DRAWER-03 | Phase 9  | TBD  |
 | DRAWER-04 | Phase 9  | TBD  |
 | DRAWER-05 | Phase 9  | TBD  |
-| GRID-01   | Phase 10 | TBD  |
-| GRID-02   | Phase 10 | TBD  |
-| GRID-03   | Phase 10 | TBD  |
-| DARK-02   | Phase 10 | TBD  |
-| DARK-03   | Phase 10 | TBD  |
-| PARITY-01 | Phase 10 | TBD  |
-| PARITY-02 | Phase 10 | TBD  |
-| PARITY-03 | Phase 10 | TBD  |
-| PARITY-04 | Phase 10 | TBD  |
-| PARITY-05 | Phase 10 | TBD  |
-| BUG-01    | Phase 10 | TBD  |
-| BUG-02    | Phase 10 | TBD  |
+| GRID-01   | Phase 10 | 10-02 |
+| GRID-02   | Phase 10 | 10-02 |
+| GRID-03   | Phase 10 | 10-02 |
+| DARK-02   | Phase 10 | 10-03 (+ 10-05 audit) |
+| DARK-03   | Phase 10 | 10-03 |
+| PARITY-01 | Phase 10 | 10-03 |
+| PARITY-02 | Phase 10 | 10-05 (verification) |
+| PARITY-03 | Phase 10 | 10-04 |
+| PARITY-04 | Phase 10 | 10-03 |
+| PARITY-05 | Phase 10 | 10-03 |
+| BUG-01    | Phase 10 | 10-04 |
+| BUG-02    | Phase 10 | 10-04 |

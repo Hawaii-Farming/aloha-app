@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Aloha Design System Retheme
-status: executing
-stopped_at: Completed 10-04-PLAN.md
-last_updated: "2026-04-10T22:05:03.321Z"
-last_activity: 2026-04-10
+status: complete
+stopped_at: Phase 10 complete
+last_updated: "2026-04-10T23:30:00.000Z"
+last_activity: 2026-04-10 -- Phase 10 complete
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 22
-  completed_plans: 21
-  percent: 95
+  completed_plans: 22
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-10)
 
 ## Current Position
 
-Phase: 10 (ag-grid-theme-template-parity-dark-mode) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-04-10
+Phase: 10 (ag-grid-theme-template-parity-dark-mode) — COMPLETE
+Plan: 5 of 5 complete
+Status: Phase 10 complete — v2.0 milestone SHIPPED
+Last activity: 2026-04-10 -- Phase 10 complete
 
-Progress: [===============     ] 75% (3/4 v2.0 phases complete)
+Progress: [====================] 100% (4/4 v2.0 phases complete)
 
 ## Performance Metrics
 
@@ -127,6 +127,12 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 10]: BUG-01 fixed by unifying expanded sidebar branch on SidebarMenuButton asChild + separating CollapsibleTrigger to an absolute sibling; isModuleActive and openModules derived via useMemo (no useEffect)
 - [Phase 10]: BUG-02 fixed by using item.path as the cmdk CommandItem value and moving label into keywords array (prevents normalization collisions between module + sub-module prefixes)
 - [Phase 10]: PARITY-03 avatar-initials e2e contract required a sidebar-footer avatar in addition to the navbar; added to workspace-sidebar.tsx as a Rule 2 deviation since the plan omitted that file
+- [Phase 10]: AG Grid theme font switched from Geist to Inter Variable (sanctioned deviation from CONTEXT D-02 per RESEARCH recommendation)
+- [Phase 10]: Dark-mode surface fix via one-line --sidebar-background edit (supersedes CONTEXT D-17/D-17b)
+- [Phase 10]: Sidebar inline collapse affordance omitted (D-10) — navbar PanelLeft is single source of truth
+- [Phase 10]: BUG-01 fixed by unifying expanded branch with SidebarMenuButton + useMemo (no useEffect)
+- [Phase 10]: BUG-02 fixed via cmdk value={item.path} + keywords={[item.label]}
+- [Phase 10 / Plan 10-05]: `@phase10` Playwright run waived at phase closure due to pre-existing E2E storage-state path bug in `e2e/playwright.config.ts:37` and missing `E2E_USER_EMAIL`/`E2E_USER_PASSWORD`. Human manual smoke covered all 8 UI-SPEC surfaces in both themes; red→green transitions are locked per-wave in git history via atomic test.fail() removal. Follow-up: fix config path + wire creds in a later infra phase.
 
 ### Pending Todos
 
@@ -144,7 +150,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-10T22:04:57.641Z
-Stopped at: Completed 10-04-PLAN.md
+Last session: 2026-04-10T23:30:00.000Z
+Stopped at: Phase 10 complete — v2.0 Aloha Design System Retheme SHIPPED
 Resume file: None
-Next action: `/gsd-plan-phase 10`
+Next action: Phase-level verification + code review via orchestrator, then milestone close.

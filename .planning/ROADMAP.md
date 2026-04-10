@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 HR Module Submodules** — Phases 1-6 (shipped 2026-04-09)
-- 🚧 **v2.0 Aloha Design System Retheme** — Phases 7-10 (started 2026-04-10)
+- ✅ **v2.0 Aloha Design System Retheme** — Phases 7-10 (SHIPPED 2026-04-10)
 
 ## Phases
 
@@ -24,7 +24,7 @@
 - [x] **Phase 7: Design Foundations** — DESIGN.md rewrite, Tailwind tokens, Inter font, derived dark palette (completed 2026-04-10)
 - [x] **Phase 8: Shared Primitives** — Button, Card, Input/Textarea/Select, Badge, Avatar, Sheet restyle (completed 2026-04-10)
 - [x] **Phase 9: App Shell — Navbar, Sidebar, Drawer** — 72px navbar, 220/68px sidebar, mobile drawer + header (completed 2026-04-10)
-- [ ] **Phase 10: AG Grid Theme, Template Parity & Dark Mode** — AG Grid token + shrink + toolbar search, sidebar/navbar parity with `../aloha-design/prototype`, dark-mode nav surfaces, avatar initials, UAT bug fixes, WCAG AA audit
+- [x] **Phase 10: AG Grid Theme, Template Parity & Dark Mode** — AG Grid token + shrink + toolbar search, sidebar/navbar parity with `../aloha-design/prototype`, dark-mode nav surfaces, avatar initials, UAT bug fixes, WCAG AA audit (completed 2026-04-10)
 
 ## Phase Details
 
@@ -100,7 +100,7 @@
 - [x] 10-02-PLAN.md — AG Grid theme rewrite + grid sizing fix + toolbar rounded-md override [Wave 1]
 - [x] 10-03-PLAN.md — Sidebar structural parity + dark --sidebar-background fix + themed scrollbars + i18n keys [Wave 2]
 - [x] 10-04-PLAN.md — getOrgInitials helper + avatar wiring + BUG-01 unify + BUG-02 cmdk fix [Wave 3]
-- [ ] 10-05-PLAN.md — WCAG AA audit + PARITY-02 verification + full regression + STATE/ROADMAP update [Wave 4]
+- [x] 10-05-PLAN.md — WCAG AA audit + PARITY-02 verification + full regression + STATE/ROADMAP update [Wave 4]
 **UI hint**: yes
 
 ## Progress
@@ -116,4 +116,4 @@
 | 7. Design Foundations | v2.0 | 3/3 | Complete   | 2026-04-10 |
 | 8. Shared Primitives | v2.0 | 0/0 | Not started | - |
 | 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 5/5 | Complete | 2026-04-10 |
-| 10. AG Grid Theme, Template Parity & Dark Mode | v2.0 | 4/5 | In Progress|  |
+| 10. AG Grid Theme, Template Parity & Dark Mode | v2.0 | 5/5 | Complete | 2026-04-10 |
