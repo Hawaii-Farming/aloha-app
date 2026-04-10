@@ -2,20 +2,35 @@
 
 import * as React from 'react';
 
+import { type VariantProps, cva } from 'class-variance-authority';
 import { Avatar as AvatarPrimitive } from 'radix-ui';
 
 import { cn } from '../lib/utils/cn';
 
+const avatarVariants = cva(
+  'relative flex shrink-0 overflow-hidden rounded-full',
+  {
+    variants: {
+      size: {
+        sm: 'h-8 w-8 text-xs',
+        md: 'h-10 w-10 text-sm',
+        lg: 'h-12 w-12 text-base',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  },
+);
+
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> &
+    VariantProps<typeof avatarVariants>
+>(({ className, size, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
-    className={cn(
-      'relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full',
-      className,
-    )}
+    className={cn(avatarVariants({ size }), className)}
     {...props}
   />
 ));
@@ -40,7 +55,7 @@ const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      'bg-muted flex h-full w-full items-center justify-center rounded-full',
+      'flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 font-medium text-white',
       className,
     )}
     {...props}
@@ -48,4 +63,4 @@ const AvatarFallback = React.forwardRef<
 ));
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-export { Avatar, AvatarImage, AvatarFallback };
+export { Avatar, AvatarImage, AvatarFallback, avatarVariants };
