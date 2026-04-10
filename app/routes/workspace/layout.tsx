@@ -38,12 +38,6 @@ export const loader = async (args: Route.LoaderArgs) => {
 export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
   const { layoutState, workspace, accountSlug } = props.loaderData;
 
-  const accounts = workspace.userOrgs.map(({ org_id, org_name }) => ({
-    label: org_name,
-    value: org_id,
-    image: null,
-  }));
-
   const user = workspace.user;
   const userForShell = { email: user.email ?? null };
 
@@ -68,7 +62,12 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
   return (
     <SidebarProvider defaultOpen={layoutState.open}>
       <div className="flex h-svh w-full flex-col">
-        <WorkspaceNavbar user={userForShell} className="hidden md:flex" />
+        <WorkspaceNavbar
+          account={accountSlug}
+          user={user}
+          navigation={workspace.navigation}
+          className="hidden md:flex"
+        />
         <WorkspaceMobileHeader
           user={userForShell}
           onOpenDrawer={() => setDrawerOpen(true)}
@@ -81,9 +80,6 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
             <WorkspaceSidebar
               account={accountSlug}
               navigation={workspace.navigation}
-              user={user}
-              accounts={accounts}
-              accessLevelId={workspace.currentOrg.access_level_id}
             />
           </div>
 
