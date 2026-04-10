@@ -1,311 +1,285 @@
-# Design System: Supabase
+# Design System: Aloha
 
 ## 1. Visual Theme & Atmosphere
 
-Supabase's website is a dark-mode-native developer platform that channels the aesthetic of a premium code editor — deep black backgrounds (`#0f0f0f`, `#171717`) with emerald green accents (`#3ecf8e`, `#00c573`) that reference the brand's open-source, PostgreSQL-green identity. The design system feels like it was born in a terminal window and evolved into a sophisticated marketing surface without losing its developer soul.
+Aloha is a polished farm-operations ERP. The design system is **light-first** — a soft slate-100 canvas (`#f1f5f9`) with clean white cards, subtle slate borders, and quiet shadows that give just enough depth to feel modern without pulling attention away from data. It is built for office supervisors at a desktop and field supervisors on a laptop or tablet in a bright outdoor environment, so the default mode favors high luminance, calm neutrals, and unambiguous contrast.
 
-The typography is built on "Circular" — a geometric sans-serif with rounded terminals that softens the technical edge. At 72px with a 1.00 line-height, the hero text is compressed to its absolute minimum vertical space, creating dense, impactful statements that waste nothing. The monospace companion (Source Code Pro) appears sparingly for uppercase technical labels with 1.2px letter-spacing, creating the "developer console" markers that connect the marketing site to the product experience.
+The brand moment is a **green gradient** — `linear-gradient(135deg, #22c55e, #059669)` (green-500 → emerald-600) — reserved for the primary CTA, the active sidebar pill, the Aloha logo wordmark, and the top-navbar brand surface. Everywhere else the palette stays disciplined slate/white with sparing green-50/green-100 washes for hover and active states. The effect is "fresh farm" without ever feeling like a marketing site.
 
-What makes Supabase distinctive is its sophisticated HSL-based color token system. Rather than flat hex values, Supabase uses HSL with alpha channels for nearly every color (`--colors-crimson4`, `--colors-purple5`, `--colors-slateA12`), enabling a nuanced layering system where colors interact through transparency. This creates depth through translucency — borders at `rgba(46, 46, 46)`, surfaces at `rgba(41, 41, 41, 0.84)`, and accents at partial opacity all blend with the dark background to create a rich, dimensional palette from minimal color ingredients.
+Typography is **Inter Variable** at a 16px base with weights 400/500/600. No display-weight drama — hierarchy comes from size, not stroke weight. Geist Mono Variable is retained for the occasional code/numeric label. Corners are soft: `--radius = 1rem` (rounded-2xl) is the base, derived sm/md/lg keep Shadcn primitives proportional. Shadows are a soft **slate-900 alpha scale** — generous around floating surfaces (popovers, the sheet/panel), minimal on flat cards.
 
-The green accent (`#3ecf8e`) appears selectively — in the Supabase logo, in link colors (`#00c573`), and in border highlights (`rgba(62, 207, 142, 0.3)`) — always as a signal of "this is Supabase" rather than as a decorative element. Pill-shaped buttons (9999px radius) for primary CTAs contrast with standard 6px radius for secondary elements, creating a clear visual hierarchy of importance.
+Dark mode is **hand-authored**, not algorithmically derived. Backgrounds drop to slate-900 (`#0f172a`) with slate-800 cards and slate-700 borders; the green primary brightens to green-400 (`#4ade80`) to preserve brand vividness on dark surfaces. Every foundation token pair is designed to meet WCAG AA (4.5:1 normal text, 3:1 large text / UI components) in both themes.
 
-**Key Characteristics:**
-- Dark-mode-native: near-black backgrounds (`#0f0f0f`, `#171717`) — never pure black
-- Emerald green brand accent (`#3ecf8e`, `#00c573`) used sparingly as identity marker
-- Geometric sans-serif font with rounded terminals
-- Source Code Pro for uppercase technical labels (1.2px letter-spacing)
-- HSL-based color token system with alpha channels for translucent layering
-- Pill buttons (9999px) for primary CTAs, 6px radius for secondary
-- Neutral gray scale from `#171717` through `#898989` to `#fafafa`
-- Border system using dark grays (`#2e2e2e`, `#363636`, `#393939`)
-- Minimal shadows — depth through border contrast and transparency
-- Radix color primitives (crimson, purple, violet, indigo, yellow, tomato, orange, slate)
+**Key characteristics:**
+- Light-first, slate-100 canvas (`#f1f5f9`), white cards, slate-200 borders
+- Green gradient brand moment (`#22c55e → #059669`) reserved for primary CTA / active pill / brand surfaces
+- Inter Variable 16px body, 400/500/600 weights — no bold display headings
+- `--radius: 1rem` (rounded-2xl) base; derived sm/md/lg via `calc()`
+- Soft slate-900 alpha shadow scale (sm/md/lg/xl/2xl) — not none, not loud
+- Hand-authored dark palette (slate-900/800/700, green-400/emerald-500) with WCAG AA verified pairs
+- Geist Mono Variable retained for `--font-mono`
+- Legacy scaffolding tokens (glass surface, slate alpha wash, prior-era brand tokens) are removed wholesale
 
 ## 2. Color Palette & Roles
 
 ### Brand
-- **Supabase Green** (`#3ecf8e`): Primary brand color, logo, accent borders
-- **Green Link** (`#00c573`): Interactive green for links and actions
-- **Green Border** (`rgba(62, 207, 142, 0.3)`): Subtle green border accent
 
-### Neutral Scale (Dark Mode)
-- **Near Black** (`#0f0f0f`): Primary button background, deepest surface
-- **Dark** (`#171717`): Page background, primary canvas
-- **Dark Border** (`#242424`): Horizontal rule, section dividers
-- **Border Dark** (`#2e2e2e`): Card borders, tab borders
-- **Mid Border** (`#363636`): Button borders, dividers
-- **Border Light** (`#393939`): Secondary borders
-- **Charcoal** (`#434343`): Tertiary borders, dark accents
-- **Dark Gray** (`#4d4d4d`): Heavy secondary text
-- **Mid Gray** (`#898989`): Muted text, link color
-- **Light Gray** (`#b4b4b4`): Secondary link text
-- **Near White** (`#efefef`): Light border, subtle surface
-- **Off White** (`#fafafa`): Primary text, button text
+| Role | Hex | Usage |
+|------|-----|-------|
+| Primary (light) | `#22c55e` (green-500) | `--primary` solid, `--ring`, active chip fill |
+| Primary (dark)  | `#4ade80` (green-400) | `--primary` solid in `.dark`, focus rings, sidebar pill |
+| Gradient start (light) | `#22c55e` (green-500) | `--gradient-primary` stop 0 |
+| Gradient end (light)   | `#059669` (emerald-600) | `--gradient-primary` stop 100 |
+| Gradient start (dark)  | `#4ade80` (green-400) | `--gradient-primary` stop 0 in `.dark` |
+| Gradient end (dark)    | `#10b981` (emerald-500) | `--gradient-primary` stop 100 in `.dark` |
+| Primary gradient | `linear-gradient(135deg, #22c55e, #059669)` | Signature CTA / logo / active-item surface |
 
-### Radix Color Tokens (HSL-based)
-- **Slate Scale**: `--colors-slate5` through `--colors-slateA12` — neutral progression
-- **Purple**: `--colors-purple4`, `--colors-purple5`, `--colors-purpleA7` — accent spectrum
-- **Violet**: `--colors-violet10` (`hsl(251, 63.2%, 63.2%)`) — vibrant accent
-- **Crimson**: `--colors-crimson4`, `--colors-crimsonA9` — warm accent / alert
-- **Indigo**: `--colors-indigoA2` — subtle blue wash
-- **Yellow**: `--colors-yellowA7` — attention/warning
-- **Tomato**: `--colors-tomatoA4` — error accent
-- **Orange**: `--colors-orange6` — warm accent
+The gradient is exposed as a dedicated CSS custom property `--gradient-primary` so Phase 8 button work can write `background: var(--gradient-primary)` without duplicating the formula. **`--primary` itself stays solid green-500** (light) / green-400 (dark) — that preserves compatibility with every Shadcn primitive that expects a single color token for `bg-primary` / `text-primary` / `ring-primary`.
 
-### Surface & Overlay
-- **Glass Dark** (`rgba(41, 41, 41, 0.84)`): Translucent dark overlay
-- **Slate Alpha** (`hsla(210, 87.8%, 16.1%, 0.031)`): Ultra-subtle blue wash
-- **Fixed Scale Alpha** (`hsla(200, 90.3%, 93.4%, 0.109)`): Light frost overlay
+### Neutrals — Slate scale
 
-### Shadows
-- Supabase uses **almost no shadows** in its dark theme. Depth is created through border contrast and surface color differences rather than box-shadows. Focus states use `rgba(0, 0, 0, 0.1) 0px 4px 12px` — minimal, functional.
+Every neutral in Aloha maps to the Tailwind `slate` scale (hex values throughout — no wide-gamut color specifiers).
 
-### Light Mode Palette
+| Token | Hex | Typical role |
+|-------|-----|--------------|
+| slate-50  | `#f8fafc` | `--foreground` (dark), lightest elevated surface |
+| slate-100 | `#f1f5f9` | `--background` (light), quiet muted surface |
+| slate-200 | `#e2e8f0` | `--border` (light), sidebar right edge |
+| slate-300 | `#cbd5e1` | `--input` border (light), scrollbar thumb |
+| slate-400 | `#94a3b8` | `--muted-foreground` (dark), scrollbar hover |
+| slate-500 | `#64748b` | `--muted-foreground` (light), secondary copy |
+| slate-600 | `#475569` | `--sidebar-foreground` (light), strong copy |
+| slate-700 | `#334155` | `--secondary`/`--accent` (dark), `--border` (dark) |
+| slate-800 | `#1e293b` | `--card` (dark), `--muted` (dark), `--sidebar-border` (dark) |
+| slate-900 | `#0f172a` | `--foreground` (light), `--background` (dark) |
 
-Status: Complete
+### Semantic colors (bg/fg/border triples)
 
-Mirrors Supabase Studio's dashboard light theme (D-01). All semantic tokens are specified in oklch per D-03 (spec-before-CSS rule). Light mode uses a darker green (D-04) to maintain contrast on white backgrounds.
+Light values are Tailwind default 50/600/100 triples. Dark values use 15% / 30% alpha washes of the 500-level color plus a brightened 400-level foreground.
 
-#### Light Mode Semantic Tokens
+| Semantic | Light bg | Light fg | Light border | Dark bg | Dark fg | Dark border |
+|----------|----------|----------|--------------|---------|---------|-------------|
+| red      | `#fef2f2` | `#dc2626` | `#fee2e2` | `rgb(239 68 68 / 0.15)` | `#f87171` | `rgb(239 68 68 / 0.30)` |
+| amber    | `#fffbeb` | `#d97706` | `#fef3c7` | `rgb(245 158 11 / 0.15)` | `#fbbf24` | `rgb(245 158 11 / 0.30)` |
+| green    | `#f0fdf4` | `#16a34a` | `#dcfce7` | `rgb(34 197 94 / 0.15)` | `#4ade80` | `rgb(34 197 94 / 0.30)` |
+| blue     | `#eff6ff` | `#2563eb` | `#dbeafe` | `rgb(59 130 246 / 0.15)` | `#60a5fa` | `rgb(59 130 246 / 0.30)` |
 
-| Token | oklch Value | Hex Approx | Notes |
-|-------|-------------|------------|-------|
-| --background | oklch(99% 0 none) | ~#fafafa | Near-white canvas |
-| --foreground | oklch(12% 0 none) | ~#171717 | Near-black text |
-| --card | oklch(100% 0 none) | #ffffff | Pure white cards |
-| --card-foreground | oklch(12% 0 none) | ~#171717 | Same as foreground |
-| --popover | oklch(100% 0 none) | #ffffff | Pure white |
-| --popover-foreground | oklch(12% 0 none) | ~#171717 | Same as foreground |
-| --primary | oklch(12% 0 none) | ~#171717 | Near-black CTA |
-| --primary-foreground | oklch(99% 0 none) | ~#fafafa | White text on primary |
-| --secondary | oklch(96% 0 none) | ~#f0f0f0 | Light gray secondary |
-| --secondary-foreground | oklch(12% 0 none) | ~#171717 | Dark text |
-| --muted | oklch(96% 0 none) | ~#f0f0f0 | Light gray muted bg |
-| --muted-foreground | oklch(45% 0 none) | ~#6b6b6b | Medium gray text |
-| --accent | oklch(96% 0 none) | ~#f0f0f0 | Light gray accent |
-| --accent-foreground | oklch(12% 0 none) | ~#171717 | Dark text |
-| --destructive | var(--color-red-500) | - | Keep Tailwind red |
-| --destructive-foreground | var(--color-white) | - | White on red |
-| --border | oklch(65% 0 none) | ~#9a9a9a | Mid-gray border (WCAG AA 3:1 on white) |
-| --input | oklch(60% 0 none) | ~#8a8a8a | Darker input border (WCAG AA on white) |
-| --ring | oklch(47% 0.165 160) | ~#1d9e65 | Darker green focus ring (D-04) |
+### Light mode foundation tokens
 
-#### Light Mode Sidebar Tokens (D-02: light sidebar)
+| Token | Value | Notes |
+|-------|-------|-------|
+| `--background` | `#f1f5f9` | slate-100 — canonical page canvas (matches prototype `body`) |
+| `--foreground` | `#0f172a` | slate-900 body text |
+| `--card` | `#ffffff` | pure white cards |
+| `--card-foreground` | `#0f172a` | slate-900 |
+| `--popover` | `#ffffff` | pure white popovers / dropdowns |
+| `--popover-foreground` | `#0f172a` | slate-900 |
+| `--primary` | `#22c55e` | green-500 solid (see §Gradient for CTA surface) |
+| `--primary-foreground` | `#ffffff` | white label (see caveat §9) |
+| `--secondary` | `#f1f5f9` | slate-100 |
+| `--secondary-foreground` | `#0f172a` | slate-900 |
+| `--muted` | `#f1f5f9` | slate-100 |
+| `--muted-foreground` | `#64748b` | slate-500 |
+| `--accent` | `#f1f5f9` | slate-100 |
+| `--accent-foreground` | `#0f172a` | slate-900 |
+| `--destructive` | `#dc2626` | red-600 |
+| `--destructive-foreground` | `#ffffff` | white |
+| `--border` | `#e2e8f0` | slate-200 |
+| `--input` | `#cbd5e1` | slate-300 |
+| `--ring` | `#22c55e` | green-500 |
+| `--radius` | `1rem` | rounded-2xl base |
+| `--gradient-primary` | `linear-gradient(135deg, #22c55e, #059669)` | signature brand gradient |
+| `--sidebar-background` | `#ffffff` | white sidebar on slate-100 canvas |
+| `--sidebar-foreground` | `#475569` | slate-600 |
+| `--sidebar-primary` | `#22c55e` | green-500 |
+| `--sidebar-primary-foreground` | `#ffffff` | white |
+| `--sidebar-accent` | `#f0fdf4` | green-50 — hover/active wash |
+| `--sidebar-accent-foreground` | `#15803d` | green-700 |
+| `--sidebar-border` | `#e2e8f0` | slate-200 |
+| `--sidebar-ring` | `#22c55e` | green-500 |
 
-| Token | oklch Value | Notes |
-|-------|-------------|-------|
-| --sidebar-background | oklch(99% 0 none) | Near-white, matches page bg |
-| --sidebar-foreground | oklch(35% 0 none) | Dark-gray nav text |
-| --sidebar-primary | oklch(47% 0.165 160) | Darker green for active items (D-04) |
-| --sidebar-primary-foreground | oklch(99% 0 none) | White text on green |
-| --sidebar-accent | oklch(95% 0.01 160) | Very subtle green wash for hover/active bg |
-| --sidebar-accent-foreground | oklch(30% 0 none) | Dark text on accent |
-| --sidebar-border | oklch(65% 0 none) | Same as --border (adjusted for WCAG AA) |
-| --sidebar-ring | oklch(47% 0.165 160) | Green focus ring |
+### Dark mode foundation tokens
 
-#### Light Mode Green Accent Note
+| Token | Value | Notes |
+|-------|-------|-------|
+| `--background` | `#0f172a` | slate-900 |
+| `--foreground` | `#f8fafc` | slate-50 |
+| `--card` | `#1e293b` | slate-800 — lifted surface |
+| `--card-foreground` | `#f8fafc` | slate-50 |
+| `--popover` | `#1e293b` | slate-800 |
+| `--popover-foreground` | `#f8fafc` | slate-50 |
+| `--primary` | `#4ade80` | green-400 — brighter for dark |
+| `--primary-foreground` | `#052e16` | green-950 — dark text on bright green |
+| `--secondary` | `#334155` | slate-700 |
+| `--secondary-foreground` | `#f8fafc` | slate-50 |
+| `--muted` | `#1e293b` | slate-800 |
+| `--muted-foreground` | `#94a3b8` | slate-400 |
+| `--accent` | `#334155` | slate-700 |
+| `--accent-foreground` | `#f8fafc` | slate-50 |
+| `--destructive` | `#ef4444` | red-500 |
+| `--destructive-foreground` | `#ffffff` | white |
+| `--border` | `#334155` | slate-700 |
+| `--input` | `#475569` | slate-600 |
+| `--ring` | `#4ade80` | green-400 |
+| `--gradient-primary` | `linear-gradient(135deg, #4ade80, #10b981)` | dark-tuned brand gradient |
+| `--sidebar-background` | `#0f172a` | slate-900 |
+| `--sidebar-foreground` | `#cbd5e1` | slate-300 |
+| `--sidebar-primary` | `#4ade80` | green-400 |
+| `--sidebar-primary-foreground` | `#052e16` | green-950 |
+| `--sidebar-accent` | `#14532d` | green-900 — hover/active wash |
+| `--sidebar-accent-foreground` | `#bbf7d0` | green-200 |
+| `--sidebar-border` | `#1e293b` | slate-800 |
+| `--sidebar-ring` | `#4ade80` | green-400 |
 
-Per D-04, light mode uses a darker green (oklch(47% 0.165 160) approx #1d9e65) while dark mode uses a brighter green (oklch(73.5% 0.158 162) approx #3ecf8e). The --supabase-green, --supabase-green-link, and --supabase-green-border tokens in :root provide the light-mode defaults; the .dark block restores the original bright green values. The --ring and --sidebar-primary tokens in :root use the darker green for sufficient contrast on white backgrounds.
+## 3. Typography
 
-#### Light Mode Link Color Hierarchy (COMP-07)
+### Font families
 
-Light mode uses four link style tiers to provide visual hierarchy on white backgrounds:
+- **Primary (body + heading):** `'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif`
+- **Monospace:** `'Geist Mono Variable', 'Source Code Pro', Menlo, monospace` (retained)
 
-1. **Green branded link**: Uses --supabase-green-link — overridden in :root to oklch(47% 0.165 160) (darker green for white bg contrast)
-2. **Primary link**: Uses text-foreground with underline — oklch(12% 0 none)
-3. **Secondary link**: Uses text-muted-foreground — oklch(45% 0 none)
-4. **Muted link**: Uses text-muted-foreground with opacity — oklch(45% 0 none) at lower opacity
+Inter is loaded via `@fontsource-variable/inter` (self-hosted woff2, full `wght` axis). Geist Mono remains via `@fontsource-variable/geist-mono`.
 
-#### Shadow Nullification
+### Scale
 
-Light theme uses the same border-depth system as dark — all --shadow-* tokens are set to `none` in both themes. This enforces the Supabase principle of depth through border contrast rather than box-shadows.
+Base size is 16px (`html { font-size: 16px }`). Weights: 400 (body), 500 (nav / buttons / labels), 600 (section headings).
 
-#### WCAG AA Contrast Verification (Phase 02-03)
+| Role | Size | Weight | Line height | Notes |
+|------|------|--------|-------------|-------|
+| Display | 3rem (48px) | 600 | 1.15 | Dashboard hero stat — rarely used |
+| H1      | 2rem (32px) | 600 | 1.2  | Page title |
+| H2      | 1.5rem (24px) | 600 | 1.25 | Section heading |
+| H3      | 1.25rem (20px) | 600 | 1.3 | Sub-section |
+| Body    | 1rem (16px) | 400 | 1.5 | Default |
+| Small   | 0.875rem (14px) | 400 | 1.5 | Secondary copy, captions, table cells |
+| Label   | 0.875rem (14px) | 500 | 1.4 | Form labels, nav items, button labels |
+| Mono    | 0.875rem (14px) | 400 | 1.5 | Numeric / code snippets (Geist Mono Variable) |
 
-All pairs verified 2026-04-02. Luminance computed from oklch L% via OKLab→linear-sRGB→WCAG formula.
+## 4. Radius
 
-**Normal text pairs (4.5:1 minimum):**
+Base `--radius: 1rem` (16px — Tailwind's `rounded-2xl`). Derived values preserve the Shadcn primitive contract:
 
-| Pair | Foreground | Background | Approx CR | Result |
-|------|-----------|------------|-----------|--------|
-| --foreground oklch(12%) | L≈0.01 | --background oklch(99%) L≈0.95 | 16.7:1 | PASS |
-| --card-foreground oklch(12%) | L≈0.01 | --card oklch(100%) L≈1.00 | 17.5:1 | PASS |
-| --popover-foreground oklch(12%) | L≈0.01 | --popover oklch(100%) L≈1.00 | 17.5:1 | PASS |
-| --primary-foreground oklch(99%) | L≈0.95 | --primary oklch(12%) L≈0.01 | 16.7:1 | PASS |
-| --secondary-foreground oklch(12%) | L≈0.01 | --secondary oklch(96%) L≈0.90 | 15.8:1 | PASS |
-| --muted-foreground oklch(45%) | L≈0.15 | --background oklch(99%) L≈0.95 | 5.0:1 | PASS |
-| --muted-foreground oklch(45%) | L≈0.15 | --muted oklch(96%) L≈0.90 | 4.75:1 | PASS |
-| --accent-foreground oklch(12%) | L≈0.01 | --accent oklch(96%) L≈0.90 | 15.8:1 | PASS |
-| --destructive-foreground white | L≈1.00 | --destructive red-500 L≈0.213 | 4.0:1 | PASS (large/bold button text) |
-| --sidebar-foreground oklch(35%) | L≈0.09 | --sidebar-background oklch(99%) L≈0.95 | 7.1:1 | PASS |
-| --sidebar-primary-foreground oklch(99%) | L≈0.95 | --sidebar-primary oklch(47% 0.165 160) L≈0.14 | 5.3:1 | PASS |
-| --sidebar-accent-foreground oklch(30%) | L≈0.06 | --sidebar-accent oklch(95% 0.01 160) L≈0.88 | 8.5:1 | PASS |
+| Token | Formula | Resolved |
+|-------|---------|----------|
+| `--radius-sm` | `calc(var(--radius) - 4px)` | 12px |
+| `--radius-md` | `calc(var(--radius) - 2px)` | 14px |
+| `--radius-lg` | `var(--radius)`             | 16px |
 
-**UI component pairs (3:1 minimum):**
+`rounded-2xl` remains the go-to explicit utility for cards and primary buttons in Phase 8.
 
-| Pair | Token | Background | Approx CR | Result |
-|------|-------|------------|-----------|--------|
-| --ring oklch(47% 0.165 160) | L≈0.14 | --background L≈0.95 | 5.3:1 | PASS |
-| --border oklch(65% 0 none) | L≈0.27 | --background L≈0.95 | 3.1:1 | PASS |
-| --input oklch(60% 0 none) | L≈0.21 | --background L≈0.95 | 3.8:1 | PASS |
+## 5. Shadows
 
-No adjustments required — all light theme pairs pass WCAG AA at their respective thresholds.
+Phase 7 exposes a soft slate-900 alpha shadow scale. Light mode uses `rgb(15 23 42 / ...)` (slate-900 alpha) for a subtle bluish-cool shadow that sits well on the slate-100 canvas. Dark mode drops to `rgb(0 0 0 / ...)` at higher alpha so shadows remain visible on slate-900 surfaces without washing out.
 
-## 3. Typography Rules
+Light:
 
-### Font Families
-- **Primary**: `Geist`, with fallbacks: `Helvetica Neue, Helvetica, Arial, sans-serif`
-- **Monospace**: `Geist Mono`, with fallbacks: `Source Code Pro, Menlo, monospace`
+```css
+--shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+--shadow:    0 1px 3px 0 rgb(15 23 42 / 0.10), 0 1px 2px -1px rgb(15 23 42 / 0.10);
+--shadow-md: 0 4px 6px -1px rgb(15 23 42 / 0.10), 0 2px 4px -2px rgb(15 23 42 / 0.10);
+--shadow-lg: 0 10px 15px -3px rgb(15 23 42 / 0.10), 0 4px 6px -4px rgb(15 23 42 / 0.10);
+--shadow-xl: 0 20px 25px -5px rgb(15 23 42 / 0.10), 0 8px 10px -6px rgb(15 23 42 / 0.10);
+--shadow-2xl: 0 25px 50px -12px rgb(15 23 42 / 0.25);
+```
 
-> Note: Original Supabase uses "Circular" (proprietary). We substitute Geist — a similar geometric sans-serif — which is free and pairs well with Shadcn UI.
+Dark:
 
-### Hierarchy
+```css
+--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.30);
+--shadow:    0 1px 3px 0 rgb(0 0 0 / 0.40), 0 1px 2px -1px rgb(0 0 0 / 0.40);
+--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.40), 0 2px 4px -2px rgb(0 0 0 / 0.40);
+--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.45), 0 4px 6px -4px rgb(0 0 0 / 0.45);
+--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.50), 0 8px 10px -6px rgb(0 0 0 / 0.50);
+--shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.60);
+```
 
-| Role | Font | Size | Weight | Line Height | Letter Spacing | Notes |
-|------|------|------|--------|-------------|----------------|-------|
-| Display Hero | Geist | 72px (4.50rem) | 400 | 1.00 (tight) | normal | Maximum density, zero waste |
-| Section Heading | Geist | 36px (2.25rem) | 400 | 1.25 (tight) | normal | Feature section titles |
-| Card Title | Geist | 24px (1.50rem) | 400 | 1.33 | -0.16px | Slight negative tracking |
-| Sub-heading | Geist | 18px (1.13rem) | 400 | 1.56 | normal | Secondary headings |
-| Body | Geist | 16px (1.00rem) | 400 | 1.50 | normal | Standard body text |
-| Nav Link | Geist | 14px (0.88rem) | 500 | 1.00–1.43 | normal | Navigation items |
-| Button | Geist | 14px (0.88rem) | 500 | 1.14 (tight) | normal | Button labels |
-| Caption | Geist | 14px (0.88rem) | 400–500 | 1.43 | normal | Metadata, tags |
-| Small | Geist | 12px (0.75rem) | 400 | 1.33 | normal | Fine print, footer links |
-| Code Label | Geist Mono | 12px (0.75rem) | 400 | 1.33 | 1.2px | `text-transform: uppercase` |
+> These tokens are not added to `shadcn-ui.css` in Plan 7-01 — they arrive in Plan 7-02 (global.css unlock + theme.css mapping). This section documents the target values so Plan 7-02 has a single source of truth to copy from.
 
-### Principles
-- **Weight restraint**: Nearly all text uses weight 400 (regular/book). Weight 500 appears only for navigation links and button labels. No bold (700) — hierarchy is created through size, not weight.
-- **1.00 hero line-height**: Hero text is compressed to absolute zero leading. Dense, efficient, no wasted vertical space.
-- **Negative tracking on cards**: Card titles use -0.16px letter-spacing, a subtle tightening.
-- **Monospace as ritual**: Geist Mono in uppercase with 1.2px letter-spacing for technical labels.
+The green-tinted primary-button glow (`shadow-lg shadow-green-500/25`) stays a Phase 8 button-level utility, **not** a global token.
 
-## 4. Component Stylings
+## 6. Component Stylings
 
-### Buttons
+Primitive restyle (Button, Card, Input, Textarea, Select, Badge, Avatar, Sheet) is **Phase 8** — this document is the token foundation only. Two notes carry forward:
 
-**Primary Pill (Dark)**
-- Background: `#0f0f0f`
-- Text: `#fafafa`
-- Padding: 8px 32px
-- Radius: 9999px (full pill)
-- Border: `1px solid #fafafa` (white border on dark)
-- Focus shadow: `rgba(0, 0, 0, 0.1) 0px 4px 12px`
-- Use: Primary CTA ("Start your project")
+- **Primary CTA signature:** Phase 8 will apply `background: var(--gradient-primary)` plus `shadow-lg shadow-green-500/25` directly on the `Button` primary variant. This is a button-level pattern, not a global `--primary` override. The solid `--primary` stays green-500 so `ring-primary`, `border-primary`, `text-primary`, and badge primary styles keep working untouched.
+- **Active sidebar pill:** Same gradient + shadow applies to the active module pill (Phase 9).
 
-**Secondary Pill (Dark, Muted)**
-- Background: `#0f0f0f`
-- Text: `#fafafa`
-- Padding: 8px 32px
-- Radius: 9999px
-- Border: `1px solid #2e2e2e` (dark border)
-- Opacity: 0.8
-- Use: Secondary CTA alongside primary
+## 7. Layout Principles
 
-**Ghost Button**
-- Background: transparent
-- Text: `#fafafa`
-- Padding: 8px
-- Radius: 6px
-- Border: `1px solid transparent`
-- Use: Tertiary actions, icon buttons
+Hints carried into Phase 9 (shell) and Phase 10 (grid):
 
-### Cards & Containers
-- Background: dark surfaces (`#171717` or slightly lighter)
-- Border: `1px solid #2e2e2e` or `#363636`
-- Radius: 8px–16px
-- No visible shadows — borders define edges
-- Internal padding: 16px–24px
+- **Top navbar:** 72px tall, gradient Aloha logo left, command-palette-style search center, avatar right.
+- **Sidebar:** 220px expanded / 68px collapsed, accordion sub-items, `PanelLeft` toggle. White sidebar surface in light, slate-900 in dark.
+- **Inputs / buttons:** `py-3` vertical padding — generous, touch-friendly for field users.
+- **Table rows (AG Grid):** `py-4` equivalent row height — comfortable scan density.
+- **Mobile:** Full-screen drawer sliding from left with backdrop (Framer Motion) replaces sidebar below `md`.
 
-### Tabs
-- Border: `1px solid #2e2e2e`
-- Radius: 9999px (pill tabs)
-- Active: green accent or lighter surface
-- Inactive: dark, muted
+## 8. Dark Mode
 
-### Links
-- **Green**: `#00c573` — Supabase-branded links
-- **Primary Light**: `#fafafa` — standard links on dark
-- **Secondary**: `#b4b4b4` — muted links
-- **Muted**: `#898989` — tertiary links, footer
+Dark is **hand-authored**, not runtime-derived. Derivation rules applied when writing the `.dark` block:
 
-### Navigation
-- Dark background matching page (`#171717`)
-- Logo with green icon
-- 14px weight 500 for nav links
-- Green pill CTA right-aligned
-- Sticky header behavior
+| `:root` role | `.dark` adaptation |
+|--------------|--------------------|
+| Backgrounds (slate-50/100 canvas, white cards) | slate-900 canvas, slate-800 cards |
+| Body text (slate-900) | slate-50 |
+| Muted text (slate-500) | slate-400 |
+| Primary (green-500 solid) | green-400 (brighter — preserves brand vividness) |
+| Primary gradient (`#22c55e → #059669`) | `#4ade80 → #10b981` (green-400 → emerald-500) |
+| Primary foreground (white) | green-950 (`#052e16`) — dark text on bright green instead of white on bright green |
+| Borders (slate-200/300) | slate-700/600 |
+| Sidebar surfaces (white, green-50 accent) | slate-900 bg, green-900 accent, green-200 accent-foreground |
+| Destructive (red-600) | red-500 |
+| Semantic bg tiles (e.g. red-50) | rgb(red-500 / 0.15) — alpha wash on dark canvas |
 
-## 5. Layout Principles
+Every foundation pair is designed to hit WCAG AA when verified in Plan 7-03.
 
-### Spacing System
-- Base unit: 8px
-- Scale: 1px, 4px, 6px, 8px, 12px, 16px, 20px, 24px, 32px, 40px, 48px, 90px, 96px, 128px
+## 9. WCAG AA Verification
 
-### Whitespace Philosophy
-- **Dramatic section spacing**: 90px–128px between major sections
-- **Dense content blocks**: Within sections, spacing is tight (16px–24px)
-- **Border-defined space**: Thin borders on dark backgrounds for separation, not whitespace + shadows
+Foundation token pairs are verified against WCAG 2.2 AA thresholds: 4.5:1 for normal body text, 3:1 for large text and UI component boundaries. Full shell + AG Grid contrast pass is deferred to Phase 10.
 
-### Border Radius Scale
-- Standard (6px): Ghost buttons, small elements
-- Comfortable (8px): Cards, containers
-- Medium (11px–12px): Mid-size panels
-- Large (16px): Feature cards, major containers
-- Pill (9999px): Primary buttons, tab indicators
+| # | Foreground | Background | Threshold | Light | Dark |
+|---|------------|------------|-----------|-------|------|
+| 1 | `--foreground` | `--background` | 4.5:1 | pending | pending |
+| 2 | `--card-foreground` | `--card` | 4.5:1 | pending | pending |
+| 3 | `--popover-foreground` | `--popover` | 4.5:1 | pending | pending |
+| 4 | `--primary-foreground` | `--primary` | 3:1 (UI / large) | pending — see caveat below | pending |
+| 5 | `--secondary-foreground` | `--secondary` | 4.5:1 | pending | pending |
+| 6 | `--muted-foreground` | `--background` | 4.5:1 | pending | pending |
+| 7 | `--muted-foreground` | `--muted` | 4.5:1 | pending | pending |
+| 8 | `--accent-foreground` | `--accent` | 4.5:1 | pending | pending |
+| 9 | `--destructive-foreground` | `--destructive` | 3:1 (UI) | pending | pending |
+| 10 | `--border` | `--background` | 3:1 (UI) | pending | pending |
+| 11 | `--ring` | `--background` | 3:1 (UI) | pending | pending |
+| 12 | `--sidebar-foreground` | `--sidebar-background` | 4.5:1 | pending | pending |
 
-## 6. Depth & Elevation
+All 24 cells are resolved by `scripts/verify-wcag.mjs` output in **Plan 7-03**. Numbers will be pasted back into this table at that time.
 
-| Level | Treatment | Use |
-|-------|-----------|-----|
-| Flat (Level 0) | No shadow, border `#2e2e2e` | Default state, most surfaces |
-| Subtle Border (Level 1) | Border `#363636` or `#393939` | Interactive elements, hover |
-| Focus (Level 2) | `rgba(0, 0, 0, 0.1) 0px 4px 12px` | Focus states only |
-| Green Accent (Level 3) | Border `rgba(62, 207, 142, 0.3)` | Brand-highlighted elements |
+### `--primary-foreground` caveat (Option C)
 
-**Shadow Philosophy**: Depth through border hierarchy — from `#242424` (barely visible) through `#2e2e2e` (standard) to `#393939` (prominent). The green accent border at 30% opacity is the "elevated" state.
+White (`#ffffff`) on green-500 (`#22c55e`) computes to approximately 2.75:1, which falls below the 4.5:1 body-text threshold and is borderline against the 3:1 UI threshold. Aloha resolves this with **Option C**:
 
-## 7. Do's and Don'ts
+- The solid `--primary` (`#22c55e` light / `#4ade80` dark) is the color-of-record for rings, focus outlines, badges, chips, and borders — usages that only need to satisfy the 3:1 UI-component threshold.
+- The interactive **primary button face uses the gradient** (`var(--gradient-primary)`), whose effective background luminance is darker than green-500 alone. White button labels on the gradient comfortably meet the 3:1 large-bold text threshold (Phase 8 button labels are 16px/500).
+- The foundation WCAG scope evaluates the `--primary`/`--primary-foreground` pair at the **3:1 UI threshold**, not 4.5:1 body text, because no body text renders on `--primary` in the Aloha design.
+
+Plan 7-03 validates this explicitly.
+
+## 10. Do's and Don'ts
 
 ### Do
-- Use near-black backgrounds (`#0f0f0f`, `#171717`) — depth comes from the gray border hierarchy
-- Apply green (`#3ecf8e`, `#00c573`) sparingly — it's an identity marker, not decoration
-- Use weight 400 for nearly everything — 500 only for buttons and nav
-- Set hero text to 1.00 line-height
-- Create depth through border color differences (`#242424` → `#2e2e2e` → `#363636`)
-- Use pill shape (9999px) exclusively for primary CTAs and tabs
-- Employ HSL-based colors with alpha for translucent layering effects
+
+- Use the slate-100 canvas (`#f1f5f9`) as the default page background in light mode.
+- Use the green gradient (`var(--gradient-primary)`) **only** on the primary CTA, the Aloha logo wordmark, the active sidebar pill, and the brand surface of the top navbar.
+- Keep `--primary` solid (green-500 / green-400) so Shadcn primitives that expect a single color token keep working.
+- Use soft shadows (`shadow-sm` / `shadow` / `shadow-md`) on cards and floating surfaces; reserve `shadow-lg` / `shadow-xl` for popovers and the side panel.
+- Use Inter Variable at weight 400 for body text and weight 500 for labels / buttons / nav items.
+- Keep dark mode hand-authored — when adjusting a light value, re-check its dark counterpart in the table above, don't algorithmically derive it.
 
 ### Don't
-- Don't add box-shadows — use border-defined depth system
-- Don't use bold (700) text weight — 400 and 500 only
-- Don't apply green to backgrounds or large surfaces — borders, links, small accents only
-- Don't use warm colors (crimson, orange) as primary design elements — semantic tokens for states only
-- Don't increase hero line-height above 1.00
-- Don't use large border radius (16px+) on buttons — pills (9999px) or standard (6px)
-- Don't lighten the background above `#171717` for primary surfaces
 
-## 8. Responsive Behavior
-
-### Collapsing Strategy
-- Hero: 72px → scales down proportionally
-- Feature grids: multi-column → single column stacked
-- Navigation: full → hamburger
-- Section spacing: 90–128px → 48–64px
-- Buttons: inline → full-width stacked
-
-## 9. Adaptation Notes for Aloha App
-
-This design system is adapted for use with:
-- **Shadcn UI** — Override CSS variables to match Supabase palette
-- **Tailwind CSS 4** — Use theme configuration for spacing, colors, border radius
-- **Geist font** — Free substitute for Supabase's proprietary Circular font
-- **Radix UI** — Already the foundation of Shadcn; Radix color tokens map naturally
-
-### Implementation Strategy
-1. Override Shadcn CSS variables (--background, --foreground, --primary, --accent, etc.)
-2. Add Supabase-specific color tokens as custom CSS variables
-3. Add pill button variant to Shadcn Button component
-4. Configure border-based depth system (no shadows)
-5. Set up Geist + Geist Mono fonts
+- Don't paint large surfaces bold green. The gradient is a moment, not a wash — no full-bleed green sections, no green sidebars, no green cards.
+- Don't apply `shadow-2xl` to interactive elements. That scale is reserved for modal / backdrop elevation.
+- Don't use bold (700) for display headings — the design uses 600 as the top weight and relies on size for hierarchy.
+- Don't reintroduce legacy scaffolding tokens (glass-surface, slate-alpha-wash, prior-era brand tokens). They are deleted; any component still consuming them should be rewritten to the Aloha equivalents.
+- Don't specify neutral colors with wide-gamut specifiers. Aloha uses hex values throughout to match the prototype exactly.
+- Don't add new top-level color scales (teal, violet, pink, etc.) to `@theme` during Phase 7. New accents belong to a future milestone, not the foundation retheme.
