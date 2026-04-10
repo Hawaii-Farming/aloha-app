@@ -17,6 +17,7 @@ import { WorkspaceNavbarProfileMenu } from './workspace-navbar-profile-menu';
 interface WorkspaceNavbarProps {
   account: string;
   user: JwtPayload;
+  orgName?: string | null;
   navigation: {
     modules: AppNavModule[];
     subModules: AppNavSubModule[];
@@ -27,6 +28,7 @@ interface WorkspaceNavbarProps {
 export function WorkspaceNavbar({
   account,
   user,
+  orgName,
   navigation,
   className,
 }: WorkspaceNavbarProps) {
@@ -88,7 +90,7 @@ export function WorkspaceNavbar({
         )}
       />
 
-      <WorkspaceNavbarProfileMenu user={user} />
+      <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
     </header>
   );
 }

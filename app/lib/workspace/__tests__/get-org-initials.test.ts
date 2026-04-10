@@ -1,13 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-// NOTE: This import intentionally points at a module that does not yet exist.
-// Phase 10 Plan 04 (PARITY-03) will create `app/lib/workspace/get-org-initials.ts`.
-// Until then this test file is the authoritative red signal for Wave 0: the
-// runtime import throws "module not found", which is exactly the Wave 0 state.
-// `@ts-expect-error` keeps `pnpm typecheck` green until Plan 04 creates the
-// module — at which point the directive itself becomes an unused-error that
-// TypeScript will flag, prompting us to remove it as part of the same edit.
-// @ts-expect-error — module is created in Plan 10-04 (PARITY-03); red is intentional.
 import { getOrgInitials } from '../get-org-initials';
 
 describe('getOrgInitials', () => {

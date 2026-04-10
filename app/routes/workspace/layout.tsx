@@ -65,6 +65,7 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
         <WorkspaceNavbar
           account={accountSlug}
           user={user}
+          orgName={workspace.currentOrg?.org_name ?? null}
           navigation={workspace.navigation}
           className="hidden md:flex"
         />
@@ -80,6 +81,8 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
             <WorkspaceSidebar
               account={accountSlug}
               navigation={workspace.navigation}
+              orgName={workspace.currentOrg?.org_name ?? null}
+              userEmail={user.email ?? null}
             />
           </div>
 

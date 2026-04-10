@@ -1,6 +1,9 @@
+import { useMemo } from 'react';
+
 import { ChevronLeft, LayoutGrid, PanelLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +15,7 @@ import {
 import { cn } from '@aloha/ui/utils';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
+import { getOrgInitials } from '~/lib/workspace/get-org-initials';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 function SidebarEdgeToggle() {
@@ -41,9 +45,15 @@ export function WorkspaceSidebar(props: {
     modules: AppNavModule[];
     subModules: AppNavSubModule[];
   };
+  orgName?: string | null;
+  userEmail?: string | null;
 }) {
-  const { account, navigation } = props;
+  const { account, navigation, orgName, userEmail } = props;
   const { t } = useTranslation('common');
+  const initials = useMemo(
+    () => getOrgInitials(orgName, userEmail),
+    [orgName, userEmail],
+  );
 
   return (
     <Sidebar
@@ -89,6 +99,19 @@ export function WorkspaceSidebar(props: {
        * CONTEXT D-14 default — no click handler, aria-disabled.
        */}
       <SidebarFooter className="border-sidebar-border border-t group-data-[collapsible=icon]:hidden">
+        <div
+          data-test="workspace-sidebar-profile"
+          className="flex w-full items-center gap-2 px-3 py-2"
+        >
+          <Avatar size="sm">
+            <AvatarFallback className="bg-muted text-foreground text-xs font-semibold dark:bg-slate-700">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-foreground flex-1 truncate text-xs font-medium">
+            {orgName ?? 'Aloha'}
+          </span>
+        </div>
         <button
           type="button"
           aria-disabled="true"

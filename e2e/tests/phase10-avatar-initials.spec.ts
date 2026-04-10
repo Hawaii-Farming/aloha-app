@@ -18,8 +18,6 @@ const EXPECTED = process.env.E2E_EXPECTED_INITIALS ?? 'HF';
 
 test.describe('@phase10 @avatar-initials — avatars render org initials', () => {
   test('navbar avatar fallback renders org initials', async ({ page }) => {
-    test.fail(true, 'Wave 0 red — PARITY-03 helper not yet created');
-
     await page.goto(`/home/${ACCOUNT_SLUG}/`);
     const navbarAvatar = page
       .locator('nav')
@@ -34,8 +32,6 @@ test.describe('@phase10 @avatar-initials — avatars render org initials', () =>
   test('sidebar footer profile avatar renders org initials', async ({
     page,
   }) => {
-    test.fail(true, 'Wave 0 red — PARITY-03 helper not yet wired to sidebar');
-
     await page.goto(`/home/${ACCOUNT_SLUG}/`);
     const sidebarAvatar = page
       .locator('aside, [data-sidebar="sidebar"]')

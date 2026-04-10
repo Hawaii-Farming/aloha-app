@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import type { JwtPayload } from '@supabase/supabase-js';
 
 import { LogOut } from 'lucide-react';
@@ -18,9 +20,11 @@ import { Trans } from '@aloha/ui/trans';
 
 import { useSignOut } from '~/lib/supabase/hooks/use-sign-out';
 import { useUser } from '~/lib/supabase/hooks/use-user';
+import { getOrgInitials } from '~/lib/workspace/get-org-initials';
 
 interface WorkspaceNavbarProfileMenuProps {
   user: JwtPayload;
+  orgName?: string | null;
 }
 
 export function WorkspaceNavbarProfileMenu(
@@ -32,7 +36,10 @@ export function WorkspaceNavbarProfileMenu(
 
   const displayName =
     userData.email ?? userData.user_metadata?.name ?? 'Account';
-  const initial = displayName.charAt(0).toUpperCase();
+  const initial = useMemo(
+    () => getOrgInitials(props.orgName, userData.email ?? null),
+    [props.orgName, userData.email],
+  );
 
   return (
     <DropdownMenu>
@@ -44,7 +51,9 @@ export function WorkspaceNavbarProfileMenu(
           className="focus-visible:ring-ring rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <Avatar size="md" data-test="workspace-navbar-avatar">
-            <AvatarFallback>{initial}</AvatarFallback>
+            <AvatarFallback className="bg-muted text-foreground text-sm font-semibold dark:bg-slate-700">
+              {initial}
+            </AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>
