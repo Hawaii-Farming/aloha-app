@@ -22,7 +22,7 @@
 - [x] **NAVBAR-01**: The desktop workspace header is 72px tall with a gradient Aloha logo square (green-500→emerald-600) and "Aloha" wordmark on the left.
 - [x] **NAVBAR-02**: A centered command-palette-style search button (Search icon + "Search..." placeholder + ⌘K hint) is displayed in the header and wires to the existing navbar search behavior without changing its logic.
 - [x] **NAVBAR-03**: The right side of the header shows the existing user avatar component restyled to the new design tokens.
-- [ ] **NAVBAR-04**: On mobile, a compact header variant shows a hamburger button, the Aloha logo, and the avatar; tapping the hamburger opens the mobile drawer.
+- [x] **NAVBAR-04**: On mobile, a compact header variant shows a hamburger button, the Aloha logo, and the avatar; tapping the hamburger opens the mobile drawer.
 
 ### Sidebar — Desktop (SIDEBAR)
 
@@ -34,11 +34,11 @@
 
 ### Mobile Drawer (DRAWER)
 
-- [ ] **DRAWER-01**: On mobile, the navigation renders as a full-screen drawer sliding in from the left over a black/30 backdrop.
-- [ ] **DRAWER-02**: A hamburger button in the mobile header opens the drawer.
-- [ ] **DRAWER-03**: The drawer open/close animation uses Framer Motion spring + fade, matching the prototype timing.
-- [ ] **DRAWER-04**: Tapping the backdrop or a leaf navigation item closes the drawer automatically.
-- [ ] **DRAWER-05**: The drawer reuses the same navigation data source as the desktop sidebar (no duplicated nav config).
+- [x] **DRAWER-01**: On mobile, the navigation renders as a full-screen drawer sliding in from the left over a black/30 backdrop.
+- [x] **DRAWER-02**: A hamburger button in the mobile header opens the drawer.
+- [x] **DRAWER-03**: The drawer open/close animation uses Framer Motion spring + fade, matching the prototype timing.
+- [x] **DRAWER-04**: Tapping the backdrop or a leaf navigation item closes the drawer automatically.
+- [x] **DRAWER-05**: The drawer reuses the same navigation data source as the desktop sidebar (no duplicated nav config).
 
 ### Shared Primitives (PRIM)
 
