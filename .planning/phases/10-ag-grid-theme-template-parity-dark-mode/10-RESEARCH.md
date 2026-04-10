@@ -620,24 +620,24 @@ Source: `app/styles/shadcn-ui.css:134`
 | A7 | The `workspace.currentOrg` field is `org_name`, not `display_name` | Pattern 5 / D-20 | Low — confirmed from file read at `org-workspace-loader.server.ts:19`. D-20 in CONTEXT.md uses `display_name` erroneously; the plan should use `org_name`. |
 | A8 | WCAG AA contrast for `var(--border) #334155` scrollbar thumb on `var(--card) #1e293b` passes at 3:1 UI-component minimum | Pattern 4 | Low — slate-700 on slate-800 is ~3.4:1, just passing. If marginal, bump to `var(--muted-foreground)` for default (not just hover). |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **D-02 font choice (Geist vs Inter in AG Grid)**
+1. **D-02 font choice (Geist vs Inter in AG Grid)** — RESOLVED: Inter Variable, locked in Plan 02 Task 1 (matches Phase 7 app-wide migration).
    - What we know: Phase 7 migrated the app to Inter; `ag-grid-theme.ts` still says Geist; D-02 says keep Geist; research recommends Inter for consistency.
    - What's unclear: user preference when Phase 7 already silently migrated the rest.
    - Recommendation: switch to Inter in the same edit; flag explicitly in the plan task so discuss-phase can confirm if needed.
 
-2. **D-17 vs D-17b vs research-proposed `--sidebar-background` fix**
+2. **D-17 vs D-17b vs research-proposed `--sidebar-background` fix** — RESOLVED: one-line `.dark { --sidebar-background: #1e293b; --sidebar-border: #334155; }` edit in `app/styles/shadcn-ui.css`, locked in Plan 03 Task 1. Supersedes CONTEXT D-17/D-17b.
    - What we know: three viable fixes exist; research recommends the simplest (one-line `.dark` block edit in `shadcn-ui.css`).
    - What's unclear: whether Phase 7 tokens were designed intentionally to have `--sidebar-background == --background` in dark mode (unlikely — probably an oversight).
    - Recommendation: planner picks the research-proposed fix; if it breaks a contrast pair in the WCAG audit, fall back to D-17 (new `--color-chrome` token).
 
-3. **BUG-01 actual mechanism — requires manual repro in Wave 0**
+3. **BUG-01 actual mechanism — requires manual repro in Wave 0** — RESOLVED: Wave 0 manual repro captured in Plan 01 Task 1; fix unifies expanded branch with `SidebarMenuButton` + `useMemo`-derived `isModuleActive` (no new `useEffect`), locked in Plan 04 Task 2.
    - What we know: symptom is "pill only after sub-module click"; deeper hypothesis is SidebarGroupLabel precedence; fix is to unify expanded branch with SidebarMenuButton (the pattern that works in collapsed mode).
    - What's unclear: without running `pnpm dev` the exact class order cannot be confirmed. The fix is safe regardless because it adopts a known-working pattern from the same file.
    - Recommendation: Wave 0 manual repro (5 min) → confirm hypothesis → apply fix. If hypothesis wrong, the unification still fixes the bug as a side effect of pattern-matching the working collapsed branch.
 
-4. **BUG-02 actual mechanism — requires manual repro in Wave 0**
+4. **BUG-02 actual mechanism — requires manual repro in Wave 0** — RESOLVED: Wave 0 manual repro captured in Plan 01 Task 1; fix uses cmdk `value={item.path}` + `keywords={[item.label]}` with `setOpen(false)` before `navigate(path)` ordering, locked in Plan 04 Task 3.
    - What we know: cmdk value collision is the leading hypothesis; current code looks correct at first read.
    - What's unclear: whether the issue is cmdk's filter, focus management, `navigate()` timing against `setOpen(false)`, or something else.
    - Recommendation: Wave 0 manual repro + console logging on `handleSelect` → confirm whether the function is even called, then which path is passed. If `handleSelect` is called with the right path, the bug is in `navigate()` racing `setOpen(false)` (React Router 7 navigation may need the dialog closed first for focus restoration). Fix: `setOpen(false)` first, then `queueMicrotask(() => navigate(path))` or `requestAnimationFrame`.
