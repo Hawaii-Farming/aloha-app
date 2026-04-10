@@ -1,211 +1,177 @@
 ---
 phase: 09-app-shell-navbar-sidebar-drawer
 verified: 2026-04-10
-verifier: claude (gsd-verifier, goal-backward pass)
 status: passed
-score: 5/5 success criteria verified
+verified_by: claude (gsd-verifier, goal-backward re-verification)
 re_verification:
-  previous_status: passed
-  previous_score: 14/14 REQ-ID grep assertions
-  previous_report: 09-VERIFICATION.md
-  note: |
-    09-VERIFICATION.md is the plan-05 grep/a11y gate (REQ-ID level).
-    This report is the goal-backward phase verification (success-criterion level)
-    required by the Phase-9 exit gate. Both are retained.
-code_review_carryover:
-  blocker: 0
-  warning: 2
-  info: 6
-  warnings:
-    - id: WR-01
-      file: app/components/sidebar/module-sidebar-navigation.tsx
-      concern: "sub-item links use native <a href> — full page reload, DRAWER-04 close works only via unload side effect"
-      status: acknowledged (advisory; Phase 9 success criteria still satisfied; logged for Phase 10 SPA-nav fix)
-    - id: WR-02
-      file: app/components/workspace-shell/workspace-mobile-drawer.tsx
-      concern: "drawer focus-management effect returns focus to hidden hamburger on initial mount (no-op in practice)"
-      status: acknowledged (latent; no observable effect; logged for Phase 10 polish)
-manual_smoke:
-  status: pending-user (headless executor, no browser)
-  items: 7
-  blocking: false
-recommendation: APPROVE
+  previous_status: gaps_found (via 09-UAT.md — 4 major issues)
+  previous_score: 5/9 UAT tests passed
+  gaps_closed:
+    - "Test 1 — active module gradient only on HR"
+    - "Test 2 — navbar missing sidebar toggle / broken search / wrong avatar menu"
+    - "Test 5 — navbar hidden by sidebar"
+    - "Test 8 — mobile drawer has no discoverable close button"
+  gaps_remaining: []
+  regressions: []
+gap_plans_verified:
+  - 09-06 (sidebar layer: gradient + z-stacking)
+  - 09-07 (navbar: toggle, search, profile menu)
+  - 09-08 (mobile drawer: close button)
 ---
 
-# Phase 9 — Goal-Backward Phase Verification
+# Phase 9 — Gap-Closure Verification Report
 
-**Phase goal:** Replace the workspace shell with the Aloha navbar, desktop sidebar, and mobile drawer so every logged-in route is framed by the new chrome WITHOUT loader or nav-config changes.
+Goal-backward re-verification of Phase 9 after gap-closure plans 09-06, 09-07, 09-08 landed on `dev-jean`. The prior 09-VERIFICATION.md marked the phase PASS on static grep coverage, but the subsequent user UAT (09-UAT.md) surfaced 4 major functional gaps. This report verifies those 4 gaps are now closed in the actual source — not just that the plans' tasks were marked done.
 
-**Verifier stance:** Success-criterion-first. For each of the 5 ROADMAP success criteria, verify the shipped source delivers the behavior. The existing `09-VERIFICATION.md` is the plan-05 grep gate at REQ-ID granularity; this report is the phase gate at goal granularity.
+## Automated Gate
 
----
+| Command | Exit | Notes |
+|---------|------|-------|
+| `pnpm typecheck` | 0 | Clean: `react-router typegen && tsc` both succeed. |
+| `pnpm lint` | 0 errors, 4 warnings | All 4 warnings pre-existing and unrelated to Phase 9: 2 `react-hooks/exhaustive-deps` in `app/components/crud/table-list-view.tsx` and 2 `react-hooks/incompatible-library` in `packages/ui/src/{kit,shadcn}/data-table.tsx` (TanStack Table). No new errors or warnings introduced by 09-06/07/08. |
 
-## Success Criterion Verdicts
+## Per-UAT-Gap Verdict
 
-### SC#1 — Desktop navbar (72px + logo + search + avatar)
+### Test 1 — Desktop sidebar active module gradient (Gap from 09-06)
 
-**Expected:** 72px tall header; gradient Aloha logo square + "Aloha" wordmark left; centered command-palette search button (Search icon + "Search..." + ⌘K hint); existing avatar on the right restyled to new tokens; search wires through unchanged.
+**Truth:** All active modules in the desktop sidebar render with the green→emerald gradient pill (not just Human Resources). Root cause: module header was a `CollapsibleTrigger`-only with no navigation, so clicking non-HR modules never changed `currentPath`, so `isModuleActive` never became true for them.
 
-**Evidence:**
-- `app/components/workspace-shell/workspace-navbar.tsx:21` — `h-[72px]` on the `<header>` element.
-- `app/components/workspace-shell/workspace-navbar.tsx:26-28` — `<AlohaLogoSquare size="md" />` + `<span className="text-foreground text-lg font-semibold">Aloha</span>` left cluster.
-- `app/components/workspace-shell/aloha-logo-square.tsx:17` — `bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/25` on the logo square.
-- `app/components/workspace-shell/workspace-navbar.tsx:30-47` — `<NavbarSearch renderTrigger={...}>` centered button with `Search` icon, "Search..." literal, `Command` icon + `K` hint, and the render-prop hook reuses the existing `NavbarSearch` dialog logic unchanged.
-- `app/components/workspace-shell/workspace-navbar.tsx:3,49-51` — `Avatar`/`AvatarFallback` imported from the Phase 8 `@aloha/ui/avatar` primitive (not the legacy shadcn path).
-- `app/components/navbar-search.tsx` exposes `renderTrigger` as a seam (confirmed 4 matches in plan-05 grep gate); the dialog logic is not forked.
+**Verdict: PASS**
 
-**Verdict:** PASS.
+Evidence (`app/components/sidebar/module-sidebar-navigation.tsx`):
+- Lines 114–125: Collapsed branch now wraps a `<Link to={modulePath}>` inside `<SidebarMenuButton asChild>`. `onClick` both navigates and opens the accordion if closed, and calls `onNavigate?.()` so the mobile drawer still auto-closes.
+- Lines 188–205: Expanded branch now has a split `<SidebarGroupLabel>` containing two siblings: a `<Link to={modulePath}>` wrapping icon+label (flex-1) and a dedicated `<CollapsibleTrigger asChild><button aria-label="Toggle ... sub-items">` wrapping the chevron svg (lines 206–233). Keyboard-accessible accordion toggle preserved via a distinct tab stop.
+- Lines 110 & 184: The gradient recipe `rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25` is symmetric across both branches and conditionally applied solely on `isModuleActive` (no HR-specific code anywhere). With `<Link>` in place, clicking any module header now moves `currentPath`, flipping `isModuleActive` for that module and painting the gradient. Closes Gap 1.
+- `grep to={modulePath}` → 2 matches (lines 115, 189). Each branch has exactly one navigable header.
 
-Minor note (advisory only): IN-02 from 09-REVIEW notes that `renderTrigger` is passed `isMac` but the navbar hardcodes `⌘K` on Windows/Linux too. SC#1 only requires the literal "⌘K" hint visible in the button — it is. Not a criterion failure.
+### Test 2 — Desktop navbar toggle / search / avatar menu (Gap from 09-07)
 
----
+**Truth:** Desktop navbar provides sidebar toggle, working search navigation, and a top-right avatar menu that replaces the legacy bottom-left user menu (without the org switcher).
 
-### SC#2 — Desktop sidebar (220/68px + gradient pill + accordion + PanelLeft + cookie)
+**Verdict: PASS** (all 3 sub-gaps closed)
 
-**Expected:** 220px expanded / 68px collapsed; slate-200 right border; gradient active pill; accordion sub-items with green-50 chip + green-200 left rail for active, slate for inactive; `PanelLeft` toggle; collapsed state persists across reload via existing cookie; loader contract unchanged.
+**Sub-gap 2a — Sidebar toggle in navbar.** Evidence (`app/components/workspace-shell/workspace-navbar.tsx`):
+- Line 5: imports `useSidebar` from `@aloha/ui/shadcn-sidebar`.
+- Line 33: `const { toggleSidebar } = useSidebar();` — safe because `<SidebarProvider>` wraps the layout.
+- Lines 56–64: `PanelLeft` button in the left cluster with `onClick={toggleSidebar}`, `data-test="workspace-navbar-sidebar-toggle"`, `aria-label="Toggle sidebar"`. Discoverable and keyboard accessible.
 
-**Evidence:**
-- `packages/ui/src/shadcn/sidebar.tsx:34-36` — `SIDEBAR_WIDTH = '13.75rem'` (220px) and `SIDEBAR_WIDTH_ICON = '4.25rem'` (68px). Constants are consumed at lines 141-145 and 154 via CSS vars.
-- `app/components/sidebar/workspace-sidebar.tsx:57` — `<Sidebar collapsible={'icon'} className="bg-card border-border border-r">` — right border via tokenized `border-border` (slate-200 in Aloha light palette per DESIGN.md).
-- `app/components/sidebar/module-sidebar-navigation.tsx:110, 177` — `rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25` applied to active module pill in BOTH the collapsed-icon branch and the expanded branch.
-- `app/components/sidebar/module-sidebar-navigation.tsx:137, 227` — active sub-item chip `rounded-lg bg-green-50 font-medium text-green-700` in both branches.
-- `app/components/sidebar/module-sidebar-navigation.tsx:208` — `<div className="ml-5 border-l-2 border-green-200 pl-3">` accordion rail wrapping expanded-branch sub-items.
-- `app/components/sidebar/module-sidebar-navigation.tsx:138, 228` — inactive sub-items use `text-muted-foreground hover:bg-muted hover:text-foreground` (slate tokens).
-- `app/components/sidebar/workspace-sidebar.tsx:3, 23-42` — `SidebarEdgeToggle` component uses the `PanelLeft` icon and calls `useSidebar().toggleSidebar` with an active/rotated visual state.
-- `app/routes/workspace/layout.tsx:19-36, 109-124` — loader still returns `{ workspace, layoutState, accountSlug }` (byte-identical shape); `getLayoutState()` still parses `sidebarStateCookie` and passes `layoutState.open` into `<SidebarProvider defaultOpen={layoutState.open}>` at line 69. Cookie mechanism is untouched — `toggleSidebar` in the shadcn sidebar primitive writes the cookie via its existing mechanism.
+**Sub-gap 2b — Command palette navigates on select.** Evidence (`app/components/navbar-search.tsx`):
+- Line 3: `import { useNavigate } from 'react-router';`
+- Line 17: `export interface NavbarSearchItem { path, label, group? }`
+- Line 28: `items?: NavbarSearchItem[]` prop
+- Line 36: `const navigate = useNavigate();`
+- Line 95: `<CommandItem … onSelect={() => handleSelect(item.path)} … />` — `handleSelect` calls `navigate(path)` and `setOpen(false)`.
+- `WorkspaceNavbar` lines 35–46 build `searchItems` from `navigation.modules` (grouped "Modules") and `navigation.subModules` (grouped "Pages") and pass them via `items={searchItems}` on line 72. The search dialog now renders real, navigable items bucketed by group. Static placeholder `<CommandItem>Dashboard</CommandItem>` strings are gone. Closes 2b.
 
-**Verdict:** PASS.
+**Sub-gap 2c — Top-right avatar menu replaces legacy bottom-left menu, org switcher excluded.** Evidence:
+- New file `app/components/workspace-shell/workspace-navbar-profile-menu.tsx` (81 lines). Contains:
+  - Line 26: `export function WorkspaceNavbarProfileMenu`.
+  - Lines 57–62: `DropdownMenuLabel` with `<Trans i18nKey="common:signedInAs" />` + `{displayName}` span.
+  - Line 66: `<SubMenuModeToggle />` (theme toggle).
+  - Lines 70–76: Sign out `DropdownMenuItem` wired to `signOut.mutateAsync()` from `useSignOut()`.
+  - Grep for `DropdownMenuSub`, `Building2`, `handleOrgSwitch`, `setLastOrg`, `pathsConfig` in this file → 0 matches. **Org switcher explicitly NOT ported.**
+- `WorkspaceNavbar` line 91: `<WorkspaceNavbarProfileMenu user={user} />` replaces the old bare `<Avatar>`.
+- `WorkspaceSidebar` (`app/components/sidebar/workspace-sidebar.tsx`) now only contains `SidebarContent` + `SidebarEdgeToggle` (lines 39–53). Grep for `SidebarProfileMenu`, `SidebarFooter`, `accounts`, `accessLevelId` → 0 matches in this file. Legacy bottom-left menu removed.
+- `app/routes/workspace/layout.tsx` lines 65–69 pass `account={accountSlug}`, `user={user}`, `navigation={workspace.navigation}` to `<WorkspaceNavbar>`. The `<WorkspaceSidebar>` call receives only `account` + `navigation` (no `accounts`, no `accessLevelId`). Prop-shape change propagated through the call chain. Closes 2c.
 
----
+### Test 5 — Navbar hidden by sidebar (Gap from 09-06)
 
-### SC#3 — Mobile shell (sidebar hidden + compact header + spring drawer over black/30)
+**Truth:** Workspace navbar renders above/in front of the sidebar at every viewport — the sidebar panel must not cover the navbar's logo + wordmark area. Root cause: shadcn `<Sidebar>` panel is rendered as `fixed inset-y-0 z-10 h-svh`, and the navbar had no z-index, so the panel's `z-10` painted over the top 72px.
 
-**Expected:** Below `md` breakpoint, desktop sidebar hidden; compact mobile header shows hamburger + logo + avatar; tapping hamburger opens full-screen drawer sliding from the left over `bg-black/30` backdrop using Framer Motion spring + fade.
+**Verdict: PASS**
 
-**Evidence:**
-- `app/routes/workspace/layout.tsx:80-88` — desktop sidebar wrapped in `<div className="hidden md:block">`.
-- `app/routes/workspace/layout.tsx:71` — desktop navbar also gated with `className="hidden md:flex"`.
-- `app/components/workspace-shell/workspace-mobile-header.tsx:28` — mobile header `md:hidden` at the header level.
-- `app/components/workspace-shell/workspace-mobile-header.tsx:32-51` — hamburger button (`<Menu>` icon, 36×36 target), `AlohaLogoSquare` + "Aloha" wordmark, right-side `Avatar`.
-- `app/routes/workspace/layout.tsx:72-77, 97-103` — hamburger is wired: `onOpenDrawer={() => setDrawerOpen(true)}`, drawer mounted with `open={drawerOpen}`.
-- `app/components/workspace-shell/workspace-mobile-drawer.tsx:56` — backdrop `motion.div` with `bg-black/30 md:hidden` + `initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}` (fade).
-- `app/components/workspace-shell/workspace-mobile-drawer.tsx:61-66` — panel `motion.nav` with `initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}` — verbatim prototype spring values.
-- `package.json:134` — `"framer-motion": "^12.38.0"` in root only (no duplicate in `packages/ui/package.json`, per plan-05 grep gate).
+Evidence:
+- `app/components/sidebar/workspace-sidebar.tsx` line 42: `<Sidebar collapsible={'icon'} className="bg-card border-border border-r md:top-[72px] md:h-[calc(100svh-72px)]">`. The `className` prop lands on the inner fixed panel (confirmed against `packages/ui/src/shadcn/sidebar.tsx` lines 259–272). `md:top-[72px]` overrides the `inset-y-0` top at the md breakpoint; `md:h-[calc(100svh-72px)]` shrinks the height so it stops at the viewport bottom. The panel now starts at y=72 on desktop.
+- `app/components/workspace-shell/workspace-navbar.tsx` line 52: `'bg-card border-border relative z-20 flex h-[72px] shrink-0 items-center gap-4 border-b px-6'`. `relative z-20` establishes a stacking context that beats the sidebar panel's `z-10`, guaranteeing the navbar paints above even during the collapse/expand transition.
+- `app/components/workspace-shell/workspace-mobile-header.tsx` line 28: same `relative z-20` added for symmetry.
+- `packages/ui/src/shadcn/sidebar.tsx` was NOT modified (fix routed entirely via `className` override). Closes Gap 5.
 
-**Verdict:** PASS.
+### Test 8 — Mobile drawer has no discoverable close button (Gap from 09-08)
 
----
+**Truth:** Mobile drawer has a discoverable way to close in addition to backdrop/Escape (explicit X button inside the drawer panel). Focus-on-open must still land on the first nav link, and focus-return-on-close must still target the hamburger.
 
-### SC#4 — Drawer dismiss semantics + single nav source
+**Verdict: PASS**
 
-**Expected:** Tapping backdrop OR any leaf nav item closes the drawer; drawer reuses the same nav data source as the desktop sidebar (no duplication).
+Evidence (`app/components/workspace-shell/workspace-mobile-drawer.tsx`):
+- Line 4: `import { X } from 'lucide-react';`
+- Line 6: `import { Button } from '@aloha/ui/button';`
+- Line 11: `import { AlohaLogoSquare } from './aloha-logo-square';`
+- Lines 84–100: Header row is the FIRST direct child of `<motion.nav>`. It contains `<AlohaLogoSquare size="sm" />` + "Aloha" wordmark on the left and a ghost `<Button size="icon" onClick={onClose} aria-label="Close navigation menu" data-test="workspace-mobile-drawer-close">` with `<X className="size-5" />` on the right. Visible, keyboard accessible, discoverable.
+- Lines 102–113: The scrollable `<div ref={firstNavRef}>` remains a SIBLING of the header row (not wrapping it). The focus-on-open effect (lines 44–58) still runs `firstNavRef.current?.querySelector<HTMLElement>('a, button')?.focus()` — because the close button lives in the sibling header, not inside `firstNavRef`, the query still targets the first nav link inside the scrollable area. Focus-on-open contract preserved.
+- Lines 54–57: The `wasOpenRef` transition guard still fires `hamburgerRef?.current?.focus()` on the open→closed transition. Focus-return-on-close contract preserved.
+- Line 35: Escape key listener still wired; Line 69: backdrop `onClick={onClose}` still wired. Two original close paths (Test 6) NOT regressed.
+- Closes Gap 4/8.
 
-**Evidence:**
-- `app/components/workspace-shell/workspace-mobile-drawer.tsx:57` — backdrop `onClick={onClose}`.
-- `app/components/workspace-shell/workspace-mobile-drawer.tsx:76-82` — drawer JSX renders `<ModuleSidebarNavigation …onNavigate={onClose} forceExpanded />`. The `onNavigate={onClose}` prop wires leaf taps to drawer close.
-- `app/components/sidebar/module-sidebar-navigation.tsx:143, 233` — `onClick={() => onNavigate?.()}` on every sub-item anchor in both branches.
-- `app/components/workspace-shell/workspace-mobile-drawer.tsx:5, 76` — drawer IMPORTS and RENDERS the same `ModuleSidebarNavigation` component that the desktop sidebar uses. No duplicate nav config exists. The shared prop contract (`onNavigate?: () => void`, `forceExpanded?: boolean`) is defined once at `module-sidebar-navigation.tsx:28-29`.
-- `app/routes/workspace/layout.tsx:97-103` — both desktop sidebar (line 81) and mobile drawer (line 97) are fed from the same `workspace.navigation` object, which originates from the single `loadOrgWorkspace()` call at line 25.
-- `app/components/sidebar/mobile-navigation.tsx` — **confirmed deleted** (glob returns no file). The legacy duplicate is gone.
+## Prior-Behavior Regression Check
 
-**Caveat (WR-01 from 09-REVIEW):** Sub-item anchors use raw `<a href>` rather than React Router `<Link>`. This means "tap leaf → close" currently works as a side effect of the full-page navigation (the whole SPA re-boots, drawer state is wiped by the unload). Functionally, SC#4's observable outcome is still satisfied: tapping a leaf closes the drawer. But the implementation is structurally brittle — if WR-01 is fixed to use `<Link>` without also relying on `onNavigate?.()` firing synchronously before the nav, close behavior must be re-verified. This is advisory only and does not downgrade SC#4's PASS status at the goal level. Logged for Phase 10 (see also `auto-close-on-route-change` useEffect at `layout.tsx:60` which is currently a dead path for the same reason).
+| Behavior | Source | Status |
+|---|---|---|
+| Sidebar widths 220/68 (13.75rem/4.25rem) | `packages/ui/src/shadcn/sidebar.tsx` lines 34, 36 | PASS — unchanged, file not modified |
+| Active-module green→emerald gradient pill | `module-sidebar-navigation.tsx` lines 110, 184 (both branches) | PASS — now reaches every active module (was the Test 1 fix) |
+| Active sub-item pale green chip `bg-green-50 text-green-700` + `border-green-200` left rail | `module-sidebar-navigation.tsx` lines 145, 237, 256 | PASS — untouched by 09-06/07/08 |
+| Mobile drawer Escape close | `workspace-mobile-drawer.tsx` lines 32–39 | PASS — preserved |
+| Mobile drawer backdrop close | `workspace-mobile-drawer.tsx` lines 64–72 | PASS — preserved |
+| Focus-on-open → first nav link | `workspace-mobile-drawer.tsx` lines 44–52 + sibling header row | PASS — close button is sibling of `firstNavRef`, not inside it |
+| Focus-return-on-close → hamburger | `workspace-mobile-drawer.tsx` lines 54–57 with `wasOpenRef` open→closed guard | PASS — preserved |
+| Drawer auto-close on leaf navigation | `workspace-mobile-drawer.tsx` line 110: `onNavigate={onClose}` | PASS — preserved |
+| Navbar 72px height + gradient logo | `workspace-navbar.tsx` line 52 (`h-[72px]`), `aloha-logo-square.tsx` | PASS — unchanged |
+| Loader contract `{ workspace, layoutState, accountSlug }` | `app/routes/workspace/layout.tsx` | PASS — loader not modified by gap plans |
+| shadcn `sidebar.tsx` guardrail (no direct edits) | `packages/ui/src/shadcn/sidebar.tsx` | PASS — fix routed entirely via `className` override |
 
-**Verdict:** PASS (with WR-01 advisory noted).
+No regressions detected.
 
----
+## Requirements Coverage (Phase 09)
 
-### SC#5 — Loader contract + org switching + permissions unchanged
+| REQ-ID | Status | Notes |
+|---|---|---|
+| NAVBAR-01 | PASS | 72px height + `relative z-20` stacking fix intact |
+| NAVBAR-02 | PASS | Command palette now navigates via `useNavigate` + `onSelect`; `items` prop wired from layout |
+| NAVBAR-03 | PASS | Avatar now triggers `WorkspaceNavbarProfileMenu` dropdown (label + theme toggle + sign out); org switcher excluded as required |
+| NAVBAR-04 | PASS | Mobile header still `md:hidden`-gated, with `relative z-20` symmetry |
+| SIDEBAR-01 | PASS | 13.75rem / 4.25rem widths unchanged in `packages/ui/src/shadcn/sidebar.tsx` |
+| SIDEBAR-02 | PASS | Gradient pill now reaches every active module (was the core Test 1 bug) |
+| SIDEBAR-03 | PASS | Sub-item `bg-green-50 text-green-700` + `border-green-200` untouched |
+| SIDEBAR-04 | PASS | `SidebarEdgeToggle` + new navbar `PanelLeft` toggle both present |
+| SIDEBAR-05 | PASS | `hidden md:block` wrapper in layout preserved |
+| DRAWER-01 | PASS | `bg-black/30` backdrop preserved (line 68) |
+| DRAWER-02 | PASS | Drawer mounted from layout |
+| DRAWER-03 | PASS | framer-motion spring transition preserved (line 77) |
+| DRAWER-04 | PASS | `onNavigate={onClose}` leaf-tap close preserved + explicit X button added |
+| DRAWER-05 | PASS | `ModuleSidebarNavigation forceExpanded` still single nav source |
 
-**Expected:** All existing workspace routes still load correctly; org switching, navigation permissions, and `loadOrgWorkspace()` contract unchanged.
+All 14 REQ-IDs satisfied.
 
-**Evidence:**
-- `app/routes/workspace/layout.tsx:19-36` — loader shape: `{ workspace, layoutState, accountSlug }`. `loadOrgWorkspace({ orgSlug: accountSlug, client, request })` called unchanged; no new queries, no new derived fields.
-- `app/routes/workspace/layout.tsx:39-45` — consumer destructures `{ layoutState, workspace, accountSlug }` — identical to pre-Phase-9 contract. `workspace.userOrgs`, `workspace.navigation`, `workspace.user`, `workspace.currentOrg.access_level_id` all still accessed via the same paths.
-- `app/components/sidebar/workspace-sidebar.tsx:68-74` — `SidebarProfileMenu` (org-switcher) is still mounted in the sidebar footer with `accounts`, `accountSlug`, `accessLevelId` props — unchanged contract.
-- No `.server.ts` file was edited in Phase 9 (spot-checked via the 09-REVIEW `files_reviewed_list` — zero server files).
-- `pnpm typecheck` and `pnpm lint` reported clean in 09-VERIFICATION.md (0 errors, 0 new warnings).
-- `<Outlet />` at `layout.tsx:92` still renders children inside `<main className="flex-1 overflow-y-auto">` — existing CRUD routes, HR modules, and detail pages inherit the new chrome without any per-route change.
+## Remaining Gaps
 
-**Verdict:** PASS.
+None. All 4 originally-failing UAT tests (1, 2, 5, 8) now PASS in static source verification. Previously-passing UAT tests (3, 4, 6, 7, 9) show no regression signals in the modified files.
 
-Manual regression of a CRUD list route (e.g. `/home/:account/hr/employees`) is listed in the pending manual smoke checklist but is NOT a verification blocker given typecheck + lint are clean and no route file was modified.
+## Recommended Manual Smoke (non-blocking)
 
----
+Static verification cannot observe browser paint, keyboard focus ring, or live navigation timing. A single ~3-minute smoke at `/home/:account/...` would close the last loop visually:
 
-## Overall Verdict
+1. Click a non-HR module header in the expanded desktop sidebar → URL changes, gradient pill moves.
+2. Click the navbar `PanelLeft` toggle → sidebar collapses to 68px icon rail; click again → expands to 220px.
+3. Press ⌘K → type a module name → press Enter → route changes + dialog closes.
+4. Click the top-right avatar → verify dropdown shows "Signed in as" + email + theme toggle + sign out, and NO org switcher / Building2 icon.
+5. Verify the desktop navbar's Aloha logo + wordmark are fully visible (not covered by the sidebar's left edge).
+6. Resize to 375px → tap hamburger → drawer opens → verify X button visible in the header row → tap X → drawer closes → focus returns to hamburger.
 
-| # | Success Criterion | Verdict |
-|---|-------------------|---------|
-| 1 | Desktop navbar (72px + logo + search + avatar) | PASS |
-| 2 | Desktop sidebar (220/68 + gradient pill + accordion + PanelLeft + cookie) | PASS |
-| 3 | Mobile shell (sidebar hidden + compact header + spring drawer) | PASS |
-| 4 | Drawer dismiss + single nav source | PASS (WR-01 advisory) |
-| 5 | Loader contract + permissions unchanged | PASS |
+These are sanity confirmations, not verification blockers.
 
-**Score: 5/5 success criteria verified.**
+## Overall Phase Verdict
 
-**Phase 9 status: PASSED.**
+**PASS**
 
----
+- `pnpm typecheck` clean.
+- `pnpm lint` 0 errors (4 pre-existing warnings in unrelated files).
+- All 4 previously-failing UAT gaps (Tests 1, 2, 5, 8) have concrete, in-source evidence of closure.
+- No regressions to prior-phase behaviors (sidebar widths, gradient recipes, drawer focus contracts, loader contract, shadcn source guardrail).
+- All 14 Phase 9 REQ-IDs still satisfied.
+- `packages/ui/src/shadcn/sidebar.tsx` untouched — fix routed entirely through `className` override per plan guardrail.
 
-## Code Review Findings Carried Forward (from 09-REVIEW.md)
-
-None are verification blockers. Listed here so Phase 10 planning picks them up:
-
-- **WR-01** — Sub-item `<a href>` causes full page reload. Phase 9 behavior is correct by observation but the implementation is structurally brittle. Fix: swap to `<Link to={subModulePath} onClick={() => onNavigate?.()}>` in both branches of `module-sidebar-navigation.tsx`. Likely 5-minute patch.
-- **WR-02** — Drawer focus-return effect fires `hamburgerRef.current?.focus()` on initial mount. Hidden element, no-op in practice, but should be gated on `wasOpenRef` transition.
-- **IN-01** — `AlohaLogoSquare` has `= {}` default-parameter pattern; React always passes props.
-- **IN-02** — `NavbarSearch` exposes `isMac` but navbar hardcodes `⌘K`.
-- **IN-03** — `navigator.platform` deprecated for Mac detection (pre-existing).
-- **IN-04** — Initial-derivation duplicated across navbar + mobile header; extract helper when a third consumer appears.
-- **IN-05** — `WorkspaceMobileDrawer`'s `account` prop should be `accountSlug` for naming consistency.
-- **IN-06** — Drawer focus query may target a hidden focusable inside a collapsed Radix `Collapsible`; defensive selector upgrade.
-
----
-
-## Manual Smoke Pending (from 09-VERIFICATION.md §Manual Smoke Checklist)
-
-All 7 items are browser-only and remain **pending-user** — not a Phase 9 blocker. Every code path has been statically verified above. Recommended 10-minute smoke pass covers:
-
-1. Desktop light mode at `/home/:account` — 72px navbar, centered search button, gradient sidebar pill, `PanelLeft` toggle + reload persistence round-trip.
-2. Desktop dark mode — token contrast check; known Phase-10 follow-up: `green-50` active chip harshness on dark slate.
-3. Mobile 375×812 (Chrome devtools iPhone) — desktop chrome hidden, hamburger opens drawer, backdrop/leaf/Escape all close.
-4. Pitfall 1 live DOM check at 375px — confirm no hidden shadcn Sheet overlay intercepts clicks (static analysis already PASS).
-5. Org switch via sidebar profile menu (desktop).
-6. CRUD list route regression (e.g. HR employees) under new shell.
-7. Hamburger keyboard a11y — Tab → Enter → focus lands in drawer → Escape → focus returns to hamburger.
+Phase 9 gap closure is complete and ready for human smoke confirmation.
 
 ---
 
-## Deferred Items (explicitly addressed in Phase 10)
-
-Per `09-CONTEXT.md` D-11 and RESEARCH §9, Phase 10 (AG Grid Theme & Dark Mode Verification) covers:
-
-- **Dark-mode regression sweep** (DARK-02) — will address `green-50` active-chip harshness on dark slate and any other dark-mode contrast issues surfaced by Phase 9 chrome.
-- **Full WCAG AA audit** across all shell surfaces — covered by Phase 10 SC#3.
-- **AG Grid token adaptation** inside the new shell — Phase 10 SC#1 / GRID-01.
-- **Tab-cycle focus trap on mobile drawer** — Phase 10 a11y sweep.
-
-These are not Phase 9 gaps; they are Phase 10 scope.
-
----
-
-## Recommendation
-
-**APPROVE — Phase 9 is complete and ready to close.**
-
-- All 5 ROADMAP success criteria are statically verified against the shipped source.
-- All 14 REQ-IDs (NAVBAR-01..04, SIDEBAR-01..05, DRAWER-01..05) were marked complete by the plan-05 grep gate and are still marked complete in `.planning/REQUIREMENTS.md`.
-- `pnpm typecheck` and `pnpm lint` pass with zero new warnings (per 09-VERIFICATION.md).
-- Loader contract (`{ workspace, layoutState, accountSlug }`) is byte-identical — no `.server.ts` file was touched in the phase.
-- 0 BLOCKER, 2 WARNING (both advisory, neither blocks a success criterion), 6 INFO from code review.
-- Manual browser smoke is pending user but does not block the verification verdict given the completeness of static evidence.
-- ROADMAP.md already marks Phase 9 "Complete 2026-04-10" (5/5 plans).
-
-**Next action:** `/gsd-plan-phase 10` — AG Grid Theme & Dark Mode Verification (inherits the new shell chrome from Phase 9).
-
----
-
-## VERIFICATION COMPLETE
-
-**Verdict: APPROVE — Phase 9 passed goal-backward verification with 5/5 success criteria satisfied.**
+_Verified: 2026-04-10_
+_Verifier: Claude (gsd-verifier, goal-backward re-verification)_
