@@ -61,6 +61,8 @@ export function NavbarSearch({
   }
 
   const handleSelect = (path: string) => {
+    // Navigate FIRST, then close the dialog — closing before navigate can
+    // abort focus-dependent navigation flows in some cmdk versions.
     navigate(path);
     setOpen(false);
   };
@@ -91,8 +93,9 @@ export function NavbarSearch({
               {groupItems.map((item) => (
                 <CommandItem
                   key={item.path}
-                  value={`${item.label} ${item.path}`}
-                  onSelect={() => handleSelect(item.path)}
+                  value={item.path}
+                  keywords={[item.label, item.group ?? ''].filter(Boolean)}
+                  onSelect={(selectedPath) => handleSelect(selectedPath)}
                   data-test={`navbar-search-item-${item.path}`}
                 >
                   {item.label}

@@ -17,8 +17,6 @@ test.describe('@phase10 @bug-02-palette-nav — palette module entry navigates',
   test('selecting the HR module from Cmd+K changes the URL', async ({
     page,
   }) => {
-    test.fail(true, 'Wave 0 red — BUG-02: palette swallows module selection');
-
     await page.goto(`/home/${ACCOUNT_SLUG}/`);
 
     const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
