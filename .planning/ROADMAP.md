@@ -24,7 +24,7 @@
 - [x] **Phase 7: Design Foundations** — DESIGN.md rewrite, Tailwind tokens, Inter font, derived dark palette (completed 2026-04-10)
 - [x] **Phase 8: Shared Primitives** — Button, Card, Input/Textarea/Select, Badge, Avatar, Sheet restyle (completed 2026-04-10)
 - [x] **Phase 9: App Shell — Navbar, Sidebar, Drawer** — 72px navbar, 220/68px sidebar, mobile drawer + header (completed 2026-04-10)
-- [ ] **Phase 10: AG Grid Theme & Dark Mode Verification** — AG Grid token adaptation, next-themes smoke pass, WCAG AA audit
+- [ ] **Phase 10: AG Grid Theme, Template Parity & Dark Mode** — AG Grid token + shrink + toolbar search, sidebar/navbar parity with `../aloha-design/prototype`, dark-mode nav surfaces, avatar initials, UAT bug fixes, WCAG AA audit
 
 ## Phase Details
 
@@ -80,15 +80,21 @@
 - [x] 09-05-PLAN.md — Phase verification smoke + a11y audit + STATE/ROADMAP update [Wave 4]
 **UI hint**: yes
 
-### Phase 10: AG Grid Theme & Dark Mode Verification
-**Goal**: Adapt the shared AG Grid theme to Aloha tokens and verify dark-mode parity plus WCAG AA across every existing route so the retheme ships with zero visual regressions.
+### Phase 10: AG Grid Theme, Template Parity & Dark Mode
+**Goal**: Close the remaining gaps between the shipped shell and the reference prototype at `../aloha-design/prototype` — AG Grid theming and sizing, sidebar/navbar structural parity, dark-mode surface tokens, org-derived avatar initials, and two UAT bug fixes — so the v2.0 retheme ships visually and behaviorally aligned with the template with zero regressions.
 **Depends on**: Phase 7, Phase 8, Phase 9
-**Requirements**: GRID-01, DARK-02
+**Requirements**: GRID-01, GRID-02, GRID-03, DARK-02, DARK-03, PARITY-01, PARITY-02, PARITY-03, PARITY-04, PARITY-05, BUG-01, BUG-02
+**Reference**: `/Users/jmr/GitHub/JJB/HawaiiFarming/aloha-design/prototype` (Vite + React prototype) is the visual source of truth — investigate its `package.json` and `src/` to identify the sidebar primitive source, scrollbar styling, and dark-mode token treatment before any port.
 **Success Criteria** (what must be TRUE):
-  1. `ag-grid-theme.ts` is updated via `themeQuartz.withParams` to the Aloha tokens (header background, row background, active row, borders, font) for both light and dark modes, and every existing HR grid (Register, Scheduler, Time Off, Payroll ×3, Hours Comparison, Housing, Employee Review) inherits the new look with no per-grid code changes.
-  2. Toggling `next-themes` light↔dark across every existing route produces no layout shifts, missing focus states, or broken contrast — verified via a documented smoke pass.
-  3. A WCAG AA contrast audit of shell chrome, primitives, and AG Grid token pairs passes in both themes (documented in the phase plan).
-  4. No CRUD flow, loader, action, i18n, or CSRF behavior regresses — existing E2E suite (or targeted manual regression) passes.
+  1. `ag-grid-theme.ts` is updated via `themeQuartz.withParams` to the Aloha tokens (header background, row background, active row, borders, font) for both light and dark modes; every existing HR grid (Register, Scheduler, Time Off, Payroll ×3, Hours Comparison, Housing, Employee Review) fills its container with no shrink/collapse; the toolbar search input is squared (rounded-md), not fully pill-shaped.
+  2. The desktop sidebar structurally matches the prototype — NAVIGATION/MODULES section headers, inline collapse affordance, separator line, chevron dropdown on module rows, and a "Focused" footer — with visible vertical separation between module and sub-module rows, all ported onto the existing Shadcn sidebar primitive (no new UI library).
+  3. Scrollbars on sidebar and main content are themed (thin, tokenized thumb) and look correct in both light and dark modes.
+  4. The navbar places the sidebar expand/collapse toggle as the leftmost control (before the Aloha logo square); the avatar fallback renders the current org's initials (e.g., "HF" for Hawaii Farming) derived from the loaded org context.
+  5. Dark mode renders the navbar and sidebar on a distinct elevated dark surface (not the page background), the centered search trigger is legible, and `next-themes` toggling produces no layout shifts or contrast regressions.
+  6. The active-module gradient pill renders immediately when a module is clicked and on initial load for the current route, not only after a sub-module has been selected.
+  7. Selecting a module entry from the navbar command-palette search navigates to that module's page reliably (no more no-op on module-level links).
+  8. A WCAG AA contrast audit of shell chrome, primitives, and AG Grid token pairs passes in both themes (documented in the phase plan).
+  9. No CRUD flow, loader, action, i18n, or CSRF behavior regresses — existing E2E suite (or targeted manual regression) passes.
 **Plans**: TBD
 **UI hint**: yes
 
@@ -105,4 +111,4 @@
 | 7. Design Foundations | v2.0 | 3/3 | Complete   | 2026-04-10 |
 | 8. Shared Primitives | v2.0 | 0/0 | Not started | - |
 | 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 5/5 | Complete | 2026-04-10 |
-| 10. AG Grid Theme & Dark Mode Verification | v2.0 | 0/0 | Not started | - |
+| 10. AG Grid Theme, Template Parity & Dark Mode | v2.0 | 0/0 | Not started | - |

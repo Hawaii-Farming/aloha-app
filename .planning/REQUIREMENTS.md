@@ -52,11 +52,29 @@
 ### AG Grid Theme (GRID)
 
 - [ ] **GRID-01**: The shared AG Grid theme (`ag-grid-theme.ts`) is updated via `themeQuartz.withParams` to the Aloha tokens (header background, row background, active row, borders, font) for both light and dark modes, so all existing HR grids inherit the new look without per-grid code changes.
+- [ ] **GRID-02**: AG Grid wrappers fill the full available width/height of their parent — no horizontal shrink, no collapsed rows — across every HR module list view.
+- [ ] **GRID-03**: The grid toolbar search input renders as a squared/rounded-md control (not fully pill/rounded-full) matching the prototype toolbar styling.
 
 ### Dark Mode (DARK)
 
 - [x] **DARK-01**: The dark palette is derived from the light palette with WCAG AA contrast verified on shell chrome, primitives, and AG Grid.
 - [ ] **DARK-02**: The existing `next-themes` toggle continues to work across every existing route with no regressions in layout, focus states, or contrast.
+- [ ] **DARK-03**: In dark mode, the navbar and sidebar render on a distinct elevated dark surface (not the page background); the centered navbar search trigger remains legible, and the light-mode convention (white nav/sidebar over slate-50 page) has a tonally equivalent dark-mode pairing.
+
+### Template Parity (PARITY)
+
+Parity with the reference prototype at `../aloha-design/prototype`.
+
+- [ ] **PARITY-01**: The desktop sidebar structurally matches the prototype — NAVIGATION/MODULES section headers, inline collapse affordance, separator line between sections, chevron dropdown buttons on module rows, and the "Focused" footer control — ported onto the existing Shadcn sidebar primitive (no new UI libraries).
+- [ ] **PARITY-02**: The sidebar expand/collapse toggle lives on the navbar **before** the Aloha logo square (leftmost control), replacing the current detached edge toggle.
+- [ ] **PARITY-03**: The navbar avatar fallback renders the current org's initials (e.g., "HF" for Hawaii Farming) instead of a static "A", derived from the loaded org context.
+- [ ] **PARITY-04**: Sub-module list items have visible vertical separation from the parent module row in the sidebar (matches prototype spacing).
+- [ ] **PARITY-05**: Scrollbars on the sidebar and main content areas match the prototype styling in both light and dark modes (thin, themed thumb, no OS default).
+
+### App Shell Bugs (BUG)
+
+- [ ] **BUG-01**: The active-module gradient pill in the sidebar renders immediately when a module is clicked (and on initial load for the current route), not only after a sub-module has been selected.
+- [ ] **BUG-02**: Selecting a module entry from the navbar command-palette search navigates to that module's page reliably (currently no-op when the target is a module-level link).
 
 ---
 
@@ -110,4 +128,14 @@ Deferred to later milestones (not this scope):
 | DRAWER-04 | Phase 9  | TBD  |
 | DRAWER-05 | Phase 9  | TBD  |
 | GRID-01   | Phase 10 | TBD  |
+| GRID-02   | Phase 10 | TBD  |
+| GRID-03   | Phase 10 | TBD  |
 | DARK-02   | Phase 10 | TBD  |
+| DARK-03   | Phase 10 | TBD  |
+| PARITY-01 | Phase 10 | TBD  |
+| PARITY-02 | Phase 10 | TBD  |
+| PARITY-03 | Phase 10 | TBD  |
+| PARITY-04 | Phase 10 | TBD  |
+| PARITY-05 | Phase 10 | TBD  |
+| BUG-01    | Phase 10 | TBD  |
+| BUG-02    | Phase 10 | TBD  |
