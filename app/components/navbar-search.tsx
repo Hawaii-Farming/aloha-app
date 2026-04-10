@@ -1,5 +1,7 @@
 import { type ReactNode, useEffect, useState } from 'react';
 
+import { useNavigate } from 'react-router';
+
 import { Search } from 'lucide-react';
 
 import {
@@ -12,12 +14,26 @@ import {
 } from '@aloha/ui/command';
 import { Kbd } from '@aloha/ui/kbd';
 
-interface NavbarSearchProps {
-  renderTrigger?: (props: { open: () => void; isMac: boolean }) => ReactNode;
+export interface NavbarSearchItem {
+  /** Unique path used as the navigate() target and the React key. */
+  path: string;
+  /** Visible label rendered inside CommandItem. */
+  label: string;
+  /** Optional group heading to bucket the item under (e.g. "Modules"). */
+  group?: string;
 }
 
-export function NavbarSearch({ renderTrigger }: NavbarSearchProps = {}) {
+interface NavbarSearchProps {
+  renderTrigger?: (props: { open: () => void; isMac: boolean }) => ReactNode;
+  items?: NavbarSearchItem[];
+}
+
+export function NavbarSearch({
+  renderTrigger,
+  items = [],
+}: NavbarSearchProps = {}) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -34,6 +50,20 @@ export function NavbarSearch({ renderTrigger }: NavbarSearchProps = {}) {
   const isMac =
     typeof navigator !== 'undefined' &&
     navigator.platform.toUpperCase().includes('MAC');
+
+  // Bucket items by optional `group`; items without a group fall under 'Suggestions'.
+  const grouped = new Map<string, NavbarSearchItem[]>();
+  for (const item of items) {
+    const key = item.group ?? 'Suggestions';
+    const list = grouped.get(key) ?? [];
+    list.push(item);
+    grouped.set(key, list);
+  }
+
+  const handleSelect = (path: string) => {
+    navigate(path);
+    setOpen(false);
+  };
 
   return (
     <>
@@ -56,11 +86,20 @@ export function NavbarSearch({ renderTrigger }: NavbarSearchProps = {}) {
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
-            <CommandItem>Dashboard</CommandItem>
-            <CommandItem>Settings</CommandItem>
-            <CommandItem>Modules</CommandItem>
-          </CommandGroup>
+          {Array.from(grouped.entries()).map(([heading, groupItems]) => (
+            <CommandGroup key={heading} heading={heading}>
+              {groupItems.map((item) => (
+                <CommandItem
+                  key={item.path}
+                  value={`${item.label} ${item.path}`}
+                  onSelect={() => handleSelect(item.path)}
+                  data-test={`navbar-search-item-${item.path}`}
+                >
+                  {item.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ))}
         </CommandList>
       </CommandDialog>
     </>
