@@ -19,11 +19,6 @@ test.describe('@phase10 @dark-surfaces — navbar + sidebar on elevated chrome',
   test('dark-mode navbar and sidebar sit above the body surface', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Wave 0 red — DARK-03 sidebar/body collision not yet fixed',
-    );
-
     await page.goto(`/home/${ACCOUNT_SLUG}/`);
     await page.evaluate(() => {
       window.localStorage.setItem('theme', 'dark');

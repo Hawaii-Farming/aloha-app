@@ -46,8 +46,6 @@ function assertClose(a: Bounds | null, b: Bounds | null, label: string) {
 
 test.describe('@phase10 @theme-toggle — no layout shift, no console errors', () => {
   test('theme toggle preserves layout within 1px', async ({ page }) => {
-    test.fail(true, 'Wave 0 red — DARK-02 visual parity not yet guaranteed');
-
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     page.on('console', (msg) => {

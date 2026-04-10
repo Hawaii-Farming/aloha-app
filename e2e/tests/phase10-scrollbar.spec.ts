@@ -16,8 +16,6 @@ const SLATE_700 = 'rgb(51, 65, 85)';
 
 test.describe('@phase10 @scrollbar — themed scrollbar in both modes', () => {
   test('html scrollbar-color references Phase 7 tokens', async ({ page }) => {
-    test.fail(true, 'Wave 0 red — PARITY-05 global CSS not yet added');
-
     await page.goto(`/home/${ACCOUNT_SLUG}/`);
     const color = await page.evaluate(
       () => window.getComputedStyle(document.documentElement).scrollbarColor,

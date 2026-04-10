@@ -131,13 +131,13 @@
     --semantic-blue-fg: #60a5fa;
     --semantic-blue-border: rgb(59 130 246 / 0.3);
 
-    --sidebar-background: #0f172a;
+    --sidebar-background: #1e293b; /* slate-800 — matches --card, elevated above --background (DARK-03) */
     --sidebar-foreground: #cbd5e1;
     --sidebar-primary: #4ade80;
     --sidebar-primary-foreground: #052e16;
     --sidebar-accent: #14532d;
     --sidebar-accent-foreground: #bbf7d0;
-    --sidebar-border: #1e293b;
+    --sidebar-border: #334155; /* slate-700 — matches --border, visible edge (DARK-03) */
     --sidebar-ring: #4ade80;
   }
 }

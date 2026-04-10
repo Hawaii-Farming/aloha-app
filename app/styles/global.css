@@ -57,3 +57,23 @@
     line-height: 1.33;
   }
 }
+
+/* Phase 10 PARITY-05 — themed scrollbars (6px, slate-200/slate-700 thumb) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
