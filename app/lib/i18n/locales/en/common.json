@@ -95,6 +95,16 @@
     "reject": "Reject",
     "accept": "Accept"
   },
+  "shell": {
+    "sidebar": {
+      "nav_section": "NAVIGATION",
+      "modules_section": "MODULES",
+      "focused_footer": "Focused"
+    },
+    "navbar": {
+      "search_placeholder": "Search for a module, sub-module, or action..."
+    }
+  },
   "otp": {
     "requestVerificationCode": "Request Verification Code",
     "requestVerificationCodeDescription": "We must verify your identity to continue with this action. We'll send a verification code to the email address {{email}}.",
