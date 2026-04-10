@@ -95,7 +95,12 @@
   7. Selecting a module entry from the navbar command-palette search navigates to that module's page reliably (no more no-op on module-level links).
   8. A WCAG AA contrast audit of shell chrome, primitives, and AG Grid token pairs passes in both themes (documented in the phase plan).
   9. No CRUD flow, loader, action, i18n, or CSRF behavior regresses — existing E2E suite (or targeted manual regression) passes.
-**Plans**: TBD
+**Plans**: 5 plans
+- [x] 10-01-PLAN.md — Wave 0: Bug repros + unit test skeletons + @phase10 E2E spec skeletons [Wave 0]
+- [ ] 10-02-PLAN.md — AG Grid theme rewrite + grid sizing fix + toolbar rounded-md override [Wave 1]
+- [ ] 10-03-PLAN.md — Sidebar structural parity + dark --sidebar-background fix + themed scrollbars + i18n keys [Wave 2]
+- [ ] 10-04-PLAN.md — getOrgInitials helper + avatar wiring + BUG-01 unify + BUG-02 cmdk fix [Wave 3]
+- [ ] 10-05-PLAN.md — WCAG AA audit + PARITY-02 verification + full regression + STATE/ROADMAP update [Wave 4]
 **UI hint**: yes
 
 ## Progress
@@ -111,4 +116,4 @@
 | 7. Design Foundations | v2.0 | 3/3 | Complete   | 2026-04-10 |
 | 8. Shared Primitives | v2.0 | 0/0 | Not started | - |
 | 9. App Shell — Navbar, Sidebar, Drawer | v2.0 | 5/5 | Complete | 2026-04-10 |
-| 10. AG Grid Theme, Template Parity & Dark Mode | v2.0 | 0/0 | Not started | - |
+| 10. AG Grid Theme, Template Parity & Dark Mode | v2.0 | 1/5 | In Progress|  |
