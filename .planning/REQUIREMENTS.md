@@ -51,9 +51,9 @@
 
 ### AG Grid Theme (GRID)
 
-- [ ] **GRID-01**: The shared AG Grid theme (`ag-grid-theme.ts`) is updated via `themeQuartz.withParams` to the Aloha tokens (header background, row background, active row, borders, font) for both light and dark modes, so all existing HR grids inherit the new look without per-grid code changes.
-- [ ] **GRID-02**: AG Grid wrappers fill the full available width/height of their parent — no horizontal shrink, no collapsed rows — across every HR module list view.
-- [ ] **GRID-03**: The grid toolbar search input renders as a squared/rounded-md control (not fully pill/rounded-full) matching the prototype toolbar styling.
+- [x] **GRID-01**: The shared AG Grid theme (`ag-grid-theme.ts`) is updated via `themeQuartz.withParams` to the Aloha tokens (header background, row background, active row, borders, font) for both light and dark modes, so all existing HR grids inherit the new look without per-grid code changes.
+- [x] **GRID-02**: AG Grid wrappers fill the full available width/height of their parent — no horizontal shrink, no collapsed rows — across every HR module list view.
+- [x] **GRID-03**: The grid toolbar search input renders as a squared/rounded-md control (not fully pill/rounded-full) matching the prototype toolbar styling.
 
 ### Dark Mode (DARK)
 
