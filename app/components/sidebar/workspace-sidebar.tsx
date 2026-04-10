@@ -1,24 +1,10 @@
-import type { JwtPayload } from '@supabase/supabase-js';
-
 import { PanelLeft } from 'lucide-react';
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  useSidebar,
-} from '@aloha/ui/shadcn-sidebar';
+import { Sidebar, SidebarContent, useSidebar } from '@aloha/ui/shadcn-sidebar';
 import { cn } from '@aloha/ui/utils';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
-import { SidebarProfileMenu } from '~/components/sidebar/sidebar-profile-menu';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
-
-interface OrgAccount {
-  label: string | null;
-  value: string | null;
-  image: string | null;
-}
 
 function SidebarEdgeToggle() {
   const { toggleSidebar, open } = useSidebar();
@@ -47,11 +33,8 @@ export function WorkspaceSidebar(props: {
     modules: AppNavModule[];
     subModules: AppNavSubModule[];
   };
-  user: JwtPayload;
-  accounts: OrgAccount[];
-  accessLevelId: string;
 }) {
-  const { account, navigation, user, accounts, accessLevelId } = props;
+  const { account, navigation } = props;
 
   return (
     <Sidebar
@@ -67,15 +50,6 @@ export function WorkspaceSidebar(props: {
           subModules={navigation.subModules}
         />
       </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarProfileMenu
-          user={user}
-          accountSlug={account}
-          accounts={accounts}
-          accessLevelId={accessLevelId}
-        />
-      </SidebarFooter>
     </Sidebar>
   );
 }
