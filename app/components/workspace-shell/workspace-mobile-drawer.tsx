@@ -21,6 +21,7 @@ export function WorkspaceMobileDrawer({
   hamburgerRef,
 }: WorkspaceMobileDrawerProps) {
   const firstNavRef = useRef<HTMLDivElement | null>(null);
+  const wasOpenRef = useRef(false);
 
   // Escape key closes drawer — justified useEffect (global key binding, per CLAUDE.md rule).
   useEffect(() => {
@@ -33,8 +34,11 @@ export function WorkspaceMobileDrawer({
   }, [open, onClose]);
 
   // Focus management — justified useEffect (post-mount DOM focus, per CLAUDE.md rule).
+  // Track previous open state so focus return only fires on open→closed transitions
+  // (prevents focusing a hidden hamburger on initial mount at md+).
   useEffect(() => {
     if (open) {
+      wasOpenRef.current = true;
       const id = requestAnimationFrame(() => {
         const first =
           firstNavRef.current?.querySelector<HTMLElement>('a, button');
@@ -42,7 +46,10 @@ export function WorkspaceMobileDrawer({
       });
       return () => cancelAnimationFrame(id);
     }
-    hamburgerRef?.current?.focus();
+    if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      hamburgerRef?.current?.focus();
+    }
   }, [open, hamburgerRef]);
 
   return (
