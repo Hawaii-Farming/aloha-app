@@ -7,28 +7,29 @@ import { Slot } from 'radix-ui';
 import { cn } from '../lib/utils/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default:
+          'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 hover:shadow-xl',
         destructive:
           'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+          'border border-border bg-background text-foreground hover:bg-muted',
         secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          'bg-background text-foreground border border-border hover:bg-muted',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        pill: 'rounded-full bg-primary text-primary-foreground border border-primary-foreground/20 px-8 py-2 font-medium hover:bg-primary/90',
+        pill: 'rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 hover:shadow-xl px-8 py-2 font-medium',
         brand:
-          'border border-[var(--supabase-green-link)] text-[var(--supabase-green-link)] bg-[var(--supabase-green)]/10 hover:bg-[var(--supabase-green)]/20',
+          'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 hover:shadow-xl',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-8',
-        icon: 'h-9 w-9',
+        default: 'px-5 py-3',
+        sm: 'px-3 py-1.5 rounded-xl text-xs',
+        lg: 'px-6 py-3 rounded-2xl text-sm',
+        icon: 'h-10 w-10 rounded-2xl',
       },
     },
     defaultVariants: {
