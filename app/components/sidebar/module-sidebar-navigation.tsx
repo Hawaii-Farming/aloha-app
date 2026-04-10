@@ -177,13 +177,23 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                 onOpenChange={() => toggleModule(mod.module_slug)}
               >
                 <SidebarGroup>
-                  <CollapsibleTrigger asChild>
-                    <SidebarGroupLabel
+                  <SidebarGroupLabel
+                    className={cn(
+                      'gap-2 p-0 select-none',
+                      isModuleActive
+                        ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
+                        : 'text-foreground rounded-xl bg-transparent',
+                    )}
+                  >
+                    <Link
+                      to={modulePath}
+                      onClick={() => {
+                        if (!isOpen) toggleModule(mod.module_slug);
+                        onNavigate?.();
+                      }}
                       className={cn(
-                        'cursor-pointer gap-2 select-none',
-                        isModuleActive
-                          ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
-                          : 'text-foreground hover:bg-muted rounded-xl bg-transparent',
+                        'flex flex-1 items-center gap-2 rounded-xl px-2 py-1.5',
+                        !isModuleActive && 'hover:bg-muted',
                       )}
                     >
                       {createElement(IconComponent, {
@@ -192,25 +202,36 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                       <span className="flex-1 truncate text-left uppercase">
                         {mod.display_name}
                       </span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    </Link>
+                    <CollapsibleTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={`Toggle ${mod.display_name} sub-items`}
                         className={cn(
-                          'h-4 w-4 shrink-0 transition-transform duration-200',
-                          isOpen && 'rotate-180',
+                          'flex h-6 w-6 shrink-0 items-center justify-center rounded-md px-2',
+                          !isModuleActive && 'hover:bg-muted',
                         )}
                       >
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
-                    </SidebarGroupLabel>
-                  </CollapsibleTrigger>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={cn(
+                            'h-4 w-4 shrink-0 transition-transform duration-200',
+                            isOpen && 'rotate-180',
+                          )}
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                    </CollapsibleTrigger>
+                  </SidebarGroupLabel>
                   <CollapsibleContent>
                     <SidebarGroupContent>
                       <div className="ml-5 border-l-2 border-green-200 pl-3">
