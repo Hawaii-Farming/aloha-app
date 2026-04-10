@@ -19,9 +19,9 @@
 
 ### Top Navbar (NAVBAR)
 
-- [ ] **NAVBAR-01**: The desktop workspace header is 72px tall with a gradient Aloha logo square (green-500→emerald-600) and "Aloha" wordmark on the left.
-- [ ] **NAVBAR-02**: A centered command-palette-style search button (Search icon + "Search..." placeholder + ⌘K hint) is displayed in the header and wires to the existing navbar search behavior without changing its logic.
-- [ ] **NAVBAR-03**: The right side of the header shows the existing user avatar component restyled to the new design tokens.
+- [x] **NAVBAR-01**: The desktop workspace header is 72px tall with a gradient Aloha logo square (green-500→emerald-600) and "Aloha" wordmark on the left.
+- [x] **NAVBAR-02**: A centered command-palette-style search button (Search icon + "Search..." placeholder + ⌘K hint) is displayed in the header and wires to the existing navbar search behavior without changing its logic.
+- [x] **NAVBAR-03**: The right side of the header shows the existing user avatar component restyled to the new design tokens.
 - [ ] **NAVBAR-04**: On mobile, a compact header variant shows a hamburger button, the Aloha logo, and the avatar; tapping the hamburger opens the mobile drawer.
 
 ### Sidebar — Desktop (SIDEBAR)

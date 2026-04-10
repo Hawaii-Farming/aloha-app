@@ -74,7 +74,7 @@
   5. All existing workspace routes still load correctly under the new shell with org switching, navigation permissions, and `loadOrgWorkspace()` contract unchanged.
 **Plans**: 5 plans
 - [x] 09-01-PLAN.md — Sidebar width bump + workspace-sidebar/module-sidebar-navigation Aloha restyle [Wave 1]
-- [ ] 09-02-PLAN.md — NavbarSearch renderTrigger seam + WorkspaceNavbar + AlohaLogoSquare [Wave 2]
+- [x] 09-02-PLAN.md — NavbarSearch renderTrigger seam + WorkspaceNavbar + AlohaLogoSquare [Wave 2]
 - [ ] 09-03-PLAN.md — framer-motion install + WorkspaceMobileHeader + WorkspaceMobileDrawer [Wave 2]
 - [ ] 09-04-PLAN.md — layout.tsx shell integration + mobile-navigation.tsx delete [Wave 3]
 - [ ] 09-05-PLAN.md — Phase verification smoke + a11y audit + STATE/ROADMAP update [Wave 4]
