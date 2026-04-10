@@ -22,7 +22,7 @@
 ### v2.0 Aloha Design System Retheme (Phases 7-10)
 
 - [x] **Phase 7: Design Foundations** — DESIGN.md rewrite, Tailwind tokens, Inter font, derived dark palette (completed 2026-04-10)
-- [ ] **Phase 8: Shared Primitives** — Button, Card, Input/Textarea/Select, Badge, Avatar, Sheet restyle
+- [x] **Phase 8: Shared Primitives** — Button, Card, Input/Textarea/Select, Badge, Avatar, Sheet restyle (completed 2026-04-10)
 - [ ] **Phase 9: App Shell — Navbar, Sidebar, Drawer** — 72px navbar, 220/68px sidebar, mobile drawer + header
 - [ ] **Phase 10: AG Grid Theme & Dark Mode Verification** — AG Grid token adaptation, next-themes smoke pass, WCAG AA audit
 
