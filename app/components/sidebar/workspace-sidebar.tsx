@@ -1,6 +1,6 @@
 import type { JwtPayload } from '@supabase/supabase-js';
 
-import { ChevronsLeft } from 'lucide-react';
+import { PanelLeft } from 'lucide-react';
 
 import {
   Sidebar,
@@ -26,11 +26,12 @@ function SidebarEdgeToggle() {
   return (
     <button
       onClick={toggleSidebar}
+      data-test="workspace-sidebar-toggle"
       className={cn(
         'bg-sidebar border-sidebar-border text-muted-foreground hover:text-foreground absolute top-4 -right-3 z-30 hidden h-6 w-6 items-center justify-center rounded-full border shadow-sm transition-colors md:flex',
       )}
     >
-      <ChevronsLeft
+      <PanelLeft
         className={cn(
           'h-3.5 w-3.5 transition-transform duration-200',
           !open && 'rotate-180',
@@ -53,7 +54,7 @@ export function WorkspaceSidebar(props: {
   const { account, navigation, user, accounts, accessLevelId } = props;
 
   return (
-    <Sidebar collapsible={'icon'}>
+    <Sidebar collapsible={'icon'} className="bg-card border-border border-r">
       <SidebarEdgeToggle />
 
       <SidebarContent className="mt-2 flex-1 overflow-y-auto">
