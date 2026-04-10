@@ -53,7 +53,13 @@
   3. `Input`, `Textarea`, and `Select` render at 16px with rounded-2xl, slate border, green-500 focus ring, and py-3 padding; all existing forms (including CRUD create/edit sheets) render without layout breakage.
   4. `Badge` supports success/warning/danger/info/neutral pill variants on the Aloha palette and `Avatar` renders initials on a gradient fallback with sm/md/lg size variants.
   5. The side-panel `Sheet` (CRUD create/edit) renders with rounded-2xl leading corners, slate border, and form-field spacing that matches the prototype — no prop contract changes to existing callers.
-**Plans**: TBD
+**Plans**: 6 plans
+- [ ] 08-01-PLAN.md — Card Aloha restyle (PRIM-02) [Wave 1]
+- [ ] 08-02-PLAN.md — Badge Aloha restyle (PRIM-04) [Wave 1]
+- [ ] 08-03-PLAN.md — Button Aloha restyle (PRIM-01) [Wave 2]
+- [ ] 08-04-PLAN.md — Avatar Aloha restyle (PRIM-05) [Wave 2]
+- [ ] 08-05-PLAN.md — Input/Textarea/Select Aloha restyle (PRIM-03) [Wave 3]
+- [ ] 08-06-PLAN.md — Sheet Aloha restyle (PRIM-06) [Wave 3]
 **UI hint**: yes
 
 ### Phase 9: App Shell — Navbar, Sidebar, Drawer
