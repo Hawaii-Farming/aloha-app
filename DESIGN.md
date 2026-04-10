@@ -237,32 +237,62 @@ Every foundation pair is designed to hit WCAG AA when verified in Plan 7-03.
 
 Foundation token pairs are verified against WCAG 2.2 AA thresholds: 4.5:1 for normal body text, 3:1 for large text and UI component boundaries. Full shell + AG Grid contrast pass is deferred to Phase 10.
 
-| # | Foreground | Background | Threshold | Light | Dark |
-|---|------------|------------|-----------|-------|------|
-| 1 | `--foreground` | `--background` | 4.5:1 | pending | pending |
-| 2 | `--card-foreground` | `--card` | 4.5:1 | pending | pending |
-| 3 | `--popover-foreground` | `--popover` | 4.5:1 | pending | pending |
-| 4 | `--primary-foreground` | `--primary` | 3:1 (UI / large) | pending — see caveat below | pending |
-| 5 | `--secondary-foreground` | `--secondary` | 4.5:1 | pending | pending |
-| 6 | `--muted-foreground` | `--background` | 4.5:1 | pending | pending |
-| 7 | `--muted-foreground` | `--muted` | 4.5:1 | pending | pending |
-| 8 | `--accent-foreground` | `--accent` | 4.5:1 | pending | pending |
-| 9 | `--destructive-foreground` | `--destructive` | 3:1 (UI) | pending | pending |
-| 10 | `--border` | `--background` | 3:1 (UI) | pending | pending |
-| 11 | `--ring` | `--background` | 3:1 (UI) | pending | pending |
-| 12 | `--sidebar-foreground` | `--sidebar-background` | 4.5:1 | pending | pending |
+Verified via `node scripts/verify-wcag.mjs` on 2026-04-10. 18 PASS / 6 FAIL — see §9.1 Failure Register for open items escalated to the human reviewer.
 
-All 24 cells are resolved by `scripts/verify-wcag.mjs` output in **Plan 7-03**. Numbers will be pasted back into this table at that time.
+| Pair | Theme | Ratio | Min | Status |
+|------|-------|-------|-----|--------|
+| foreground/background | light | 16.30:1 | 4.5:1 | PASS |
+| card-foreground/card | light | 17.85:1 | 4.5:1 | PASS |
+| popover-foreground/popover | light | 17.85:1 | 4.5:1 | PASS |
+| primary-foreground/primary | light | 2.28:1 | 3.0:1 | FAIL |
+| secondary-foreground/secondary | light | 16.30:1 | 4.5:1 | PASS |
+| muted-foreground/background | light | 4.34:1 | 4.5:1 | FAIL |
+| muted-foreground/muted | light | 4.34:1 | 4.5:1 | FAIL |
+| accent-foreground/accent | light | 16.30:1 | 4.5:1 | PASS |
+| destructive-foreground/destructive | light | 4.83:1 | 3.0:1 | PASS |
+| border/background | light | 1.13:1 | 3.0:1 | FAIL |
+| ring/background | light | 2.08:1 | 3.0:1 | FAIL |
+| sidebar-foreground/sidebar-background | light | 7.58:1 | 4.5:1 | PASS |
+| foreground/background | dark | 17.06:1 | 4.5:1 | PASS |
+| card-foreground/card | dark | 13.98:1 | 4.5:1 | PASS |
+| popover-foreground/popover | dark | 13.98:1 | 4.5:1 | PASS |
+| primary-foreground/primary | dark | 8.55:1 | 3.0:1 | PASS |
+| secondary-foreground/secondary | dark | 9.90:1 | 4.5:1 | PASS |
+| muted-foreground/background | dark | 6.96:1 | 4.5:1 | PASS |
+| muted-foreground/muted | dark | 5.71:1 | 4.5:1 | PASS |
+| accent-foreground/accent | dark | 9.90:1 | 4.5:1 | PASS |
+| destructive-foreground/destructive | dark | 3.76:1 | 3.0:1 | PASS |
+| border/background | dark | 1.72:1 | 3.0:1 | FAIL |
+| ring/background | dark | 10.25:1 | 3.0:1 | PASS |
+| sidebar-foreground/sidebar-background | dark | 12.02:1 | 4.5:1 | PASS |
+
+### 9.1 Failure Register (escalated to human review)
+
+Six assertions flagged. Phase 7 does NOT silently retune palette values to clear them — any change requires explicit human approval because the palette was locked in Plan 7-01 against the prototype and the research doc.
+
+1. **`primary-foreground/primary` light — 2.28:1 (needs 3.0:1)**
+   White (`#ffffff`) on green-500 (`#22c55e`). Research A1 estimated ~2.75:1; actual is lower. Per D-14 Option C, the solid `--primary` is used as a color-of-record for rings/badges/borders (all of which fail independently — see pairs 10/11) and the interactive primary button face uses the **gradient** (green-500 → emerald-600), whose effective luminance is darker than green-500 alone. White button labels on the gradient are the real user-visible surface and should be re-measured in Phase 8 against the gradient midpoint, not against the solid token. Open decision: either (a) darken `--primary` to emerald-600 `#059669` (clears 3:1, changes brand feel), (b) switch `--primary-foreground` to a dark green (e.g. green-950 `#052e16` which already works in dark), or (c) accept that the solid `--primary` token is for UI decoration only and that text-on-primary rendering is always via the gradient button variant. Dark mode passes comfortably (8.55:1).
+
+2. **`muted-foreground/background` and `muted-foreground/muted` light — 4.34:1 (needs 4.5:1)**
+   Slate-500 (`#64748b`) on slate-100 (`#f1f5f9`). Near-miss body-text failure (0.16 short). Options: darken `--muted-foreground` to slate-600 `#475569` (clears 7+:1 but changes "muted" feel), or accept the 4.34:1 miss for Phase 7 and revisit when Phase 8 touches form labels. Dark mode passes comfortably (6.96 / 5.71).
+
+3. **`border/background` light — 1.13:1 and dark — 1.72:1 (needs 3.0:1)**
+   Slate-200 on slate-100 (light), slate-700 on slate-900 (dark). WCAG 1.4.11 requires 3:1 for UI components whose presence must be perceivable to understand the UI — decorative hairline borders on cards are generally exempt because they are not the only affordance indicating a card. However, if borders carry semantic weight (e.g., input field outlines), they need 3:1. The threshold was set to 3.0 in Plan 7-03 because the plan author wanted to catch any hidden reliance on borders as the sole affordance. Recommendation: reclassify these as decorative (drop to informational in the script) once Phase 8 confirms inputs do not rely solely on `--border` for affordance, OR bump `--border` to slate-300/slate-600.
+
+4. **`ring/background` light — 2.08:1 (needs 3.0:1)**
+   Green-500 (`#22c55e`) on slate-100 (`#f1f5f9`). The focus ring is a real UI component (WCAG 2.4.7 visible focus) and must meet 3:1. This is a genuine failure that needs a palette tweak. Options: darken `--ring` to emerald-600 `#059669` (clears 3:1), add a slate-900 outer halo ring around the green inner ring (composite technique), or accept a brighter green like `#16a34a` (green-600). Dark passes at 10.25:1.
+
+Plan 7-03 exits with 6 WCAG failures and is marked **PLAN COMPLETE WITH WARNINGS**. Resolution is a Phase 8 decision point.
 
 ### `--primary-foreground` caveat (Option C)
 
-White (`#ffffff`) on green-500 (`#22c55e`) computes to approximately 2.75:1, which falls below the 4.5:1 body-text threshold and is borderline against the 3:1 UI threshold. Aloha resolves this with **Option C**:
+White (`#ffffff`) on green-500 (`#22c55e`) was estimated at ~2.75:1 in research; the measured value is 2.28:1. This falls below both the 4.5:1 body-text threshold and the 3:1 UI threshold. Aloha's Option C resolution:
 
-- The solid `--primary` (`#22c55e` light / `#4ade80` dark) is the color-of-record for rings, focus outlines, badges, chips, and borders — usages that only need to satisfy the 3:1 UI-component threshold.
-- The interactive **primary button face uses the gradient** (`var(--gradient-primary)`), whose effective background luminance is darker than green-500 alone. White button labels on the gradient comfortably meet the 3:1 large-bold text threshold (Phase 8 button labels are 16px/500).
+- The solid `--primary` (`#22c55e` light / `#4ade80` dark) is the color-of-record for rings, focus outlines, badges, chips, and borders — usages that only need to satisfy the 3:1 UI-component threshold. (Note: the light `--ring` and `--border` derived from `--primary`/slate-200 still fail — see §9.1.)
+- The interactive **primary button face uses the gradient** (`var(--gradient-primary)`), whose effective background luminance is darker than green-500 alone. White button labels on the gradient should re-measure against the gradient midpoint and not the solid token — Phase 8 captures this explicitly.
 - The foundation WCAG scope evaluates the `--primary`/`--primary-foreground` pair at the **3:1 UI threshold**, not 4.5:1 body text, because no body text renders on `--primary` in the Aloha design.
 
-Plan 7-03 validates this explicitly.
+Dark mode clears this pair at 8.55:1. The light-mode FAIL is tracked in §9.1 item 1 for Phase 8 resolution.
 
 ## 10. Do's and Don'ts
 
