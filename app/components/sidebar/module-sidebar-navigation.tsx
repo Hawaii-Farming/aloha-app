@@ -25,10 +25,18 @@ interface ModuleSidebarNavigationProps {
   account: string;
   modules: AppNavModule[];
   subModules: AppNavSubModule[];
+  onNavigate?: () => void;
+  forceExpanded?: boolean;
 }
 
 export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
-  const { account, modules, subModules } = props;
+  const {
+    account,
+    modules,
+    subModules,
+    onNavigate,
+    forceExpanded = false,
+  } = props;
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -83,66 +91,79 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
             {index > 0 && <SidebarSeparator className="mx-0" />}
 
             {/* Collapsed mode — module icon with popover sub-menu */}
-            <div className="hidden group-data-[collapsible=icon]:block">
-              <SidebarGroup>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <Collapsible
-                      open={isOpen}
-                      onOpenChange={() => toggleModule(mod.module_slug)}
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton
-                            tooltip={mod.display_name}
-                            isActive={isModuleActive}
-                            className={cn(
-                              !isModuleActive && 'text-muted-foreground',
-                            )}
-                          >
-                            {createElement(IconComponent, {
-                              className: 'h-4 w-4 shrink-0',
-                            })}
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          {children.map((sm) => {
-                            const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
-                            const isActive =
-                              currentPath === subModulePath ||
-                              currentPath.startsWith(subModulePath + '/');
-                            const SubModuleIcon = getSubModuleIcon(
-                              sm.sub_module_slug,
-                            );
+            {!forceExpanded && (
+              <div className="hidden group-data-[collapsible=icon]:block">
+                <SidebarGroup>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      <Collapsible
+                        open={isOpen}
+                        onOpenChange={() => toggleModule(mod.module_slug)}
+                      >
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
+                              tooltip={mod.display_name}
+                              isActive={isModuleActive}
+                              className={cn(
+                                isModuleActive
+                                  ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
+                                  : 'text-foreground hover:bg-muted rounded-xl bg-transparent',
+                              )}
+                            >
+                              {createElement(IconComponent, {
+                                className: 'h-4 w-4 shrink-0',
+                              })}
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            {children.map((sm) => {
+                              const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
+                              const isActive =
+                                currentPath === subModulePath ||
+                                currentPath.startsWith(subModulePath + '/');
+                              const SubModuleIcon = getSubModuleIcon(
+                                sm.sub_module_slug,
+                              );
 
-                            return (
-                              <SidebarMenuButton
-                                key={sm.sub_module_id}
-                                asChild
-                                isActive={isActive}
-                                tooltip={sm.display_name}
-                                className={cn(
-                                  !isActive && 'text-muted-foreground',
-                                )}
-                              >
-                                <a href={subModulePath}>
-                                  {createElement(SubModuleIcon, {
-                                    className: 'h-4 w-4 shrink-0',
-                                  })}
-                                </a>
-                              </SidebarMenuButton>
-                            );
-                          })}
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            </div>
+                              return (
+                                <SidebarMenuButton
+                                  key={sm.sub_module_id}
+                                  asChild
+                                  isActive={isActive}
+                                  tooltip={sm.display_name}
+                                  className={cn(
+                                    isActive
+                                      ? 'rounded-lg bg-green-50 font-medium text-green-700'
+                                      : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent',
+                                  )}
+                                >
+                                  <a
+                                    href={subModulePath}
+                                    onClick={() => onNavigate?.()}
+                                  >
+                                    {createElement(SubModuleIcon, {
+                                      className: 'h-4 w-4 shrink-0',
+                                    })}
+                                  </a>
+                                </SidebarMenuButton>
+                              );
+                            })}
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              </div>
+            )}
 
             {/* Expanded mode — hidden when sidebar is icon mode */}
-            <div className="group-data-[collapsible=icon]:hidden">
+            <div
+              className={cn(
+                !forceExpanded && 'group-data-[collapsible=icon]:hidden',
+              )}
+            >
               <Collapsible
                 open={isOpen}
                 onOpenChange={() => toggleModule(mod.module_slug)}
@@ -152,7 +173,9 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                     <SidebarGroupLabel
                       className={cn(
                         'cursor-pointer gap-2 select-none',
-                        !isModuleActive && 'text-muted-foreground',
+                        isModuleActive
+                          ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
+                          : 'text-foreground hover:bg-muted rounded-xl bg-transparent',
                       )}
                     >
                       {createElement(IconComponent, {
@@ -182,39 +205,46 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarGroupContent>
-                      <SidebarMenu>
-                        {children.map((sm) => {
-                          const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
-                          const isActive =
-                            currentPath === subModulePath ||
-                            currentPath.startsWith(subModulePath + '/');
-                          const SubModuleIcon = getSubModuleIcon(
-                            sm.sub_module_slug,
-                          );
+                      <div className="ml-5 border-l-2 border-green-200 pl-3">
+                        <SidebarMenu>
+                          {children.map((sm) => {
+                            const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
+                            const isActive =
+                              currentPath === subModulePath ||
+                              currentPath.startsWith(subModulePath + '/');
+                            const SubModuleIcon = getSubModuleIcon(
+                              sm.sub_module_slug,
+                            );
 
-                          return (
-                            <SidebarMenuItem key={sm.sub_module_id}>
-                              <SidebarMenuButton
-                                asChild
-                                isActive={isActive}
-                                tooltip={sm.display_name}
-                                className={cn(
-                                  !isActive && 'text-muted-foreground',
-                                )}
-                              >
-                                <a href={subModulePath}>
-                                  {createElement(SubModuleIcon, {
-                                    className: 'h-4 w-4 shrink-0',
-                                  })}
-                                  <span className="truncate capitalize">
-                                    {sm.display_name}
-                                  </span>
-                                </a>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          );
-                        })}
-                      </SidebarMenu>
+                            return (
+                              <SidebarMenuItem key={sm.sub_module_id}>
+                                <SidebarMenuButton
+                                  asChild
+                                  isActive={isActive}
+                                  tooltip={sm.display_name}
+                                  className={cn(
+                                    isActive
+                                      ? 'rounded-lg bg-green-50 font-medium text-green-700'
+                                      : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent',
+                                  )}
+                                >
+                                  <a
+                                    href={subModulePath}
+                                    onClick={() => onNavigate?.()}
+                                  >
+                                    {createElement(SubModuleIcon, {
+                                      className: 'h-4 w-4 shrink-0',
+                                    })}
+                                    <span className="truncate capitalize">
+                                      {sm.display_name}
+                                    </span>
+                                  </a>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            );
+                          })}
+                        </SidebarMenu>
+                      </div>
                     </SidebarGroupContent>
                   </CollapsibleContent>
                 </SidebarGroup>
