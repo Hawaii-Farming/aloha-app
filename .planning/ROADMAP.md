@@ -72,7 +72,12 @@
   3. Below the mobile breakpoint, the desktop sidebar is hidden; the compact mobile header shows hamburger + logo + avatar, and tapping the hamburger opens a full-screen drawer sliding from the left over a `black/30` backdrop using Framer Motion spring + fade.
   4. Tapping the backdrop or any leaf navigation item closes the drawer; the drawer reuses the same nav data source as the desktop sidebar (single nav config, no duplication).
   5. All existing workspace routes still load correctly under the new shell with org switching, navigation permissions, and `loadOrgWorkspace()` contract unchanged.
-**Plans**: TBD
+**Plans**: 5 plans
+- [x] 09-01-PLAN.md — Sidebar width bump + workspace-sidebar/module-sidebar-navigation Aloha restyle [Wave 1]
+- [ ] 09-02-PLAN.md — NavbarSearch renderTrigger seam + WorkspaceNavbar + AlohaLogoSquare [Wave 2]
+- [ ] 09-03-PLAN.md — framer-motion install + WorkspaceMobileHeader + WorkspaceMobileDrawer [Wave 2]
+- [ ] 09-04-PLAN.md — layout.tsx shell integration + mobile-navigation.tsx delete [Wave 3]
+- [ ] 09-05-PLAN.md — Phase verification smoke + a11y audit + STATE/ROADMAP update [Wave 4]
 **UI hint**: yes
 
 ### Phase 10: AG Grid Theme & Dark Mode Verification

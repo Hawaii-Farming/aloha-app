@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Aloha Design System Retheme
 status: executing
-stopped_at: Phase 9 UI-SPEC approved
-last_updated: "2026-04-10T17:54:31.482Z"
-last_activity: 2026-04-10 -- Phase 8 execution started
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-04-10T18:15:40.788Z"
+last_activity: 2026-04-10
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
-  percent: 100
+  total_plans: 14
+  completed_plans: 10
+  percent: 71
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-10)
 
 **Core value:** Every module renders real data from the database and supports full CRUD operations through a polished, consistent shell and design system.
-**Current focus:** Phase 8 — Shared Primitives
+**Current focus:** Phase 9 — App Shell — Navbar, Sidebar, Drawer
 
 ## Current Position
 
-Phase: 8 (Shared Primitives) — EXECUTING
-Plan: 1 of 6
-Status: Executing Phase 8
-Last activity: 2026-04-10 -- Phase 8 execution started
+Phase: 9 (App Shell — Navbar, Sidebar, Drawer) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-04-10
 
 Progress: [                    ] 0% (0/4 v2.0 phases complete)
 
@@ -58,6 +58,7 @@ Progress: [                    ] 0% (0/4 v2.0 phases complete)
 | Phase 07-design-foundations P07-01 | 25min | 2 tasks | 2 files |
 | Phase 07-design-foundations P07-02 | 2min | 3 tasks | 4 files |
 | Phase 07-design-foundations P03 | ~15min | 3 tasks | 4 files |
+| Phase 09-app-shell-navbar-sidebar-drawer P01 | 3min | 3 tasks | 3 files |
 
 ### v1.0 Historical Velocity
 
@@ -105,6 +106,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Side-panel forms (Shadcn Sheet) for all CRUD, matching register pattern
 - AG Grid themed via `themeQuartz.withParams()` — single theme config file inherited by all grids
 - [Phase 07-design-foundations]: Plan 7-03 escalated 6 WCAG failures to human instead of silently retuning the locked palette (Rule 4)
+- [Phase 09-app-shell-navbar-sidebar-drawer]: Literal green/emerald Tailwind classes for sidebar active states (intentional exception to token rule per D-09/D-11)
 
 ### Pending Todos
 
@@ -122,7 +124,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-10T17:54:31.479Z
-Stopped at: Phase 9 UI-SPEC approved
-Resume file: .planning/phases/09-app-shell-navbar-sidebar-drawer/09-UI-SPEC.md
+Last session: 2026-04-10T18:15:36.408Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: None
 Next action: `/gsd-plan-phase 7`
