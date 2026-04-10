@@ -101,21 +101,29 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                         onOpenChange={() => toggleModule(mod.module_slug)}
                       >
                         <SidebarMenuItem>
-                          <CollapsibleTrigger asChild>
-                            <SidebarMenuButton
-                              tooltip={mod.display_name}
-                              isActive={isModuleActive}
-                              className={cn(
-                                isModuleActive
-                                  ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
-                                  : 'text-foreground hover:bg-muted rounded-xl bg-transparent',
-                              )}
+                          <SidebarMenuButton
+                            asChild
+                            tooltip={mod.display_name}
+                            isActive={isModuleActive}
+                            className={cn(
+                              isModuleActive
+                                ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25'
+                                : 'text-foreground hover:bg-muted rounded-xl bg-transparent',
+                            )}
+                          >
+                            <Link
+                              to={modulePath}
+                              onClick={() => {
+                                if (!isOpen) toggleModule(mod.module_slug);
+                                onNavigate?.();
+                              }}
+                              aria-label={mod.display_name}
                             >
                               {createElement(IconComponent, {
                                 className: 'h-4 w-4 shrink-0',
                               })}
-                            </SidebarMenuButton>
-                          </CollapsibleTrigger>
+                            </Link>
+                          </SidebarMenuButton>
                           <CollapsibleContent>
                             {children.map((sm) => {
                               const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
