@@ -12,10 +12,10 @@
 
 ### Design Tokens (DESIGN)
 
-- [ ] **DESIGN-01**: `DESIGN.md` is rewritten as the Aloha theme source of truth — Inter 16px base, slate neutrals, green-500→emerald-600 gradient primary, rounded-2xl radius scale, shadow tokens, light-first.
-- [ ] **DESIGN-02**: Tailwind 4 `@theme` block in the app CSS is updated with the Aloha palette, font family, radius, and shadow tokens (replacing Supabase tokens), matching `DESIGN.md`.
+- [x] **DESIGN-01**: `DESIGN.md` is rewritten as the Aloha theme source of truth — Inter 16px base, slate neutrals, green-500→emerald-600 gradient primary, rounded-2xl radius scale, shadow tokens, light-first.
+- [x] **DESIGN-02**: Tailwind 4 `@theme` block in the app CSS is updated with the Aloha palette, font family, radius, and shadow tokens (replacing Supabase tokens), matching `DESIGN.md`.
 - [ ] **DESIGN-03**: Inter variable font is loaded via `@fontsource-variable/inter`, replacing Geist as the body font across the app.
-- [ ] **DESIGN-04**: Light mode is canonical and dark mode is derived, with WCAG AA contrast verified on every token pair used in shell chrome and primitives.
+- [x] **DESIGN-04**: Light mode is canonical and dark mode is derived, with WCAG AA contrast verified on every token pair used in shell chrome and primitives.
 
 ### Top Navbar (NAVBAR)
 
@@ -55,7 +55,7 @@
 
 ### Dark Mode (DARK)
 
-- [ ] **DARK-01**: The dark palette is derived from the light palette with WCAG AA contrast verified on shell chrome, primitives, and AG Grid.
+- [x] **DARK-01**: The dark palette is derived from the light palette with WCAG AA contrast verified on shell chrome, primitives, and AG Grid.
 - [ ] **DARK-02**: The existing `next-themes` toggle continues to work across every existing route with no regressions in layout, focus states, or contrast.
 
 ---
