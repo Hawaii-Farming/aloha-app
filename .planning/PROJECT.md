@@ -1,12 +1,26 @@
-# HR Module Submodules
+# Aloha ERP App
 
 ## What This Is
 
-Wire up all HR submodules in the Aloha ERP app with AG Grid Community tables, side-panel CRUD forms, and row-click detail views. The register submodule is already built as the base pattern; this project replicates and adapts that pattern across 7 remaining HR submodules backed by existing Supabase schema tables and views.
+Aloha is a farm operations ERP for Hawaii Farming. v1.0 wired up the HR module with AG Grid tables and CRUD forms on a Supabase-inspired theme. v2.0 replaces that theme with the polished Aloha design system (light-first, dark adapted) across the app shell — sidebar, top navbar, mobile drawer, design tokens, and shared primitives — without touching feature behavior.
 
 ## Core Value
 
-Every HR submodule renders real data from the database and supports full CRUD operations through AG Grid tables styled to the Supabase-inspired design system.
+Every module renders real data from the database and supports full CRUD operations through a polished, consistent shell and design system that feels fast and clear to field and office users alike.
+
+## Current Milestone: v2.0 Aloha Design System Retheme
+
+**Goal:** Replace the Supabase-inspired theme with the polished Aloha design system (light-first, dark adapted) across shell chrome only — sidebar, top navbar, mobile drawer, tokens, buttons, cards — without changing feature behavior.
+
+**Target features:**
+- Rewrite DESIGN.md as source of truth for the new Aloha theme (Inter 16px base, green-500→emerald-600 gradient primary, rounded-2xl, slate neutrals, WCAG AA light + dark)
+- Update Tailwind 4 theme tokens / CSS variables in the app to match DESIGN.md
+- New 72px top navbar: gradient Aloha logo left, command-palette-style search center, avatar right
+- Rebuild workspace sidebar: 220px expanded / 68px collapsed, gradient active pill, accordion sub-items, PanelLeft toggle
+- Mobile: full-screen drawer sliding from left with backdrop (Framer Motion) replacing the desktop sidebar below breakpoint
+- Restyle shared primitives (Button, Card, Badge, Avatar, form inputs, side panel) to match the Aloha prototype
+- Adapt AG Grid theme to the new tokens so existing HR grids inherit the new look without code changes
+- Preserve next-themes dark mode, existing routes, loaders, actions, i18n, CSRF, and CRUD flows
 
 ## Requirements
 
@@ -32,7 +46,7 @@ Every HR submodule renders real data from the database and supports full CRUD op
 
 ### Active
 
-(None — all v1 requirements shipped. Next milestone will define new requirements.)
+(Defined in `.planning/REQUIREMENTS.md` for milestone v2.0 — Aloha design system retheme.)
 
 ### Out of Scope
 
@@ -62,6 +76,7 @@ Shipped v1.0 with 6 phases, 21 plans across 199 commits (283 files changed, +31,
 - **Pattern**: Replicate register submodule pattern (loader + action + component) with AG Grid replacing TanStack Table
 - **Schema**: Use existing tables/views where possible; only create hr_employee_review migration
 - **Stack**: React Router 7 SSR, Supabase, TypeScript, Tailwind CSS 4, Shadcn UI — no new UI libraries beyond AG Grid
+- **v2.0 retheme**: Shell chrome + design tokens only — no feature changes, no new pages, no role/device switching. Preserve Shadcn/Radix, Tailwind 4, AG Grid. Light mode canonical, dark adapted. WCAG AA both themes. No breaking changes to component props or route loaders.
 
 ## Key Decisions
 
@@ -96,4 +111,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after v1.0 milestone*
+*Last updated: 2026-04-10 — milestone v2.0 Aloha Design System Retheme started*
