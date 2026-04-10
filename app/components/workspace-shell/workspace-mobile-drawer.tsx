@@ -1,9 +1,14 @@
 import { useEffect, useRef } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { X } from 'lucide-react';
+
+import { Button } from '@aloha/ui/button';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
+
+import { AlohaLogoSquare } from './aloha-logo-square';
 
 interface WorkspaceMobileDrawerProps {
   open: boolean;
@@ -76,6 +81,24 @@ export function WorkspaceMobileDrawer({
             aria-label="Mobile navigation"
             data-test="workspace-mobile-drawer"
           >
+            <div className="border-border flex h-14 shrink-0 items-center justify-between border-b px-3">
+              <div className="flex items-center gap-2">
+                <AlohaLogoSquare size="sm" />
+                <span className="text-foreground text-base font-semibold">
+                  Aloha
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                aria-label="Close navigation menu"
+                data-test="workspace-mobile-drawer-close"
+              >
+                <X className="size-5" />
+              </Button>
+            </div>
+
             <div
               ref={firstNavRef}
               className="mt-1 flex-1 overflow-y-auto px-3 py-2"
