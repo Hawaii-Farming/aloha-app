@@ -58,18 +58,18 @@
 ### Dark Mode (DARK)
 
 - [x] **DARK-01**: The dark palette is derived from the light palette with WCAG AA contrast verified on shell chrome, primitives, and AG Grid.
-- [ ] **DARK-02**: The existing `next-themes` toggle continues to work across every existing route with no regressions in layout, focus states, or contrast.
-- [ ] **DARK-03**: In dark mode, the navbar and sidebar render on a distinct elevated dark surface (not the page background); the centered navbar search trigger remains legible, and the light-mode convention (white nav/sidebar over slate-50 page) has a tonally equivalent dark-mode pairing.
+- [x] **DARK-02**: The existing `next-themes` toggle continues to work across every existing route with no regressions in layout, focus states, or contrast.
+- [x] **DARK-03**: In dark mode, the navbar and sidebar render on a distinct elevated dark surface (not the page background); the centered navbar search trigger remains legible, and the light-mode convention (white nav/sidebar over slate-50 page) has a tonally equivalent dark-mode pairing.
 
 ### Template Parity (PARITY)
 
 Parity with the reference prototype at `../aloha-design/prototype`.
 
-- [ ] **PARITY-01**: The desktop sidebar structurally matches the prototype — NAVIGATION/MODULES section headers, inline collapse affordance, separator line between sections, chevron dropdown buttons on module rows, and the "Focused" footer control — ported onto the existing Shadcn sidebar primitive (no new UI libraries).
+- [x] **PARITY-01**: The desktop sidebar structurally matches the prototype — NAVIGATION/MODULES section headers, inline collapse affordance, separator line between sections, chevron dropdown buttons on module rows, and the "Focused" footer control — ported onto the existing Shadcn sidebar primitive (no new UI libraries).
 - [ ] **PARITY-02**: The sidebar expand/collapse toggle lives on the navbar **before** the Aloha logo square (leftmost control), replacing the current detached edge toggle.
 - [ ] **PARITY-03**: The navbar avatar fallback renders the current org's initials (e.g., "HF" for Hawaii Farming) instead of a static "A", derived from the loaded org context.
-- [ ] **PARITY-04**: Sub-module list items have visible vertical separation from the parent module row in the sidebar (matches prototype spacing).
-- [ ] **PARITY-05**: Scrollbars on the sidebar and main content areas match the prototype styling in both light and dark modes (thin, themed thumb, no OS default).
+- [x] **PARITY-04**: Sub-module list items have visible vertical separation from the parent module row in the sidebar (matches prototype spacing).
+- [x] **PARITY-05**: Scrollbars on the sidebar and main content areas match the prototype styling in both light and dark modes (thin, themed thumb, no OS default).
 
 ### App Shell Bugs (BUG)
 
