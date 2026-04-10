@@ -700,22 +700,16 @@ Top 3 to watch: **R-01, R-02, R-03** as flagged by user.
 
 **If any A1–A6 item surprises the plan**, fix inline during execution — none are architectural blockers.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should `--gradient-primary` be exposed as a CSS var in `shadcn-ui.css` or only as a Tailwind arbitrary utility?**
-   - What we know: CONTEXT D-05 requires the gradient be separate from `--primary`. The mechanism is Claude's discretion.
-   - What's unclear: Does Phase 8 button work read best from `background: var(--gradient-primary)` (CSS) or from a bespoke utility `.bg-gradient-primary` (Tailwind)?
-   - Recommendation: Define `--gradient-primary` as a CSS var (single source of truth, dark-mode overridable). Add `--color-gradient-primary` mapping in `theme.css` so Tailwind can consume it. Phase 8 picks consumer style.
+1. **Should `--gradient-primary` be exposed as a CSS var in `shadcn-ui.css` or only as a Tailwind arbitrary utility?** — **RESOLVED**
+   - Decision: expose as a CSS custom property `--gradient-primary` in `shadcn-ui.css` `:root` + `.dark` (single source of truth, dark-mode overridable) AND add `--color-gradient-primary: var(--gradient-primary)` mapping in `theme.css` `@theme` so Tailwind arbitrary utilities can consume it. Applied in Plan 07-01 (Task 2) and Plan 07-02 (Task 1).
 
-2. **Remove `--glass-surface` and `--slate-alpha-wash`, or retain as orphans?**
-   - What we know: Both are Supabase translucency tokens with no Aloha counterpart per D-03. Both map into `theme.css` `@theme` as `--color-glass-surface` / `--color-slate-alpha-wash`.
-   - What's unclear: Whether any v1.0 component actually consumes them via `bg-glass-surface` / similar.
-   - Recommendation: `grep -rn "glass-surface\|slate-alpha-wash" app/ packages/` in plan Task 2. If zero hits → delete both var defs + theme.css mappings. If hits → retain as orphans with a "remove in Phase 10 cleanup" comment.
+2. **Remove `--glass-surface` and `--slate-alpha-wash`, or retain as orphans?** — **RESOLVED**
+   - Decision: DELETE unconditionally from both `shadcn-ui.css` (var defs) and `theme.css` `@theme` (mappings). These are Supabase-era translucency tokens with no Aloha counterpart per D-03; retaining orphans violates the "no Supabase-era tokens remaining" success criterion in ROADMAP.md. If any component currently consumes them, that's a pre-existing dead reference and will surface in Phase 8/9 restyle where it can be fixed in context. Applied in Plan 07-01 (Task 2) and Plan 07-02 (Task 1).
 
-3. **Does `--radius-radius: var(--radius)` in `theme.css` L65 need to exist?**
-   - What we know: It's a weird self-referential mapping. The actual consumed tokens are `--radius-sm/md/lg`.
-   - What's unclear: Whether Tailwind utility `rounded-radius` or similar is used anywhere.
-   - Recommendation: `grep -rn "rounded-radius" app/ packages/` in plan. If no hits, delete the line. Cosmetic cleanup.
+3. **Does `--radius-radius: var(--radius)` in `theme.css` L65 need to exist?** — **RESOLVED**
+   - Decision: DEFERRED to Phase 10 cleanup — out of scope for Phase 7. The line is cosmetic dead code (self-reference, no known consumer) and does not block the phase goal (token swap + Inter + WCAG). Touching it now adds a grep step without buying anything for the goal. Plan 07-02 Task 1 explicitly leaves this line alone so the deferral is observable.
 
 ## Sources
 
@@ -785,11 +779,11 @@ Top 3 to watch: **R-01, R-02, R-03** as flagged by user.
 | WCAG Tooling | HIGH | `wcag-contrast@3.0.0` verified, approach sized right for 24 assertions |
 | Pitfalls | HIGH | All grounded in direct file inspection |
 
-### Open Questions
+### Open Questions (RESOLVED)
 
-1. `--gradient-primary` as CSS var vs Tailwind utility (recommend CSS var)
-2. Whether `--glass-surface` / `--slate-alpha-wash` are consumed anywhere (grep during plan)
-3. Whether `--radius-radius` self-reference in theme.css is consumed (grep during plan)
+1. **RESOLVED:** `--gradient-primary` exposed as CSS custom property in `shadcn-ui.css` + `--color-gradient-primary` mapped in `theme.css` `@theme` (Plan 07-01 Task 2 + Plan 07-02 Task 1).
+2. **RESOLVED:** `--glass-surface` / `--slate-alpha-wash` deleted unconditionally (Plan 07-01 Task 2 + Plan 07-02 Task 1) — Supabase-era orphans, no Aloha counterpart per D-03.
+3. **RESOLVED:** `--radius-radius` self-reference explicitly deferred to Phase 10 cleanup — out of scope for Phase 7 (goal is token swap + Inter + WCAG, not dead-code removal).
 
 ### Ready for Planning
 
