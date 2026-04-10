@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Aloha Design System Retheme
 status: executing
-stopped_at: Completed 10-03-PLAN.md
-last_updated: "2026-04-10T21:57:54.241Z"
+stopped_at: Completed 10-04-PLAN.md
+last_updated: "2026-04-10T22:05:03.321Z"
 last_activity: 2026-04-10
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 22
-  completed_plans: 20
-  percent: 91
+  completed_plans: 21
+  percent: 95
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-10)
 ## Current Position
 
 Phase: 10 (ag-grid-theme-template-parity-dark-mode) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-04-10
 
@@ -67,6 +67,7 @@ Progress: [===============     ] 75% (3/4 v2.0 phases complete)
 | Phase 10 P10-01 | 18min | 3 tasks | 13 files |
 | Phase 10 P10-02 | 12min | 3 tasks | 5 files |
 | Phase 10 P03 | 20min | 3 tasks | 10 files |
+| Phase 10 P04 | ~15min | 3 tasks | 10 files |
 
 ### v1.0 Historical Velocity
 
@@ -123,6 +124,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 10]: Workspace layout scroll owner moved from <main> to inner content div so AG Grid virtual scroller gets a bounded min-h-0 chain
 - [Phase 10]: Render both NAVIGATION and MODULES SidebarGroupLabel headers (plan said 'MODULES reserved for future' but Wave 0 e2e contract asserts both visible — test wins)
 - [Phase 10]: Accordion sub-menu uses plain div with data-sidebar='menu-sub' attribute (not the SidebarMenuSub primitive) to keep existing SidebarMenuItem children
+- [Phase 10]: BUG-01 fixed by unifying expanded sidebar branch on SidebarMenuButton asChild + separating CollapsibleTrigger to an absolute sibling; isModuleActive and openModules derived via useMemo (no useEffect)
+- [Phase 10]: BUG-02 fixed by using item.path as the cmdk CommandItem value and moving label into keywords array (prevents normalization collisions between module + sub-module prefixes)
+- [Phase 10]: PARITY-03 avatar-initials e2e contract required a sidebar-footer avatar in addition to the navbar; added to workspace-sidebar.tsx as a Rule 2 deviation since the plan omitted that file
 
 ### Pending Todos
 
@@ -140,7 +144,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-10T21:57:48.890Z
-Stopped at: Completed 10-03-PLAN.md
+Last session: 2026-04-10T22:04:57.641Z
+Stopped at: Completed 10-04-PLAN.md
 Resume file: None
 Next action: `/gsd-plan-phase 10`

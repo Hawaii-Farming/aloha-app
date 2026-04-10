@@ -67,14 +67,14 @@ Parity with the reference prototype at `../aloha-design/prototype`.
 
 - [x] **PARITY-01**: The desktop sidebar structurally matches the prototype — NAVIGATION/MODULES section headers, inline collapse affordance, separator line between sections, chevron dropdown buttons on module rows, and the "Focused" footer control — ported onto the existing Shadcn sidebar primitive (no new UI libraries).
 - [ ] **PARITY-02**: The sidebar expand/collapse toggle lives on the navbar **before** the Aloha logo square (leftmost control), replacing the current detached edge toggle.
-- [ ] **PARITY-03**: The navbar avatar fallback renders the current org's initials (e.g., "HF" for Hawaii Farming) instead of a static "A", derived from the loaded org context.
+- [x] **PARITY-03**: The navbar avatar fallback renders the current org's initials (e.g., "HF" for Hawaii Farming) instead of a static "A", derived from the loaded org context.
 - [x] **PARITY-04**: Sub-module list items have visible vertical separation from the parent module row in the sidebar (matches prototype spacing).
 - [x] **PARITY-05**: Scrollbars on the sidebar and main content areas match the prototype styling in both light and dark modes (thin, themed thumb, no OS default).
 
 ### App Shell Bugs (BUG)
 
-- [ ] **BUG-01**: The active-module gradient pill in the sidebar renders immediately when a module is clicked (and on initial load for the current route), not only after a sub-module has been selected.
-- [ ] **BUG-02**: Selecting a module entry from the navbar command-palette search navigates to that module's page reliably (currently no-op when the target is a module-level link).
+- [x] **BUG-01**: The active-module gradient pill in the sidebar renders immediately when a module is clicked (and on initial load for the current route), not only after a sub-module has been selected.
+- [x] **BUG-02**: Selecting a module entry from the navbar command-palette search navigates to that module's page reliably (currently no-op when the target is a module-level link).
 
 ---
 
