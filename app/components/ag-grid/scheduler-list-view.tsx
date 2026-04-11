@@ -577,13 +577,13 @@ export default function SchedulerListView(props: ListViewProps) {
             />
 
             <Button
-              size="sm"
               variant="outline"
               onClick={() => setHistoryOpen(true)}
               data-test="history-toggle"
+              aria-label="History"
+              className="h-9 w-9 rounded-full p-0"
             >
-              <History className="mr-2 h-4 w-4" />
-              History
+              <History className="h-4 w-4" />
             </Button>
 
             <Button
