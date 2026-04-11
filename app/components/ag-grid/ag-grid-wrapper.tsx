@@ -132,6 +132,22 @@ function AgGridInner({
     });
   }, [colDefs, isMobile]);
 
+  // Wrap user's onGridReady so that on mobile we force-unpin every column
+  // AFTER any restored column state has been applied. Without this, a
+  // persisted `pinned: 'left'` from localStorage would override the
+  // stripped colDefs on mount.
+  const handleGridReadyWithMobileUnpin = useCallback(
+    (event: GridReadyEvent) => {
+      onGridReady?.(event);
+      if (isMobile) {
+        event.api.applyColumnState({
+          defaultState: { pinned: null },
+        });
+      }
+    },
+    [onGridReady, isMobile],
+  );
+
   const defaultColDef = useMemo(
     () => ({
       resizable: true,
@@ -222,7 +238,7 @@ function AgGridInner({
           loading={loading}
           overlayNoRowsTemplate={emptyMessage ?? 'No records found'}
           rowSelection={rowSelection}
-          onGridReady={onGridReady}
+          onGridReady={handleGridReadyWithMobileUnpin}
           onSelectionChanged={onSelectionChanged}
           onColumnMoved={onColumnMoved}
           onColumnResized={onColumnResized}
