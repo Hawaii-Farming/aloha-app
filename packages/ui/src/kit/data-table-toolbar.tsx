@@ -15,22 +15,20 @@ interface DataTableToolbarProps {
 export function DataTableToolbar(props: DataTableToolbarProps) {
   return (
     <div
-      className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+      className="flex flex-wrap items-center gap-2"
       data-test="data-table-toolbar"
     >
-      <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
-          value={props.searchValue}
-          onChange={(e) => props.onSearchChange(e.target.value)}
-          placeholder={props.searchPlaceholder}
-          className="placeholder:text-muted-foreground/50 h-8 w-full rounded-md text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none sm:w-[250px]"
-          data-test="table-search"
-        />
+      <Input
+        value={props.searchValue}
+        onChange={(e) => props.onSearchChange(e.target.value)}
+        placeholder={props.searchPlaceholder}
+        className="placeholder:text-muted-foreground/50 h-8 min-w-0 flex-1 rounded-md text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none sm:max-w-[250px]"
+        data-test="table-search"
+      />
 
-        {props.filterSlot}
-      </div>
+      {props.filterSlot}
 
-      <div className="flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-2">
         {props.selectedCount && props.selectedCount > 0 ? (
           <span className="text-muted-foreground text-sm">
             <Trans

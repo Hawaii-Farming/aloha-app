@@ -520,8 +520,8 @@ export default function SchedulerListView(props: ListViewProps) {
         className="flex min-h-0 flex-1 flex-col"
         data-test="scheduler-list-view"
       >
-        {/* Single toolbar row — spans full width */}
-        <div className="flex shrink-0 items-center justify-between gap-4 pb-4">
+        {/* Toolbar — wraps on narrow viewports */}
+        <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
           <div className="flex items-center gap-2">
             <Button
               size="sm"
@@ -550,12 +550,12 @@ export default function SchedulerListView(props: ListViewProps) {
               <ChevronRight className="h-4 w-4" />
             </Button>
 
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium whitespace-nowrap">
               {formatWeekLabel(currentWeek)}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex min-w-0 flex-1 items-center gap-2 sm:flex-initial">
             <input
               type="text"
               value={searchValue}
@@ -572,7 +572,7 @@ export default function SchedulerListView(props: ListViewProps) {
                 }, 300);
               }}
               placeholder="Search scheduler..."
-              className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
+              className="border-input bg-background placeholder:text-muted-foreground/50 h-8 min-w-0 flex-1 rounded-md border px-3 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none sm:w-[200px] sm:flex-initial"
               data-test="scheduler-search"
             />
 

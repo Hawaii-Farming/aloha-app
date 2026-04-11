@@ -1,5 +1,5 @@
 import type { ComponentType, RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   ColDef,
@@ -26,6 +26,22 @@ import { useTheme } from 'next-themes';
 import { ClientOnly } from '@aloha/ui/client-only';
 
 import { getAgGridTheme } from '~/components/ag-grid/ag-grid-theme';
+
+// Match MOBILE_BREAKPOINT from @aloha/ui/hooks/use-mobile (768). Local copy
+// because the shared hook isn't exported from the package.
+const MOBILE_BREAKPOINT = 768;
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    const onChange = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    onChange();
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+  return isMobile;
+}
 
 // Module-level constants so references are stable across renders
 const AG_GRID_MODULES: Module[] = [AllCommunityModule];
@@ -101,6 +117,21 @@ function AgGridInner({
 }: AgGridWrapperProps) {
   const { resolvedTheme } = useTheme();
   const theme = useMemo(() => getAgGridTheme(), []);
+  const isMobile = useIsMobile();
+
+  // Strip pinned: 'left'/'right' from colDefs on mobile — pinned columns
+  // occupy too much of the narrow viewport and hide the rest of the table.
+  const effectiveColDefs = useMemo(() => {
+    if (!isMobile) return colDefs;
+    return colDefs.map((col) => {
+      if ('pinned' in col && col.pinned) {
+        const { pinned: _pinned, ...rest } = col as ColDef;
+        return rest;
+      }
+      return col;
+    });
+  }, [colDefs, isMobile]);
+
   const defaultColDef = useMemo(
     () => ({
       resizable: true,
@@ -168,7 +199,7 @@ function AgGridInner({
         <AgGridReact
           ref={gridRef}
           theme={theme}
-          columnDefs={colDefs}
+          columnDefs={effectiveColDefs}
           rowData={rowData}
           pinnedBottomRowData={pinnedBottomRowData}
           defaultColDef={defaultColDef}
