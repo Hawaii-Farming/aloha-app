@@ -1,25 +1,15 @@
-import { useMemo } from 'react';
-
-import {
-  ChevronLeft,
-  LayoutGrid,
-  PanelLeft,
-  PanelLeftClose,
-} from 'lucide-react';
+import { PanelLeft, PanelLeftClose } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroupLabel,
   useSidebar,
 } from '@aloha/ui/shadcn-sidebar';
 import { cn } from '@aloha/ui/utils';
 
 import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-navigation';
-import { getOrgInitials } from '~/lib/workspace/get-org-initials';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 function NavigationCollapseButton() {
@@ -48,12 +38,8 @@ export function WorkspaceSidebar(props: {
   orgName?: string | null;
   userEmail?: string | null;
 }) {
-  const { account, navigation, orgName, userEmail } = props;
+  const { account, navigation } = props;
   const { t } = useTranslation('common');
-  const initials = useMemo(
-    () => getOrgInitials(orgName, userEmail),
-    [orgName, userEmail],
-  );
 
   return (
     <Sidebar
@@ -96,38 +82,6 @@ export function WorkspaceSidebar(props: {
           />
         </div>
       </SidebarContent>
-
-      {/*
-       * Phase 10 PARITY-01: "Focused" footer placeholder (disabled visual).
-       * CONTEXT D-14 default — no click handler, aria-disabled.
-       */}
-      <SidebarFooter className="border-sidebar-border border-t group-data-[collapsible=icon]:hidden">
-        <div
-          data-test="workspace-sidebar-profile"
-          className="flex w-full items-center gap-3 px-3 py-2.5"
-        >
-          <Avatar size="sm">
-            <AvatarFallback className="bg-muted text-foreground text-xs font-semibold dark:bg-slate-700">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-foreground flex-1 truncate text-xs font-medium">
-            {orgName ?? 'Aloha'}
-          </span>
-        </div>
-        <button
-          type="button"
-          aria-disabled="true"
-          tabIndex={-1}
-          className="text-muted-foreground flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium opacity-60"
-        >
-          <LayoutGrid className="h-4 w-4" />
-          <span className="flex-1 text-left">
-            {t('shell.sidebar.focused_footer')}
-          </span>
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-      </SidebarFooter>
     </Sidebar>
   );
 }
