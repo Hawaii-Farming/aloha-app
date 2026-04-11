@@ -592,13 +592,13 @@ export default function SchedulerListView(props: ListViewProps) {
             <CsvExportButton gridApi={gridApi} fileName="scheduler" />
 
             <Button
-              size="sm"
               variant="brand"
               onClick={() => setCreateOpen(true)}
               data-test="sub-module-create-button"
+              aria-label="Create"
+              className="h-9 w-9 rounded-full p-0"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Create
+              <Plus className="h-4 w-4" />
             </Button>
           </div>
         </div>
