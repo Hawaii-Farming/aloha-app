@@ -76,12 +76,13 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
       />
 
       {/* Hide filter + action slots while mobile search is open so the
-       * input gets the full toolbar width. */}
+       * input gets the full toolbar width. Filters are pushed to the
+       * right so they sit next to actions. */}
       <div
         className={
           mobileSearchOpen
-            ? 'hidden flex-wrap items-center gap-2 sm:flex'
-            : 'flex flex-wrap items-center gap-2'
+            ? 'ml-auto hidden min-w-0 flex-1 items-center gap-2 sm:flex sm:flex-initial'
+            : 'ml-auto flex min-w-0 flex-1 items-center gap-2 sm:flex-initial'
         }
       >
         {props.filterSlot}
@@ -90,8 +91,8 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
       <div
         className={
           mobileSearchOpen
-            ? 'ml-auto hidden items-center gap-2 sm:flex'
-            : 'ml-auto flex items-center gap-2'
+            ? 'hidden items-center gap-2 sm:flex'
+            : 'flex items-center gap-2'
         }
       >
         {props.selectedCount && props.selectedCount > 0 ? (
