@@ -19,6 +19,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@aloha/ui/shadcn-sidebar';
 import { cn } from '@aloha/ui/utils';
 
@@ -43,6 +44,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
   } = props;
   const location = useLocation();
   const currentPath = location.pathname;
+  const { setOpen } = useSidebar();
 
   const subModulesByModule = useMemo(() => {
     const map = new Map<string, AppNavSubModule[]>();
@@ -105,7 +107,11 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
               <div className="hidden items-center justify-center px-2 py-1 group-data-[collapsible=icon]:flex">
                 <Link
                   to={modulePath}
-                  onClick={() => onNavigate?.()}
+                  onClick={() => {
+                    onNavigate?.();
+                    setOpen(true);
+                    if (hasChildren) setOpenSlug(mod.module_slug);
+                  }}
                   aria-label={mod.display_name}
                   title={mod.display_name}
                   className={cn(
