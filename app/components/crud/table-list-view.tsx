@@ -492,13 +492,13 @@ function BulkActions({
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
-            size="sm"
             variant="destructive"
             disabled={isSubmitting}
             data-test="bulk-delete-button"
+            aria-label="Delete selected"
+            className="h-9 w-9 rounded-full p-0"
           >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            <Trash2 className="h-4 w-4" />
           </Button>
         </AlertDialogTrigger>
 
