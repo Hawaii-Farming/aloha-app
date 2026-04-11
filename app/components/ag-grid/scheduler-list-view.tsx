@@ -572,7 +572,7 @@ export default function SchedulerListView(props: ListViewProps) {
                 }, 300);
               }}
               placeholder="Search scheduler..."
-              className="border-input bg-background placeholder:text-muted-foreground h-8 w-[200px] rounded-md border px-3 text-sm"
+              className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs"
               data-test="scheduler-search"
             />
 
