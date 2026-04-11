@@ -23,6 +23,8 @@ const shared = {
   rowVerticalPaddingScale: 1.6,
   columnBorder: true,
   iconSize: 12,
+  inputFocusBorder: 'solid 1px transparent',
+  inputFocusShadow: 'none',
 } as const;
 
 export function getAgGridTheme() {
