@@ -132,7 +132,7 @@ export function CreatePanel({
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side="right"
-        className="flex h-full w-[90%] flex-col gap-0 p-0 sm:max-w-2xl"
+        className="flex h-full w-full flex-col gap-0 rounded-none border-0 p-0 sm:w-[90%] sm:max-w-2xl sm:rounded-l-2xl sm:border-l"
         data-test="create-panel"
       >
         <SheetHeader className="border-b px-6 pt-6 pb-4">
