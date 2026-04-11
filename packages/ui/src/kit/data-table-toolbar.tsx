@@ -23,7 +23,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
 
   return (
     <div
-      className="flex flex-wrap items-center gap-2"
+      className="flex flex-nowrap items-center gap-2 sm:flex-wrap"
       data-test="data-table-toolbar"
     >
       {/* Backdrop dims the rest of the screen while search is open on mobile.
