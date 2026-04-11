@@ -291,26 +291,24 @@ export default function EmployeeReviewListView(props: ListViewProps) {
       data-test="employee-review-list-view"
     >
       {/* Toolbar */}
-      <div className="flex shrink-0 items-center justify-between gap-4 pb-4">
-        <div className="flex items-center gap-2">
-          <YearQuarterFilter years={reviewYears} />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <TableSearchInput
-            value={searchValue}
-            onChange={(value) => {
+      <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
+        <TableSearchInput
+          value={searchValue}
+          onChange={(value) => {
+            setSearchValue(value);
+            if (searchDebounceRef.current) {
+              clearTimeout(searchDebounceRef.current);
+            }
+            searchDebounceRef.current = setTimeout(() => {
               setSearchValue(value);
-              if (searchDebounceRef.current) {
-                clearTimeout(searchDebounceRef.current);
-              }
-              searchDebounceRef.current = setTimeout(() => {
-                setSearchValue(value);
-              }, 300);
-            }}
-            placeholder="Search reviews..."
-            data-test="employee-review-search"
-          />
+            }, 300);
+          }}
+          placeholder="Search reviews..."
+          data-test="employee-review-search"
+        />
+
+        <div className="ml-auto flex items-center gap-2">
+          <YearQuarterFilter years={reviewYears} />
         </div>
       </div>
 
