@@ -23,6 +23,7 @@ import {
 } from '~/components/ag-grid/column-state';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { scoreColorCellClassRules } from '~/components/ag-grid/row-class-rules';
+import { TableSearchInput } from '~/components/ag-grid/table-search-input';
 import { YearQuarterFilter } from '~/components/ag-grid/year-quarter-filter';
 import type { ListViewProps } from '~/lib/crud/types';
 
@@ -296,23 +297,18 @@ export default function EmployeeReviewListView(props: ListViewProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <input
-            type="text"
+          <TableSearchInput
             value={searchValue}
-            onChange={(e) => {
-              const value = e.target.value;
+            onChange={(value) => {
               setSearchValue(value);
-
               if (searchDebounceRef.current) {
                 clearTimeout(searchDebounceRef.current);
               }
-
               searchDebounceRef.current = setTimeout(() => {
                 setSearchValue(value);
               }, 300);
             }}
             placeholder="Search reviews..."
-            className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
             data-test="employee-review-search"
           />
         </div>

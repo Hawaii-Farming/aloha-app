@@ -11,7 +11,6 @@ import {
   ChefHat,
   Home,
   Lamp,
-  Search,
   Sofa,
   TreePalm,
   UserRound,
@@ -22,9 +21,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@aloha/ui/avatar';
 import { Badge } from '@aloha/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@aloha/ui/card';
-import { Input } from '@aloha/ui/input';
 import { cn } from '@aloha/ui/utils';
 
+import { TableSearchInput } from '~/components/ag-grid/table-search-input';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -487,18 +486,13 @@ export default function HousingMapView(props: ListViewProps) {
       className="flex flex-1 flex-col gap-5 overflow-y-auto"
       data-test="housing-map-view"
     >
-      <div className="flex items-center gap-3">
-        <div className="relative max-w-sm flex-1">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-          <Input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search accommodations..."
-            className="placeholder:text-muted-foreground/50 h-8 rounded-md pl-9 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
-            data-test="housing-search"
-          />
-        </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <TableSearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search accommodations..."
+          data-test="housing-search"
+        />
         <div className="text-muted-foreground text-sm">
           {filtered.length} accommodation
           {filtered.length !== 1 ? 's' : ''}

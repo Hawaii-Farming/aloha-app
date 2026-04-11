@@ -36,6 +36,7 @@ import {
 } from '~/components/ag-grid/column-state';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
+import { TableSearchInput } from '~/components/ag-grid/table-search-input';
 import { CreatePanel } from '~/components/crud/create-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
@@ -556,23 +557,18 @@ export default function SchedulerListView(props: ListViewProps) {
           </div>
 
           <div className="ml-auto flex min-w-0 flex-1 items-center gap-2 sm:flex-initial">
-            <input
-              type="text"
+            <TableSearchInput
               value={searchValue}
-              onChange={(e) => {
-                const value = e.target.value;
+              onChange={(value) => {
                 setSearchValue(value);
-
                 if (searchDebounceRef.current) {
                   clearTimeout(searchDebounceRef.current);
                 }
-
                 searchDebounceRef.current = setTimeout(() => {
                   setSearchValue(value);
                 }, 300);
               }}
               placeholder="Search scheduler..."
-              className="border-input bg-background placeholder:text-muted-foreground/50 h-8 min-w-0 flex-1 rounded-md border px-3 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none sm:w-[200px] sm:flex-initial"
               data-test="scheduler-search"
             />
 

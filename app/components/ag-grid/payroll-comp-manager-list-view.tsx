@@ -34,6 +34,7 @@ import {
   CurrencyRenderer,
   hoursFormatter,
 } from '~/components/ag-grid/payroll-formatters';
+import { TableSearchInput } from '~/components/ag-grid/table-search-input';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -548,23 +549,18 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <input
-            type="text"
+          <TableSearchInput
             value={searchValue}
-            onChange={(e) => {
-              const value = e.target.value;
+            onChange={(value) => {
               setSearchValue(value);
-
               if (searchDebounceRef.current) {
                 clearTimeout(searchDebounceRef.current);
               }
-
               searchDebounceRef.current = setTimeout(() => {
                 setSearchValue(value);
               }, 300);
             }}
             placeholder="Search payroll..."
-            className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
             data-test="payroll-comp-manager-search"
           />
         </div>
