@@ -1,5 +1,5 @@
 // Font: Inter Variable (matches Phase 7 app-wide migration — supersedes CONTEXT D-02)
-import { iconSetAlpine, themeQuartz } from 'ag-grid-community';
+import { iconSetMaterial, themeQuartz } from 'ag-grid-community';
 
 /**
  * Returns an AG Grid theme configured with Aloha/Phase-7 Supabase-inspired
@@ -22,11 +22,12 @@ const shared = {
   checkboxBorderRadius: 4,
   rowVerticalPaddingScale: 1.6,
   columnBorder: true,
+  iconSize: 12,
 } as const;
 
 export function getAgGridTheme() {
   return themeQuartz
-    .withPart(iconSetAlpine)
+    .withPart(iconSetMaterial)
     .withParams(
       {
         ...shared,
