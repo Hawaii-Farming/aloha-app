@@ -39,7 +39,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@aloha/ui/tooltip';
-import { Trans } from '@aloha/ui/trans';
 
 import { CreatePanel } from '~/components/crud/create-panel';
 import type {
@@ -328,13 +327,13 @@ export function TableListView({
                   />
                 )}
                 <Button
-                  size="sm"
                   variant="brand"
                   onClick={() => setCreateOpen(true)}
                   data-test="sub-module-create-button"
+                  aria-label="Create"
+                  className="h-9 w-9 rounded-full p-0"
                 >
-                  <Plus className="mr-2 h-4 w-4" />
-                  <Trans i18nKey="common:create" />
+                  <Plus className="h-4 w-4" />
                 </Button>
               </div>
             }

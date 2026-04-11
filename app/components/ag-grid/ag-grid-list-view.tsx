@@ -28,7 +28,6 @@ import {
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
 import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
-import { Trans } from '@aloha/ui/trans';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
@@ -271,13 +270,13 @@ export default function AgGridListView({
                 />
                 {(config?.formFields?.length ?? 0) > 0 && (
                   <Button
-                    size="sm"
                     variant="brand"
                     onClick={() => setCreateOpen(true)}
                     data-test="sub-module-create-button"
+                    aria-label="Create"
+                    className="h-9 w-9 rounded-full p-0"
                   >
-                    <Plus className="mr-2 h-4 w-4" />
-                    <Trans i18nKey="common:create" />
+                    <Plus className="h-4 w-4" />
                   </Button>
                 )}
               </div>
