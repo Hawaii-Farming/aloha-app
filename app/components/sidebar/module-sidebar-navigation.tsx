@@ -181,7 +181,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                       </SidebarMenuItem>
                     </SidebarMenu>
                   </SidebarGroupContent>
-                  <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden">
+                  <CollapsibleContent className="data-[state=closed]:animate-[collapsible-up_0.22s_cubic-bezier(0.4,0,0.2,1)] data-[state=open]:animate-[collapsible-down_0.32s_cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden">
                     <SidebarGroupContent>
                       {/* PARITY-04: vertical separation + dark-mode rail.
                        * Sub-items are plain anchors (not <li>) to avoid
