@@ -63,7 +63,13 @@ function getCurrentWeekStart(): string {
 function formatWeekLabel(weekStartStr: string): string {
   const weekStart = parseISO(weekStartStr);
   const weekEnd = addDays(weekStart, 6);
-  return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`;
+  const sameMonth = weekStart.getMonth() === weekEnd.getMonth();
+  // Compact: "Apr 5 – 11" when same month, "Mar 30 – Apr 5" when spanning.
+  // Year is omitted on narrow viewports (restored via title attribute).
+  if (sameMonth) {
+    return `${format(weekStart, 'MMM d')} – ${format(weekEnd, 'd')}`;
+  }
+  return `${format(weekStart, 'MMM d')} – ${format(weekEnd, 'MMM d')}`;
 }
 
 interface HistoryRow {
@@ -523,37 +529,38 @@ export default function SchedulerListView(props: ListViewProps) {
       >
         {/* Toolbar — wraps on narrow viewports */}
         <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
+          {/* Week navigator: a single pill with < | date | > */}
+          <div
+            className="border-border bg-background inline-flex items-center overflow-hidden rounded-full border"
+            data-test="week-navigator"
+          >
+            <button
+              type="button"
               onClick={handlePrev}
+              aria-label="Previous week"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center transition-colors"
               data-test="week-nav-prev"
             >
               <ChevronLeft className="h-4 w-4" />
-            </Button>
-
-            <Button
-              size="sm"
-              variant="outline"
+            </button>
+            <button
+              type="button"
               onClick={handleToday}
+              title="Jump to current week"
+              className="text-foreground hover:bg-muted border-border border-x px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
               data-test="week-nav-today"
             >
-              Today
-            </Button>
-
-            <Button
-              size="sm"
-              variant="outline"
+              {formatWeekLabel(currentWeek)}
+            </button>
+            <button
+              type="button"
               onClick={handleNext}
+              aria-label="Next week"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center transition-colors"
               data-test="week-nav-next"
             >
               <ChevronRight className="h-4 w-4" />
-            </Button>
-
-            <span className="text-sm font-medium whitespace-nowrap">
-              {formatWeekLabel(currentWeek)}
-            </span>
+            </button>
           </div>
 
           <div className="ml-auto flex min-w-0 flex-1 items-center gap-2 sm:flex-initial">
