@@ -59,30 +59,22 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
     [modules],
   );
 
-  // User-driven open/close state. Auto-expand of the active module is
-  // computed derivationally in `openModules` below — no useEffect,
-  // no stale state when the route changes.
-  const [userToggled, setUserToggled] = useState<Set<string>>(new Set());
+  // Accordion behavior: at most one module open at a time. Tracks the
+  // user-selected open slug; the module matching the current URL
+  // auto-opens unless the user has explicitly toggled a different one.
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
 
-  const openModules = useMemo(() => {
-    const s = new Set(userToggled);
-    const active = sortedModules.find((m) =>
-      currentPath.startsWith(`/home/${account}/${m.module_slug}`),
-    )?.module_slug;
-    if (active) s.add(active);
-    return s;
-  }, [userToggled, sortedModules, currentPath, account]);
+  const effectiveOpenSlug = useMemo(() => {
+    if (openSlug !== null) return openSlug;
+    return (
+      sortedModules.find((m) =>
+        currentPath.startsWith(`/home/${account}/${m.module_slug}`),
+      )?.module_slug ?? null
+    );
+  }, [openSlug, sortedModules, currentPath, account]);
 
   function toggleModule(slug: string) {
-    setUserToggled((prev) => {
-      const next = new Set(prev);
-      if (next.has(slug)) {
-        next.delete(slug);
-      } else {
-        next.add(slug);
-      }
-      return next;
-    });
+    setOpenSlug((prev) => (prev === slug ? null : slug));
   }
 
   return (
@@ -96,11 +88,11 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
           currentPath === modulePath ||
           currentPath.startsWith(`${modulePath}/`);
         const IconComponent = getModuleIcon(mod.module_slug);
-        const isOpen = openModules.has(mod.module_slug);
+        const isOpen = effectiveOpenSlug === mod.module_slug;
         const hasChildren = children.length > 0;
         // Prototype parity: the module row shows the green gradient
         // whenever its group is open (expanded), not only when a child
-        // route is active. Active URL still forces open via openModules.
+        // route is active. Active URL still forces open via effectiveOpenSlug.
         const isModuleActive = isOpen || isRouteActive;
 
         return (
@@ -181,7 +173,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                       </SidebarMenuItem>
                     </SidebarMenu>
                   </SidebarGroupContent>
-                  <CollapsibleContent className="data-[state=closed]:animate-[collapsible-up_0.22s_cubic-bezier(0.4,0,0.2,1)] data-[state=open]:animate-[collapsible-down_0.32s_cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden">
+                  <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-[collapsible-up_0.22s_cubic-bezier(0.4,0,0.2,1)] data-[state=open]:animate-[collapsible-down_0.32s_cubic-bezier(0.34,1.56,0.64,1)]">
                     <SidebarGroupContent>
                       {/* PARITY-04: vertical separation + dark-mode rail.
                        * Sub-items are plain anchors (not <li>) to avoid
