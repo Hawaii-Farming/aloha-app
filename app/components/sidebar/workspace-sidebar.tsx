@@ -56,8 +56,8 @@ export function WorkspaceSidebar(props: {
          */}
         <div
           className={cn(
-            'bg-card sticky top-0 z-10 flex items-center justify-between px-3 pt-3 pb-2',
-            'group-data-[collapsible=icon]:justify-center',
+            'bg-card sticky top-0 z-10 flex items-center justify-between px-5 pt-3 pb-2',
+            'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-3',
           )}
         >
           <SidebarGroupLabel className="text-muted-foreground p-0 text-[11px] font-medium tracking-wider uppercase group-data-[collapsible=icon]:hidden">
@@ -67,7 +67,7 @@ export function WorkspaceSidebar(props: {
         </div>
         <SidebarGroupLabel
           className={cn(
-            'text-muted-foreground px-3 pt-3 pb-2 text-[11px] font-medium tracking-wider uppercase',
+            'text-muted-foreground px-5 pt-3 pb-2 text-[11px] font-medium tracking-wider uppercase',
             'group-data-[collapsible=icon]:hidden',
           )}
         >
