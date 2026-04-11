@@ -41,7 +41,10 @@ export function PayrollDataFilterBar() {
         value={currentEmployee || 'all'}
         onValueChange={handleEmployeeChange}
       >
-        <SelectTrigger className="h-8 w-[200px]" data-test="employee-filter">
+        <SelectTrigger
+          className="h-8 w-[200px] rounded-md px-3 py-1 text-xs"
+          data-test="employee-filter"
+        >
           <SelectValue placeholder="All employees" />
         </SelectTrigger>
         <SelectContent>

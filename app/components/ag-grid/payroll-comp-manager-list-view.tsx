@@ -54,7 +54,10 @@ function ManagerFilter({ managers }: { managers: RowData[] }) {
 
   return (
     <Select value={currentManager || 'all'} onValueChange={handleChange}>
-      <SelectTrigger className="h-8 w-[220px]" data-test="manager-filter">
+      <SelectTrigger
+        className="h-8 w-[220px] rounded-md px-3 py-1 text-xs"
+        data-test="manager-filter"
+      >
         <SelectValue placeholder="All managers" />
       </SelectTrigger>
       <SelectContent>
@@ -88,7 +91,10 @@ function CheckDateFilter({ dates }: { dates: string[] }) {
 
   return (
     <Select value={currentDate || 'all'} onValueChange={handleChange}>
-      <SelectTrigger className="h-8 w-[160px]" data-test="check-date-filter">
+      <SelectTrigger
+        className="h-8 w-[160px] rounded-md px-3 py-1 text-xs"
+        data-test="check-date-filter"
+      >
         <SelectValue placeholder="All Dates" />
       </SelectTrigger>
       <SelectContent>

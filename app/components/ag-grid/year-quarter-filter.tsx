@@ -40,7 +40,10 @@ export function YearQuarterFilter({ years }: YearQuarterFilterProps) {
   return (
     <div className="flex items-center gap-2">
       <Select value={currentYear || 'all'} onValueChange={handleYearChange}>
-        <SelectTrigger className="h-8 w-[120px]" data-test="year-filter">
+        <SelectTrigger
+          className="h-8 w-[120px] rounded-md px-3 py-1 text-xs"
+          data-test="year-filter"
+        >
           <SelectValue placeholder="Year" />
         </SelectTrigger>
         <SelectContent>
@@ -56,7 +59,10 @@ export function YearQuarterFilter({ years }: YearQuarterFilterProps) {
         value={currentQuarter || 'all'}
         onValueChange={handleQuarterChange}
       >
-        <SelectTrigger className="h-8 w-[100px]" data-test="quarter-filter">
+        <SelectTrigger
+          className="h-8 w-[100px] rounded-md px-3 py-1 text-xs"
+          data-test="quarter-filter"
+        >
           <SelectValue placeholder="Quarter" />
         </SelectTrigger>
         <SelectContent>
