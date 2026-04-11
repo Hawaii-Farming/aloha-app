@@ -105,75 +105,28 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
 
         return (
           <div key={mod.module_id}>
-            {/* Collapsed mode — module icon with popover sub-menu */}
+            {/* Collapsed (icon-only) mode — just the module icon.
+             * Prototype parity: submenus are NEVER rendered when the
+             * sidebar is collapsed. Clicking the icon navigates to the
+             * module root; tooltip shows the full label on hover. */}
             {!forceExpanded && (
-              <div className="hidden group-data-[collapsible=icon]:block">
-                <SidebarGroup>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      <Collapsible open={isOpen}>
-                        <SidebarMenuItem>
-                          <SidebarMenuButton
-                            asChild
-                            tooltip={mod.display_name}
-                            isActive={isModuleActive}
-                            className={cn(
-                              isModuleActive
-                                ? 'rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 dark:from-green-400 dark:to-emerald-500 dark:text-green-950'
-                                : 'text-foreground hover:bg-muted rounded-xl bg-transparent',
-                            )}
-                          >
-                            <Link
-                              to={modulePath}
-                              onClick={() => {
-                                onNavigate?.();
-                                if (hasChildren) {
-                                  toggleModule(mod.module_slug);
-                                }
-                              }}
-                              aria-label={mod.display_name}
-                            >
-                              {createElement(IconComponent, {
-                                className: 'h-[18px] w-[18px] shrink-0',
-                              })}
-                            </Link>
-                          </SidebarMenuButton>
-                          <CollapsibleContent>
-                            {children.map((sm) => {
-                              const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
-                              const isActive =
-                                currentPath === subModulePath ||
-                                currentPath.startsWith(subModulePath + '/');
-
-                              return (
-                                <SidebarMenuButton
-                                  key={sm.sub_module_id}
-                                  asChild
-                                  isActive={isActive}
-                                  tooltip={sm.display_name}
-                                  className={cn(
-                                    isActive
-                                      ? 'rounded-lg bg-green-50 px-2.5 py-1.5 text-sm font-medium text-green-700 dark:bg-green-900/40 dark:text-green-200'
-                                      : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent px-2.5 py-1.5 text-sm',
-                                  )}
-                                >
-                                  <Link
-                                    to={subModulePath}
-                                    onClick={() => onNavigate?.()}
-                                  >
-                                    <span className="truncate">
-                                      {sm.display_name}
-                                    </span>
-                                  </Link>
-                                </SidebarMenuButton>
-                              );
-                            })}
-                          </CollapsibleContent>
-                        </SidebarMenuItem>
-                      </Collapsible>
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
+              <div className="hidden items-center justify-center px-2 py-1 group-data-[collapsible=icon]:flex">
+                <Link
+                  to={modulePath}
+                  onClick={() => onNavigate?.()}
+                  aria-label={mod.display_name}
+                  title={mod.display_name}
+                  className={cn(
+                    'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
+                    isRouteActive
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 dark:from-green-400 dark:to-emerald-500 dark:text-green-950'
+                      : 'text-foreground hover:bg-muted bg-transparent',
+                  )}
+                >
+                  {createElement(IconComponent, {
+                    className: 'h-[18px] w-[18px] shrink-0',
+                  })}
+                </Link>
               </div>
             )}
 
