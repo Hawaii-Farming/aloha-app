@@ -51,7 +51,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
           }}
           onBlur={closeMobileSearch}
           placeholder={props.searchPlaceholder}
-          className="placeholder:text-muted-foreground/50 relative z-40 h-9 min-w-0 flex-1 rounded-full text-sm focus:outline-none focus-visible:ring-0 focus-visible:outline-none sm:hidden"
+          className="placeholder:text-muted-foreground/50 relative z-40 h-9 w-full basis-full rounded-full text-sm focus:outline-none focus-visible:ring-0 focus-visible:outline-none sm:hidden"
           data-test="table-search-mobile"
         />
       ) : (
@@ -75,9 +75,25 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
         data-test="table-search"
       />
 
-      {props.filterSlot}
+      {/* Hide filter + action slots while mobile search is open so the
+       * input gets the full toolbar width. */}
+      <div
+        className={
+          mobileSearchOpen
+            ? 'hidden flex-wrap items-center gap-2 sm:flex'
+            : 'flex flex-wrap items-center gap-2'
+        }
+      >
+        {props.filterSlot}
+      </div>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div
+        className={
+          mobileSearchOpen
+            ? 'ml-auto hidden items-center gap-2 sm:flex'
+            : 'ml-auto flex items-center gap-2'
+        }
+      >
         {props.selectedCount && props.selectedCount > 0 ? (
           <span className="text-muted-foreground text-sm">
             <Trans
