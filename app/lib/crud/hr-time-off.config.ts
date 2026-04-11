@@ -98,9 +98,10 @@ const timeOffColDefs = [
     sortable: true,
     filter: false,
     resizable: false,
-    maxWidth: 110,
-    minWidth: 100,
+    width: 130,
+    minWidth: 120,
     pinned: 'right' as const,
+    cellClass: 'ag-cell-no-ellipsis',
   },
   {
     headerName: 'Actions',
