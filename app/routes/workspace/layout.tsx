@@ -61,13 +61,13 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
 
   return (
     <SidebarProvider defaultOpen={layoutState.open}>
-      <div className="flex min-h-svh w-full flex-col">
+      <div className="flex h-svh w-full flex-col">
         <WorkspaceNavbar
           account={accountSlug}
           user={user}
           orgName={workspace.currentOrg?.org_name ?? null}
           navigation={workspace.navigation}
-          className="sticky top-0 z-30 hidden md:flex"
+          className="hidden md:flex"
         />
         <WorkspaceMobileHeader
           user={userForShell}
@@ -76,7 +76,7 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
           hamburgerRef={hamburgerRef}
         />
 
-        <div className="flex flex-1">
+        <div className="flex min-h-0 flex-1 overflow-hidden">
           <div className="hidden md:block">
             <WorkspaceSidebar
               account={accountSlug}
@@ -86,8 +86,8 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
             />
           </div>
 
-          <main className="flex flex-1 flex-col">
-            <div className="flex flex-1 flex-col p-4">
+          <main className="flex min-h-0 flex-1 flex-col">
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
               <Outlet />
             </div>
           </main>
