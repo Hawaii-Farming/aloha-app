@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { ChevronLeft, LayoutGrid, PanelLeft } from 'lucide-react';
+import { ChevronLeft, LayoutGrid, PanelLeftClose } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
@@ -9,7 +9,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroupLabel,
-  SidebarSeparator,
   useSidebar,
 } from '@aloha/ui/shadcn-sidebar';
 import { cn } from '@aloha/ui/utils';
@@ -29,7 +28,7 @@ function NavigationCollapseButton() {
       aria-label="Toggle sidebar"
       className="border-border text-muted-foreground hover:text-foreground hover:bg-muted flex h-6 w-6 items-center justify-center rounded-md border transition-colors"
     >
-      <PanelLeft className="h-3.5 w-3.5" />
+      <PanelLeftClose className="h-3.5 w-3.5" />
     </button>
   );
 }
@@ -65,7 +64,7 @@ export function WorkspaceSidebar(props: {
          */}
         <div
           className={cn(
-            'flex items-center justify-between px-3 pt-3 pb-2',
+            'bg-card sticky top-0 z-10 flex items-center justify-between px-3 pt-3 pb-2',
             'group-data-[collapsible=icon]:hidden',
           )}
         >
@@ -74,7 +73,6 @@ export function WorkspaceSidebar(props: {
           </SidebarGroupLabel>
           <NavigationCollapseButton />
         </div>
-        <SidebarSeparator className="mx-0 group-data-[collapsible=icon]:hidden" />
         <SidebarGroupLabel
           className={cn(
             'text-muted-foreground px-3 pt-3 pb-2 text-[11px] font-medium tracking-wider uppercase',
