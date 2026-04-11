@@ -495,7 +495,7 @@ export default function HousingMapView(props: ListViewProps) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search accommodations..."
-            className="pl-9"
+            className="placeholder:text-muted-foreground/50 h-8 rounded-md pl-9 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
             data-test="housing-search"
           />
         </div>
