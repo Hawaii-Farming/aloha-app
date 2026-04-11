@@ -71,7 +71,7 @@ export function WorkspaceSidebar(props: {
          */}
         <SidebarGroupLabel
           className={cn(
-            'text-muted-foreground px-3 pt-3 pb-2 text-xs font-semibold tracking-wider uppercase',
+            'text-muted-foreground px-3 pt-3 pb-2 text-[11px] font-medium tracking-wider uppercase',
             'group-data-[collapsible=icon]:hidden',
           )}
         >
@@ -80,18 +80,20 @@ export function WorkspaceSidebar(props: {
         <SidebarSeparator className="mx-0 group-data-[collapsible=icon]:hidden" />
         <SidebarGroupLabel
           className={cn(
-            'text-muted-foreground px-3 pt-3 pb-2 text-xs font-semibold tracking-wider uppercase',
+            'text-muted-foreground px-3 pt-3 pb-2 text-[11px] font-medium tracking-wider uppercase',
             'group-data-[collapsible=icon]:hidden',
           )}
         >
           {t('shell.sidebar.modules_section')}
         </SidebarGroupLabel>
 
-        <ModuleSidebarNavigation
-          account={account}
-          modules={navigation.modules}
-          subModules={navigation.subModules}
-        />
+        <div className="flex flex-col gap-0.5">
+          <ModuleSidebarNavigation
+            account={account}
+            modules={navigation.modules}
+            subModules={navigation.subModules}
+          />
+        </div>
       </SidebarContent>
 
       {/*
@@ -101,7 +103,7 @@ export function WorkspaceSidebar(props: {
       <SidebarFooter className="border-sidebar-border border-t group-data-[collapsible=icon]:hidden">
         <div
           data-test="workspace-sidebar-profile"
-          className="flex w-full items-center gap-2 px-3 py-2"
+          className="flex w-full items-center gap-3 px-3 py-2.5"
         >
           <Avatar size="sm">
             <AvatarFallback className="bg-muted text-foreground text-xs font-semibold dark:bg-slate-700">
@@ -116,7 +118,7 @@ export function WorkspaceSidebar(props: {
           type="button"
           aria-disabled="true"
           tabIndex={-1}
-          className="text-muted-foreground flex w-full cursor-not-allowed items-center gap-2 px-3 py-2 text-xs font-medium opacity-60"
+          className="text-muted-foreground flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium opacity-60"
         >
           <LayoutGrid className="h-4 w-4" />
           <span className="flex-1 text-left">
