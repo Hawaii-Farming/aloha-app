@@ -20,7 +20,6 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { PayPeriodFilter } from '~/components/ag-grid/pay-period-filter';
 import { hoursFormatter } from '~/components/ag-grid/payroll-formatters';
@@ -342,7 +341,6 @@ export default function PayrollHoursListView(props: ListViewProps) {
   const accountSlug = params.account ?? '';
 
   const gridRef = useRef<AgGridReact>(null);
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -417,7 +415,6 @@ export default function PayrollHoursListView(props: ListViewProps) {
 
   // Column state persistence
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    setGridApi(event.api);
     restoreColumnState('payroll_hours', event.api);
   }, []);
 
@@ -492,11 +489,6 @@ export default function PayrollHoursListView(props: ListViewProps) {
             placeholder="Search employees..."
             className="border-input bg-background placeholder:text-muted-foreground h-8 w-[200px] rounded-md border px-3 text-sm"
             data-test="payroll-hours-search"
-          />
-
-          <CsvExportButton
-            gridApi={gridApi}
-            fileName="payroll-hours-comparison"
           />
         </div>
       </div>

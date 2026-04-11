@@ -34,7 +34,6 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
 import { CreatePanel } from '~/components/crud/create-panel';
@@ -280,7 +279,6 @@ export default function SchedulerListView(props: ListViewProps) {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const gridRef = useRef<AgGridReact>(null);
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
@@ -429,7 +427,6 @@ export default function SchedulerListView(props: ListViewProps) {
   // Column state persistence
   const handleGridReady = useCallback((event: GridReadyEvent) => {
     const api = event.api;
-    setGridApi(api);
     restoreColumnState('scheduler', api);
   }, []);
 
@@ -588,8 +585,6 @@ export default function SchedulerListView(props: ListViewProps) {
               <History className="mr-2 h-4 w-4" />
               History
             </Button>
-
-            <CsvExportButton gridApi={gridApi} fileName="scheduler" />
 
             <Button
               variant="brand"

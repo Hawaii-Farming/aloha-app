@@ -21,7 +21,6 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { scoreColorCellClassRules } from '~/components/ag-grid/row-class-rules';
 import { YearQuarterFilter } from '~/components/ag-grid/year-quarter-filter';
@@ -215,7 +214,6 @@ export default function EmployeeReviewListView(props: ListViewProps) {
   const reviewYears = (loaderData.reviewYears ?? []) as number[];
 
   const gridRef = useRef<AgGridReact>(null);
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -242,7 +240,6 @@ export default function EmployeeReviewListView(props: ListViewProps) {
 
   // Column state persistence
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    setGridApi(event.api);
     restoreColumnState('employee_review', event.api);
   }, []);
 
@@ -318,8 +315,6 @@ export default function EmployeeReviewListView(props: ListViewProps) {
             className="border-input bg-background placeholder:text-muted-foreground h-8 w-[200px] rounded-md border px-3 text-sm"
             data-test="employee-review-search"
           />
-
-          <CsvExportButton gridApi={gridApi} fileName="employee-reviews" />
         </div>
       </div>
 

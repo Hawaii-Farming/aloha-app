@@ -28,7 +28,6 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { PayPeriodFilter } from '~/components/ag-grid/pay-period-filter';
 import {
@@ -402,7 +401,6 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
   const checkDateFilter = searchParams.get('check_date') ?? '';
 
   const gridRef = useRef<AgGridReact>(null);
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -486,7 +484,6 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
 
   // Column state persistence
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    setGridApi(event.api);
     restoreColumnState('payroll_comp_manager', event.api);
   }, []);
 
@@ -564,8 +561,6 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
             className="border-input bg-background placeholder:text-muted-foreground h-8 w-[200px] rounded-md border px-3 text-sm"
             data-test="payroll-comp-manager-search"
           />
-
-          <CsvExportButton gridApi={gridApi} fileName="payroll-comp-manager" />
         </div>
       </div>
 

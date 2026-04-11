@@ -36,7 +36,6 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { CsvExportButton } from '~/components/ag-grid/csv-export-button';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { InlineDetailRow } from '~/components/ag-grid/inline-detail-row';
 import { CreatePanel } from '~/components/crud/create-panel';
@@ -264,10 +263,6 @@ export default function AgGridListView({
                     onComplete={clearSelection}
                   />
                 )}
-                <CsvExportButton
-                  gridApi={gridApi}
-                  fileName={config?.tableName}
-                />
                 {(config?.formFields?.length ?? 0) > 0 && (
                   <Button
                     variant="brand"
