@@ -487,7 +487,7 @@ export default function PayrollHoursListView(props: ListViewProps) {
               }, 300);
             }}
             placeholder="Search employees..."
-            className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs"
+            className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
             data-test="payroll-hours-search"
           />
         </div>

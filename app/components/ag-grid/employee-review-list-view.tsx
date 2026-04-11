@@ -312,7 +312,7 @@ export default function EmployeeReviewListView(props: ListViewProps) {
               }, 300);
             }}
             placeholder="Search reviews..."
-            className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs"
+            className="border-input bg-background placeholder:text-muted-foreground/50 h-8 w-[200px] rounded-md border px-3 text-xs focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
             data-test="employee-review-search"
           />
         </div>
