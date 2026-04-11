@@ -143,7 +143,6 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                       <SidebarMenuItem>
                         <SidebarMenuButton
                           asChild
-                          isActive={isModuleActive}
                           className={cn(
                             'gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium',
                             isModuleActive
