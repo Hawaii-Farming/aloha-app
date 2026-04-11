@@ -529,6 +529,21 @@ export default function SchedulerListView(props: ListViewProps) {
       >
         {/* Toolbar — wraps on narrow viewports */}
         <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
+          <TableSearchInput
+            value={searchValue}
+            onChange={(value) => {
+              setSearchValue(value);
+              if (searchDebounceRef.current) {
+                clearTimeout(searchDebounceRef.current);
+              }
+              searchDebounceRef.current = setTimeout(() => {
+                setSearchValue(value);
+              }, 300);
+            }}
+            placeholder="Search scheduler..."
+            data-test="scheduler-search"
+          />
+
           {/* Week navigator: a single pill with < | date | > */}
           <div
             className="border-border bg-background inline-flex items-center overflow-hidden rounded-full border"
@@ -563,22 +578,7 @@ export default function SchedulerListView(props: ListViewProps) {
             </button>
           </div>
 
-          <div className="ml-auto flex min-w-0 flex-1 items-center gap-2 sm:flex-initial">
-            <TableSearchInput
-              value={searchValue}
-              onChange={(value) => {
-                setSearchValue(value);
-                if (searchDebounceRef.current) {
-                  clearTimeout(searchDebounceRef.current);
-                }
-                searchDebounceRef.current = setTimeout(() => {
-                  setSearchValue(value);
-                }, 300);
-              }}
-              placeholder="Search scheduler..."
-              data-test="scheduler-search"
-            />
-
+          <div className="ml-auto flex items-center gap-2">
             <Button
               variant="outline"
               onClick={() => setHistoryOpen(true)}
