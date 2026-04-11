@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 
-import { ChevronLeft, LayoutGrid, PanelLeftClose } from 'lucide-react';
+import {
+  ChevronLeft,
+  LayoutGrid,
+  PanelLeft,
+  PanelLeftClose,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
@@ -18,7 +23,8 @@ import { getOrgInitials } from '~/lib/workspace/get-org-initials';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 function NavigationCollapseButton() {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, state } = useSidebar();
+  const Icon = state === 'collapsed' ? PanelLeft : PanelLeftClose;
 
   return (
     <button
@@ -28,7 +34,7 @@ function NavigationCollapseButton() {
       aria-label="Toggle sidebar"
       className="border-border text-muted-foreground hover:text-foreground hover:bg-muted flex h-6 w-6 items-center justify-center rounded-md border transition-colors"
     >
-      <PanelLeftClose className="h-3.5 w-3.5" />
+      <Icon className="h-3.5 w-3.5" />
     </button>
   );
 }
@@ -65,10 +71,10 @@ export function WorkspaceSidebar(props: {
         <div
           className={cn(
             'bg-card sticky top-0 z-10 flex items-center justify-between px-3 pt-3 pb-2',
-            'group-data-[collapsible=icon]:hidden',
+            'group-data-[collapsible=icon]:justify-center',
           )}
         >
-          <SidebarGroupLabel className="text-muted-foreground p-0 text-[11px] font-medium tracking-wider uppercase">
+          <SidebarGroupLabel className="text-muted-foreground p-0 text-[11px] font-medium tracking-wider uppercase group-data-[collapsible=icon]:hidden">
             {t('shell.sidebar.nav_section')}
           </SidebarGroupLabel>
           <NavigationCollapseButton />
