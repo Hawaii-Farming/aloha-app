@@ -32,7 +32,7 @@ function NavigationCollapseButton() {
       onClick={toggleSidebar}
       data-test="workspace-sidebar-toggle"
       aria-label="Toggle sidebar"
-      className="border-border text-muted-foreground hover:text-foreground hover:bg-muted flex h-6 w-6 items-center justify-center rounded-md border transition-colors"
+      className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-7 w-7 items-center justify-center rounded-lg bg-transparent transition-colors"
     >
       <Icon className="h-3.5 w-3.5" />
     </button>
