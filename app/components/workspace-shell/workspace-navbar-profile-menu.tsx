@@ -51,7 +51,7 @@ export function WorkspaceNavbarProfileMenu(
           className="focus-visible:ring-ring rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <Avatar size="md" data-test="workspace-navbar-avatar">
-            <AvatarFallback className="bg-muted text-foreground text-sm font-semibold dark:bg-slate-700">
+            <AvatarFallback className="bg-gradient-to-br from-green-500 to-emerald-600 text-sm font-semibold text-white shadow-lg shadow-green-500/25 dark:from-green-400 dark:to-emerald-500 dark:text-green-950">
               {initial}
             </AvatarFallback>
           </Avatar>
