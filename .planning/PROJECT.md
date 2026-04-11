@@ -2,25 +2,17 @@
 
 ## What This Is
 
-Aloha is a farm operations ERP for Hawaii Farming. v1.0 wired up the HR module with AG Grid tables and CRUD forms on a Supabase-inspired theme. v2.0 replaces that theme with the polished Aloha design system (light-first, dark adapted) across the app shell — sidebar, top navbar, mobile drawer, design tokens, and shared primitives — without touching feature behavior.
+Aloha is a farm operations ERP for Hawaii Farming. v1.0 wired up the HR module with AG Grid tables and CRUD forms on a Supabase-inspired theme. v2.0 replaced that theme with the polished Aloha design system (light-first, dark adapted) across the app shell — sidebar, top navbar, mobile drawer, design tokens, shared primitives, and AG Grid theme — without touching feature behavior.
 
 ## Core Value
 
 Every module renders real data from the database and supports full CRUD operations through a polished, consistent shell and design system that feels fast and clear to field and office users alike.
 
-## Current Milestone: v2.0 Aloha Design System Retheme
+## Current State
 
-**Goal:** Replace the Supabase-inspired theme with the polished Aloha design system (light-first, dark adapted) across shell chrome only — sidebar, top navbar, mobile drawer, tokens, buttons, cards — without changing feature behavior.
+**Shipped:** v2.0 Aloha Design System Retheme (2026-04-10)
 
-**Target features:**
-- Rewrite DESIGN.md as source of truth for the new Aloha theme (Inter 16px base, green-500→emerald-600 gradient primary, rounded-2xl, slate neutrals, WCAG AA light + dark)
-- Update Tailwind 4 theme tokens / CSS variables in the app to match DESIGN.md
-- New 72px top navbar: gradient Aloha logo left, command-palette-style search center, avatar right
-- Rebuild workspace sidebar: 220px expanded / 68px collapsed, gradient active pill, accordion sub-items, PanelLeft toggle
-- Mobile: full-screen drawer sliding from left with backdrop (Framer Motion) replacing the desktop sidebar below breakpoint
-- Restyle shared primitives (Button, Card, Badge, Avatar, form inputs, side panel) to match the Aloha prototype
-- Adapt AG Grid theme to the new tokens so existing HR grids inherit the new look without code changes
-- Preserve next-themes dark mode, existing routes, loaders, actions, i18n, CSRF, and CRUD flows
+**Next milestone:** TBD — start with `/gsd-new-milestone`. Likely candidates: role-specific app shells (Doer / Manager / Executive), command palette implementation, page-level redesigns inheriting new tokens, Framer Motion page transitions.
 
 ## Requirements
 
@@ -43,10 +35,19 @@ Every module renders real data from the database and supports full CRUD operatio
 - ✓ Employee Review submodule — quarterly scores with color coding, Year-Quarter filter, lock enforcement — v1.0
 - ✓ Full-width detail rows in AG Grid Community for all row-click-to-expand interactions — v1.0
 - ✓ Side-panel forms for Create/Edit following register pattern — v1.0
+- ✓ DESIGN.md rewritten as Aloha theme source of truth (Inter 16px, green-500→emerald-600 gradient, slate neutrals, rounded-2xl, shadow scale, light-first) — v2.0
+- ✓ Tailwind 4 `@theme` tokens + Inter variable font + WCAG AA verification script — v2.0
+- ✓ Shared primitives restyled (Button, Card, Badge, Avatar, Input/Textarea/Select, Sheet) with zero caller prop changes — v2.0
+- ✓ 72px workspace navbar with gradient Aloha logo, ⌘K search trigger, profile menu, and org-derived avatar initials — v2.0
+- ✓ Workspace sidebar 220/68px with gradient active pill, accordion sub-items, persisted collapse, and structural parity with prototype (NAVIGATION/MODULES headers, chevron dropdowns, Focused footer) — v2.0
+- ✓ Framer Motion mobile drawer with backdrop, hamburger trigger, explicit close, and shared nav source — v2.0
+- ✓ AG Grid theme rewrite (`themeQuartz.withParams` to Aloha tokens) across all HR grids with bounded flex-chain fill and toolbar search rounded-md — v2.0
+- ✓ Dark-mode elevated navbar/sidebar surfaces + themed scrollbars + WCAG AA audit across shell, primitives, and grid — v2.0
+- ✓ Sidebar toggle relocated to navbar (leftmost, before logo) and command-palette module navigation fixed — v2.0
 
 ### Active
 
-(Defined in `.planning/REQUIREMENTS.md` for milestone v2.0 — Aloha design system retheme.)
+(To be defined for next milestone via `/gsd-new-milestone`.)
 
 ### Out of Scope
 
@@ -62,12 +63,17 @@ Every module renders real data from the database and supports full CRUD operatio
 
 Shipped v1.0 with 6 phases, 21 plans across 199 commits (283 files changed, +31,810/-12,692 lines). Timeline: 3 days (2026-04-07 → 2026-04-09).
 
-- **AG Grid**: v35.2.1 Community with custom Supabase-themed dark/light config via `themeQuartz.withParams()`. AgGridWrapper provides SSR safety, column mapping, detail rows, CSV export, and column state persistence.
-- **8 HR submodules**: Register (converted from TanStack Table), Scheduler, Time Off, Payroll Comparison, Payroll Comp Manager, Payroll Data, Hours Comparison, Housing, Employee Review — all with AG Grid tables and side-panel CRUD forms.
-- **SQL views**: 10+ custom views for aggregation (payroll by task/employee/manager, hours comparison FULL OUTER JOIN, housing occupancy, employee reviews, time off requests, weekly schedule).
-- **Migrations pushed**: org_site max_beds, app_hr_housing, hr_employee_review table + RLS, app_hr_employee_reviews view — all on hosted Supabase.
-- **Design**: DESIGN.md Supabase-inspired theme with dark-mode-native colors, emerald green accents, Geist font. AG Grid themed via ag-theme-quartz base.
-- **Dual tenant model**: Template auth (accounts/memberships) coexists with business auth (org/hr_employee). All data queries org-scoped.
+Shipped v2.0 with 4 phases, 22 plans across 166 commits (144 files changed, +21,255/-1,445 lines). Timeline: 1 day (2026-04-10, ~12h sprint).
+
+- **Design tokens**: DESIGN.md rewritten as Aloha theme spec (Inter 16px, slate neutrals, green-500→emerald-600 gradient primary, rounded-2xl scale, shadow tokens, light-first). Tailwind 4 `@theme` block carries palette, radius, font, and shadow tokens. `scripts/verify-wcag.mjs` enforces 24 contrast assertions.
+- **Primitives**: Button, Card, Badge, Avatar, Input, Textarea, Select, Sheet restyled via cva using Phase 7 tokens — zero caller prop changes. §9.1 Option A focus ring (`ring-2 ring-primary ring-offset-2`) applied across all form primitives.
+- **Workspace shell**: 72px navbar with gradient AlohaLogoSquare, ⌘K search trigger (renderTrigger seam over existing NavbarSearch), WorkspaceNavbarProfileMenu, and `getOrgInitials`-derived avatar. 220/68px sidebar with gradient active pill, accordion sub-items, persisted collapse cookie, NAVIGATION/MODULES section headers, chevron module dropdowns, "Focused" footer, and themed scrollbars. Sidebar toggle sits leftmost in navbar (before logo).
+- **Mobile shell**: WorkspaceMobileHeader (hamburger + logo + avatar) + WorkspaceMobileDrawer (Framer Motion spring + fade, black/30 backdrop, explicit X close, auto-close on route change). Drawer reuses the same nav data source as the desktop sidebar.
+- **AG Grid**: `ag-grid-theme.ts` rewritten via `themeQuartz.withParams` to Aloha hexes and Inter Variable for both themes. Workspace layout uses a bounded flex chain so every HR grid fills its container. Toolbar search input overridden to rounded-md.
+- **Dark mode**: Navbar and sidebar render on distinct elevated dark surfaces (not page bg). All token pairs pass WCAG AA in both themes. next-themes toggle produces no layout shifts.
+- **UAT bug fixes**: BUG-01 (active-pill immediacy on module click and initial route load), BUG-02 (command-palette navigation to module-level links).
+- **Dual tenant model (unchanged)**: Template auth (accounts/memberships) coexists with business auth (org/hr_employee). All data queries org-scoped. v2.0 shipped without touching loaders, actions, i18n, CSRF, or CRUD flows.
+- **Post-ship polish**: Quick task 260410-sl6 landed a mobile responsiveness pass (AG Grid search input shrink, mobile search dialog, container-query detail rows, toolbar reorder, navbar search label-inclusive filtering).
 
 ## Constraints
 
@@ -92,6 +98,15 @@ Shipped v1.0 with 6 phases, 21 plans across 199 commits (283 files changed, +31,
 | FULL OUTER JOIN for hours comparison | Shows employees with schedule-only or payroll-only entries | ✓ Good — catches discrepancies both ways |
 | GENERATED ALWAYS AS STORED for review avg | DB-computed average prevents client-side tampering | ✓ Good — data integrity enforced at schema level |
 | Server-side category/lock enforcement | Housing category and review lock checks in action, not client | ✓ Good — prevents form tampering |
+| Aloha design system as DESIGN.md rewrite (v2.0) | Single source of truth — every token, primitive, and shell surface inherits from one spec | ✓ Good — Phases 8/9/10 consumed it without drift |
+| Light-first palette with derived dark (v2.0) | Dark mode stops being a second design pass; WCAG AA verified via script | ✓ Good — 24 contrast assertions green, no token regressions |
+| cva + Phase 7 tokens for primitive restyle (v2.0) | Zero caller prop changes; visual-only updates across Button/Card/Badge/Avatar/Input/Textarea/Select/Sheet | ✓ Good — Phase 8 shipped without touching consumers |
+| Framer Motion for mobile drawer only (v2.0) | Targeted dependency — spring + fade match prototype timing without adopting it for page transitions yet | ✓ Good — single import surface |
+| `themeQuartz.withParams` for AG Grid (v2.0) | Drives all HR grids from Aloha tokens; no per-grid code changes | ✓ Good — grids inherited theme automatically |
+| Bounded flex chain for workspace content area (v2.0) | Fixes AG Grid shrink/collapse without per-grid height hacks | ✓ Good — every HR grid fills its container |
+| `renderTrigger` seam on NavbarSearch (v2.0) | Keeps existing search behavior intact while letting the new navbar render its own trigger | ✓ Good — backward compatible, used by navbar + mobile header |
+| Sidebar toggle moved to navbar leftmost position (v2.0) | Matches prototype; retires detached edge toggle | ✓ Good — one affordance, discoverable |
+| Org-derived avatar initials via `getOrgInitials` (v2.0) | Personalizes shell to tenant; sourced from loaded org context | ✓ Good — no extra query, pure helper |
 
 ## Evolution
 
@@ -111,4 +126,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 — milestone v2.0 Aloha Design System Retheme started*
+*Last updated: 2026-04-10 — after v2.0 Aloha Design System Retheme milestone*

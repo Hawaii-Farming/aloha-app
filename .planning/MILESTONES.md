@@ -1,5 +1,32 @@
 # Milestones
 
+## v2.0 Aloha Design System Retheme (Shipped: 2026-04-10)
+
+**Phases completed:** 4 phases, 22 plans, 40 requirement IDs
+
+**Stats:** 166 commits, 144 files changed, +21,255 / −1,445 lines. Timeline: 1 day (2026-04-10, ~12h sprint).
+
+**Key accomplishments:**
+
+- DESIGN.md rewritten as Aloha theme source of truth (Inter 16px, slate neutrals, green-500→emerald-600 gradient primary, rounded-2xl scale, shadow tokens, light-first). Tailwind 4 `@theme` block carries palette, font, radius, and shadow tokens; Inter Variable loaded via `@fontsource-variable/inter` replacing Geist.
+- `scripts/verify-wcag.mjs` enforces 24 contrast assertions across shell chrome, primitives, and AG Grid token pairs; derived dark palette passes WCAG AA in both themes.
+- Shared primitives restyled via cva + Phase 7 tokens — Button (green gradient, py-3, rounded-2xl), Card (rounded-2xl + slate border + soft shadow), Input/Textarea/Select (text-base, green focus halo), Badge (pill + 7 semantic variants), Avatar (sm/md/lg + gradient fallback), Sheet (leading-corner radius + form-field spacing). Zero caller prop changes.
+- §9.1 Option A focus ring (`ring-2 ring-primary ring-offset-2 ring-offset-background`) applied uniformly to all form primitives.
+- WorkspaceNavbar (72px desktop header) with AlohaLogoSquare gradient primitive, `renderTrigger`-seamed ⌘K search trigger, WorkspaceNavbarProfileMenu, and `getOrgInitials`-derived avatar fallback ("HF" for Hawaii Farming).
+- Workspace sidebar bumped to 220/68px with gradient active pill, accordion sub-items (green-50 chip + green-200 left rail), persisted collapse cookie, NAVIGATION/MODULES section headers, chevron module dropdowns, and "Focused" footer — all ported onto the existing Shadcn sidebar primitive.
+- Sidebar toggle relocated to navbar leftmost position (before the Aloha logo square), retiring the detached edge toggle.
+- WorkspaceMobileHeader + WorkspaceMobileDrawer (Framer Motion spring + fade, black/30 backdrop, explicit X close, auto-close on route change). Drawer reuses the desktop sidebar nav source — no duplicated config.
+- Scrollbars on sidebar and main content themed (thin, tokenized thumb) in both light and dark modes, matching the prototype.
+- `ag-grid-theme.ts` rewritten via `themeQuartz.withParams` to Aloha hexes and Inter Variable for both themes; every HR grid (Register, Scheduler, Time Off, Payroll ×3, Hours Comparison, Housing, Employee Review) inherits the new look without per-grid code changes.
+- Workspace layout bounded flex chain eliminates AG Grid shrink/collapse; toolbar search input overridden to rounded-md (squared) matching the prototype.
+- Dark mode renders navbar and sidebar on distinct elevated dark surfaces (not page background); `next-themes` toggle produces no layout shifts or contrast regressions.
+- BUG-01 fixed — active-module gradient pill renders immediately on click and on initial route load, unified across module/sub-module states.
+- BUG-02 fixed — cmdk command-palette now navigates to module-level links reliably via `NavbarSearchItem` + `onSelect`-driven navigation.
+- Phase 10 full regression: WCAG AA audit passed, PARITY-02 static verification, zero CRUD/loader/action/i18n/CSRF regressions.
+- Post-ship quick task 260410-sl6 landed a mobile responsiveness pass (AG Grid search shrink, mobile search dialog, container-query detail rows, toolbar reorder, navbar search label-inclusive filtering).
+
+---
+
 ## v1.0 HR Module Submodules (Shipped: 2026-04-09)
 
 **Phases completed:** 6 phases, 21 plans, 43 tasks
