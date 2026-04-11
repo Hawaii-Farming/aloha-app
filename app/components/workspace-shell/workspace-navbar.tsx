@@ -1,8 +1,7 @@
 import type { JwtPayload } from '@supabase/supabase-js';
 
-import { Command, PanelLeft, Search } from 'lucide-react';
+import { Command, Search } from 'lucide-react';
 
-import { useSidebar } from '@aloha/ui/shadcn-sidebar';
 import { cn } from '@aloha/ui/utils';
 
 import {
@@ -32,8 +31,6 @@ export function WorkspaceNavbar({
   navigation,
   className,
 }: WorkspaceNavbarProps) {
-  const { toggleSidebar } = useSidebar();
-
   const searchItems: NavbarSearchItem[] = [
     ...navigation.modules.map((mod) => ({
       path: `/home/${account}/${mod.module_slug}`,
@@ -55,16 +52,6 @@ export function WorkspaceNavbar({
         className,
       )}
     >
-      <button
-        type="button"
-        onClick={toggleSidebar}
-        data-test="workspace-navbar-sidebar-toggle"
-        aria-label="Toggle sidebar"
-        className="text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
-      >
-        <PanelLeft className="h-5 w-5" />
-      </button>
-
       <div className="flex items-center gap-3">
         <AlohaLogoSquare size="md" />
         <span className="text-foreground text-lg font-semibold">Aloha</span>

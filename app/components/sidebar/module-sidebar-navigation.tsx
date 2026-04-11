@@ -92,12 +92,16 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
           (a, b) => a.display_order - b.display_order,
         );
         const modulePath = `/home/${account}/${mod.module_slug}`;
-        const isModuleActive =
+        const isRouteActive =
           currentPath === modulePath ||
           currentPath.startsWith(`${modulePath}/`);
         const IconComponent = getModuleIcon(mod.module_slug);
         const isOpen = openModules.has(mod.module_slug);
         const hasChildren = children.length > 0;
+        // Prototype parity: the module row shows the green gradient
+        // whenever its group is open (expanded), not only when a child
+        // route is active. Active URL still forces open via openModules.
+        const isModuleActive = isOpen || isRouteActive;
 
         return (
           <div key={mod.module_id}>
@@ -225,12 +229,14 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                       </SidebarMenuItem>
                     </SidebarMenu>
                   </SidebarGroupContent>
-                  <CollapsibleContent>
+                  <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
                     <SidebarGroupContent>
-                      {/* PARITY-04: vertical separation + dark-mode rail */}
+                      {/* PARITY-04: vertical separation + dark-mode rail.
+                       * Sub-items are plain anchors (not <li>) to avoid
+                       * native list markers inside the green rail. */}
                       <div
                         data-sidebar="menu-sub"
-                        className="mt-1 mb-1 ml-5 flex flex-col gap-0.5 border-l-2 border-green-200 pl-3 dark:border-green-900/60"
+                        className="mt-1 mb-1 ml-5 flex list-none flex-col gap-0.5 border-l-2 border-green-200 pl-3 dark:border-green-900/60"
                       >
                         {children.map((sm, subIndex) => {
                           const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
@@ -239,30 +245,23 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                             currentPath.startsWith(subModulePath + '/');
 
                           return (
-                            <SidebarMenuItem
+                            <Link
                               key={sm.sub_module_id}
-                              className={cn(subIndex === 0 && 'mt-1')}
+                              to={subModulePath}
+                              onClick={() => onNavigate?.()}
+                              title={sm.display_name}
+                              className={cn(
+                                'block rounded-lg px-2.5 py-1.5 text-sm transition-colors',
+                                subIndex === 0 && 'mt-1',
+                                isActive
+                                  ? 'bg-green-50 font-medium text-green-700 dark:bg-green-900/40 dark:text-green-200'
+                                  : 'text-muted-foreground hover:bg-muted hover:text-foreground bg-transparent',
+                              )}
                             >
-                              <SidebarMenuButton
-                                asChild
-                                isActive={isActive}
-                                tooltip={sm.display_name}
-                                className={cn(
-                                  isActive
-                                    ? 'rounded-lg bg-green-50 px-2.5 py-1.5 text-sm font-medium text-green-700 dark:bg-green-900/40 dark:text-green-200'
-                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg bg-transparent px-2.5 py-1.5 text-sm',
-                                )}
-                              >
-                                <Link
-                                  to={subModulePath}
-                                  onClick={() => onNavigate?.()}
-                                >
-                                  <span className="truncate">
-                                    {sm.display_name}
-                                  </span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
+                              <span className="block truncate">
+                                {sm.display_name}
+                              </span>
+                            </Link>
                           );
                         })}
                       </div>

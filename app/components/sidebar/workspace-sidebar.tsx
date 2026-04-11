@@ -18,23 +18,18 @@ import { ModuleSidebarNavigation } from '~/components/sidebar/module-sidebar-nav
 import { getOrgInitials } from '~/lib/workspace/get-org-initials';
 import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
-function SidebarEdgeToggle() {
-  const { toggleSidebar, open } = useSidebar();
+function NavigationCollapseButton() {
+  const { toggleSidebar } = useSidebar();
 
   return (
     <button
+      type="button"
       onClick={toggleSidebar}
       data-test="workspace-sidebar-toggle"
-      className={cn(
-        'bg-sidebar border-sidebar-border text-muted-foreground hover:text-foreground absolute top-4 -right-3 z-30 hidden h-6 w-6 items-center justify-center rounded-full border shadow-sm transition-colors md:flex',
-      )}
+      aria-label="Toggle sidebar"
+      className="border-border text-muted-foreground hover:text-foreground hover:bg-muted flex h-6 w-6 items-center justify-center rounded-md border transition-colors"
     >
-      <PanelLeft
-        className={cn(
-          'h-3.5 w-3.5 transition-transform duration-200',
-          !open && 'rotate-180',
-        )}
-      />
+      <PanelLeft className="h-3.5 w-3.5" />
     </button>
   );
 }
@@ -60,23 +55,25 @@ export function WorkspaceSidebar(props: {
       collapsible={'icon'}
       className="bg-card border-border border-r md:top-[72px] md:h-[calc(100svh-72px)]"
     >
-      <SidebarEdgeToggle />
-
       <SidebarContent className="mt-2 flex-1 overflow-y-auto">
         {/*
          * Phase 10 PARITY-01: NAVIGATION + MODULES section headers with a
          * separator between them, above the module list. Both labels are
          * rendered (UI-SPEC §Surface 2 + Wave 0 e2e contract). Collapsed
-         * mode hides the labels via group-data selector.
+         * mode hides the labels via group-data selector. The collapse
+         * button lives inline in the NAVIGATION row (prototype parity).
          */}
-        <SidebarGroupLabel
+        <div
           className={cn(
-            'text-muted-foreground px-3 pt-3 pb-2 text-[11px] font-medium tracking-wider uppercase',
+            'flex items-center justify-between px-3 pt-3 pb-2',
             'group-data-[collapsible=icon]:hidden',
           )}
         >
-          {t('shell.sidebar.nav_section')}
-        </SidebarGroupLabel>
+          <SidebarGroupLabel className="text-muted-foreground p-0 text-[11px] font-medium tracking-wider uppercase">
+            {t('shell.sidebar.nav_section')}
+          </SidebarGroupLabel>
+          <NavigationCollapseButton />
+        </div>
         <SidebarSeparator className="mx-0 group-data-[collapsible=icon]:hidden" />
         <SidebarGroupLabel
           className={cn(
