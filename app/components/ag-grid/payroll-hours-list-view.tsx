@@ -206,7 +206,7 @@ function HoursDetailInner({ data, accountSlug }: HoursDetailInnerProps) {
     <div className="h-full max-h-[310px] overflow-y-auto px-4 py-2">
       {recentWeeks.map((week, wi) => (
         <div key={wi} className={`${wi > 0 ? 'mt-2' : ''}`}>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 md:grid-cols-7">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-7">
             {week.map(({ date, dayName, entry }) => {
               const isWeekend = dayName === 'Sun' || dayName === 'Sat';
               const isOff = !entry;
