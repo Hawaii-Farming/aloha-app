@@ -93,9 +93,9 @@ export function NavbarSearch({
               {groupItems.map((item) => (
                 <CommandItem
                   key={item.path}
-                  value={item.path}
+                  value={`${item.label} ${item.path}`}
                   keywords={[item.label, item.group ?? ''].filter(Boolean)}
-                  onSelect={(selectedPath) => handleSelect(selectedPath)}
+                  onSelect={() => handleSelect(item.path)}
                   data-test={`navbar-search-item-${item.path}`}
                 >
                   {item.label}
