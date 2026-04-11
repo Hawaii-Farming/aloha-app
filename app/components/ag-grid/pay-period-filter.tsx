@@ -47,7 +47,7 @@ export function PayPeriodFilter({ periods }: PayPeriodFilterProps) {
   return (
     <Select value={currentValue || 'all'} onValueChange={handleChange}>
       <SelectTrigger
-        className="h-8 w-[260px] rounded-md px-3 py-1 text-xs"
+        className="h-8 w-full min-w-0 rounded-md px-3 py-1 text-xs sm:w-[260px]"
         data-test="pay-period-filter"
       >
         <SelectValue placeholder="Select pay period" />

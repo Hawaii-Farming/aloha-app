@@ -33,7 +33,7 @@ export function PayrollDataFilterBar() {
 
   return (
     <div
-      className="flex items-center gap-2"
+      className="flex min-w-0 flex-wrap items-center gap-2"
       data-test="payroll-data-filter-bar"
     >
       <PayPeriodFilter periods={payPeriods} />
@@ -42,7 +42,7 @@ export function PayrollDataFilterBar() {
         onValueChange={handleEmployeeChange}
       >
         <SelectTrigger
-          className="h-8 w-[200px] rounded-md px-3 py-1 text-xs"
+          className="h-8 w-full min-w-0 rounded-md px-3 py-1 text-xs sm:w-[200px]"
           data-test="employee-filter"
         >
           <SelectValue placeholder="All employees" />
