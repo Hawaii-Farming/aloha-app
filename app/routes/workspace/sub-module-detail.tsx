@@ -1,6 +1,8 @@
 import { Suspense, lazy } from 'react';
 
-import { redirect } from 'react-router';
+import { redirect, useParams } from 'react-router';
+
+import type { z } from 'zod';
 
 import { CardDetailView } from '~/components/crud/card-detail-view';
 import { createWorkflowAgent } from '~/lib/ai/workflow-automation.server';
@@ -116,6 +118,30 @@ export const action = async (args: {
     });
   }
 
+  if (body.intent === 'patch') {
+    const schema = config?.schema;
+
+    if (!schema) {
+      return { success: false, error: 'No schema configured' };
+    }
+
+    // Partial update — inline-edit sends one field at a time, so validate
+    // against a partial schema so required fields aren't mistakenly required.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const partialSchema = (schema as any).partial() as z.ZodType;
+
+    return crudUpdateAction({
+      client,
+      tableName,
+      orgId: accountSlug,
+      employeeId: workspace.currentOrg.employee_id,
+      data: body.data,
+      schema: partialSchema,
+      pkColumn,
+      pkValue: recordId,
+    });
+  }
+
   if (body.intent === 'delete') {
     const result = await crudDeleteAction({
       client,
@@ -175,18 +201,21 @@ export const action = async (args: {
 
 const detailViewCache = new Map<string, React.ComponentType<DetailViewProps>>();
 
-function resolveDetailView(config: CrudModuleConfig | undefined) {
-  const viewType = config?.viewType?.detail ?? 'card';
+function resolveDetailView(subModuleSlug: string) {
+  // Re-resolve config from the client-side registry — loader serialization
+  // strips non-serializable fields like customViews (function references).
+  const freshConfig = getModuleConfig(subModuleSlug);
+  const viewType = freshConfig?.viewType?.detail ?? 'card';
 
-  if (viewType !== 'custom' || !config?.customViews?.detail) {
+  if (viewType !== 'custom' || !freshConfig?.customViews?.detail) {
     return CardDetailView;
   }
 
-  const cacheKey = config.tableName ?? 'default';
+  const cacheKey = freshConfig.tableName ?? 'default';
   const cached = detailViewCache.get(cacheKey);
   if (cached) return cached;
 
-  const component = lazy(config.customViews.detail);
+  const component = lazy(freshConfig.customViews.detail);
   detailViewCache.set(cacheKey, component);
   return component;
 }
@@ -207,7 +236,9 @@ export default function SubModuleDetailPage(props: {
     comboboxOptions,
   } = props.loaderData;
 
-  const ViewComponent = resolveDetailView(config);
+  const params = useParams();
+  const subModuleSlug = params.subModule ?? config?.tableName ?? '';
+  const ViewComponent = resolveDetailView(subModuleSlug);
 
   const viewProps: DetailViewProps = {
     record,

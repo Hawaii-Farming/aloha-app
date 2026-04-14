@@ -36,7 +36,6 @@ import {
 } from '~/components/ag-grid/column-state';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
-import { TableSearchInput } from '~/components/ag-grid/table-search-input';
 import { CreatePanel } from '~/components/crud/create-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
@@ -290,9 +289,7 @@ export default function SchedulerListView(props: ListViewProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentWeek = searchParams.get('week') ?? getCurrentWeekStart();
 
@@ -358,8 +355,6 @@ export default function SchedulerListView(props: ListViewProps) {
         field: 'full_name',
         cellRenderer: SchedulerEmployeeRenderer,
         minWidth: 220,
-        sortable: true,
-        filter: true,
         pinned: 'left' as const,
       },
       ...['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({
@@ -389,7 +384,6 @@ export default function SchedulerListView(props: ListViewProps) {
         headerName: 'Total Hrs',
         field: 'total_hours',
         cellRenderer: HoursHeatmapRenderer,
-        sortable: true,
         type: 'numericColumn',
         minWidth: 100,
       },
@@ -409,13 +403,11 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Date',
         field: 'date',
-        sortable: true,
         minWidth: 120,
       },
       {
         headerName: 'Employees',
         field: 'employee_count',
-        sortable: true,
         type: 'numericColumn',
         minWidth: 100,
       },
@@ -423,7 +415,6 @@ export default function SchedulerListView(props: ListViewProps) {
         headerName: 'Total Hours',
         field: 'total_hours',
         cellRenderer: HoursHeatmapRenderer,
-        sortable: true,
         type: 'numericColumn',
         minWidth: 110,
       },
@@ -529,21 +520,6 @@ export default function SchedulerListView(props: ListViewProps) {
       >
         {/* Toolbar — wraps on narrow viewports */}
         <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
-          <TableSearchInput
-            value={searchValue}
-            onChange={(value) => {
-              setSearchValue(value);
-              if (searchDebounceRef.current) {
-                clearTimeout(searchDebounceRef.current);
-              }
-              searchDebounceRef.current = setTimeout(() => {
-                setSearchValue(value);
-              }, 300);
-            }}
-            placeholder="Search scheduler..."
-            data-test="scheduler-search"
-          />
-
           {/* Week navigator: a single pill with < | date | > */}
           <div
             className="border-border bg-background inline-flex items-center overflow-hidden rounded-full border"
@@ -608,7 +584,6 @@ export default function SchedulerListView(props: ListViewProps) {
             colDefs={colDefs}
             rowData={detailRowData as RowData[]}
             rowClassRules={otWarningRowClassRules}
-            quickFilterText={searchValue}
             onRowClicked={handleDetailRowClicked}
             isFullWidthRow={isFullWidthRow}
             fullWidthCellRenderer={fullWidthCellRenderer}

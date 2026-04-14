@@ -8,34 +8,66 @@
 Optimize dropdowns for mobile
  */
 [data-radix-popper-content-wrapper] {
-    @apply w-full md:w-auto;
+  @apply w-full md:w-auto;
 }
 
 [data-radix-menu-content] {
-    @apply rounded-none md:rounded-lg w-full md:w-auto;
+  @apply w-full rounded-none md:w-auto md:rounded-lg;
 }
 
-[data-radix-menu-content] [role="menuitem"] {
-    @apply md:min-h-0 min-h-12;
+[data-radix-menu-content] [role='menuitem'] {
+  @apply min-h-12 md:min-h-0;
 }
 
 .site-header > .container:before,
 .site-footer > .container:before {
-    background: radial-gradient(62.87% 100% at 50% 100%, var(--color-gray-200) 0%, rgba(255, 255, 255, 0) 100%);
+  background: radial-gradient(
+    62.87% 100% at 50% 100%,
+    var(--color-gray-200) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
 
-    bottom: 0;
-    content: "";
-    height: 1px;
-    left: 0;
-    position: absolute;
-    width: 100%;
+  bottom: 0;
+  content: '';
+  height: 1px;
+  left: 0;
+  position: absolute;
+  width: 100%;
 }
 
 .dark .site-header > .container:before,
 .dark .site-footer > .container:before {
-    background: radial-gradient(62.87% 100% at 50% 100%, rgba(255, 255, 255, .10) 0%, rgba(255, 255, 255, 0) 100%);
+  background: radial-gradient(
+    62.87% 100% at 50% 100%,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 .site-footer > .container:before {
-    top: 0;
+  top: 0;
+}
+
+/* AG Grid: continuous vertical column borders on body cells */
+.ag-grid-cell-borders .ag-cell {
+  border-right: 1px solid var(--ag-border-color);
+}
+
+/* Ghost row fill — extend the zebra pattern below the last rendered row so
+ * short datasets don't leave a flat dead zone above the pinned bottom row
+ * (TOTAL) or the bottom of the viewport. Stripe height matches the 52px
+ * row height used across list views. Real rows render on top of this
+ * background and fully occlude it where data exists; the pattern only
+ * shows through in otherwise-empty space.
+ *
+ * Light-mode only — dark mode has no visible zebra on real rows (odd and
+ * even share the same color), so we leave the solid grid background. */
+[data-ag-theme-mode='light'].ag-grid-cell-borders .ag-body-viewport {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #ffffff 0,
+    #ffffff 52px,
+    #f8fafc 52px,
+    #f8fafc 104px
+  );
 }

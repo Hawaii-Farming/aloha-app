@@ -144,6 +144,10 @@ function AgGridInner({
           defaultState: { pinned: null },
         });
       }
+      // Auto-size all columns to fit their content
+      setTimeout(() => {
+        event.api.autoSizeAllColumns();
+      }, 0);
     },
     [onGridReady, isMobile],
   );
@@ -152,8 +156,9 @@ function AgGridInner({
     () => ({
       resizable: true,
       sortable: true,
-      filter: true,
-      width: 120,
+      filter: false,
+      minWidth: 100,
+      autoHeaderHeight: true,
     }),
     [],
   );
@@ -204,7 +209,7 @@ function AgGridInner({
       ref={containerRef}
       data-ag-theme-mode={resolvedTheme === 'dark' ? 'dark' : 'light'}
       data-test="ag-grid-wrapper"
-      className="h-full w-full"
+      className="ag-grid-cell-borders h-full w-full"
       style={
         effectiveDomLayout === 'normal'
           ? { height: height ?? '100%' }

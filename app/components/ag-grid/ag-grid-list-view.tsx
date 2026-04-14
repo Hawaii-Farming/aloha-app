@@ -1,6 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useFetcher, useParams, useRevalidator } from 'react-router';
+import {
+  useFetcher,
+  useNavigate,
+  useParams,
+  useRevalidator,
+} from 'react-router';
 
 import type {
   ColDef,
@@ -9,6 +14,7 @@ import type {
   ColumnVisibleEvent,
   GridApi,
   GridReadyEvent,
+  RowClickedEvent,
   SelectionChangedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
@@ -27,7 +33,6 @@ import {
   AlertDialogTrigger,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
-import { DataTableToolbar } from '@aloha/ui/data-table-toolbar';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
@@ -36,15 +41,9 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
-import { InlineDetailRow } from '~/components/ag-grid/inline-detail-row';
 import { CreatePanel } from '~/components/crud/create-panel';
 import { getModuleConfig } from '~/lib/crud/registry';
-import type {
-  CrudModuleConfig,
-  ListViewProps,
-  WorkflowConfig,
-} from '~/lib/crud/types';
+import type { ListViewProps, WorkflowConfig } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
 
@@ -56,8 +55,6 @@ const CHECKBOX_COL: ColDef = {
   filter: false,
   resizable: false,
   suppressMovable: true,
-  pinned: 'left',
-  lockPosition: true,
 };
 
 const AVATAR_COL: ColDef = {
@@ -70,8 +67,6 @@ const AVATAR_COL: ColDef = {
   filter: false,
   resizable: false,
   suppressMovable: true,
-  pinned: 'left',
-  lockPosition: true,
 };
 
 export default function AgGridListView({
@@ -80,15 +75,12 @@ export default function AgGridListView({
   fkOptions,
   comboboxOptions,
   subModuleDisplayName,
-  filterSlot,
 }: ListViewProps) {
   const gridRef = useRef<AgGridReact>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const params = useParams();
 
@@ -102,42 +94,17 @@ export default function AgGridListView({
     [subModuleSlug, config],
   );
 
-  const noDetailRow = freshConfig?.noDetailRow === true;
+  const navigate = useNavigate();
+  const account = params.account ?? '';
+  const moduleSlug = params.module ?? '';
 
-  // Inline detail row — use custom detail component from config if available
-  const CustomDetail = freshConfig?.agGridDetailRow;
-  const detailComponent = useMemo(
-    () =>
-      function DetailRenderer({ data }: { data: Record<string, unknown> }) {
-        if (CustomDetail) return <CustomDetail data={data} />;
-        return (
-          <InlineDetailRow data={data} config={config as CrudModuleConfig} />
-        );
-      },
-    [config, CustomDetail],
-  );
-
-  const {
-    rowData: detailRowData,
-    isFullWidthRow,
-    fullWidthCellRenderer,
-    handleRowClicked: handleDetailRowClicked,
-    getRowId,
-    hasExpandedRow: _hasExpandedRow,
-  } = useDetailRow({
-    sourceData: (tableData.data as Record<string, unknown>[]) ?? [],
-    pkColumn,
-    detailComponent,
-    gridRef,
-  });
-
-  const detailRowHeight = 160;
-  const getRowHeight = useCallback(
-    (params: { data?: Record<string, unknown> }) => {
-      if (params.data?._isDetailRow) return detailRowHeight;
-      return undefined;
+  const handleRowClicked = useCallback(
+    (event: RowClickedEvent) => {
+      const recordId = event.data?.[pkColumn];
+      if (!recordId) return;
+      navigate(`/home/${account}/${moduleSlug}/${subModuleSlug}/${recordId}`);
     },
-    [detailRowHeight],
+    [navigate, account, moduleSlug, subModuleSlug, pkColumn],
   );
 
   const hasCustomColDefs = Boolean(freshConfig?.agGridColDefs);
@@ -234,50 +201,16 @@ export default function AgGridListView({
   return (
     <>
       <div className="flex min-h-0 flex-1 flex-col" data-test="sub-module-list">
-        <div className="shrink-0 overflow-visible pb-4">
-          <DataTableToolbar
-            searchValue={searchValue}
-            onSearchChange={(value) => {
-              setSearchValue(value);
-
-              if (searchDebounceRef.current) {
-                clearTimeout(searchDebounceRef.current);
-              }
-
-              searchDebounceRef.current = setTimeout(() => {
-                setSearchValue(value);
-              }, 300);
-            }}
-            searchPlaceholder={
-              config?.search?.placeholder ??
-              `Search ${subModuleDisplayName.toLowerCase()}...`
-            }
-            filterSlot={filterSlot}
-            actionSlot={
-              <div className="flex items-center gap-2">
-                {selectedCount > 0 && (
-                  <BulkActions
-                    selectedIds={selectedIds}
-                    selectedCount={selectedCount}
-                    workflowConfig={config?.workflow}
-                    onComplete={clearSelection}
-                  />
-                )}
-                {(config?.formFields?.length ?? 0) > 0 && (
-                  <Button
-                    variant="brand"
-                    onClick={() => setCreateOpen(true)}
-                    data-test="sub-module-create-button"
-                    aria-label="Create"
-                    className="h-9 w-9 rounded-full p-0"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            }
-          />
-        </div>
+        {selectedCount > 0 && (
+          <div className="shrink-0 overflow-visible px-4 py-2">
+            <BulkActions
+              selectedIds={selectedIds}
+              selectedCount={selectedCount}
+              workflowConfig={config?.workflow}
+              onComplete={clearSelection}
+            />
+          </div>
+        )}
 
         <div
           className="flex min-h-0 flex-1 flex-col"
@@ -286,21 +219,8 @@ export default function AgGridListView({
           <AgGridWrapper
             gridRef={gridRef}
             colDefs={allColDefs}
-            rowData={
-              noDetailRow
-                ? (tableData.data as RowData[])
-                : (detailRowData as RowData[])
-            }
-            quickFilterText={searchValue}
-            onRowClicked={noDetailRow ? undefined : handleDetailRowClicked}
-            isFullWidthRow={noDetailRow ? undefined : isFullWidthRow}
-            fullWidthCellRenderer={
-              noDetailRow ? undefined : fullWidthCellRenderer
-            }
-            getRowId={noDetailRow ? undefined : getRowId}
-            getRowHeight={noDetailRow ? undefined : getRowHeight}
-            rowSelection={noDetailRow ? undefined : 'multiple'}
-            suppressRowClickSelection={noDetailRow ? undefined : true}
+            rowData={tableData.data as RowData[]}
+            onRowClicked={handleRowClicked}
             pagination={false}
             onGridReady={handleGridReady}
             onSelectionChanged={handleSelectionChanged}
@@ -311,6 +231,18 @@ export default function AgGridListView({
           />
         </div>
       </div>
+
+      {(config?.formFields?.length ?? 0) > 0 && (
+        <Button
+          variant="brand"
+          onClick={() => setCreateOpen(true)}
+          data-test="sub-module-create-button"
+          aria-label="Create"
+          className="fixed right-10 bottom-10 z-30 h-14 w-14 rounded-full p-0 shadow-lg"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      )}
 
       {(config?.formFields?.length ?? 0) > 0 && (
         <CreatePanel

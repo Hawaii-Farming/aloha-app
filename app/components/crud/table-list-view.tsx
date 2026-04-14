@@ -228,8 +228,6 @@ export function TableListView({
 
   const sort = searchParams.get('sort') ?? 'id';
   const dir = searchParams.get('dir') ?? 'asc';
-  const q = searchParams.get('q') ?? '';
-  const [searchValue, setSearchValue] = useState(q);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clear any pending search debounce on unmount so we don't try to update
@@ -300,22 +298,6 @@ export function TableListView({
       >
         <div className="shrink-0 pb-4">
           <DataTableToolbar
-            searchValue={searchValue}
-            onSearchChange={(value) => {
-              setSearchValue(value);
-
-              if (debounceRef.current) {
-                clearTimeout(debounceRef.current);
-              }
-
-              debounceRef.current = setTimeout(() => {
-                updateParams({ q: value, page: 1 });
-              }, 400);
-            }}
-            searchPlaceholder={
-              config?.search?.placeholder ??
-              `Search ${subModuleDisplayName.toLowerCase()}...`
-            }
             actionSlot={
               <div className="flex items-center gap-2">
                 {selectedCount > 0 && (

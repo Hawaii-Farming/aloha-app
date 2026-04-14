@@ -24,13 +24,11 @@ const timeOffColumns: ColumnConfig[] = [
   {
     key: 'compensation_manager_name',
     label: 'Comp Manager',
-    sortable: true,
   },
   {
     key: 'start_date',
     label: 'Start Date',
     type: 'date',
-    sortable: true,
   },
   {
     key: 'return_date',
@@ -75,7 +73,6 @@ const timeOffColumns: ColumnConfig[] = [
     key: 'status',
     label: 'Status',
     type: 'workflow',
-    sortable: true,
   },
 ];
 
@@ -84,8 +81,6 @@ const timeOffColDefs = [
     headerName: 'Employee',
     field: 'full_name',
     cellRenderer: SchedulerEmployeeRenderer,
-    sortable: true,
-    filter: 'agTextColumnFilter',
     minWidth: 200,
   },
   ...mapColumnsToColDefs(
@@ -95,7 +90,6 @@ const timeOffColDefs = [
     headerName: 'Status',
     field: 'status',
     cellRenderer: StatusBadgeRenderer,
-    sortable: true,
     filter: false,
     resizable: false,
     width: 130,

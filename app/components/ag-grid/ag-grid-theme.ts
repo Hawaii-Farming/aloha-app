@@ -18,13 +18,16 @@ const shared = {
     "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontSize: 14,
   headerFontSize: 13,
-  headerFontWeight: 500,
+  headerFontWeight: 700,
+  headerVerticalPaddingScale: 1,
   checkboxBorderRadius: 4,
   rowVerticalPaddingScale: 1.6,
   columnBorder: true,
   iconSize: 12,
   inputFocusBorder: 'solid 1px transparent',
   inputFocusShadow: 'none',
+  wrapperBorder: false,
+  wrapperBorderRadius: 0,
 } as const;
 
 export function getAgGridTheme() {
@@ -37,8 +40,8 @@ export function getAgGridTheme() {
         backgroundColor: '#ffffff',
         foregroundColor: '#0f172a',
         headerBackgroundColor: '#f1f5f9',
-        headerTextColor: '#475569',
-        borderColor: '#e2e8f0',
+        headerTextColor: '#1e293b',
+        borderColor: '#cbd5e1',
         accentColor: '#22c55e',
         rowHoverColor: '#f1f5f9',
         selectedRowBackgroundColor: '#f0fdf4',

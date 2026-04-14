@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
-import { useLoaderData, useParams } from 'react-router';
+import {
+  useLoaderData,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router';
 
 import type {
   ColDef,
@@ -10,6 +15,7 @@ import type {
   GridApi,
   GridReadyEvent,
   RowClassParams,
+  RowClickedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
@@ -20,10 +26,8 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
-import { PayPeriodFilter } from '~/components/ag-grid/pay-period-filter';
 import { hoursFormatter } from '~/components/ag-grid/payroll-formatters';
-import { TableSearchInput } from '~/components/ag-grid/table-search-input';
+import { NavbarFilterButton } from '~/components/navbar-filter-button';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -32,44 +36,17 @@ function VariancePillRenderer(props: CustomCellRendererProps) {
   const value = props.value as number | null;
   if (value == null) return null;
 
-  if (props.node.rowPinned === 'bottom') {
-    const prefix = value > 0 ? '+' : '';
-    const pillClass =
-      value > 0
-        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
-        : value < 0
-          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-          : 'bg-muted text-muted-foreground border-border';
-    return (
-      <div className="flex h-full items-center justify-end">
-        <span
-          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold tabular-nums ${pillClass}`}
-        >
-          {prefix}
-          {value.toFixed(1)}
-        </span>
-      </div>
-    );
-  }
-
   const prefix = value > 0 ? '+' : '';
-  const label = `${prefix}${value.toFixed(1)}`;
-
-  const pillClass =
-    value > 0
-      ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
-      : value < 0
-        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-        : 'bg-muted text-muted-foreground border-border';
+  const weight =
+    props.node.rowPinned === 'bottom' ? 'font-bold' : 'font-medium';
 
   return (
-    <div className="flex h-full items-center justify-end">
-      <span
-        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tabular-nums ${pillClass}`}
-      >
-        {label}
-      </span>
-    </div>
+    <span
+      className={`flex h-full items-center justify-end font-mono tabular-nums ${weight}`}
+    >
+      {prefix}
+      {value.toFixed(1)}
+    </span>
   );
 }
 
@@ -83,202 +60,14 @@ function EmployeeDeptRenderer(props: CustomCellRendererProps) {
   if (!data) return null;
 
   const fullName = String(data.full_name ?? '');
-  const dept = data.department_name ? String(data.department_name) : '';
-
-  if (props.node.rowPinned === 'bottom') {
-    return <span className="font-bold">{fullName}</span>;
-  }
+  const pinned = props.node.rowPinned === 'bottom';
 
   return (
-    <div className="flex h-full flex-col justify-center leading-tight">
-      <span className="text-sm font-medium">{fullName}</span>
-      {dept && <span className="text-muted-foreground text-xs">{dept}</span>}
-    </div>
-  );
-}
-
-interface HoursDetailInnerProps {
-  data: RowData;
-  accountSlug: string;
-}
-
-function HoursDetailInner({ data, accountSlug }: HoursDetailInnerProps) {
-  const [detailData, setDetailData] = useState<RowData[]>([]);
-
-  const employeeId = String(data.hr_employee_id ?? '');
-  const periodStart = String(data.pay_period_start ?? '');
-  const periodEnd = String(data.pay_period_end ?? '');
-
-  const canFetch = !!(employeeId && periodStart && periodEnd);
-  const [loading, setLoading] = useState(canFetch);
-
-  // Justified: fetch schedule data on mount when detail row expands
-  useEffect(() => {
-    if (!canFetch) return;
-
-    let cancelled = false;
-
-    const params = new URLSearchParams({
-      employeeId,
-      orgId: accountSlug,
-      periodStart,
-      periodEnd,
-    });
-
-    fetch(`/api/schedule-by-period?${params.toString()}`)
-      .then((res) => res.json())
-      .then((json: { data?: RowData[] }) => {
-        if (!cancelled) {
-          setDetailData(json.data ?? []);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [canFetch, employeeId, accountSlug, periodStart, periodEnd]);
-
-  if (loading) {
-    return (
-      <div className="text-muted-foreground px-6 py-4 text-sm">
-        Loading schedule data...
-      </div>
-    );
-  }
-
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  const byDate = new Map<string, RowData>();
-  for (const row of detailData) {
-    const date = (row.date as string) ?? '';
-    if (date) byDate.set(date, row);
-  }
-
-  function buildWeek(weekStart: Date) {
-    const week: { date: string; dayName: string; entry: RowData | null }[] = [];
-    for (let i = 0; i < 7; i++) {
-      const dayDate = new Date(weekStart);
-      dayDate.setDate(weekStart.getDate() + i);
-      const dayStr = dayDate.toISOString().split('T')[0] ?? '';
-      week.push({
-        date: dayStr,
-        dayName: dayNames[i] ?? '',
-        entry: byDate.get(dayStr) ?? null,
-      });
-    }
-    return week;
-  }
-
-  let recentWeeks: { date: string; dayName: string; entry: RowData | null }[][];
-
-  if (detailData.length === 0) {
-    const now = new Date();
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
-    recentWeeks = [buildWeek(weekStart)];
-  } else {
-    const allDates = [...byDate.keys()].sort();
-    const weeks: typeof recentWeeks = [];
-    const seen = new Set<string>();
-
-    for (const date of allDates) {
-      const d = new Date(date + 'T00:00:00');
-      const dow = d.getDay();
-      const weekStart = new Date(d);
-      weekStart.setDate(d.getDate() - dow);
-      const weekKey = weekStart.toISOString().split('T')[0] ?? '';
-
-      if (seen.has(weekKey)) continue;
-      seen.add(weekKey);
-      weeks.push(buildWeek(weekStart));
-    }
-
-    recentWeeks = weeks;
-  }
-
-  return (
-    <div className="@container h-full max-h-[310px] overflow-y-auto px-4 py-2">
-      {recentWeeks.map((week, wi) => (
-        <div key={wi} className={`${wi > 0 ? 'mt-2' : ''}`}>
-          <div className="grid grid-cols-1 gap-2 @xs:grid-cols-2 @sm:grid-cols-3 @md:grid-cols-4 @lg:grid-cols-5 @xl:grid-cols-6 @2xl:grid-cols-7">
-            {week.map(({ date, dayName, entry }) => {
-              const isWeekend = dayName === 'Sun' || dayName === 'Sat';
-              const isOff = !entry;
-
-              if (isOff) {
-                return (
-                  <div
-                    key={date}
-                    className={`overflow-hidden rounded-lg border border-dashed px-2 py-1.5 opacity-40 ${
-                      isWeekend ? 'border-amber-500/30' : 'border-border'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold">{dayName}</span>
-                      <span className="text-muted-foreground text-[10px]">
-                        {date}
-                      </span>
-                    </div>
-                    <div className="text-muted-foreground mt-1 text-[10px]">
-                      Off
-                    </div>
-                  </div>
-                );
-              }
-
-              const hours = entry.hours as number | null;
-
-              return (
-                <div
-                  key={date}
-                  className={`overflow-hidden rounded-lg border px-2 py-1.5 ${
-                    isWeekend
-                      ? 'border-amber-500/30 bg-amber-500/5'
-                      : 'border-border bg-muted/30'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold">{dayName}</span>
-                    <span className="text-muted-foreground text-[10px]">
-                      {date}
-                    </span>
-                  </div>
-                  <div className="mt-1">
-                    <span className="text-muted-foreground text-[10px]">
-                      {(entry.start_time_formatted as string) ?? ''} -{' '}
-                      {(entry.end_time_formatted as string) ?? ''}
-                    </span>
-                    {hours !== null && (
-                      <span className="text-primary ml-1 text-[10px] font-semibold">
-                        {hours}h
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {entry.task_name ? (
-                      <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 text-[10px] font-medium text-emerald-500">
-                        {String(entry.task_name)}
-                      </span>
-                    ) : null}
-                    {entry.department_name ? (
-                      <span className="text-muted-foreground text-[10px]">
-                        {String(entry.department_name)}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
+    <span
+      className={`flex h-full items-center truncate text-sm ${pinned ? 'font-bold' : 'font-medium'}`}
+    >
+      {fullName}
+    </span>
   );
 }
 
@@ -302,10 +91,13 @@ const colDefs: ColDef[] = [
     field: 'full_name',
     headerName: 'Employee',
     cellRenderer: EmployeeDeptRenderer,
-    sortable: true,
-    filter: true,
-    minWidth: 250,
+    minWidth: 200,
     pinned: 'left',
+  },
+  {
+    field: 'department_name',
+    headerName: 'Department',
+    minWidth: 140,
   },
   {
     field: 'scheduled_hours',
@@ -338,13 +130,21 @@ export default function PayrollHoursListView(props: ListViewProps) {
 
   const loaderData = useLoaderData() as RowData;
   const payPeriods = (loaderData.payPeriods ?? []) as RowData[];
-  const params = useParams();
-  const accountSlug = params.account ?? '';
+  const navigate = useNavigate();
+  const { account } = useParams();
 
   const gridRef = useRef<AgGridReact>(null);
-  const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleRowClicked = useCallback(
+    (event: RowClickedEvent) => {
+      if (event.node.rowPinned) return;
+      const employeeId = event.data?.hr_employee_id as string | undefined;
+      if (!employeeId || !account) return;
+      navigate(`/home/${account}/human_resources/register/${employeeId}`);
+    },
+    [navigate, account],
+  );
 
   const rawRows = tableData.data as RowData[];
 
@@ -366,43 +166,6 @@ export default function PayrollHoursListView(props: ListViewProps) {
       },
     ];
   }, [rawRows]);
-
-  const detailComponent = useMemo(
-    () =>
-      function DetailRenderer({ data }: { data: RowData }) {
-        return <HoursDetailInner data={data} accountSlug={accountSlug} />;
-      },
-    [accountSlug],
-  );
-
-  const {
-    rowData: detailRowData,
-    isFullWidthRow,
-    fullWidthCellRenderer,
-    handleRowClicked: handleDetailRowClicked,
-    getRowId,
-  } = useDetailRow({
-    sourceData: rawRows,
-    pkColumn: 'hr_employee_id',
-    detailComponent,
-    gridRef,
-  });
-
-  const getRowHeight = useCallback((params: { data?: RowData }) => {
-    if (params.data?._isDetailRow) {
-      const parent = params.data._parentData as RowData | undefined;
-      const start = parent?.pay_period_start as string | undefined;
-      const end = parent?.pay_period_end as string | undefined;
-      if (start && end) {
-        const days =
-          (new Date(end).getTime() - new Date(start).getTime()) / 86400000 + 1;
-        const weeks = Math.ceil(days / 7);
-        return weeks * 80 + 24;
-      }
-      return 200;
-    }
-    return 52;
-  }, []);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
     if (params.node.rowPinned === 'bottom') {
@@ -460,48 +223,61 @@ export default function PayrollHoursListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const periodStart = searchParams.get('period_start') ?? '';
+  const periodEnd = searchParams.get('period_end') ?? '';
+  const periodValue =
+    periodStart && periodEnd ? `${periodStart}|${periodEnd}` : '';
+
   return (
     <div
       className="flex min-h-0 flex-1 flex-col"
       data-test="payroll-hours-list-view"
     >
-      {/* Toolbar */}
-      <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
-        <TableSearchInput
-          value={searchValue}
-          onChange={(value) => {
-            setSearchValue(value);
-            if (searchDebounceRef.current) {
-              clearTimeout(searchDebounceRef.current);
-            }
-            searchDebounceRef.current = setTimeout(() => {
-              setSearchValue(value);
-            }, 300);
-          }}
-          placeholder="Search employees..."
-          data-test="payroll-hours-search"
-        />
-
-        <div className="ml-auto flex items-center gap-2">
-          <PayPeriodFilter periods={payPeriods} />
-        </div>
-      </div>
+      <NavbarFilterButton
+        testKey="payroll-hours-filter"
+        filters={[
+          {
+            key: 'period',
+            label: 'Pay Period',
+            allLabel: 'All Pay Periods',
+            value: periodValue,
+            onChange: (v) => {
+              const next = new URLSearchParams(searchParams);
+              if (v === '') {
+                next.delete('period_start');
+                next.delete('period_end');
+              } else {
+                const [start, end] = v.split('|');
+                if (start && end) {
+                  next.set('period_start', start);
+                  next.set('period_end', end);
+                }
+              }
+              setSearchParams(next, { preventScrollReset: true });
+            },
+            options: payPeriods.map((p) => {
+              const start = String(p.pay_period_start ?? '');
+              const end = String(p.pay_period_end ?? '');
+              return {
+                value: `${start}|${end}`,
+                label: `${start} – ${end}`,
+              };
+            }),
+          },
+        ]}
+      />
 
       {/* Grid */}
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper
           gridRef={gridRef}
           colDefs={colDefs}
-          rowData={detailRowData as RowData[]}
+          rowData={rawRows}
           pinnedBottomRowData={totalsRow}
-          quickFilterText={searchValue}
           pagination={false}
           getRowStyle={getRowStyle}
-          onRowClicked={handleDetailRowClicked}
-          isFullWidthRow={isFullWidthRow}
-          fullWidthCellRenderer={fullWidthCellRenderer}
-          getRowId={getRowId}
-          getRowHeight={getRowHeight}
+          onRowClicked={handleRowClicked}
           onGridReady={handleGridReady}
           onColumnMoved={handleColumnMoved}
           onColumnResized={handleColumnResized}

@@ -24,7 +24,7 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       field: col.key,
       headerName: col.label,
       sortable: col.sortable ?? true,
-      filter: getFilterType(col.type),
+      filter: false,
       hide: false,
     };
 
@@ -37,8 +37,6 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
     if (col.render === 'full_name') {
       colDef.cellRenderer = EmployeeCellRenderer;
       colDef.minWidth = 250;
-      colDef.pinned = 'left';
-      colDef.lockPosition = true;
       colDef.valueGetter = (params: ValueGetterParams) => {
         const first = (params.data?.first_name as string) ?? '';
         const last = (params.data?.last_name as string) ?? '';
@@ -95,18 +93,4 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
 
     return colDef;
   });
-}
-
-function getFilterType(type?: string): string | boolean {
-  switch (type) {
-    case 'number':
-      return 'agNumberColumnFilter';
-    case 'date':
-    case 'datetime':
-      return 'agDateColumnFilter';
-    case 'boolean':
-      return false;
-    default:
-      return 'agTextColumnFilter';
-  }
 }

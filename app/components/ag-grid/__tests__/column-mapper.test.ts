@@ -22,7 +22,7 @@ vi.mock('~/components/ag-grid/cell-renderers/code-cell-renderer', () => ({
 }));
 
 describe('mapColumnsToColDefs', () => {
-  it('maps basic ColumnConfig to ColDef with field and headerName', async () => {
+  it('maps basic ColumnConfig to ColDef — sortable defaults true, filter always false', async () => {
     const { mapColumnsToColDefs } =
       await import('~/components/ag-grid/column-mapper');
     const columns: ColumnConfig[] = [
@@ -34,9 +34,19 @@ describe('mapColumnsToColDefs', () => {
     expect(col.field).toBe('name');
     expect(col.headerName).toBe('Name');
     expect(col.sortable).toBe(true);
+    expect(col.filter).toBe(false);
   });
 
-  it('maps type=date to agDateColumnFilter with DatePillRenderer', async () => {
+  it('respects explicit sortable=false on a column', async () => {
+    const { mapColumnsToColDefs } =
+      await import('~/components/ag-grid/column-mapper');
+    const columns: ColumnConfig[] = [
+      { key: 'actions', label: 'Actions', sortable: false },
+    ];
+    expect(mapColumnsToColDefs(columns)[0]!.sortable).toBe(false);
+  });
+
+  it('maps type=date to DatePillRenderer; no filter', async () => {
     const { DatePillRenderer } =
       await import('~/components/ag-grid/cell-renderers/pill-renderer');
     const { mapColumnsToColDefs } =
@@ -46,18 +56,18 @@ describe('mapColumnsToColDefs', () => {
     ];
     const result = mapColumnsToColDefs(columns);
     const col = result[0]!;
-    expect(col.filter).toBe('agDateColumnFilter');
+    expect(col.filter).toBe(false);
     expect(col.cellRenderer).toBe(DatePillRenderer);
   });
 
-  it('maps type=number to agNumberColumnFilter', async () => {
+  it('maps type=number with no filter', async () => {
     const { mapColumnsToColDefs } =
       await import('~/components/ag-grid/column-mapper');
     const columns: ColumnConfig[] = [
       { key: 'salary', label: 'Salary', type: 'number' },
     ];
     const result = mapColumnsToColDefs(columns);
-    expect(result[0]!.filter).toBe('agNumberColumnFilter');
+    expect(result[0]!.filter).toBe(false);
   });
 
   it('maps priority=low to hide=false (all columns visible by default)', async () => {
@@ -141,31 +151,18 @@ describe('mapColumnsToColDefs', () => {
     expect(result[0]!.cellRenderer).toBe(StatusBadgeRenderer);
   });
 
-  it('defaults sortable to true when not specified', async () => {
-    const { mapColumnsToColDefs } =
-      await import('~/components/ag-grid/column-mapper');
-    const columns: ColumnConfig[] = [{ key: 'name', label: 'Name' }];
-    const result = mapColumnsToColDefs(columns);
-    expect(result[0]!.sortable).toBe(true);
-  });
-
-  it('defaults filter to agTextColumnFilter for text type', async () => {
+  it('disables sortable and filter on all columns', async () => {
     const { mapColumnsToColDefs } =
       await import('~/components/ag-grid/column-mapper');
     const columns: ColumnConfig[] = [
-      { key: 'name', label: 'Name', type: 'text' },
-    ];
-    const result = mapColumnsToColDefs(columns);
-    expect(result[0]!.filter).toBe('agTextColumnFilter');
-  });
-
-  it('disables filter for boolean type', async () => {
-    const { mapColumnsToColDefs } =
-      await import('~/components/ag-grid/column-mapper');
-    const columns: ColumnConfig[] = [
+      { key: 'name', label: 'Name' },
       { key: 'is_active', label: 'Active', type: 'boolean' },
+      { key: 'email', label: 'Email', type: 'text' },
     ];
     const result = mapColumnsToColDefs(columns);
-    expect(result[0]!.filter).toBe(false);
+    for (const col of result) {
+      expect(col.sortable).toBe(false);
+      expect(col.filter).toBe(false);
+    }
   });
 });
