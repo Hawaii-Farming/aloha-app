@@ -33,6 +33,10 @@ This project uses **hosted Supabase** — there is no local Docker instance. Do 
 - **Create migration**: `pnpm supabase db diff` (creates a local migration file)
 - **Generate types**: `npx supabase gen types --lang typescript --linked > app/lib/database.types.ts`
 
+## Production Deployment
+
+Deployed to **Google Cloud Run** at **https://aloha.ag**. Pushes to `main` auto-build and deploy via [.github/workflows/deploy.yml](.github/workflows/deploy.yml). GCP project `aloha-96743`, region `us-west1`, service `aloha-app`. `VITE_*` env vars are both build args (baked into the client bundle) and runtime env — any change to them requires a rebuild, not just a Cloud Run config update.
+
 ## Essential Commands
 
 ```bash
