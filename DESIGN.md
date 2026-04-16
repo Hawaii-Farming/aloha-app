@@ -6,7 +6,7 @@ Aloha is a polished farm-operations ERP. The design system is **light-first** �
 
 The brand moment is a **green gradient** — `linear-gradient(135deg, #22c55e, #059669)` (green-500 → emerald-600) — reserved for the primary CTA, the active sidebar pill, the Aloha logo wordmark, and the top-navbar brand surface. Everywhere else the palette stays disciplined slate/white with sparing green-50/green-100 washes for hover and active states. The effect is "fresh farm" without ever feeling like a marketing site.
 
-Typography is **Inter Variable** at a 16px base with weights 400/500/600. No display-weight drama — hierarchy comes from size, not stroke weight. Geist Mono Variable is retained for the occasional code/numeric label. Corners are soft: `--radius = 1rem` (rounded-2xl) is the base, derived sm/md/lg keep Shadcn primitives proportional. Shadows are a soft **slate-900 alpha scale** — generous around floating surfaces (popovers, the sheet/panel), minimal on flat cards.
+Typography is **Inter Variable** at a 16px base with weights 400/500/600 for prose. No display-weight drama for headings — hierarchy comes from size, not stroke weight. Table/grid column headers are a single deliberate exception: weight 700 substitutes for the sort/filter UI chrome intentionally stripped from AG Grid (see `UI-RULES.md §Tables`). Geist Mono Variable is retained for the occasional code/numeric label. Corners are soft: `--radius = 1rem` (rounded-2xl) is the base, derived sm/md/lg keep Shadcn primitives proportional. Shadows are a soft **slate-900 alpha scale** — generous around floating surfaces (popovers, the sheet/panel), minimal on flat cards.
 
 Dark mode is **hand-authored**, not algorithmically derived. Backgrounds drop to slate-900 (`#0f172a`) with slate-800 cards and slate-700 borders; the green primary brightens to green-400 (`#4ade80`) to preserve brand vividness on dark surfaces. Every foundation token pair is designed to meet WCAG AA (4.5:1 normal text, 3:1 large text / UI components) in both themes.
 
@@ -19,6 +19,8 @@ Dark mode is **hand-authored**, not algorithmically derived. Backgrounds drop to
 - Hand-authored dark palette (slate-900/800/700, green-400/emerald-500) with WCAG AA verified pairs
 - Geist Mono Variable retained for `--font-mono`
 - Legacy scaffolding tokens (glass surface, slate alpha wash, prior-era brand tokens) are removed wholesale
+
+> **Companion document:** `UI-RULES.md` covers app-wide **behavior and structure** rules (tables, search, filters, detail views, form fields, layout). This file (`DESIGN.md`) covers **tokens** — colors, typography, radius, shadows. Read both when working on UI.
 
 ## 2. Color Palette & Roles
 
@@ -63,6 +65,8 @@ Light values are Tailwind default 50/600/100 triples. Dark values use 15% / 30% 
 | amber    | `#fffbeb` | `#d97706` | `#fef3c7` | `rgb(245 158 11 / 0.15)` | `#fbbf24` | `rgb(245 158 11 / 0.30)` |
 | green    | `#f0fdf4` | `#16a34a` | `#dcfce7` | `rgb(34 197 94 / 0.15)` | `#4ade80` | `rgb(34 197 94 / 0.30)` |
 | blue     | `#eff6ff` | `#2563eb` | `#dbeafe` | `rgb(59 130 246 / 0.15)` | `#60a5fa` | `rgb(59 130 246 / 0.30)` |
+
+> **Scope:** These semantic tokens are used for alerts, toasts, and inline form errors. Status values rendered in tables are always neutral plain text — see `UI-RULES.md §Tables`.
 
 ### Light mode foundation tokens
 
@@ -142,7 +146,7 @@ Inter is loaded via `@fontsource-variable/inter` (self-hosted woff2, full `wght`
 
 ### Scale
 
-Base size is 16px (`html { font-size: 16px }`). Weights: 400 (body), 500 (nav / buttons / labels), 600 (section headings).
+Base size is 16px (`html { font-size: 16px }`). Weights: 400 (body), 500 (nav / buttons / labels), 600 (section headings), 700 (table/grid headers — see `UI-RULES.md §Tables`).
 
 | Role | Size | Weight | Line height | Notes |
 |------|------|--------|-------------|-------|
@@ -154,6 +158,7 @@ Base size is 16px (`html { font-size: 16px }`). Weights: 400 (body), 500 (nav / 
 | Small   | 0.875rem (14px) | 400 | 1.5 | Secondary copy, captions, table cells |
 | Label   | 0.875rem (14px) | 500 | 1.4 | Form labels, nav items, button labels |
 | Mono    | 0.875rem (14px) | 400 | 1.5 | Numeric / code snippets (Geist Mono Variable) |
+| Table header | 0.8125rem (13px) | 700 | 1.2 | AG Grid column headers — flat emphasis substitutes for stripped sort/filter chrome |
 
 ## 4. Radius
 
@@ -309,7 +314,7 @@ Dark mode clears this pair at 8.55:1. The light-mode FAIL is tracked in §9.1 it
 
 - Don't paint large surfaces bold green. The gradient is a moment, not a wash — no full-bleed green sections, no green sidebars, no green cards.
 - Don't apply `shadow-2xl` to interactive elements. That scale is reserved for modal / backdrop elevation.
-- Don't use bold (700) for display headings — the design uses 600 as the top weight and relies on size for hierarchy.
+- Don't use bold (700) for display headings — the design uses 600 as the top weight for prose hierarchy and relies on size. Table/grid column headers are the sole exception: 700 substitutes for the sort/filter chrome intentionally stripped from AG Grid (see `UI-RULES.md §Tables`).
 - Don't reintroduce legacy scaffolding tokens (glass-surface, slate-alpha-wash, prior-era brand tokens). They are deleted; any component still consuming them should be rewritten to the Aloha equivalents.
 - Don't specify neutral colors with wide-gamut specifiers. Aloha uses hex values throughout to match the prototype exactly.
 - Don't add new top-level color scales (teal, violet, pink, etc.) to `@theme` during Phase 7. New accents belong to a future milestone, not the foundation retheme.
