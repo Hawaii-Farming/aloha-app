@@ -26,6 +26,17 @@ Pricing is managed with three tiers of specificity -- default prices by product 
 | Data Tables | AG Grid Community v35 |
 | Testing | Playwright (E2E), Vitest (unit) |
 
+## Production
+
+| Setting | Value |
+|---------|-------|
+| URL | https://aloha.ag |
+| Host | Google Cloud Run |
+| GCP project | `aloha-96743` |
+| Region | `us-west1` |
+| Service | `aloha-app` |
+| Deploy | Automatic on push to `main` via [.github/workflows/deploy.yml](.github/workflows/deploy.yml) |
+
 ## Supabase Project
 
 | Setting | Value |
