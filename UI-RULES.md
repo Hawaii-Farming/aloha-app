@@ -15,6 +15,44 @@ Source of truth for cross-cutting UI conventions. `DESIGN.md` covers tokens (col
 - **Ghost zebra fill.** When rows don't fill the viewport, the empty area continues the zebra pattern (handled in `kit.css`, tied to the 52px row height).
 - **Pinned TOTAL row** for sum rows. Stays visible while scrolling vertically.
 
+### Table theme (AG Grid)
+
+Canonical hex lookups for the AG Grid theme. AG Grid v35's `themeQuartz.withParams()` does not resolve CSS vars — these values are hardcoded in `app/components/ag-grid/ag-grid-theme.ts` and asserted by `app/components/ag-grid/__tests__/ag-grid-theme.test.ts`. Any edit here must update both.
+
+**Light mode**
+
+| Param                        | Hex       |
+| ---------------------------- | --------- |
+| `backgroundColor`            | `#ffffff` |
+| `foregroundColor`            | `#0f172a` |
+| `headerBackgroundColor`      | `#f1f5f9` |
+| `headerTextColor`            | `#1e293b` |
+| `borderColor`                | `#cbd5e1` |
+| `accentColor`                | `#22c55e` |
+| `rowHoverColor`              | `#f1f5f9` |
+
+**Dark mode**
+
+| Param                        | Hex       |
+| ---------------------------- | --------- |
+| `backgroundColor`            | `#1e293b` |
+| `foregroundColor`            | `#f8fafc` |
+| `headerBackgroundColor`      | `#0f172a` |
+| `headerTextColor`            | `#cbd5e1` |
+| `borderColor`                | `#334155` |
+| `accentColor`                | `#4ade80` |
+| `rowHoverColor`              | `#334155` |
+
+**Shared (both modes)**
+
+| Param                      | Value            |
+| -------------------------- | ---------------- |
+| `fontFamily`               | `Inter Variable` |
+| `fontSize`                 | `14`             |
+| `headerFontSize`           | `13`             |
+| `headerFontWeight`         | `700`            |
+| `rowVerticalPaddingScale`  | `1.6`            |
+
 ## Search
 
 - **Global search only.** No per-table search bars. The navbar search opens the Command palette.
