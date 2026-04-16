@@ -33,8 +33,9 @@ export default defineConfig({
     trace: 'on',
     navigationTimeout: 15 * 1000,
 
-    /* Reuse auth state saved by globalSetup */
-    storageState: 'e2e/.auth/user.json',
+    /* Reuse auth state saved by globalSetup.
+     * Path is relative to this config file (e2e/), not the repo root. */
+    storageState: '.auth/user.json',
   },
 
   // test timeout set to 2 minutes
@@ -70,15 +71,16 @@ export default defineConfig({
     // },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: process.env.PLAYWRIGHT_SERVER_COMMAND
-    ? {
-        cwd: '../',
-        command: process.env.PLAYWRIGHT_SERVER_COMMAND,
-        url: 'http://localhost:5173',
-        reuseExistingServer: !process.env.CI,
-        stdout: 'pipe',
-        stderr: 'pipe',
-      }
-    : undefined,
+  /* Run your local dev server before starting the tests.
+   * Defaults to `pnpm dev` (Vite HMR) for local runs; CI can override via
+   * PLAYWRIGHT_SERVER_COMMAND (e.g. `pnpm start` for the built server). */
+  webServer: {
+    cwd: '../',
+    command: process.env.PLAYWRIGHT_SERVER_COMMAND ?? 'pnpm dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+    stdout: 'pipe',
+    stderr: 'pipe',
+    timeout: 120 * 1000,
+  },
 });
