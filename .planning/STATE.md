@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-16 - Completed quick task 260416-ovx: Align DESIGN.md with UI-RULES.md companion
+Last activity: 2026-04-16 - Completed quick task 260416-p3e: Fix E2E Playwright setup (storageState path + webServer default + README)
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -151,6 +151,7 @@ None.
 | 260410-sl6 | Sidebar parity with aloha-design prototype | 2026-04-11 | c43a781 | [260410-sl6-sidebar-parity-with-aloha-design-prototy](./quick/260410-sl6-sidebar-parity-with-aloha-design-prototy/) |
 | 260416-n2y | Align tests+docs+impl on design branch per UI-RULES.md (update tests, drop dead getStatusVariant, document grid tokens) | 2026-04-16 | 20937f8 | [260416-n2y-align-tests-docs-impl-on-design-branch-p](./quick/260416-n2y-align-tests-docs-impl-on-design-branch-p/) |
 | 260416-ovx | Align DESIGN.md with UI-RULES.md companion (cross-ref, table-header weight exception, scope notes) | 2026-04-16 | cfec9da | [260416-ovx-align-design-md-with-design-branch-inten](./quick/260416-ovx-align-design-md-with-design-branch-inten/) |
+| 260416-p3e | Fix E2E Playwright setup (storageState path, webServer default, README) | 2026-04-16 | e063aa2 | [260416-p3e-fix-e2e-playwright-setup-storagestate-pa](./quick/260416-p3e-fix-e2e-playwright-setup-storagestate-pa/) |
 
 ## Session Continuity
 
