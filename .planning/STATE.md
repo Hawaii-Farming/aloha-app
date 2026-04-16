@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-16 - Completed quick task 260416-p3e: Fix E2E Playwright setup (storageState path + webServer default + README)
+Last activity: 2026-04-16 - Completed quick task 260416-ppa: Fix E2E auth setup cascade (dotenv, waitUntil, slug docs)
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -152,6 +152,7 @@ None.
 | 260416-n2y | Align tests+docs+impl on design branch per UI-RULES.md (update tests, drop dead getStatusVariant, document grid tokens) | 2026-04-16 | 20937f8 | [260416-n2y-align-tests-docs-impl-on-design-branch-p](./quick/260416-n2y-align-tests-docs-impl-on-design-branch-p/) |
 | 260416-ovx | Align DESIGN.md with UI-RULES.md companion (cross-ref, table-header weight exception, scope notes) | 2026-04-16 | cfec9da | [260416-ovx-align-design-md-with-design-branch-inten](./quick/260416-ovx-align-design-md-with-design-branch-inten/) |
 | 260416-p3e | Fix E2E Playwright setup (storageState path, webServer default, README) | 2026-04-16 | e063aa2 | [260416-p3e-fix-e2e-playwright-setup-storagestate-pa](./quick/260416-p3e-fix-e2e-playwright-setup-storagestate-pa/) |
+| 260416-ppa | Fix E2E auth setup cascade (dotenv loader, waitUntil, account slug docs) | 2026-04-16 | 617d1e3 | [260416-ppa-fix-e2e-auth-setup-cascade-dotenv-loader](./quick/260416-ppa-fix-e2e-auth-setup-cascade-dotenv-loader/) |
 
 ## Session Continuity
 
