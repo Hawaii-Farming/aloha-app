@@ -96,7 +96,7 @@ pnpm format:fix && pnpm lint:fix  # Run when task is complete
 - **SSR-first**: Routes export `loader` (server) + `default` component (client) + optional `action`
 - **Server/client boundary**: `.server.ts` files are never imported client-side
 - **Request-scoped Supabase**: `getSupabaseServerClient(request)` — new client per request with auto cookie management
-- **Tenant isolation**: SQL views (`app_org_context`, `app_nav_modules`, `app_user_orgs`) use `auth.uid()` + `hr_employee` membership to filter rows. RLS policies enforce at database layer.
+- **Tenant isolation**: SQL views (`app_org_context`, `app_navigation`, `app_user_orgs`) use `auth.uid()` + `hr_employee` membership to filter rows. RLS policies enforce at database layer.
 - **CRUD registry**: `getModuleConfig(subModuleSlug)` maps URL slugs → table metadata, form schemas, column definitions
 - **CSRF**: Token generated in root loader, stored in meta tag, validated in form actions
 - **Workspace loader**: `loadOrgWorkspace()` loads org context + navigation for layout — fresh per request

@@ -19,15 +19,16 @@ export const loader = async (args: {
     orgSlug: accountSlug,
   });
 
-  // Get sub-modules for this module, ordered by display_order
-  // View is not in generated types — use queryUntypedView helper
-  const { data } = await queryUntypedView(client, 'app_nav_sub_modules')
-    .select(
-      'sub_module_id, org_id, module_slug, sub_module_slug, display_name, display_order',
-    )
+  // Get sub-modules for this module, ordered by display_order.
+  // Uses the `app_navigation` view (one row per accessible sub-module) —
+  // the previous query targeted `app_nav_sub_modules`, which doesn't exist
+  // in the database and silently returned empty → false redirect to
+  // `/home/{account}`.
+  const { data } = await queryUntypedView(client, 'app_navigation')
+    .select('sub_module_slug, sub_module_display_order')
     .eq('org_id', accountSlug)
     .eq('module_slug', moduleSlug)
-    .order('display_order');
+    .order('sub_module_display_order');
 
   const subModules = castRows<{ sub_module_slug: string }>(data);
 

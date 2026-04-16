@@ -116,7 +116,7 @@ Each feature package encapsulates domain logic, UI components, and server action
 
 **`auth/`** -- Authentication flows: password sign-in, sign-up, password reset, magic link. Exports TypeScript types for the view contracts (`AppUserProfile`, `AppUserOrgs`, `AppOrgContext`) consumed by workspace loaders.
 
-**`access-control/`** -- Module-level access control. Exports view contract types (`AppNavModule`, `AppNavSubModule`) and the `requireModuleAccess` route guard that checks `app_nav_modules` before rendering a module page.
+**`access-control/`** -- Module-level access control. Exports view contract types (`AppNavModule`, `AppNavSubModule`) and the `requireModuleAccess` route guard that checks `app_navigation` before rendering a module page.
 
 **`team-accounts/`** -- Organization management. Handles org settings (name update), member list (queries `hr_employee`), role updates (changes `sys_access_level_id`), member removal, and ownership transfer.
 
@@ -216,8 +216,7 @@ Five database views bridge the schema to the application UI. These views are sec
 | `app_user_profile` | Current user's employee record (employee_id, org_id, name, access_level) |
 | `app_user_orgs` | All orgs the user belongs to (for org switcher) |
 | `app_org_context` | Current org context including employee_id and access_level |
-| `app_nav_modules` | Modules the user can access in an org (pre-filtered by `hr_module_access`) |
-| `app_nav_sub_modules` | Sub-modules filtered by `sys_access_level` comparison |
+| `app_navigation` | One row per accessible sub-module for the current user, with parent module info and ABAC permissions (pre-filtered by feature toggles, RBAC access level, and `hr_module_access`) |
 
 The view SQL is defined in `supabase/schemas/19-view-contracts.sql` and `20-nav-view-contracts.sql`. To deploy to a new Supabase project, run `sql/deploy-views-and-seed.sql` from the [`aloha-data-migrations`](../aloha-data-migrations) repo in the SQL Editor.
 
