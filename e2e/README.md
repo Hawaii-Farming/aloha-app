@@ -15,17 +15,26 @@ a dev server is already running on `:5173` it is reused (no duplicate start).
 
 ## Required env vars
 
-Set these in the repo-root `.env` (or export in the shell) so `auth.setup.ts`
-can log in and capture a storage-state file before the suite runs:
+`playwright.config.ts` loads the repo-root `.env` via `dotenv` at startup, so
+these can live alongside your other dev vars (or be exported in the shell —
+both work):
 
 ```bash
 E2E_USER_EMAIL=<dev user email>
 E2E_USER_PASSWORD=<dev user password>
+E2E_ACCOUNT_SLUG=<your workspace account slug>   # e.g. hawaii_farming
 ```
 
-When either is missing, `globalSetup` writes an empty storage-state and every
-authenticated test fails with a 401 redirect. This is intentional — tests
-should not silently pass without a real session.
+`E2E_ACCOUNT_SLUG` is the tenant slug the signed-in test user belongs to; the
+URL-path tests (`/home/:account/...`) use it to navigate. For the seeded
+admin user (`admin@hawaiifarming.com`) the slug is `hawaii_farming`. Tests
+fall back to `acme-farms` when unset — that's a placeholder and will cause
+404s against real data.
+
+When `E2E_USER_EMAIL` or `E2E_USER_PASSWORD` is missing, `globalSetup` writes
+an empty storage-state and every authenticated test fails with a 401
+redirect. This is intentional — tests should not silently pass without a
+real session.
 
 ## How auth state works
 

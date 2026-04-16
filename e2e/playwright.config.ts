@@ -1,10 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'node:path';
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+ * Load environment variables from the repo-root `.env` so auth.setup and
+ * per-test defaults can read E2E_USER_EMAIL, E2E_USER_PASSWORD,
+ * E2E_ACCOUNT_SLUG without requiring the user to export them in the shell.
  */
-// require('dotenv').config();
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
