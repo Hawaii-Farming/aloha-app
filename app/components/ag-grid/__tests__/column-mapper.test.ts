@@ -151,18 +151,28 @@ describe('mapColumnsToColDefs', () => {
     expect(result[0]!.cellRenderer).toBe(StatusBadgeRenderer);
   });
 
-  it('disables sortable and filter on all columns', async () => {
+  it('disables filter always; sortable defaults to true with opt-out support', async () => {
     const { mapColumnsToColDefs } =
       await import('~/components/ag-grid/column-mapper');
     const columns: ColumnConfig[] = [
       { key: 'name', label: 'Name' },
       { key: 'is_active', label: 'Active', type: 'boolean' },
       { key: 'email', label: 'Email', type: 'text' },
+      { key: 'actions', label: 'Actions', sortable: false },
     ];
     const result = mapColumnsToColDefs(columns);
+
+    // filter: false on every column, always
     for (const col of result) {
-      expect(col.sortable).toBe(false);
       expect(col.filter).toBe(false);
     }
+
+    // sortable: true when unspecified (first three fixture entries)
+    expect(result[0]!.sortable).toBe(true);
+    expect(result[1]!.sortable).toBe(true);
+    expect(result[2]!.sortable).toBe(true);
+
+    // sortable: false only when explicitly opted out (actions column)
+    expect(result[3]!.sortable).toBe(false);
   });
 });

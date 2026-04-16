@@ -3,18 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { getAgGridTheme } from '../ag-grid-theme';
 
 /**
- * Phase 10 Wave 0 — GRID-01 regression guard.
- *
- * These assertions describe the Aloha/Phase-7 hex targets the theme MUST
- * resolve to once Plan 10-02 rewrites `ag-grid-theme.ts`. Until that plan
- * lands, this suite is expected to be RED.
- *
- * AG Grid v35 `themeQuartz.withParams(params, mode)` pushes the supplied
- * params into the theme's `parts[]` array as a new part whose `modeParams`
- * object is keyed by the mode string (e.g. `'light'` or `'dark'`). To read
- * them back we walk the parts and collect every entry that contributed to
- * the requested mode, merging them in declaration order so later calls
- * override earlier ones.
+ * Asserts the Aloha AG Grid theme tokens documented in DESIGN.md and the
+ * "Table theme (AG Grid)" subsection of UI-RULES.md. AG Grid v35's Theming
+ * API does not resolve CSS vars, so these hex values are the canonical
+ * theme lookup and this test is the regression guard against drift.
  */
 
 type ThemeParams = Record<string, unknown>;
@@ -57,8 +49,8 @@ describe('getAgGridTheme', () => {
       expect(params.backgroundColor).toBe('#ffffff');
       expect(params.foregroundColor).toBe('#0f172a');
       expect(params.headerBackgroundColor).toBe('#f1f5f9');
-      expect(params.headerTextColor).toBe('#475569');
-      expect(params.borderColor).toBe('#e2e8f0');
+      expect(params.headerTextColor).toBe('#1e293b');
+      expect(params.borderColor).toBe('#cbd5e1');
       expect(params.accentColor).toBe('#22c55e');
       expect(params.rowHoverColor).toBe('#f1f5f9');
       expect(params.selectedRowBackgroundColor).toBe('#f0fdf4');
@@ -73,7 +65,7 @@ describe('getAgGridTheme', () => {
     it('preserves shared typographic + spacing scale', () => {
       expect(params.fontSize).toBe(14);
       expect(params.headerFontSize).toBe(13);
-      expect(params.headerFontWeight).toBe(500);
+      expect(params.headerFontWeight).toBe(700);
       expect(params.rowVerticalPaddingScale).toBe(1.6);
     });
   });
@@ -100,7 +92,7 @@ describe('getAgGridTheme', () => {
     it('preserves shared typographic + spacing scale', () => {
       expect(params.fontSize).toBe(14);
       expect(params.headerFontSize).toBe(13);
-      expect(params.headerFontWeight).toBe(500);
+      expect(params.headerFontWeight).toBe(700);
       expect(params.rowVerticalPaddingScale).toBe(1.6);
     });
   });
