@@ -7,6 +7,10 @@ import { ChevronRight, Home } from 'lucide-react';
 import { Card } from '@aloha/ui/card';
 import { cn } from '@aloha/ui/utils';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -193,20 +197,32 @@ function HousingListRow({ accom }: { accom: Accommodation }) {
 export default function HousingMapView(props: ListViewProps) {
   const { tableData } = props;
 
+  const { query } = useActiveTableSearch();
+  useRegisterActiveTable('housing', props.subModuleDisplayName ?? 'Housing');
+
   const allSites = (tableData.data as RowData[]).map(parseHousingSite);
   const accommodations = useMemo(
     () => buildAccommodations(allSites),
     [allSites],
   );
 
+  const filteredAccommodations = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return accommodations;
+    return accommodations.filter((accom) => {
+      if (accom.site.name.toLowerCase().includes(q)) return true;
+      return accom.rooms.some((room) => room.name.toLowerCase().includes(q));
+    });
+  }, [accommodations, query]);
+
   return (
     <div
       className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-4"
       data-test="housing-list-view"
     >
-      <SummaryBar accommodations={accommodations} />
+      <SummaryBar accommodations={filteredAccommodations} />
 
-      {accommodations.length === 0 ? (
+      {filteredAccommodations.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
           <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-full">
             <Home className="text-muted-foreground h-6 w-6" />
@@ -222,7 +238,7 @@ export default function HousingMapView(props: ListViewProps) {
         <Card className="overflow-hidden p-0">
           <HousingListHeader />
           <div className="flex flex-col">
-            {accommodations.map((accom) => (
+            {filteredAccommodations.map((accom) => (
               <HousingListRow key={accom.site.id} accom={accom} />
             ))}
           </div>
