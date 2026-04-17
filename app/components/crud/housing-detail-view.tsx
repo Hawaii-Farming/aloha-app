@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
 
-import { Link, useFetcher, useNavigate } from 'react-router';
+import { useFetcher, useNavigate } from 'react-router';
 
 import { useQuery } from '@tanstack/react-query';
+import type { ColDef, RowClickedEvent } from 'ag-grid-community';
+import type { CustomCellRendererProps } from 'ag-grid-react';
 import { ArrowLeft, Home, Trash2 } from 'lucide-react';
 
 import {
@@ -21,6 +23,11 @@ import { Card } from '@aloha/ui/card';
 import { Separator } from '@aloha/ui/separator';
 import { Trans } from '@aloha/ui/trans';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
+import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { EditPanel } from '~/components/crud/edit-panel';
 import type { DetailViewProps } from '~/lib/crud/types';
 import { AccessGate } from '~/lib/workspace/access-gate';
@@ -34,9 +41,6 @@ interface TenantRow {
   work_authorization_name: string;
 }
 
-const TENANT_COLS =
-  'grid grid-cols-[40px_minmax(0,1fr)_160px_160px] items-center gap-4 px-4 py-3 text-sm';
-
 async function fetchTenants(
   siteId: string,
   accountSlug: string,
@@ -48,36 +52,81 @@ async function fetchTenants(
   return json.data ?? [];
 }
 
-function TenantRowView({
-  tenant,
+function TenantInitialsRenderer(props: CustomCellRendererProps) {
+  const data = props.data as TenantRow | undefined;
+  if (!data) return null;
+  const initials = data.full_name
+    .split(' ')
+    .map((n) => n[0] ?? '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+  return (
+    <div className="flex h-full items-center justify-center">
+      <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold">
+        {initials}
+      </div>
+    </div>
+  );
+}
+
+const TENANT_COL_DEFS: ColDef[] = [
+  {
+    headerName: '',
+    cellRenderer: TenantInitialsRenderer,
+    maxWidth: 60,
+    minWidth: 60,
+    sortable: false,
+    filter: false,
+    resizable: false,
+    suppressMovable: true,
+  },
+  { field: 'full_name', headerName: 'Name', flex: 1, minWidth: 200 },
+  {
+    field: 'department_name',
+    headerName: 'Department',
+    flex: 1,
+    minWidth: 160,
+    valueFormatter: (p) => (p.value ? String(p.value) : '—'),
+  },
+  {
+    field: 'work_authorization_name',
+    headerName: 'Work Auth',
+    flex: 1,
+    minWidth: 140,
+    valueFormatter: (p) => (p.value ? String(p.value) : '—'),
+  },
+];
+
+function TenantsGrid({
+  tenants,
   accountSlug,
 }: {
-  tenant: TenantRow;
+  tenants: TenantRow[];
   accountSlug: string;
 }) {
+  const navigate = useNavigate();
+  const { query } = useActiveTableSearch();
+  useRegisterActiveTable('housing-tenants', 'Tenants');
+
+  const handleRowClicked = useCallback(
+    (event: RowClickedEvent) => {
+      const tenantId = (event.data as TenantRow | undefined)?.id;
+      if (!tenantId || !accountSlug) return;
+      navigate(`/home/${accountSlug}/human_resources/employees/${tenantId}`);
+    },
+    [navigate, accountSlug],
+  );
+
   return (
-    <Link
-      to={`/home/${accountSlug}/human_resources/employees/${tenant.id}`}
-      className={`${TENANT_COLS} hover:bg-muted/50 border-border border-b transition-colors last:border-b-0`}
-      data-test={`housing-tenant-${tenant.id}`}
-    >
-      <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold">
-        {tenant.full_name
-          .split(' ')
-          .map((n) => n[0])
-          .join('')
-          .slice(0, 2)}
-      </div>
-      <span className="text-foreground truncate font-medium">
-        {tenant.full_name}
-      </span>
-      <span className="text-muted-foreground truncate">
-        {tenant.department_name || '—'}
-      </span>
-      <span className="text-muted-foreground truncate">
-        {tenant.work_authorization_name || '—'}
-      </span>
-    </Link>
+    <AgGridWrapper
+      colDefs={TENANT_COL_DEFS}
+      rowData={tenants as unknown as Record<string, unknown>[]}
+      quickFilterText={query}
+      pagination={false}
+      domLayout="autoHeight"
+      onRowClicked={handleRowClicked}
+    />
   );
 }
 
@@ -232,23 +281,7 @@ export default function HousingDetailView({
                   No tenants currently assigned.
                 </p>
               ) : (
-                <Card className="overflow-hidden p-0">
-                  <div
-                    className={`${TENANT_COLS} text-muted-foreground border-border border-b font-medium tracking-wide uppercase`}
-                  >
-                    <span />
-                    <span>Name</span>
-                    <span>Department</span>
-                    <span>Work Auth</span>
-                  </div>
-                  {tenants.map((tenant) => (
-                    <TenantRowView
-                      key={tenant.id}
-                      tenant={tenant}
-                      accountSlug={accountSlug}
-                    />
-                  ))}
-                </Card>
+                <TenantsGrid tenants={tenants} accountSlug={accountSlug} />
               )}
             </div>
           </div>
