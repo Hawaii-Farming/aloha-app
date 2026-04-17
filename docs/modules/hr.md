@@ -39,6 +39,13 @@
 
   The view itself does not apply these filters — it returns everything. The module loader (server-side) must (a) resolve the current user's access level and employee id, (b) add the `compensation_manager_id` filter for managers, and (c) project away the dollar columns for employees and team leads before the payload reaches the client.
 
+- **Period-over-period view (frontend aggregation):** the legacy had a second comparison where each row = one employee for the current check date, with delta columns vs that employee's prior check (`HoursDelta`, `TotalCostDelta`, `RegularPayDelta`, `DiscretionaryOvertimeDelta`, `OtherPayDelta`). Build this on the client, not as a separate view:
+  1. Fetch `hr_payroll_schedule_comparison` rows for the two `check_date`s of interest (usually the latest two).
+  2. Group by `(hr_employee_id, check_date)` in JS, summing across `qb_account`. Each bucket row's `scheduled_hours` is raw, so summing is valid and collapses the bucket grain back to one row per employee per check.
+  3. Pivot on `check_date` to get current vs previous per employee, then compute `current - previous` for each numeric field.
+
+  Gotcha: a typical employee appears 2–3 times per check (once per QB account). If you skip the collapse step, every column will double-count.
+
 ### 5. Payroll Data (`payroll_data`)
 - **Data sits in:** `hr_payroll`
 - **Read from:** `hr_payroll` directly
