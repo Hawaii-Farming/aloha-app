@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-17 - Completed quick task 260416-u1s: Add UI-RULES.md cross-references to root CLAUDE.md
+Last activity: 2026-04-17 - Completed quick task 260417-lbu: Navbar search bar should search active page table in addition to module/submodule navigation
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -155,6 +155,7 @@ None.
 | 260416-ppa | Fix E2E auth setup cascade (dotenv loader, waitUntil, account slug docs) | 2026-04-16 | 617d1e3 | [260416-ppa-fix-e2e-auth-setup-cascade-dotenv-loader](./quick/260416-ppa-fix-e2e-auth-setup-cascade-dotenv-loader/) |
 | 260416-q6i | Fix module.tsx querying non-existent app_nav_sub_modules view; align docs | 2026-04-16 | 938a413 | [260416-q6i-fix-module-tsx-querying-non-existent-app](./quick/260416-q6i-fix-module-tsx-querying-non-existent-app/) |
 | 260416-u1s | Add UI-RULES.md cross-references to root CLAUDE.md | 2026-04-17 | b6b1964 | [260416-u1s-add-ui-rules-md-cross-references-to-root](./quick/260416-u1s-add-ui-rules-md-cross-references-to-root/) |
+| 260417-lbu | Navbar search bar should search active page table in addition to module/submodule navigation | 2026-04-17 | 7d8af43 | [260417-lbu-navbar-search-bar-should-search-active-p](./quick/260417-lbu-navbar-search-bar-should-search-active-p/) |
 
 ## Session Continuity
 
