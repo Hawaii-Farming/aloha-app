@@ -1,8 +1,8 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { Search } from 'lucide-react';
+import { Filter, Search } from 'lucide-react';
 
 import {
   CommandDialog,
@@ -13,6 +13,8 @@ import {
   CommandList,
 } from '@aloha/ui/command';
 import { Kbd } from '@aloha/ui/kbd';
+
+import { useActiveTableSearch } from '~/components/active-table-search-context';
 
 export interface NavbarSearchItem {
   /** Unique path used as the navigate() target and the React key. */
@@ -34,6 +36,8 @@ export function NavbarSearch({
 }: NavbarSearchProps = {}) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { activeTable, setQuery } = useActiveTableSearch();
+  const [input, setInput] = useState('');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,6 +50,20 @@ export function NavbarSearch({
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // Reset the controlled input each time the dialog opens. cmdk clears its
+  // internal filter on unmount, but controlled mode requires explicit reset
+  // so the user starts with an empty palette every time. Justified useEffect
+  // per CLAUDE.md — observing the open→true transition is the only signal
+  // available (CommandDialog does not fire an onOpen callback).
+  const lastOpenRef = useRef(open);
+  useEffect(() => {
+    if (open && !lastOpenRef.current) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- transition guarded by ref; runs only on closed→open
+      setInput('');
+    }
+    lastOpenRef.current = open;
+  }, [open]);
 
   const isMac =
     typeof navigator !== 'undefined' &&
@@ -67,6 +85,13 @@ export function NavbarSearch({
     setOpen(false);
   };
 
+  const handleFilterActiveTable = () => {
+    const trimmed = input.trim();
+    if (!trimmed || !activeTable) return;
+    setQuery(trimmed);
+    setOpen(false);
+  };
+
   return (
     <>
       {renderTrigger ? (
@@ -85,9 +110,32 @@ export function NavbarSearch({
       )}
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
+        <CommandInput
+          placeholder="Type a command or search..."
+          value={input}
+          onValueChange={setInput}
+        />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
+          {activeTable && input.trim().length > 0 && (
+            <CommandGroup heading="Active Page">
+              <CommandItem
+                value={`filter-active-table ${input}`}
+                keywords={[input, activeTable.displayName, 'filter', 'rows']}
+                onSelect={handleFilterActiveTable}
+                data-test="navbar-search-filter-active-table"
+              >
+                <Filter
+                  className="mr-2 h-3.5 w-3.5 shrink-0"
+                  aria-hidden="true"
+                />
+                <span>
+                  Filter {activeTable.displayName} rows matching &quot;
+                  {input.trim()}&quot;
+                </span>
+              </CommandItem>
+            </CommandGroup>
+          )}
           {Array.from(grouped.entries()).map(([heading, groupItems]) => (
             <CommandGroup key={heading} heading={heading}>
               {groupItems.map((item) => (
