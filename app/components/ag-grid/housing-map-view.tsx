@@ -4,27 +4,20 @@ import { useNavigate, useParams } from 'react-router';
 
 import type {
   ColDef,
-  ColumnMovedEvent,
-  ColumnResizedEvent,
-  ColumnVisibleEvent,
-  GridApi,
   GridReadyEvent,
   RowClassParams,
   RowClickedEvent,
-  SortChangedEvent,
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 import { Home } from 'lucide-react';
+
+import { Card } from '@aloha/ui/card';
 
 import {
   useActiveTableSearch,
   useRegisterActiveTable,
 } from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
-import {
-  restoreColumnState,
-  saveColumnState,
-} from '~/components/ag-grid/column-state';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -98,7 +91,7 @@ function buildAccommodations(sites: HousingSite[]): Accommodation[] {
 function HomeIconRenderer(_props: CustomCellRendererProps) {
   return (
     <div className="flex h-full items-center justify-center">
-      <div className="bg-muted text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full">
+      <div className="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full">
         <Home className="h-4 w-4" />
       </div>
     </div>
@@ -133,8 +126,43 @@ function OccupancyCellRenderer(props: CustomCellRendererProps) {
   );
 }
 
+function SummaryBar({ accommodations }: { accommodations: Accommodation[] }) {
+  const totalBedrooms = accommodations.reduce(
+    (sum, a) => sum + a.bedroomCount,
+    0,
+  );
+  const totalTenants = accommodations.reduce(
+    (sum, a) => sum + a.site.tenantCount,
+    0,
+  );
+  const occupied = accommodations.filter((a) => a.site.tenantCount > 0).length;
+
+  const items = [
+    { label: 'Accommodations', value: accommodations.length },
+    { label: 'Total Bedrooms', value: totalBedrooms },
+    { label: 'Total Tenants', value: totalTenants },
+    { label: 'Occupied', value: occupied },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {items.map((item) => (
+        <Card key={item.label} className="p-4">
+          <div className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
+            {item.label}
+          </div>
+          <div className="text-foreground mt-1 text-2xl font-semibold tabular-nums">
+            {item.value}
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 const colDefs: ColDef[] = [
   {
+    colId: 'home_icon',
     headerName: '',
     cellRenderer: HomeIconRenderer,
     maxWidth: 60,
@@ -182,7 +210,6 @@ export default function HousingMapView(props: ListViewProps) {
   useRegisterActiveTable('housing', props.subModuleDisplayName ?? 'Housing');
 
   const gridRef = useRef<AgGridReact>(null);
-  const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const rawData = tableData.data as RowData[];
   const accommodations = useMemo(
@@ -214,49 +241,8 @@ export default function HousingMapView(props: ListViewProps) {
   );
 
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    restoreColumnState('housing', event.api);
+    setTimeout(() => event.api.sizeColumnsToFit(), 20);
   }, []);
-
-  const debouncedSaveState = useCallback((api: GridApi) => {
-    if (saveDebounceRef.current) {
-      clearTimeout(saveDebounceRef.current);
-    }
-    saveDebounceRef.current = setTimeout(() => {
-      saveColumnState('housing', api);
-    }, 300);
-  }, []);
-
-  const handleColumnMoved = useCallback(
-    (event: ColumnMovedEvent) => {
-      if (event.finished && event.api) {
-        debouncedSaveState(event.api);
-      }
-    },
-    [debouncedSaveState],
-  );
-
-  const handleColumnResized = useCallback(
-    (event: ColumnResizedEvent) => {
-      if (event.finished && event.api) {
-        debouncedSaveState(event.api);
-      }
-    },
-    [debouncedSaveState],
-  );
-
-  const handleSortChanged = useCallback(
-    (event: SortChangedEvent) => {
-      debouncedSaveState(event.api);
-    },
-    [debouncedSaveState],
-  );
-
-  const handleColumnVisible = useCallback(
-    (event: ColumnVisibleEvent) => {
-      debouncedSaveState(event.api);
-    },
-    [debouncedSaveState],
-  );
 
   const getRowStyle = useCallback((params: RowClassParams) => {
     const row = params.data as AccommodationRow | undefined;
@@ -267,21 +253,25 @@ export default function HousingMapView(props: ListViewProps) {
   }, []);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col" data-test="housing-list-view">
-      <AgGridWrapper
-        gridRef={gridRef}
-        colDefs={colDefs}
-        rowData={rowData as unknown as Record<string, unknown>[]}
-        quickFilterText={query}
-        pagination={false}
-        getRowStyle={getRowStyle}
-        onRowClicked={handleRowClicked}
-        onGridReady={handleGridReady}
-        onColumnMoved={handleColumnMoved}
-        onColumnResized={handleColumnResized}
-        onSortChanged={handleSortChanged}
-        onColumnVisible={handleColumnVisible}
-      />
+    <div
+      className="flex min-h-0 flex-1 flex-col gap-4 px-4 py-4"
+      data-test="housing-list-view"
+    >
+      <div className="shrink-0">
+        <SummaryBar accommodations={accommodations} />
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col">
+        <AgGridWrapper
+          gridRef={gridRef}
+          colDefs={colDefs}
+          rowData={rowData as unknown as Record<string, unknown>[]}
+          quickFilterText={query}
+          pagination={false}
+          getRowStyle={getRowStyle}
+          onRowClicked={handleRowClicked}
+          onGridReady={handleGridReady}
+        />
+      </div>
     </div>
   );
 }
