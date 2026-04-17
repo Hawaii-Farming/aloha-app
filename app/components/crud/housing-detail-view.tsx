@@ -67,7 +67,7 @@ function TenantInitialsRenderer(props: CustomCellRendererProps) {
     .toUpperCase();
   return (
     <div className="flex h-full items-center justify-center">
-      <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold">
+      <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
         {initials}
       </div>
     </div>

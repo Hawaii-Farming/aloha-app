@@ -91,8 +91,8 @@ function buildAccommodations(sites: HousingSite[]): Accommodation[] {
 function HomeIconRenderer(_props: CustomCellRendererProps) {
   return (
     <div className="flex h-full items-center justify-center">
-      <div className="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full">
-        <Home className="h-4 w-4" />
+      <div className="bg-muted text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+        <Home className="h-4 w-4 shrink-0" />
       </div>
     </div>
   );
