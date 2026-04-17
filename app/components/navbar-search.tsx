@@ -149,13 +149,12 @@ export function NavbarSearch({
         data-test="navbar-search-popover"
       >
         <Command shouldFilter={!activeTable} onKeyDown={handleCommandKeyDown}>
-          <div className="border-border flex items-center border-b">
+          <div className="border-border flex items-center border-b [&>[cmdk-input-wrapper]]:flex-1 [&>[cmdk-input-wrapper]]:border-b-0">
             <CommandInput
               ref={inputRef}
               placeholder="Type a command or search..."
               value={input}
               onValueChange={handleInputChange}
-              className="flex-1 border-b-0"
             />
             {input.length > 0 && (
               <button
