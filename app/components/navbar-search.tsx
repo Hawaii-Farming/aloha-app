@@ -148,7 +148,7 @@ export function NavbarSearch({
         className="w-[520px] max-w-[calc(100vw-2rem)] overflow-hidden p-0"
         data-test="navbar-search-popover"
       >
-        <Command onKeyDown={handleCommandKeyDown}>
+        <Command shouldFilter={!activeTable} onKeyDown={handleCommandKeyDown}>
           <div className="border-border flex items-center border-b">
             <CommandInput
               ref={inputRef}
