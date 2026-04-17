@@ -34,6 +34,10 @@ import {
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import { mapColumnsToColDefs } from '~/components/ag-grid/column-mapper';
@@ -86,6 +90,9 @@ export default function AgGridListView({
 
   const subModuleSlug = params.subModule ?? config?.tableName ?? 'unknown';
   const pkColumn = config?.pkColumn ?? 'id';
+
+  const { query } = useActiveTableSearch();
+  useRegisterActiveTable(subModuleSlug, subModuleDisplayName ?? subModuleSlug);
 
   // Re-resolve config from registry to recover non-serializable fields
   // (cellRenderer functions are lost during React Router loader serialization)
@@ -220,6 +227,7 @@ export default function AgGridListView({
             gridRef={gridRef}
             colDefs={allColDefs}
             rowData={tableData.data as RowData[]}
+            quickFilterText={query}
             onRowClicked={handleRowClicked}
             pagination={false}
             onGridReady={handleGridReady}

@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { PageLayoutStyle } from '@aloha/ui/page';
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
+import { ActiveTableSearchProvider } from '~/components/active-table-search-context';
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
 import { WorkspaceMobileDrawer } from '~/components/workspace-shell/workspace-mobile-drawer';
 import { WorkspaceMobileHeader } from '~/components/workspace-shell/workspace-mobile-header';
@@ -61,46 +62,48 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
 
   return (
     <SidebarProvider defaultOpen={layoutState.open}>
-      <div className="flex h-svh w-full flex-col">
-        <WorkspaceNavbar
-          account={accountSlug}
-          user={user}
-          orgName={workspace.currentOrg?.org_name ?? null}
-          navigation={workspace.navigation}
-          className="hidden md:flex"
-        />
-        <WorkspaceMobileHeader
-          user={userForShell}
-          onOpenDrawer={() => setDrawerOpen(true)}
-          drawerOpen={drawerOpen}
-          hamburgerRef={hamburgerRef}
-        />
+      <ActiveTableSearchProvider>
+        <div className="flex h-svh w-full flex-col">
+          <WorkspaceNavbar
+            account={accountSlug}
+            user={user}
+            orgName={workspace.currentOrg?.org_name ?? null}
+            navigation={workspace.navigation}
+            className="hidden md:flex"
+          />
+          <WorkspaceMobileHeader
+            user={userForShell}
+            onOpenDrawer={() => setDrawerOpen(true)}
+            drawerOpen={drawerOpen}
+            hamburgerRef={hamburgerRef}
+          />
 
-        <div className="flex min-h-0 flex-1 overflow-hidden">
-          <div className="hidden md:block">
-            <WorkspaceSidebar
-              account={accountSlug}
-              navigation={workspace.navigation}
-              orgName={workspace.currentOrg?.org_name ?? null}
-              userEmail={user.email ?? null}
-            />
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            <div className="hidden md:block">
+              <WorkspaceSidebar
+                account={accountSlug}
+                navigation={workspace.navigation}
+                orgName={workspace.currentOrg?.org_name ?? null}
+                userEmail={user.email ?? null}
+              />
+            </div>
+
+            <main className="flex min-h-0 flex-1 flex-col">
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                <Outlet />
+              </div>
+            </main>
           </div>
 
-          <main className="flex min-h-0 flex-1 flex-col">
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-              <Outlet />
-            </div>
-          </main>
+          <WorkspaceMobileDrawer
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            account={accountSlug}
+            navigation={workspace.navigation}
+            hamburgerRef={hamburgerRef}
+          />
         </div>
-
-        <WorkspaceMobileDrawer
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          account={accountSlug}
-          navigation={workspace.navigation}
-          hamburgerRef={hamburgerRef}
-        />
-      </div>
+      </ActiveTableSearchProvider>
     </SidebarProvider>
   );
 }
