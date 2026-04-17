@@ -20,6 +20,10 @@ import type {
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import {
@@ -192,6 +196,13 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
   const navigate = useNavigate();
   const { account } = useParams();
 
+  const subModuleSlug = 'payroll_comp_manager';
+  const { query } = useActiveTableSearch();
+  useRegisterActiveTable(
+    subModuleSlug,
+    props.subModuleDisplayName ?? 'Payroll Comp Manager',
+  );
+
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
       if (event.node.rowPinned) return;
@@ -307,6 +318,7 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
           gridRef={gridRef}
           colDefs={colDefs}
           rowData={groupedRows}
+          quickFilterText={query}
           pinnedBottomRowData={totalsRow}
           pagination={false}
           getRowStyle={getRowStyle}
