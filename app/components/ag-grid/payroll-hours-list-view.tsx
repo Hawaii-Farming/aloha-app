@@ -20,6 +20,10 @@ import type {
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import {
@@ -132,6 +136,13 @@ export default function PayrollHoursListView(props: ListViewProps) {
   const payPeriods = (loaderData.payPeriods ?? []) as RowData[];
   const navigate = useNavigate();
   const { account } = useParams();
+
+  const subModuleSlug = 'hours_comp';
+  const { query } = useActiveTableSearch();
+  useRegisterActiveTable(
+    subModuleSlug,
+    props.subModuleDisplayName ?? 'Payroll Hours',
+  );
 
   const gridRef = useRef<AgGridReact>(null);
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -274,6 +285,7 @@ export default function PayrollHoursListView(props: ListViewProps) {
           gridRef={gridRef}
           colDefs={colDefs}
           rowData={rawRows}
+          quickFilterText={query}
           pinnedBottomRowData={totalsRow}
           pagination={false}
           getRowStyle={getRowStyle}
