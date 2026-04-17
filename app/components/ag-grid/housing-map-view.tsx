@@ -200,10 +200,10 @@ export default function HousingMapView(props: ListViewProps) {
   const { query } = useActiveTableSearch();
   useRegisterActiveTable('housing', props.subModuleDisplayName ?? 'Housing');
 
-  const allSites = (tableData.data as RowData[]).map(parseHousingSite);
+  const rawData = tableData.data as RowData[];
   const accommodations = useMemo(
-    () => buildAccommodations(allSites),
-    [allSites],
+    () => buildAccommodations(rawData.map(parseHousingSite)),
+    [rawData],
   );
 
   const filteredAccommodations = useMemo(() => {
