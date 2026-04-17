@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-17 - Completed quick task 260417-lqq: Navbar search UX polish (live filter, clear, separator, anchored popover)
+Last activity: 2026-04-17 - Completed quick task 260417-mg2: Fix navbar palette — wire Payroll/Housing filter and stop filtering dropdown items when active table registered
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -157,6 +157,7 @@ None.
 | 260416-u1s | Add UI-RULES.md cross-references to root CLAUDE.md | 2026-04-17 | b6b1964 | [260416-u1s-add-ui-rules-md-cross-references-to-root](./quick/260416-u1s-add-ui-rules-md-cross-references-to-root/) |
 | 260417-lbu | Navbar search bar should search active page table in addition to module/submodule navigation | 2026-04-17 | 7d8af43 | [260417-lbu-navbar-search-bar-should-search-active-p](./quick/260417-lbu-navbar-search-bar-should-search-active-p/) |
 | 260417-lqq | Navbar search UX polish: live filter, X clear, group separator, anchored popover below trigger | 2026-04-17 | 4e8c0f0 | [260417-lqq-navbar-search-ux-polish-live-filter-on-t](./quick/260417-lqq-navbar-search-ux-polish-live-filter-on-t/) |
+| 260417-mg2 | Fix navbar palette: wire Payroll/Housing filter and stop filtering dropdown items when active table registered | 2026-04-17 | d85cc1c | [260417-mg2-fix-navbar-palette-wire-payroll-housing-](./quick/260417-mg2-fix-navbar-palette-wire-payroll-housing-/) |
 
 ## Session Continuity
 
