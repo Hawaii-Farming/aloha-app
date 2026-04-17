@@ -115,6 +115,7 @@ pnpm format:fix && pnpm lint:fix  # Run when task is complete
 
 **Always use AG Grid Community** for data tables — never TanStack Table, HTML tables, or other table libraries.
 
+- **Rules**: See `UI-RULES.md §Tables` for the stripped-chrome conventions — no per-table search (navbar-only), `defaultColDef.filter = false`, no coloring, one datum per cell, flat `ColDef[]` (no group headers), uniform `text-sm`, ghost zebra fill, pinned TOTAL rows.
 - **Standard CRUD grids**: Use `AgGridListView` (drop-in, handles search, CSV export, column visibility, pagination)
 - **Custom grids** (filters, toggles, pinned rows): Compose `AgGridWrapper` directly for full toolbar control
 - **Theming**: AG Grid is themed to DESIGN.md via `ag-grid-theme.ts` (dark/light, Supabase-inspired)
@@ -127,6 +128,8 @@ pnpm format:fix && pnpm lint:fix  # Run when task is complete
 ## Design System
 
 The current project is a comprehensive retheme adopting a Supabase-inspired design system. **`DESIGN.md` is the source of truth** for all visual decisions — colors, typography, spacing, component styling, and theme tokens. Read it before any UI/CSS work.
+
+**Companion:** `UI-RULES.md` covers app-wide **behavior and structure** rules — tables, search, filters, detail views, form fields, layout, and the floating create button. Read both `DESIGN.md` (tokens) and `UI-RULES.md` (behavior) before any UI work.
 
 ### Constraints
 
