@@ -14,6 +14,10 @@ import type {
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import {
@@ -288,6 +292,13 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   const periodValue =
     periodStart && periodEnd ? `${periodStart}|${periodEnd}` : '';
 
+  const subModuleSlug = 'payroll_comp';
+  const { query } = useActiveTableSearch();
+  useRegisterActiveTable(
+    subModuleSlug,
+    props.subModuleDisplayName ?? 'Payroll Comparison',
+  );
+
   const gridRef = useRef<AgGridReact>(null);
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -430,6 +441,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
           gridRef={gridRef}
           colDefs={colDefs}
           rowData={rowData}
+          quickFilterText={query}
           pinnedBottomRowData={totalsRow}
           pagination={false}
           getRowStyle={getRowStyle}
