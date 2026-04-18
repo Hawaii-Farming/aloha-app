@@ -217,10 +217,7 @@ export default function HousingMapView(props: ListViewProps) {
   }, []);
 
   return (
-    <div
-      className="flex min-h-0 flex-1 flex-col gap-4 px-4 py-4"
-      data-test="housing-list-view"
-    >
+    <div className="flex min-h-0 flex-1 flex-col" data-test="housing-list-view">
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper
           gridRef={gridRef}
