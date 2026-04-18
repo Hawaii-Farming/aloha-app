@@ -12,7 +12,7 @@ Source of truth for cross-cutting UI conventions. `DESIGN.md` covers tokens (col
 - **Numbers always right-aligned**, `tabular-nums`, monospace when IDs/codes.
 - **No group/super headers.** Flat `ColDef[]` only — no `ColGroupDef` nesting.
 - **Uniform `text-sm`.** Header row, data rows, footer — all the same size. No `text-xs` "secondary" sub-line to fake hierarchy.
-- **Pinned TOTAL row** for sum rows. Stays visible while scrolling vertically.
+- **TOTAL row** for sum rows is rendered as the last regular row (not pinned). Style via bold + muted background on the data-matched row.
 
 ### Table theme (AG Grid)
 

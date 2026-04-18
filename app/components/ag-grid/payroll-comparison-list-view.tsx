@@ -346,7 +346,10 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   }, [groupedRows, isByEmployee]);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
-    if (params.node.rowPinned === 'bottom') {
+    const d = params.data as
+      | { full_name?: string; department_name?: string }
+      | undefined;
+    if (d?.full_name === 'TOTAL' || d?.department_name === 'TOTAL') {
       return { fontWeight: 'bold', background: 'var(--color-muted)' };
     }
     return undefined;
@@ -389,7 +392,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
-  const rowData = groupedRows;
+  const rowData = [...groupedRows, ...totalsRow];
 
   return (
     <div
@@ -439,7 +442,6 @@ export default function PayrollComparisonListView(props: ListViewProps) {
           colDefs={colDefs}
           rowData={rowData}
           quickFilterText={query}
-          pinnedBottomRowData={totalsRow}
           pagination={false}
           getRowStyle={getRowStyle}
           onGridReady={handleGridReady}

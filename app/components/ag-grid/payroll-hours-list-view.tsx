@@ -179,7 +179,7 @@ export default function PayrollHoursListView(props: ListViewProps) {
   }, [rawRows]);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
-    if (params.node.rowPinned === 'bottom') {
+    if ((params.data as { full_name?: string } | undefined)?.full_name === 'TOTAL') {
       return {
         fontWeight: 'bold',
         background: 'var(--color-muted)',
@@ -284,9 +284,8 @@ export default function PayrollHoursListView(props: ListViewProps) {
         <AgGridWrapper
           gridRef={gridRef}
           colDefs={colDefs}
-          rowData={rawRows}
+          rowData={[...rawRows, ...totalsRow]}
           quickFilterText={query}
-          pinnedBottomRowData={totalsRow}
           pagination={false}
           getRowStyle={getRowStyle}
           onRowClicked={handleRowClicked}
