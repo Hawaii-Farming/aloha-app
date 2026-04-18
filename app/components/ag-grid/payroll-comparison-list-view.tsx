@@ -396,10 +396,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       className="flex min-h-0 flex-1 flex-col"
       data-test="payroll-comparison-list-view"
     >
-      {/* Toolbar */}
-      <div className="flex shrink-0 items-center gap-2 pb-4">
-        <PayrollViewToggle />
-      </div>
+      <PayrollViewToggle />
 
       <NavbarFilterButton
         testKey="payroll-comparison-filter"
