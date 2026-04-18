@@ -12,7 +12,6 @@ Source of truth for cross-cutting UI conventions. `DESIGN.md` covers tokens (col
 - **Numbers always right-aligned**, `tabular-nums`, monospace when IDs/codes.
 - **No group/super headers.** Flat `ColDef[]` only — no `ColGroupDef` nesting.
 - **Uniform `text-sm`.** Header row, data rows, footer — all the same size. No `text-xs` "secondary" sub-line to fake hierarchy.
-- **Ghost zebra fill.** When rows don't fill the viewport, the empty area continues the zebra pattern (handled in `kit.css`, tied to the 52px row height).
 - **Pinned TOTAL row** for sum rows. Stays visible while scrolling vertically.
 
 ### Table theme (AG Grid)

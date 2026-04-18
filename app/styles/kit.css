@@ -52,22 +52,3 @@ Optimize dropdowns for mobile
 .ag-grid-cell-borders .ag-cell {
   border-right: 1px solid var(--ag-border-color);
 }
-
-/* Ghost row fill — extend the zebra pattern below the last rendered row so
- * short datasets don't leave a flat dead zone above the pinned bottom row
- * (TOTAL) or the bottom of the viewport. Stripe height matches the 52px
- * row height used across list views. Real rows render on top of this
- * background and fully occlude it where data exists; the pattern only
- * shows through in otherwise-empty space.
- *
- * Light-mode only — dark mode has no visible zebra on real rows (odd and
- * even share the same color), so we leave the solid grid background. */
-[data-ag-theme-mode='light'].ag-grid-cell-borders .ag-body-viewport {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    #ffffff 0,
-    #ffffff 52px,
-    #f8fafc 52px,
-    #f8fafc 104px
-  );
-}
