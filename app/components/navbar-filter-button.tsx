@@ -102,7 +102,7 @@ export function NavbarFilterButton({
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="w-80 p-0"
+        className="w-[22rem] p-0"
         data-test={`${testKey}-panel`}
       >
         <div className="border-border flex items-center justify-between border-b px-4 py-3">
@@ -129,12 +129,12 @@ export function NavbarFilterButton({
                 onValueChange={(v) => f.onChange(v === 'all' ? '' : v)}
               >
                 <SelectTrigger
-                  className="h-9 w-full text-sm"
+                  className="h-9 w-full text-sm tabular-nums"
                   data-test={`${testKey}-${f.key}`}
                 >
                   <SelectValue placeholder={f.allLabel ?? `All ${f.label}`} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="tabular-nums">
                   <SelectItem value="all">
                     {f.allLabel ?? `All ${f.label}`}
                   </SelectItem>

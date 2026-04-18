@@ -33,6 +33,7 @@ import {
 import { hoursFormatter } from '~/components/ag-grid/payroll-formatters';
 import { NavbarFilterButton } from '~/components/navbar-filter-button';
 import type { ListViewProps } from '~/lib/crud/types';
+import { formatPayPeriodLabel } from '~/lib/format/pay-period';
 
 type RowData = Record<string, unknown>;
 
@@ -179,7 +180,9 @@ export default function PayrollHoursListView(props: ListViewProps) {
   }, [rawRows]);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
-    if ((params.data as { full_name?: string } | undefined)?.full_name === 'TOTAL') {
+    if (
+      (params.data as { full_name?: string } | undefined)?.full_name === 'TOTAL'
+    ) {
       return {
         fontWeight: 'bold',
         background: 'var(--color-muted)',
@@ -272,7 +275,7 @@ export default function PayrollHoursListView(props: ListViewProps) {
               const end = String(p.pay_period_end ?? '');
               return {
                 value: `${start}|${end}`,
-                label: `${start} – ${end}`,
+                label: formatPayPeriodLabel(start, end),
               };
             }),
           },

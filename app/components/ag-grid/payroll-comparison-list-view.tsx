@@ -31,6 +31,7 @@ import {
 import { PayrollViewToggle } from '~/components/ag-grid/payroll-view-toggle';
 import { NavbarFilterButton } from '~/components/navbar-filter-button';
 import type { ListViewProps } from '~/lib/crud/types';
+import { formatPayPeriodLabel } from '~/lib/format/pay-period';
 
 type RowData = Record<string, unknown>;
 
@@ -428,7 +429,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
               const end = String(p.pay_period_end ?? '');
               return {
                 value: `${start}|${end}`,
-                label: `${start} – ${end}`,
+                label: formatPayPeriodLabel(start, end),
               };
             }),
           },
