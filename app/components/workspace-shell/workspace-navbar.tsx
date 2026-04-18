@@ -96,39 +96,40 @@ export function WorkspaceNavbar({
       )}
     >
       <NavbarSidebarHeader />
-      <div className="flex flex-1 items-center gap-4 px-6">
+      <div className="relative flex flex-1 items-center px-6">
         <div
           id="workspace-navbar-filter-slot"
           data-test="workspace-navbar-filter-slot"
-          className="flex shrink-0 items-center gap-2"
-        />
-        <NavbarSearch
-          items={searchItems}
-          renderTrigger={({ open }) => (
-            <button
-              type="button"
-              onClick={open}
-              data-test="workspace-navbar-search-trigger"
-              aria-label="Open search"
-              className="bg-muted text-muted-foreground/60 hover:bg-muted/80 hover:text-muted-foreground/80 mx-auto flex max-w-md flex-1 items-center gap-2 rounded-2xl px-4 py-2.5 transition-colors dark:bg-slate-700"
-            >
-              <Search size={16} />
-              <span className="text-sm">Search...</span>
-              <span className="ml-auto flex items-center gap-1 text-xs">
-                <Command size={12} />
-                <span>K</span>
-              </span>
-            </button>
-          )}
+          className="flex min-w-0 shrink items-center gap-2"
         />
 
-        <div
-          id="workspace-navbar-action-slot"
-          data-test="workspace-navbar-action-slot"
-          className="flex shrink-0 items-center gap-2"
-        />
+        <div className="pointer-events-none absolute inset-x-0 flex justify-center px-6">
+          <div className="pointer-events-auto w-full max-w-md">
+            <NavbarSearch
+              items={searchItems}
+              renderTrigger={({ open }) => (
+                <button
+                  type="button"
+                  onClick={open}
+                  data-test="workspace-navbar-search-trigger"
+                  aria-label="Open search"
+                  className="bg-muted text-muted-foreground/60 hover:bg-muted/80 hover:text-muted-foreground/80 flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 transition-colors dark:bg-slate-700"
+                >
+                  <Search size={16} />
+                  <span className="text-sm">Search...</span>
+                  <span className="ml-auto flex items-center gap-1 text-xs">
+                    <Command size={12} />
+                    <span>K</span>
+                  </span>
+                </button>
+              )}
+            />
+          </div>
+        </div>
 
-        <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
+        <div className="ml-auto flex shrink-0 items-center gap-2 pl-4">
+          <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
+        </div>
       </div>
     </header>
   );

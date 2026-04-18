@@ -8,11 +8,11 @@ import { User, Users } from 'lucide-react';
 
 import { cn } from '@aloha/ui/utils';
 
-function useNavbarActionSlot(): HTMLElement | null {
+function useNavbarFilterSlot(): HTMLElement | null {
   const [el, setEl] = useState<HTMLElement | null>(null);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot portal target lookup on mount
-    setEl(document.getElementById('workspace-navbar-action-slot'));
+    setEl(document.getElementById('workspace-navbar-filter-slot'));
   }, []);
   return el;
 }
@@ -20,7 +20,7 @@ function useNavbarActionSlot(): HTMLElement | null {
 export function PayrollViewToggle() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentView = searchParams.get('view') ?? 'by_task';
-  const slot = useNavbarActionSlot();
+  const slot = useNavbarFilterSlot();
 
   const handleToggle = (view: string) => {
     const next = new URLSearchParams(searchParams);
