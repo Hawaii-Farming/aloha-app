@@ -20,6 +20,7 @@ One table defines all modules, their prefixes, file numbering, and doc numbering
 | `pack_`   | Pack            | 114, 116, 118–125 | 07 |
 | `maint_`  | Maintenance     | 126–128 | 09 |
 | `fsafe_`  | Food Safety     | 129–134 | 10 |
+| `fin_`    | Finance         | 20260417000010– | 11 |
 
 Migration ranges are interleaved in some areas due to cross-module FK dependencies (e.g. sales_product at 035 precedes ops tables, pack_lot at 114 precedes sales_po_fulfillment at 117).
 
