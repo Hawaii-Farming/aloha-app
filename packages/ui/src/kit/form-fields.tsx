@@ -1,6 +1,6 @@
 'use client';
 
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
@@ -202,7 +202,10 @@ export function FormDateField<T extends FieldValues = FieldValues>({
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {field.value
-                    ? format(new Date(field.value), 'MM/dd/yyyy')
+                    ? format(
+                        parse(field.value, 'yyyy-MM-dd', new Date()),
+                        'MM/dd/yyyy',
+                      )
                     : (placeholder ?? 'Pick a date')}
                 </Button>
               </FormControl>
@@ -210,7 +213,11 @@ export function FormDateField<T extends FieldValues = FieldValues>({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={field.value ? new Date(field.value) : undefined}
+                selected={
+                  field.value
+                    ? parse(field.value, 'yyyy-MM-dd', new Date())
+                    : undefined
+                }
                 onSelect={(date) =>
                   field.onChange(date ? format(date, 'yyyy-MM-dd') : '')
                 }
