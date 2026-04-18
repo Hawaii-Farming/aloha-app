@@ -20,7 +20,7 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, History, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
@@ -36,6 +36,7 @@ import {
 } from '~/components/ag-grid/column-state';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
+import { SchedulerNavbarTools } from '~/components/ag-grid/scheduler-navbar-tools';
 import { CreatePanel } from '~/components/crud/create-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
@@ -518,54 +519,13 @@ export default function SchedulerListView(props: ListViewProps) {
         className="flex min-h-0 flex-1 flex-col"
         data-test="scheduler-list-view"
       >
-        {/* Toolbar — wraps on narrow viewports */}
-        <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
-          {/* Week navigator: a single pill with < | date | > */}
-          <div
-            className="border-border bg-background inline-flex items-center overflow-hidden rounded-full border"
-            data-test="week-navigator"
-          >
-            <button
-              type="button"
-              onClick={handlePrev}
-              aria-label="Previous week"
-              className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center transition-colors"
-              data-test="week-nav-prev"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={handleToday}
-              title="Jump to current week"
-              className="text-foreground hover:bg-muted border-border border-x px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
-              data-test="week-nav-today"
-            >
-              {formatWeekLabel(currentWeek)}
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              aria-label="Next week"
-              className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center transition-colors"
-              data-test="week-nav-next"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="ml-auto flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setHistoryOpen(true)}
-              data-test="history-toggle"
-              aria-label="History"
-              className="h-9 w-9 rounded-full p-0"
-            >
-              <History className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <SchedulerNavbarTools
+          weekLabel={formatWeekLabel(currentWeek)}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          onToday={handleToday}
+          onHistoryOpen={() => setHistoryOpen(true)}
+        />
 
         {/* Weekly Schedule — full width */}
         <div className="flex min-h-0 flex-1 flex-col">
