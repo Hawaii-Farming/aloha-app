@@ -19,7 +19,6 @@ import {
   AlertDialogTrigger,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
-import { Separator } from '@aloha/ui/separator';
 import { Trans } from '@aloha/ui/trans';
 
 import {
@@ -187,6 +186,15 @@ export default function HousingDetailView({
                 {name}
               </span>
             </div>
+
+            <div className="bg-border h-5 w-px" />
+
+            <span
+              className="text-muted-foreground text-sm"
+              data-test="housing-detail-tenants-count"
+            >
+              Tenants ({tenants.length})
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -231,33 +239,24 @@ export default function HousingDetailView({
           </div>
         </div>
 
-        {/* Body — flex column; tenants grid fills remaining height */}
-        <div className="flex min-h-0 flex-1 flex-col gap-6 px-8 py-6">
+        {/* Body — flex column; tenants grid fills edge-to-edge below the header */}
+        <div className="flex min-h-0 flex-1 flex-col">
           {notes && (
-            <div className="shrink-0">
-              <h2 className="text-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
-                Notes
-              </h2>
-              <Separator className="mb-3" />
-              <p className="text-foreground text-sm">{notes}</p>
+            <div className="text-foreground border-border shrink-0 border-b px-6 py-3 text-sm">
+              <span className="text-muted-foreground">Notes: </span>
+              {notes}
             </div>
           )}
 
-          <div className="flex min-h-0 flex-1 flex-col">
-            <h2 className="text-foreground mb-2 shrink-0 text-sm font-semibold tracking-wide uppercase">
-              Tenants ({tenants.length})
-            </h2>
-            <Separator className="mb-3 shrink-0" />
-            {tenants.length === 0 ? (
-              <p className="text-muted-foreground text-sm">
-                No tenants currently assigned.
-              </p>
-            ) : (
-              <div className="flex min-h-0 flex-1 flex-col">
-                <TenantsGrid tenants={tenants} accountSlug={accountSlug} />
-              </div>
-            )}
-          </div>
+          {tenants.length === 0 ? (
+            <p className="text-muted-foreground px-6 py-4 text-sm">
+              No tenants currently assigned.
+            </p>
+          ) : (
+            <div className="flex min-h-0 flex-1 flex-col">
+              <TenantsGrid tenants={tenants} accountSlug={accountSlug} />
+            </div>
+          )}
         </div>
       </div>
 
