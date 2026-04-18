@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-18 - Completed quick task 260417-vmj: portal scheduler History + week navigator into workspace navbar
+Last activity: 2026-04-18 - Completed quick task 260417-vw8: remove Housing detail stat cards + portal Payroll Comparison view toggle into navbar
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -162,6 +162,7 @@ None.
 | 260417-nbq | Polish Housing AG Grid: restore summary cards, fix column order, avatar size, grid width | 2026-04-17 | b6d5145 | [260417-nbq-polish-housing-ag-grid-restore-summary-c](./quick/260417-nbq-polish-housing-ag-grid-restore-summary-c/) |
 | 260417-v9t | Replace scheduler's top-right toolbar "+" with floating bottom-right "+" per UI-RULES §Floating Create | 2026-04-18 | 04126a2 | [260417-v9t-replace-scheduler-s-top-right-toolbar-ic](./quick/260417-v9t-replace-scheduler-s-top-right-toolbar-ic/) |
 | 260417-vmj | Portal scheduler History button + week navigator into workspace navbar filter slot (History first) | 2026-04-18 | dd3978c | [260417-vmj-portal-scheduler-history-button-week-nav](./quick/260417-vmj-portal-scheduler-history-button-week-nav/) |
+| 260417-vw8 | Remove Housing detail stat cards + portal Payroll Comparison view toggle into workspace navbar | 2026-04-18 | 1db4405 | [260417-vw8-full-screen-tables-in-scheduler-payroll-](./quick/260417-vw8-full-screen-tables-in-scheduler-payroll-/) |
 
 ## Session Continuity
 
