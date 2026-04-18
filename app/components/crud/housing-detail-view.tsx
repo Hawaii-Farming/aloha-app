@@ -3,7 +3,11 @@ import { useCallback, useState } from 'react';
 import { useFetcher, useNavigate } from 'react-router';
 
 import { useQuery } from '@tanstack/react-query';
-import type { ColDef, RowClickedEvent } from 'ag-grid-community';
+import type {
+  ColDef,
+  GridReadyEvent,
+  RowClickedEvent,
+} from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
 import { ArrowLeft, Home, Trash2 } from 'lucide-react';
 
@@ -116,13 +120,19 @@ function TenantsGrid({
     [navigate, accountSlug],
   );
 
+  const handleGridReady = useCallback((event: GridReadyEvent) => {
+    setTimeout(() => event.api.sizeColumnsToFit(), 20);
+  }, []);
+
   return (
     <AgGridWrapper
       colDefs={TENANT_COL_DEFS}
       rowData={tenants as unknown as Record<string, unknown>[]}
       quickFilterText={query}
       pagination={false}
+      domLayout="autoHeight"
       onRowClicked={handleRowClicked}
+      onGridReady={handleGridReady}
     />
   );
 }
