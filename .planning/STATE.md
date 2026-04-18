@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-18 - Completed quick task 260417-wyc: inline tenants count in Housing detail header; edge-to-edge grid
+Last activity: 2026-04-18 - Completed quick task 260417-x0t: kill ghost zebra stripes in Housing detail tenants grid
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -173,6 +173,7 @@ None.
 | 260417-wti | Rename Payroll Comp to Payroll in UI navigation | 2026-04-18 | a370d76 | [260417-wti-rename-payroll-comp-to-payroll](./quick/260417-wti-rename-payroll-comp-to-payroll/) |
 | 260417-wvf | Remove padding around Housing list grid to match Payroll edge-to-edge | 2026-04-18 | 94dc613 | [260417-wvf-housing-list-edge-to-edge](./quick/260417-wvf-housing-list-edge-to-edge/) |
 | 260417-wyc | Inline tenants count in Housing detail header; edge-to-edge grid | 2026-04-18 | 0ec86b2 | [260417-wyc-housing-detail-inline-tenants-count](./quick/260417-wyc-housing-detail-inline-tenants-count/) |
+| 260417-x0t | Kill ghost zebra stripes in Housing detail tenants grid (autoHeight + sizeColumnsToFit) | 2026-04-18 | e95b035 | [260417-x0t-housing-detail-tenants-no-ghost-zebra](./quick/260417-x0t-housing-detail-tenants-no-ghost-zebra/) |
 
 ## Session Continuity
 
