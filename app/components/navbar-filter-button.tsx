@@ -88,14 +88,15 @@ export function NavbarFilterButton({
           className="h-10 max-w-[520px] gap-2 rounded-full px-4 text-sm font-medium"
         >
           <SlidersHorizontal className="h-4 w-4 shrink-0" />
-          <span className="shrink-0">Filters</span>
-          {activeCount > 0 && (
+          {activeCount > 0 ? (
             <span
               className="text-muted-foreground min-w-0 truncate font-normal"
               data-test={`${testKey}-active-summary`}
             >
               {activeSummary}
             </span>
+          ) : (
+            <span className="shrink-0">Filters</span>
           )}
         </Button>
       </PopoverTrigger>
