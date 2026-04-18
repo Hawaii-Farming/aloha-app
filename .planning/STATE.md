@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-18 - Completed quick task 260418-tz2: add datetime form field for scheduler/task-tracker timestamp columns
+Last activity: 2026-04-18 - Completed quick task 260418-tz3: time picker to Shadcn Selects (consistent dropdown styling)
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -180,6 +180,7 @@ None.
 | 260417-xat | Pretty pay-period filter labels; widen navbar filter popover | 2026-04-18 | 073657a | [260417-xat-pretty-pay-period-filter](./quick/260417-xat-pretty-pay-period-filter/) |
 | 260418-tz1 | Fix FormDateField timezone off-by-one in HST (UTC parse of yyyy-MM-dd) | 2026-04-18 | 23e62a6 | [260418-tz1-fix-date-picker-timezone](./quick/260418-tz1-fix-date-picker-timezone/) |
 | 260418-tz2 | Add datetime form field (hh:mm) for scheduler/task-tracker timestamp columns | 2026-04-18 | 6246d06 | [260418-tz2-add-datetime-field](./quick/260418-tz2-add-datetime-field/) |
+| 260418-tz3 | Time picker to Shadcn Selects (HH + MM) for consistent dropdown styling | 2026-04-18 | 36737ab | [260418-tz3-time-picker-shadcn-select](./quick/260418-tz3-time-picker-shadcn-select/) |
 
 ## Session Continuity
 
