@@ -122,12 +122,18 @@ function deriveNavigation(
     // — hide its own sidebar/search entry. Route stays accessible via the toggle.
     if (row.sub_module_slug === 'payroll_data') continue;
 
+    // Rename payroll_comp → "Payroll" in UI (DB display name is "Payroll Comp").
+    const displayName =
+      row.sub_module_slug === 'payroll_comp'
+        ? 'Payroll'
+        : row.sub_module_display_name;
+
     subModules.push({
       sub_module_id: row.sub_module_id,
       org_id: orgId,
       module_slug: row.module_slug,
       sub_module_slug: row.sub_module_slug,
-      display_name: row.sub_module_display_name,
+      display_name: displayName,
       display_order: row.sub_module_display_order,
     });
   }
