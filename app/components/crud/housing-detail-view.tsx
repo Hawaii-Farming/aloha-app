@@ -3,11 +3,7 @@ import { useCallback, useState } from 'react';
 import { useFetcher, useNavigate } from 'react-router';
 
 import { useQuery } from '@tanstack/react-query';
-import type {
-  ColDef,
-  GridReadyEvent,
-  RowClickedEvent,
-} from 'ag-grid-community';
+import type { ColDef, RowClickedEvent } from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
 import { ArrowLeft, Home, Trash2 } from 'lucide-react';
 
@@ -23,7 +19,6 @@ import {
   AlertDialogTrigger,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
-import { Card } from '@aloha/ui/card';
 import { Separator } from '@aloha/ui/separator';
 import { Trans } from '@aloha/ui/trans';
 
@@ -122,19 +117,13 @@ function TenantsGrid({
     [navigate, accountSlug],
   );
 
-  const handleGridReady = useCallback((event: GridReadyEvent) => {
-    setTimeout(() => event.api.sizeColumnsToFit(), 20);
-  }, []);
-
   return (
     <AgGridWrapper
       colDefs={TENANT_COL_DEFS}
       rowData={tenants as unknown as Record<string, unknown>[]}
       quickFilterText={query}
       pagination={false}
-      domLayout="autoHeight"
       onRowClicked={handleRowClicked}
-      onGridReady={handleGridReady}
     />
   );
 }
@@ -153,9 +142,6 @@ export default function HousingDetailView({
 
   const siteId = String(record.id ?? '');
   const name = String(record.name ?? 'Housing');
-  const maxBeds = record.max_beds != null ? Number(record.max_beds) : null;
-  const tenantCount = Number(record.tenant_count ?? 0);
-  const availableBeds = Number(record.available_beds ?? 0);
   const notes = record.notes ? String(record.notes) : null;
 
   const { data: tenants = [] } = useQuery({
@@ -172,12 +158,6 @@ export default function HousingDetailView({
   }, [fetcher]);
 
   const isDeleting = fetcher.state !== 'idle';
-
-  const stats: { label: string; value: string | number }[] = [
-    { label: 'Max Beds', value: maxBeds ?? '—' },
-    { label: 'Tenants', value: tenantCount },
-    { label: 'Available Beds', value: availableBeds },
-  ];
 
   return (
     <>
@@ -251,48 +231,32 @@ export default function HousingDetailView({
           </div>
         </div>
 
-        {/* Scrollable content */}
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="flex flex-col gap-6 px-8 py-6">
-            {/* Stat cards */}
-            <div className="grid grid-cols-3 gap-3">
-              {stats.map((s) => (
-                <Card key={s.label} className="p-4">
-                  <div className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-                    {s.label}
-                  </div>
-                  <div className="text-foreground mt-1 text-2xl font-semibold tabular-nums">
-                    {s.value}
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {/* Notes */}
-            {notes && (
-              <div>
-                <h2 className="text-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
-                  Notes
-                </h2>
-                <Separator className="mb-3" />
-                <p className="text-foreground text-sm">{notes}</p>
-              </div>
-            )}
-
-            {/* Tenants */}
-            <div>
+        {/* Body — flex column; tenants grid fills remaining height */}
+        <div className="flex min-h-0 flex-1 flex-col gap-6 px-8 py-6">
+          {notes && (
+            <div className="shrink-0">
               <h2 className="text-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
-                Tenants ({tenants.length})
+                Notes
               </h2>
               <Separator className="mb-3" />
-              {tenants.length === 0 ? (
-                <p className="text-muted-foreground text-sm">
-                  No tenants currently assigned.
-                </p>
-              ) : (
-                <TenantsGrid tenants={tenants} accountSlug={accountSlug} />
-              )}
+              <p className="text-foreground text-sm">{notes}</p>
             </div>
+          )}
+
+          <div className="flex min-h-0 flex-1 flex-col">
+            <h2 className="text-foreground mb-2 shrink-0 text-sm font-semibold tracking-wide uppercase">
+              Tenants ({tenants.length})
+            </h2>
+            <Separator className="mb-3 shrink-0" />
+            {tenants.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No tenants currently assigned.
+              </p>
+            ) : (
+              <div className="flex min-h-0 flex-1 flex-col">
+                <TenantsGrid tenants={tenants} accountSlug={accountSlug} />
+              </div>
+            )}
           </div>
         </div>
       </div>

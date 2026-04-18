@@ -11,8 +11,6 @@ import type {
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 import { Home } from 'lucide-react';
 
-import { Card } from '@aloha/ui/card';
-
 import {
   useActiveTableSearch,
   useRegisterActiveTable,
@@ -126,40 +124,6 @@ function OccupancyCellRenderer(props: CustomCellRendererProps) {
   );
 }
 
-function SummaryBar({ accommodations }: { accommodations: Accommodation[] }) {
-  const totalBedrooms = accommodations.reduce(
-    (sum, a) => sum + a.bedroomCount,
-    0,
-  );
-  const totalTenants = accommodations.reduce(
-    (sum, a) => sum + a.site.tenantCount,
-    0,
-  );
-  const occupied = accommodations.filter((a) => a.site.tenantCount > 0).length;
-
-  const items = [
-    { label: 'Accommodations', value: accommodations.length },
-    { label: 'Total Bedrooms', value: totalBedrooms },
-    { label: 'Total Tenants', value: totalTenants },
-    { label: 'Occupied', value: occupied },
-  ];
-
-  return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {items.map((item) => (
-        <Card key={item.label} className="p-4">
-          <div className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-            {item.label}
-          </div>
-          <div className="text-foreground mt-1 text-2xl font-semibold tabular-nums">
-            {item.value}
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
 const colDefs: ColDef[] = [
   {
     colId: 'home_icon',
@@ -257,9 +221,6 @@ export default function HousingMapView(props: ListViewProps) {
       className="flex min-h-0 flex-1 flex-col gap-4 px-4 py-4"
       data-test="housing-list-view"
     >
-      <div className="shrink-0">
-        <SummaryBar accommodations={accommodations} />
-      </div>
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper
           gridRef={gridRef}
