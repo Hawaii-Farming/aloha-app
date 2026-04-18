@@ -76,8 +76,8 @@ export const opsTaskTrackerConfig: CrudModuleConfig<
       fkTable: 'org_site',
       fkLabelColumn: 'name',
     },
-    { key: 'start_time', label: 'Start Time', type: 'date', required: true },
-    { key: 'stop_time', label: 'Stop Time', type: 'date' },
+    { key: 'start_time', label: 'Start Time', type: 'datetime', required: true },
+    { key: 'stop_time', label: 'Stop Time', type: 'datetime' },
     { key: 'is_completed', label: 'Completed', type: 'boolean' },
     { key: 'notes', label: 'Notes', type: 'textarea' },
     {

@@ -1,6 +1,6 @@
 'use client';
 
-import { format, parse } from 'date-fns';
+import { format, formatISO, parse, parseISO } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
@@ -229,6 +229,90 @@ export function FormDateField<T extends FieldValues = FieldValues>({
           <FormMessage />
         </FormItem>
       )}
+    />
+  );
+}
+
+export function FormDateTimeField<T extends FieldValues = FieldValues>({
+  control,
+  name,
+  label,
+  placeholder,
+  description,
+  disabled,
+  required,
+}: FormFieldProps<T>) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => {
+        const currentDate = field.value ? parseISO(field.value) : undefined;
+        const timeValue = currentDate ? format(currentDate, 'HH:mm') : '';
+        const dateLabel = currentDate
+          ? format(currentDate, 'MM/dd/yyyy')
+          : (placeholder ?? 'Pick a date');
+
+        const combine = (date: Date, hhmm: string) => {
+          const [h, m] = hhmm ? hhmm.split(':').map((n) => Number(n)) : [0, 0];
+          const next = new Date(date);
+          next.setHours(h ?? 0, m ?? 0, 0, 0);
+          return formatISO(next);
+        };
+
+        return (
+          <FormItem>
+            <FormLabel className="text-xs font-medium">
+              {label}
+              <RequiredMark required={required} />
+            </FormLabel>
+            <div className="flex gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'flex-1 justify-start text-left font-normal',
+                        !field.value && 'text-muted-foreground',
+                      )}
+                      disabled={disabled}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateLabel}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={currentDate}
+                    onSelect={(date) => {
+                      if (!date) return field.onChange('');
+                      field.onChange(combine(date, timeValue));
+                    }}
+                    disabled={disabled}
+                  />
+                </PopoverContent>
+              </Popover>
+              <Input
+                type="time"
+                className="w-32"
+                value={timeValue}
+                disabled={disabled}
+                onChange={(e) => {
+                  const nextTime = e.target.value;
+                  if (!nextTime) return;
+                  const base = currentDate ?? new Date();
+                  field.onChange(combine(base, nextTime));
+                }}
+              />
+            </div>
+            {description && <FormDescription>{description}</FormDescription>}
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }

@@ -5,6 +5,7 @@ import { FkCombobox } from '@aloha/ui/fk-combobox';
 import {
   FormBooleanField,
   FormDateField,
+  FormDateTimeField,
   FormNumberField,
   FormRadioField,
   FormSelectField,
@@ -85,6 +86,17 @@ export function renderFormField({
     case 'date':
       return (
         <FormDateField
+          key={field.key}
+          control={control}
+          name={name}
+          label={field.label}
+          required={field.required}
+        />
+      );
+
+    case 'datetime':
+      return (
+        <FormDateTimeField
           key={field.key}
           control={control}
           name={name}
