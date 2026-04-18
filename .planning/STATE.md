@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-18 - Completed quick task 260417-x8e: unpin TOTAL row on payroll grids; render as last scrolling row
+Last activity: 2026-04-18 - Completed quick task 260417-xat: pretty pay-period filter labels; widen navbar filter popover
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -177,6 +177,7 @@ None.
 | 260417-x3h | Remove global ghost zebra CSS fill; empty grid area now flat across all list views | 2026-04-18 | a690f77 | [260417-x3h-remove-ghost-zebra-css-globally](./quick/260417-x3h-remove-ghost-zebra-css-globally/) |
 | 260417-x5e | All AG Grid list views fit to width and refit on sidebar toggle | 2026-04-18 | 3693fb6 | [260417-x5e-grids-fit-width-on-resize](./quick/260417-x5e-grids-fit-width-on-resize/) |
 | 260417-x8e | Unpin TOTAL row on payroll grids; render as last scrolling row | 2026-04-18 | ebc6c37 | [260417-x8e-unpin-payroll-total-rows](./quick/260417-x8e-unpin-payroll-total-rows/) |
+| 260417-xat | Pretty pay-period filter labels; widen navbar filter popover | 2026-04-18 | 073657a | [260417-xat-pretty-pay-period-filter](./quick/260417-xat-pretty-pay-period-filter/) |
 
 ## Session Continuity
 
