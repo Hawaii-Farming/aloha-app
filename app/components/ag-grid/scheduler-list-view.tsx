@@ -564,16 +564,6 @@ export default function SchedulerListView(props: ListViewProps) {
             >
               <History className="h-4 w-4" />
             </Button>
-
-            <Button
-              variant="brand"
-              onClick={() => setCreateOpen(true)}
-              data-test="sub-module-create-button"
-              aria-label="Create"
-              className="h-9 w-9 rounded-full p-0"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
           </div>
         </div>
 
@@ -617,6 +607,18 @@ export default function SchedulerListView(props: ListViewProps) {
           </div>
         </SheetContent>
       </Sheet>
+
+      {(config?.formFields?.length ?? 0) > 0 && (
+        <Button
+          variant="brand"
+          onClick={() => setCreateOpen(true)}
+          data-test="sub-module-create-button"
+          aria-label="Create"
+          className="fixed right-10 bottom-10 z-30 h-14 w-14 rounded-full p-0 shadow-lg"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      )}
 
       <CreatePanel
         open={createOpen}
