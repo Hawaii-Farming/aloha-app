@@ -32,7 +32,7 @@ export function PayrollViewToggle() {
 
   const segmentClass = (active: boolean) =>
     cn(
-      'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
+      'flex h-9 w-9 items-center justify-center rounded-full transition-colors',
       active
         ? 'bg-primary text-primary-foreground'
         : 'text-muted-foreground hover:text-foreground hover:bg-muted',
@@ -40,7 +40,7 @@ export function PayrollViewToggle() {
 
   return createPortal(
     <div
-      className="border-border bg-background inline-flex h-9 items-center rounded-full border p-0.5"
+      className="border-border bg-background inline-flex h-10 items-center rounded-full border p-0.5"
       data-test="payroll-view-toggle"
       role="group"
       aria-label="View"

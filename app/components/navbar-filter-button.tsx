@@ -85,7 +85,7 @@ export function NavbarFilterButton({
           variant="outline"
           data-test={`${testKey}-button`}
           aria-label="Filters"
-          className="h-9 max-w-[520px] gap-2 rounded-full px-4 text-sm font-medium"
+          className="h-10 max-w-[520px] gap-2 rounded-full px-4 text-sm font-medium"
         >
           <SlidersHorizontal className="h-4 w-4 shrink-0" />
           <span className="shrink-0">Filters</span>
