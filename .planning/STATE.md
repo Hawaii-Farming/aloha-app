@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-17 - Completed quick task 260417-nbq: Polish Housing AG Grid (summary cards restored, column order fixed, avatar sized, grid fills width)
+Last activity: 2026-04-18 - Completed quick task 260417-v9t: move scheduler Create button to floating bottom-right per UI-RULES
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -160,6 +160,7 @@ None.
 | 260417-mg2 | Fix navbar palette: wire Payroll/Housing filter and stop filtering dropdown items when active table registered | 2026-04-17 | d85cc1c | [260417-mg2-fix-navbar-palette-wire-payroll-housing-](./quick/260417-mg2-fix-navbar-palette-wire-payroll-housing-/) |
 | 260417-mwl | Convert Housing list + Housing detail tenants to AG Grid for parity with Register/Departments | 2026-04-17 | 7f84467 | [260417-mwl-convert-housing-list-housing-detail-tena](./quick/260417-mwl-convert-housing-list-housing-detail-tena/) |
 | 260417-nbq | Polish Housing AG Grid: restore summary cards, fix column order, avatar size, grid width | 2026-04-17 | b6d5145 | [260417-nbq-polish-housing-ag-grid-restore-summary-c](./quick/260417-nbq-polish-housing-ag-grid-restore-summary-c/) |
+| 260417-v9t | Replace scheduler's top-right toolbar "+" with floating bottom-right "+" per UI-RULES §Floating Create | 2026-04-18 | 04126a2 | [260417-v9t-replace-scheduler-s-top-right-toolbar-ic](./quick/260417-v9t-replace-scheduler-s-top-right-toolbar-ic/) |
 
 ## Session Continuity
 
