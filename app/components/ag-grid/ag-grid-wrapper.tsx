@@ -144,12 +144,20 @@ function AgGridInner({
           defaultState: { pinned: null },
         });
       }
-      // Auto-size all columns to fit their content
+      // Fit columns to the grid width on mount
       setTimeout(() => {
-        event.api.autoSizeAllColumns();
+        event.api.sizeColumnsToFit();
       }, 0);
     },
     [onGridReady, isMobile],
+  );
+
+  // Re-fit columns when the grid container resizes (e.g. sidebar toggle)
+  const handleGridSizeChanged = useCallback(
+    (event: { api: { sizeColumnsToFit: () => void } }) => {
+      event.api.sizeColumnsToFit();
+    },
+    [],
   );
 
   const defaultColDef = useMemo(
@@ -244,6 +252,7 @@ function AgGridInner({
           overlayNoRowsTemplate={emptyMessage ?? 'No records found'}
           rowSelection={rowSelection}
           onGridReady={handleGridReadyWithMobileUnpin}
+          onGridSizeChanged={handleGridSizeChanged}
           onSelectionChanged={onSelectionChanged}
           onColumnMoved={onColumnMoved}
           onColumnResized={onColumnResized}
