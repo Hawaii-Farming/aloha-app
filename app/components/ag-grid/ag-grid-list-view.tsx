@@ -107,6 +107,18 @@ export default function AgGridListView({
 
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
+      // AG Grid listens on the row DOM directly, so React's synthetic
+      // stopPropagation in cell renderers fires too late. Inspect the native
+      // event target and skip navigation when the click originated from an
+      // interactive control (buttons, links, inputs) inside a cell renderer.
+      const nativeTarget = (event.event?.target ?? null) as HTMLElement | null;
+      if (
+        nativeTarget?.closest(
+          'button, a, input, textarea, select, [role="button"], [role="menuitem"], [data-ag-grid-skip-row-click]',
+        )
+      ) {
+        return;
+      }
       const recordId = event.data?.[pkColumn];
       if (!recordId) return;
       navigate(`/home/${account}/${moduleSlug}/${subModuleSlug}/${recordId}`);
