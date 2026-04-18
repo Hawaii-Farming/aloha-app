@@ -233,6 +233,11 @@ export function FormDateField<T extends FieldValues = FieldValues>({
   );
 }
 
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) =>
+  i.toString().padStart(2, '0'),
+);
+const MINUTE_OPTIONS = ['00', '15', '30', '45'];
+
 export function FormDateTimeField<T extends FieldValues = FieldValues>({
   control,
   name,
@@ -248,16 +253,16 @@ export function FormDateTimeField<T extends FieldValues = FieldValues>({
       name={name}
       render={({ field }) => {
         const currentDate = field.value ? parseISO(field.value) : undefined;
-        const timeValue = currentDate ? format(currentDate, 'HH:mm') : '';
+        const hourValue = currentDate ? format(currentDate, 'HH') : '';
+        const minuteValue = currentDate ? format(currentDate, 'mm') : '';
         const dateLabel = currentDate
           ? format(currentDate, 'MM/dd/yyyy')
           : (placeholder ?? 'Pick a date');
 
-        const combine = (date: Date, hhmm: string) => {
-          const [h, m] = hhmm ? hhmm.split(':').map((n) => Number(n)) : [0, 0];
+        const commit = (date: Date, h: string, m: string) => {
           const next = new Date(date);
-          next.setHours(h ?? 0, m ?? 0, 0, 0);
-          return formatISO(next);
+          next.setHours(Number(h) || 0, Number(m) || 0, 0, 0);
+          field.onChange(formatISO(next));
         };
 
         return (
@@ -289,24 +294,48 @@ export function FormDateTimeField<T extends FieldValues = FieldValues>({
                     selected={currentDate}
                     onSelect={(date) => {
                       if (!date) return field.onChange('');
-                      field.onChange(combine(date, timeValue));
+                      commit(date, hourValue, minuteValue);
                     }}
                     disabled={disabled}
                   />
                 </PopoverContent>
               </Popover>
-              <Input
-                type="time"
-                className="w-32"
-                value={timeValue}
+              <Select
+                value={hourValue}
+                onValueChange={(h) =>
+                  commit(currentDate ?? new Date(), h, minuteValue || '00')
+                }
                 disabled={disabled}
-                onChange={(e) => {
-                  const nextTime = e.target.value;
-                  if (!nextTime) return;
-                  const base = currentDate ?? new Date();
-                  field.onChange(combine(base, nextTime));
-                }}
-              />
+              >
+                <SelectTrigger className="w-20">
+                  <SelectValue placeholder="HH" />
+                </SelectTrigger>
+                <SelectContent>
+                  {HOUR_OPTIONS.map((h) => (
+                    <SelectItem key={h} value={h}>
+                      {h}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={minuteValue}
+                onValueChange={(m) =>
+                  commit(currentDate ?? new Date(), hourValue || '00', m)
+                }
+                disabled={disabled}
+              >
+                <SelectTrigger className="w-20">
+                  <SelectValue placeholder="MM" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MINUTE_OPTIONS.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {description && <FormDescription>{description}</FormDescription>}
             <FormMessage />
