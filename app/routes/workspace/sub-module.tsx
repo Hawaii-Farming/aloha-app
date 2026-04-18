@@ -431,7 +431,11 @@ export default function SubModulePage(props: {
   const subModuleSlug = params.subModule ?? '';
   const ViewComponent = resolveListView(subModuleSlug);
 
-  const typedConfig = config as CrudModuleConfig;
+  // Re-resolve config from the client registry so non-serializable fields
+  // (Zod schema prototype methods, customViews functions) are live.
+  // loaderData config is JSON-serialized and loses all class prototypes.
+  const typedConfig = (getModuleConfig(subModuleSlug) ??
+    config) as CrudModuleConfig;
 
   const viewProps: ListViewProps = {
     data: tableData.data as Record<string, unknown>[],

@@ -224,6 +224,16 @@ export default function SubModuleCreatePage(props: {
     [fetcher],
   );
 
+  const onInvalid = useCallback(
+    (errors: Record<string, { message?: string } | undefined>) => {
+      console.warn('[sub-module-create] validation failed', errors);
+      const firstKey = Object.keys(errors)[0];
+      const firstMessage = firstKey ? errors[firstKey]?.message : undefined;
+      toast.error(firstMessage ?? 'Please fix the highlighted fields');
+    },
+    [],
+  );
+
   const isSubmitting = fetcher.state !== 'idle';
 
   const fetcherData = fetcher.data as
@@ -251,7 +261,7 @@ export default function SubModuleCreatePage(props: {
           <CardContent className="pt-6">
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onSubmit, onInvalid)}
                 className="space-y-6"
                 data-test="crud-create-form"
               >
