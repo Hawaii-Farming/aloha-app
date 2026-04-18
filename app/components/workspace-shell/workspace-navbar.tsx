@@ -100,7 +100,7 @@ export function WorkspaceNavbar({
         <div
           id="workspace-navbar-filter-slot"
           data-test="workspace-navbar-filter-slot"
-          className="flex min-w-0 shrink items-center gap-2"
+          className="flex max-w-[calc(50%-15rem)] min-w-0 shrink items-center gap-2"
         />
 
         <div className="pointer-events-none absolute inset-x-0 flex justify-center px-6">
