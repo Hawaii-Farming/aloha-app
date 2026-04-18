@@ -122,6 +122,12 @@ export function WorkspaceNavbar({
           )}
         />
 
+        <div
+          id="workspace-navbar-action-slot"
+          data-test="workspace-navbar-action-slot"
+          className="flex shrink-0 items-center gap-2"
+        />
+
         <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
       </div>
     </header>

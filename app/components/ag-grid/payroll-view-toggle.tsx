@@ -4,15 +4,15 @@ import { createPortal } from 'react-dom';
 
 import { useSearchParams } from 'react-router';
 
+import { User, Users } from 'lucide-react';
+
 import { cn } from '@aloha/ui/utils';
 
-// Resolve the navbar slot once on mount. The slot is rendered by
-// WorkspaceNavbar and is stable for the lifetime of the shell.
-function useNavbarFilterSlot(): HTMLElement | null {
+function useNavbarActionSlot(): HTMLElement | null {
   const [el, setEl] = useState<HTMLElement | null>(null);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot portal target lookup on mount
-    setEl(document.getElementById('workspace-navbar-filter-slot'));
+    setEl(document.getElementById('workspace-navbar-action-slot'));
   }, []);
   return el;
 }
@@ -20,7 +20,7 @@ function useNavbarFilterSlot(): HTMLElement | null {
 export function PayrollViewToggle() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentView = searchParams.get('view') ?? 'by_task';
-  const slot = useNavbarFilterSlot();
+  const slot = useNavbarActionSlot();
 
   const handleToggle = (view: string) => {
     const next = new URLSearchParams(searchParams);
@@ -32,7 +32,7 @@ export function PayrollViewToggle() {
 
   const segmentClass = (active: boolean) =>
     cn(
-      'h-8 rounded-full px-4 text-sm font-medium transition-colors',
+      'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
       active
         ? 'bg-primary text-primary-foreground'
         : 'text-muted-foreground hover:text-foreground hover:bg-muted',
@@ -50,16 +50,20 @@ export function PayrollViewToggle() {
         onClick={() => handleToggle('by_task')}
         className={segmentClass(currentView === 'by_task')}
         data-test="view-toggle-by-task"
+        aria-label="By Department"
+        title="By Department"
       >
-        By Department
+        <Users className="h-4 w-4" />
       </button>
       <button
         type="button"
         onClick={() => handleToggle('by_employee')}
         className={segmentClass(currentView === 'by_employee')}
         data-test="view-toggle-by-employee"
+        aria-label="By Employee"
+        title="By Employee"
       >
-        By Employee
+        <User className="h-4 w-4" />
       </button>
     </div>,
     slot,
