@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-18 - Completed quick task 260417-wi8: match navbar toggle + Filters height to search bar (h-10)
+Last activity: 2026-04-18 - Completed quick task 260417-wjx: cap navbar filter slot so Filters can't touch centered search
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -166,6 +166,7 @@ None.
 | 260417-wd1 | Shrink Payroll Comp view toggle to icons; move to right-side navbar action slot (after search, left of avatar) | 2026-04-18 | 73bfdb9 | [260417-wd1-payroll-comp-view-toggle-make-icon-only-](./quick/260417-wd1-payroll-comp-view-toggle-make-icon-only-/) |
 | 260417-wgi | Lock navbar search centered via absolute positioning; move Payroll Comp toggle back to filter slot before Filters | 2026-04-18 | b0de5be | [260417-wgi-lock-navbar-search-centered-move-payroll](./quick/260417-wgi-lock-navbar-search-centered-move-payroll/) |
 | 260417-wi8 | Match navbar toggle + Filters button height to search bar (h-10) | 2026-04-18 | 631b111 | [260417-wi8-match-navbar-toggle-filters-height](./quick/260417-wi8-match-navbar-toggle-filters-height/) |
+| 260417-wjx | Cap navbar filter slot so Filters can't touch centered search (1rem gap) | 2026-04-18 | fd9eb50 | [260417-wjx-cap-navbar-filter-slot-width](./quick/260417-wjx-cap-navbar-filter-slot-width/) |
 
 ## Session Continuity
 
