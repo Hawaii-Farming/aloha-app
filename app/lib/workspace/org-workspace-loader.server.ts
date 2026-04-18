@@ -118,6 +118,10 @@ function deriveNavigation(
       });
     }
 
+    // payroll_data is merged under payroll_comp's 3-way toggle (Data | By Dept | By Employee)
+    // — hide its own sidebar/search entry. Route stays accessible via the toggle.
+    if (row.sub_module_slug === 'payroll_data') continue;
+
     subModules.push({
       sub_module_id: row.sub_module_id,
       org_id: orgId,

@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 
 import { format, startOfWeek } from 'date-fns';
 
+import { PayrollViewToggle } from '~/components/ag-grid/payroll-view-toggle';
 import { StatusFilterTabs } from '~/components/ag-grid/status-filter-tabs';
 import { TableListView } from '~/components/crud/table-list-view';
 import {
@@ -462,6 +463,7 @@ export default function SubModulePage(props: {
         </div>
       }
     >
+      {subModuleSlug === 'payroll_data' && <PayrollViewToggle />}
       <ViewComponent {...viewProps} />
     </Suspense>
   );

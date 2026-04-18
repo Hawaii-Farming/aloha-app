@@ -2,11 +2,18 @@ import { useEffect, useState } from 'react';
 
 import { createPortal } from 'react-dom';
 
-import { useSearchParams } from 'react-router';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router';
 
-import { User, Users } from 'lucide-react';
+import { Database, User, Users } from 'lucide-react';
 
 import { cn } from '@aloha/ui/utils';
+
+type PayrollView = 'data' | 'by_task' | 'by_employee';
 
 function useNavbarFilterSlot(): HTMLElement | null {
   const [el, setEl] = useState<HTMLElement | null>(null);
@@ -18,14 +25,27 @@ function useNavbarFilterSlot(): HTMLElement | null {
 }
 
 export function PayrollViewToggle() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const currentView = searchParams.get('view') ?? 'by_task';
   const slot = useNavbarFilterSlot();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+  const [searchParams] = useSearchParams();
 
-  const handleToggle = (view: string) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('view', view);
-    setSearchParams(next, { preventScrollReset: true });
+  const account = params.account ?? '';
+  const activeView: PayrollView = location.pathname.endsWith('/payroll_data')
+    ? 'data'
+    : searchParams.get('view') === 'by_employee'
+      ? 'by_employee'
+      : 'by_task';
+
+  const go = (view: PayrollView) => {
+    if (view === 'data') {
+      navigate(`/home/${account}/human_resources/payroll_data`);
+    } else {
+      navigate(`/home/${account}/human_resources/payroll_comp?view=${view}`, {
+        preventScrollReset: true,
+      });
+    }
   };
 
   if (!slot) return null;
@@ -43,12 +63,22 @@ export function PayrollViewToggle() {
       className="border-border bg-background inline-flex h-10 items-center rounded-full border p-0.5"
       data-test="payroll-view-toggle"
       role="group"
-      aria-label="View"
+      aria-label="Payroll view"
     >
       <button
         type="button"
-        onClick={() => handleToggle('by_task')}
-        className={segmentClass(currentView === 'by_task')}
+        onClick={() => go('data')}
+        className={segmentClass(activeView === 'data')}
+        data-test="view-toggle-data"
+        aria-label="Data"
+        title="Data"
+      >
+        <Database className="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => go('by_task')}
+        className={segmentClass(activeView === 'by_task')}
         data-test="view-toggle-by-task"
         aria-label="By Department"
         title="By Department"
@@ -57,8 +87,8 @@ export function PayrollViewToggle() {
       </button>
       <button
         type="button"
-        onClick={() => handleToggle('by_employee')}
-        className={segmentClass(currentView === 'by_employee')}
+        onClick={() => go('by_employee')}
+        className={segmentClass(activeView === 'by_employee')}
         data-test="view-toggle-by-employee"
         aria-label="By Employee"
         title="By Employee"
