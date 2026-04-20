@@ -2,7 +2,7 @@
 
 ## Design Direction
 
-Supabase-inspired quiet data density mapped to Aloha's DESIGN.md tokens: slate-100 canvas, white cards, slate-200 borders, `--radius: 1rem`, Inter Variable body, a reserved emerald gradient brand moment, hand-authored dark mode, and the existing amber accent for weekend differentiation. Components prefer positioned blocks over nested grids so timing is legible at a glance, and all time formatting flows through `toLocaleTimeString` so the viewer's browser timezone is the source of truth.
+Aloha's "fresh farm" design system per DESIGN.md — polished farm-operations ERP, light-first: slate-100 canvas, white cards, slate-200 borders, `--radius: 1rem`, Inter Variable body, a reserved green-gradient brand moment (`#22c55e → #059669`), hand-authored dark mode, and the existing amber accent for weekend differentiation. Components prefer positioned blocks over nested grids so timing is legible at a glance, and all time formatting flows through `toLocaleTimeString` so the viewer's browser timezone is the source of truth.
 
 ## Reference Points
 
