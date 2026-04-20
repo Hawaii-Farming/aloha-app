@@ -90,7 +90,9 @@
     --card: #1e1710;
     --card-foreground: #d3af86;
 
-    --popover: #1e1710;
+    --popover: #2a2015; /* Lifted above --card (#1e1710) so dropdowns,
+                           select menus, modals, and sheets separate
+                           clearly from the page bg and card surfaces */
     --popover-foreground: #d3af86;
 
     --primary: #4ade80; /* PRESERVED — Aloha brand green-400 */
