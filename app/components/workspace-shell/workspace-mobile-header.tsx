@@ -1,12 +1,20 @@
-import { Menu } from 'lucide-react';
+import type { JwtPayload } from '@supabase/supabase-js';
 
-import { Avatar, AvatarFallback } from '@aloha/ui/avatar';
+import { Menu, Search } from 'lucide-react';
+
 import { cn } from '@aloha/ui/utils';
 
-import { AlohaLogoSquare } from './aloha-logo-square';
+import {
+  NavbarSearch,
+  type NavbarSearchItem,
+} from '~/components/navbar-search';
+
+import { WorkspaceNavbarProfileMenu } from './workspace-navbar-profile-menu';
 
 interface WorkspaceMobileHeaderProps {
-  user: { email?: string | null };
+  user: JwtPayload;
+  orgName?: string | null;
+  searchItems: NavbarSearchItem[];
   onOpenDrawer: () => void;
   drawerOpen: boolean;
   hamburgerRef?: React.RefObject<HTMLButtonElement | null>;
@@ -15,12 +23,13 @@ interface WorkspaceMobileHeaderProps {
 
 export function WorkspaceMobileHeader({
   user,
+  orgName,
+  searchItems,
   onOpenDrawer,
   drawerOpen,
   hamburgerRef,
   className,
 }: WorkspaceMobileHeaderProps) {
-  const initial = user.email?.[0]?.toUpperCase() ?? 'U';
   return (
     <header
       data-test="workspace-mobile-header"
@@ -41,14 +50,25 @@ export function WorkspaceMobileHeader({
         <Menu size={20} />
       </button>
 
-      <div className="flex flex-1 items-center gap-2">
-        <AlohaLogoSquare size="sm" />
-        <span className="text-foreground text-base font-semibold">Aloha</span>
-      </div>
+      <div className="flex-1" />
 
-      <Avatar size="md" data-test="workspace-mobile-header-avatar">
-        <AvatarFallback>{initial}</AvatarFallback>
-      </Avatar>
+      <div className="flex shrink-0 items-center gap-2">
+        <NavbarSearch
+          items={searchItems}
+          renderTrigger={({ open }) => (
+            <button
+              type="button"
+              onClick={open}
+              aria-label="Open search"
+              data-test="workspace-mobile-header-search-trigger"
+              className="text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
+            >
+              <Search className="h-[18px] w-[18px]" />
+            </button>
+          )}
+        />
+        <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
+      </div>
     </header>
   );
 }

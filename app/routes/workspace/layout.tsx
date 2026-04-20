@@ -8,6 +8,7 @@ import { PageLayoutStyle } from '@aloha/ui/page';
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
 import { ActiveTableSearchProvider } from '~/components/active-table-search-context';
+import type { NavbarSearchItem } from '~/components/navbar-search';
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
 import { WorkspaceMobileDrawer } from '~/components/workspace-shell/workspace-mobile-drawer';
 import { WorkspaceMobileHeader } from '~/components/workspace-shell/workspace-mobile-header';
@@ -40,7 +41,19 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
   const { layoutState, workspace, accountSlug } = props.loaderData;
 
   const user = workspace.user;
-  const userForShell = { email: user.email ?? null };
+
+  const searchItems: NavbarSearchItem[] = [
+    ...workspace.navigation.modules.map((mod) => ({
+      path: `/home/${accountSlug}/${mod.module_slug}`,
+      label: mod.display_name,
+      group: 'Modules',
+    })),
+    ...workspace.navigation.subModules.map((sm) => ({
+      path: `/home/${accountSlug}/${sm.module_slug}/${sm.sub_module_slug}`,
+      label: sm.display_name,
+      group: 'Pages',
+    })),
+  ];
 
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -72,7 +85,9 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
             className="hidden md:flex"
           />
           <WorkspaceMobileHeader
-            user={userForShell}
+            user={user}
+            orgName={workspace.currentOrg?.org_name ?? null}
+            searchItems={searchItems}
             onOpenDrawer={() => setDrawerOpen(true)}
             drawerOpen={drawerOpen}
             hamburgerRef={hamburgerRef}
