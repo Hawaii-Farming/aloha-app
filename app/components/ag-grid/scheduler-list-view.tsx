@@ -503,15 +503,14 @@ export default function SchedulerListView(props: ListViewProps) {
     gridRef,
   });
 
+  // Only the expanded detail row (timeline) needs a custom height.
+  // Normal rows return undefined so AG Grid uses the theme default
+  // (driven by `rowVerticalPaddingScale` in ag-grid-theme.ts).
   const getRowHeight = useCallback(
-    (params: { data?: Record<string, unknown> }) => {
-      if (params.data?._isDetailRow) return 330;
-      return 44;
-    },
+    (params: { data?: Record<string, unknown> }) =>
+      params.data?._isDetailRow ? 330 : undefined,
     [],
   );
-
-  const getHistoryRowHeight = useCallback(() => 40, []);
 
   return (
     <>
@@ -561,7 +560,6 @@ export default function SchedulerListView(props: ListViewProps) {
               rowData={historyData as unknown as RowData[]}
               loading={historyLoading}
               pagination={false}
-              getRowHeight={getHistoryRowHeight}
               emptyMessage="No schedule history found"
             />
           </div>
