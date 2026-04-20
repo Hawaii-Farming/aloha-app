@@ -111,11 +111,21 @@ export function CreatePanel({
     [fetcher],
   );
 
+  const onInvalid = useCallback(
+    (errors: Record<string, { message?: string } | undefined>) => {
+      console.warn('[create-panel] validation failed', errors);
+      const firstKey = Object.keys(errors)[0];
+      const firstMessage = firstKey ? errors[firstKey]?.message : undefined;
+      toast.error(firstMessage ?? 'Please fix the highlighted fields');
+    },
+    [],
+  );
+
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
-      form.handleSubmit(onSubmit)(e);
+      form.handleSubmit(onSubmit, onInvalid)(e);
     },
-    [form, onSubmit],
+    [form, onSubmit, onInvalid],
   );
 
   const handleOpenChange = useCallback(

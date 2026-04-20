@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 
 import { format, startOfWeek } from 'date-fns';
 
+import { PayrollViewToggle } from '~/components/ag-grid/payroll-view-toggle';
 import { StatusFilterTabs } from '~/components/ag-grid/status-filter-tabs';
 import { TableListView } from '~/components/crud/table-list-view';
 import {
@@ -431,7 +432,11 @@ export default function SubModulePage(props: {
   const subModuleSlug = params.subModule ?? '';
   const ViewComponent = resolveListView(subModuleSlug);
 
-  const typedConfig = config as CrudModuleConfig;
+  // Re-resolve config from the client registry so non-serializable fields
+  // (Zod schema prototype methods, customViews functions) are live.
+  // loaderData config is JSON-serialized and loses all class prototypes.
+  const typedConfig = (getModuleConfig(subModuleSlug) ??
+    config) as CrudModuleConfig;
 
   const viewProps: ListViewProps = {
     data: tableData.data as Record<string, unknown>[],
@@ -458,6 +463,7 @@ export default function SubModulePage(props: {
         </div>
       }
     >
+      {subModuleSlug === 'payroll_data' && <PayrollViewToggle />}
       <ViewComponent {...viewProps} />
     </Suspense>
   );

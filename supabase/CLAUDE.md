@@ -12,7 +12,7 @@ Schemas are numbered files in `schemas/` — numbers set dependency order:
 | `03-accounts.sql` | Auth accounts (Supabase Auth anchor) |
 | `04-tables.sql` | All app tables: org, hr_employee, modules, access control |
 | `05-view-contracts.sql` | Auth views: `app_org_context`, `app_user_orgs` |
-| `06-nav-view-contracts.sql` | Sidebar views: `app_nav_modules`, `app_nav_sub_modules` |
+| `06-nav-view-contracts.sql` | Sidebar view: `app_navigation` (one row per accessible sub-module with module info) |
 
 ## Multi-Tenant Model
 

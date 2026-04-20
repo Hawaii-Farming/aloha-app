@@ -27,11 +27,18 @@ export default async function globalSetup(config: FullConfig) {
   const page = await context.newPage();
 
   try {
-    await page.goto('/auth/sign-in');
+    await page.goto('/auth/sign-in', { waitUntil: 'domcontentloaded' });
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', password);
     await page.click('button[type="submit"]');
-    await page.waitForURL(/\/home\//, { timeout: 30_000 });
+    /* waitUntil: 'domcontentloaded' — the 'load' default blocks on every
+     * resource finishing, and the app emits 404s for missing i18n files
+     * (public/locales/en/chats.json) that can keep the load event pending
+     * until timeout. We only need the auth redirect to have committed. */
+    await page.waitForURL(/\/home\//, {
+      timeout: 30_000,
+      waitUntil: 'domcontentloaded',
+    });
 
     await context.storageState({ path: STORAGE_STATE_PATH });
   } catch (error) {

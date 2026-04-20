@@ -69,10 +69,10 @@ export const opsTaskScheduleConfig: CrudModuleConfig<
     {
       key: 'start_time',
       label: 'Date & Start Time',
-      type: 'date',
+      type: 'datetime',
       required: true,
     },
-    { key: 'stop_time', label: 'End Time', type: 'date' },
+    { key: 'stop_time', label: 'End Time', type: 'datetime' },
   ],
 
   noPagination: true,

@@ -1,6 +1,6 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useSearchParams } from 'react-router';
 
 import type {
   ColDef,
@@ -21,10 +21,8 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { scoreColorCellClassRules } from '~/components/ag-grid/row-class-rules';
-import { TableSearchInput } from '~/components/ag-grid/table-search-input';
-import { YearQuarterFilter } from '~/components/ag-grid/year-quarter-filter';
+import { NavbarFilterButton } from '~/components/navbar-filter-button';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -43,28 +41,21 @@ const colDefs: ColDef[] = [
     headerName: 'Employee',
     field: 'full_name',
     cellRenderer: SchedulerEmployeeRenderer,
-    sortable: true,
-    filter: 'agTextColumnFilter',
     minWidth: 200,
   },
   {
     headerName: 'Dept',
     field: 'department_name',
-    sortable: true,
-    filter: 'agTextColumnFilter',
     minWidth: 100,
   },
   {
     headerName: 'Quarter',
     field: 'quarter_label',
-    sortable: true,
-    filter: 'agTextColumnFilter',
     minWidth: 90,
   },
   {
     headerName: 'Prod',
     field: 'productivity',
-    sortable: true,
     minWidth: 70,
     maxWidth: 90,
     cellClassRules: scoreColorCellClassRules(),
@@ -72,7 +63,6 @@ const colDefs: ColDef[] = [
   {
     headerName: 'Attend',
     field: 'attendance',
-    sortable: true,
     minWidth: 70,
     maxWidth: 90,
     cellClassRules: scoreColorCellClassRules(),
@@ -80,7 +70,6 @@ const colDefs: ColDef[] = [
   {
     headerName: 'Quality',
     field: 'quality',
-    sortable: true,
     minWidth: 70,
     maxWidth: 90,
     cellClassRules: scoreColorCellClassRules(),
@@ -88,7 +77,6 @@ const colDefs: ColDef[] = [
   {
     headerName: 'Engage',
     field: 'engagement',
-    sortable: true,
     minWidth: 70,
     maxWidth: 90,
     cellClassRules: scoreColorCellClassRules(),
@@ -96,7 +84,6 @@ const colDefs: ColDef[] = [
   {
     headerName: 'Avg',
     field: 'average',
-    sortable: true,
     minWidth: 70,
     maxWidth: 80,
     valueFormatter: averageFormatter,
@@ -110,7 +97,6 @@ const colDefs: ColDef[] = [
   {
     headerName: 'Lead',
     field: 'lead_name',
-    sortable: true,
     minWidth: 100,
   },
   {
@@ -124,90 +110,6 @@ const colDefs: ColDef[] = [
   },
 ];
 
-// Lazy-loaded detail component cached at module scope
-const LazyDetailRow = function EmployeeReviewDetailWrapper({
-  data,
-}: {
-  data: RowData;
-}) {
-  // Dynamic import resolved via useDetailRow's fullWidthCellRenderer
-  return <EmployeeReviewDetailInline data={data} />;
-};
-
-function EmployeeReviewDetailInline({ data }: { data: RowData }) {
-  const scoreDisplay = (value: unknown) => {
-    const num = Number(value);
-    if (num === 1)
-      return { text: '1 - Below', className: 'text-red-600 dark:text-red-400' };
-    if (num === 2)
-      return {
-        text: '2 - Meets',
-        className: 'text-amber-600 dark:text-amber-400',
-      };
-    if (num === 3)
-      return {
-        text: '3 - Exceeds',
-        className: 'text-green-600 dark:text-green-400',
-      };
-    return { text: String(value ?? ''), className: '' };
-  };
-
-  const avg = data.average != null ? Number(data.average).toFixed(1) : '';
-
-  return (
-    <div className="px-6 py-4">
-      <div className="mb-3 flex items-center gap-3">
-        <span className="text-sm font-semibold">
-          {String(data.full_name ?? '')}
-        </span>
-        <span className="text-muted-foreground text-xs">
-          {String(data.department_name ?? '')}
-        </span>
-        <span className="text-muted-foreground text-xs">
-          {String(data.quarter_label ?? '')}
-        </span>
-        {data.is_locked === true && (
-          <Lock className="text-muted-foreground h-3.5 w-3.5" />
-        )}
-      </div>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {(['productivity', 'attendance', 'quality', 'engagement'] as const).map(
-          (key) => {
-            const score = scoreDisplay(data[key]);
-            return (
-              <div key={key} className="rounded-lg border px-3 py-2">
-                <div className="text-muted-foreground text-[10px] capitalize">
-                  {key}
-                </div>
-                <div className={`text-sm font-semibold ${score.className}`}>
-                  {score.text}
-                </div>
-              </div>
-            );
-          },
-        )}
-      </div>
-      <div className="mt-3 flex items-center gap-4">
-        <div>
-          <span className="text-muted-foreground text-xs">Average: </span>
-          <span className="text-sm font-semibold">{avg}</span>
-        </div>
-        {data.lead_name ? (
-          <div>
-            <span className="text-muted-foreground text-xs">Lead: </span>
-            <span className="text-sm">{String(data.lead_name)}</span>
-          </div>
-        ) : null}
-      </div>
-      {data.notes ? (
-        <div className="text-muted-foreground mt-2 text-xs">
-          {String(data.notes)}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 export default function EmployeeReviewListView(props: ListViewProps) {
   const { tableData } = props;
 
@@ -215,29 +117,9 @@ export default function EmployeeReviewListView(props: ListViewProps) {
   const reviewYears = (loaderData.reviewYears ?? []) as number[];
 
   const gridRef = useRef<AgGridReact>(null);
-  const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const rawRows = tableData.data as RowData[];
-
-  const {
-    rowData: detailRowData,
-    isFullWidthRow,
-    fullWidthCellRenderer,
-    handleRowClicked: handleDetailRowClicked,
-    getRowId,
-  } = useDetailRow({
-    sourceData: rawRows,
-    pkColumn: 'id',
-    detailComponent: LazyDetailRow,
-    gridRef,
-  });
-
-  const getRowHeight = useCallback((params: { data?: RowData }) => {
-    if (params.data?._isDetailRow) return 250;
-    return 52;
-  }, []);
 
   // Column state persistence
   const handleGridReady = useCallback((event: GridReadyEvent) => {
@@ -285,46 +167,62 @@ export default function EmployeeReviewListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const yearValue = searchParams.get('year') ?? '';
+  const quarterValue = searchParams.get('quarter') ?? '';
+
+  const setParam = useCallback(
+    (key: string, value: string) => {
+      const next = new URLSearchParams(searchParams);
+      if (value === '') next.delete(key);
+      else next.set(key, value);
+      setSearchParams(next, { preventScrollReset: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
   return (
     <div
       className="flex min-h-0 flex-1 flex-col"
       data-test="employee-review-list-view"
     >
-      {/* Toolbar */}
-      <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
-        <TableSearchInput
-          value={searchValue}
-          onChange={(value) => {
-            setSearchValue(value);
-            if (searchDebounceRef.current) {
-              clearTimeout(searchDebounceRef.current);
-            }
-            searchDebounceRef.current = setTimeout(() => {
-              setSearchValue(value);
-            }, 300);
-          }}
-          placeholder="Search reviews..."
-          data-test="employee-review-search"
-        />
-
-        <div className="ml-auto flex items-center gap-2">
-          <YearQuarterFilter years={reviewYears} />
-        </div>
-      </div>
+      <NavbarFilterButton
+        testKey="employee-review-filter"
+        filters={[
+          {
+            key: 'year',
+            label: 'Year',
+            allLabel: 'All Years',
+            value: yearValue,
+            onChange: (v) => setParam('year', v),
+            options: reviewYears.map((y) => ({
+              value: String(y),
+              label: String(y),
+            })),
+          },
+          {
+            key: 'quarter',
+            label: 'Quarter',
+            allLabel: 'All Quarters',
+            value: quarterValue,
+            onChange: (v) => setParam('quarter', v),
+            options: [
+              { value: '1', label: 'Q1' },
+              { value: '2', label: 'Q2' },
+              { value: '3', label: 'Q3' },
+              { value: '4', label: 'Q4' },
+            ],
+          },
+        ]}
+      />
 
       {/* Grid */}
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper
           gridRef={gridRef}
           colDefs={colDefs}
-          rowData={detailRowData as RowData[]}
-          quickFilterText={searchValue}
+          rowData={rawRows}
           pagination={false}
-          onRowClicked={handleDetailRowClicked}
-          isFullWidthRow={isFullWidthRow}
-          fullWidthCellRenderer={fullWidthCellRenderer}
-          getRowId={getRowId}
-          getRowHeight={getRowHeight}
           onGridReady={handleGridReady}
           onColumnMoved={handleColumnMoved}
           onColumnResized={handleColumnResized}

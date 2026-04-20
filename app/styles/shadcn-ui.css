@@ -79,65 +79,80 @@
   }
 
   .dark {
-    --background: #0f172a;
-    --foreground: #f8fafc;
+    /* Kimbie Dark palette (quick-260420-kd0) — warm earth tones inspired by the
+     * Kimbie Dark VS Code theme (Heiko Cavelier). The emerald brand tokens
+     * (--primary, --primary-foreground, --ring, --gradient-primary) are
+     * intentionally preserved so the Aloha green CTA still reads as brand on
+     * the Kimbie canvas. See DESIGN.md §2 Dark mode foundation tokens. */
+    --background: #15100a;
+    --foreground: #d3af86;
 
-    --card: #1e293b;
-    --card-foreground: #f8fafc;
+    --card: #1e1710;
+    --card-foreground: #d3af86;
 
-    --popover: #1e293b;
-    --popover-foreground: #f8fafc;
+    --popover: #2a2015; /* Lifted above --card (#1e1710) so dropdowns,
+                           select menus, modals, and sheets separate
+                           clearly from the page bg and card surfaces */
+    --popover-foreground: #d3af86;
 
-    --primary: #4ade80;
-    --primary-foreground: #052e16;
+    --primary: #4ade80; /* PRESERVED — Aloha brand green-400 */
+    --primary-foreground: #052e16; /* PRESERVED — green-950 */
 
-    --secondary: #334155;
-    --secondary-foreground: #f8fafc;
+    --secondary: #332618;
+    --secondary-foreground: #d3af86;
 
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
+    --muted: #0e0a06; /* Kimbie surface-muted — recessed below page bg so
+                         search triggers and muted surfaces separate from the
+                         #15100a canvas */
+    --muted-foreground: #a57a4c;
 
-    --accent: #334155;
-    --accent-foreground: #f8fafc;
+    --accent: #332618;
+    --accent-foreground: #d3af86;
 
-    --destructive: #ef4444;
+    --destructive: #dc3958;
     --destructive-foreground: #ffffff;
 
-    --border: #334155;
-    --input: #475569;
-    --ring: #4ade80;
+    --border: #332618;
+    --input: #4a3620;
+    --ring: #4ade80; /* PRESERVED — focus ring stays emerald */
 
-    --gradient-primary: linear-gradient(135deg, #4ade80, #10b981);
+    --gradient-primary: linear-gradient(
+      135deg,
+      #22c55e,
+      #059669
+    ); /* Kimbie-tuned brand moment: green-500 → emerald-600 (same as light).
+          Deeper saturation reads as "brand" on warm cocoa surfaces without
+          the green-400 pop that felt too neon in Kimbie dark. */
 
     --chart-1: #4ade80;
     --chart-2: #10b981;
-    --chart-3: #60a5fa;
-    --chart-4: #fbbf24;
-    --chart-5: #c084fc;
+    --chart-3: #51bdb2; /* Kimbie teal — replaces slate-blue */
+    --chart-4: #f79a32; /* Kimbie yellow-orange — replaces amber */
+    --chart-5: #d3af86; /* Kimbie cream — replaces purple */
 
-    --semantic-red-bg: rgb(239 68 68 / 0.15);
-    --semantic-red-fg: #f87171;
-    --semantic-red-border: rgb(239 68 68 / 0.3);
+    --semantic-red-bg: rgb(220 57 88 / 0.15);
+    --semantic-red-fg: #f87171; /* Tailwind red-400 held for legibility on warm bg */
+    --semantic-red-border: rgb(220 57 88 / 0.3);
 
-    --semantic-amber-bg: rgb(245 158 11 / 0.15);
-    --semantic-amber-fg: #fbbf24;
-    --semantic-amber-border: rgb(245 158 11 / 0.3);
+    --semantic-amber-bg: rgb(247 154 50 / 0.15);
+    --semantic-amber-fg: #f79a32;
+    --semantic-amber-border: rgb(247 154 50 / 0.3);
 
-    --semantic-green-bg: rgb(34 197 94 / 0.15);
-    --semantic-green-fg: #4ade80;
-    --semantic-green-border: rgb(34 197 94 / 0.3);
+    --semantic-green-bg: rgb(136 155 74 / 0.18);
+    --semantic-green-fg: #a7c05a; /* brightened Kimbie olive for legibility */
+    --semantic-green-border: rgb(136 155 74 / 0.35);
 
-    --semantic-blue-bg: rgb(59 130 246 / 0.15);
-    --semantic-blue-fg: #60a5fa;
-    --semantic-blue-border: rgb(59 130 246 / 0.3);
+    --semantic-blue-bg: rgb(81 189 178 / 0.14);
+    --semantic-blue-fg: #51bdb2;
+    --semantic-blue-border: rgb(81 189 178 / 0.3);
 
-    --sidebar-background: #1e293b; /* slate-800 — matches --card, elevated above --background (DARK-03) */
-    --sidebar-foreground: #cbd5e1;
-    --sidebar-primary: #4ade80;
-    --sidebar-primary-foreground: #052e16;
-    --sidebar-accent: #14532d;
-    --sidebar-accent-foreground: #bbf7d0;
-    --sidebar-border: #334155; /* slate-700 — matches --border, visible edge (DARK-03) */
-    --sidebar-ring: #4ade80;
+    --sidebar-background: #15100a; /* matches --background — cohesive Kimbie canvas */
+    --sidebar-foreground: #a57a4c;
+    --sidebar-primary: #4ade80; /* PRESERVED */
+    --sidebar-primary-foreground: #052e16; /* PRESERVED */
+    --sidebar-accent: #332618; /* Kimbie muted cocoa — cohesive with --secondary / --border */
+    --sidebar-accent-foreground: #d3af86;
+    --sidebar-border: #1e1710; /* matches --card — subtle lift edge */
+    --sidebar-ring: #4ade80; /* PRESERVED */
   }
 }

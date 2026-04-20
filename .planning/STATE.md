@@ -4,8 +4,8 @@ milestone: v2.0
 milestone_name: Aloha Design System Retheme
 status: completed
 stopped_at: Phase 10 complete — v2.0 Aloha Design System Retheme SHIPPED
-last_updated: "2026-04-11T04:23:50.353Z"
-last_activity: 2026-04-11
+last_updated: "2026-04-20T20:20:03Z"
+last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 4
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-10
+Last activity: 2026-04-20 - Completed quick task 260420-mb0: Mobile navbar + drawer fixes (search + avatar menu + overlay blur removed)
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -149,6 +149,40 @@ None.
 |---|-------------|------|--------|-----------|
 | 260408-mj6 | Scheduler AG Grid with Register-style features | 2026-04-08 | 48b6015 | [260408-mj6-make-scheduler-table-an-aggrid-table-ins](./quick/260408-mj6-make-scheduler-table-an-aggrid-table-ins/) |
 | 260410-sl6 | Sidebar parity with aloha-design prototype | 2026-04-11 | c43a781 | [260410-sl6-sidebar-parity-with-aloha-design-prototy](./quick/260410-sl6-sidebar-parity-with-aloha-design-prototy/) |
+| 260416-n2y | Align tests+docs+impl on design branch per UI-RULES.md (update tests, drop dead getStatusVariant, document grid tokens) | 2026-04-16 | 20937f8 | [260416-n2y-align-tests-docs-impl-on-design-branch-p](./quick/260416-n2y-align-tests-docs-impl-on-design-branch-p/) |
+| 260416-ovx | Align DESIGN.md with UI-RULES.md companion (cross-ref, table-header weight exception, scope notes) | 2026-04-16 | cfec9da | [260416-ovx-align-design-md-with-design-branch-inten](./quick/260416-ovx-align-design-md-with-design-branch-inten/) |
+| 260416-p3e | Fix E2E Playwright setup (storageState path, webServer default, README) | 2026-04-16 | e063aa2 | [260416-p3e-fix-e2e-playwright-setup-storagestate-pa](./quick/260416-p3e-fix-e2e-playwright-setup-storagestate-pa/) |
+| 260416-ppa | Fix E2E auth setup cascade (dotenv loader, waitUntil, account slug docs) | 2026-04-16 | 617d1e3 | [260416-ppa-fix-e2e-auth-setup-cascade-dotenv-loader](./quick/260416-ppa-fix-e2e-auth-setup-cascade-dotenv-loader/) |
+| 260416-q6i | Fix module.tsx querying non-existent app_nav_sub_modules view; align docs | 2026-04-16 | 938a413 | [260416-q6i-fix-module-tsx-querying-non-existent-app](./quick/260416-q6i-fix-module-tsx-querying-non-existent-app/) |
+| 260416-u1s | Add UI-RULES.md cross-references to root CLAUDE.md | 2026-04-17 | b6b1964 | [260416-u1s-add-ui-rules-md-cross-references-to-root](./quick/260416-u1s-add-ui-rules-md-cross-references-to-root/) |
+| 260417-lbu | Navbar search bar should search active page table in addition to module/submodule navigation | 2026-04-17 | 7d8af43 | [260417-lbu-navbar-search-bar-should-search-active-p](./quick/260417-lbu-navbar-search-bar-should-search-active-p/) |
+| 260417-lqq | Navbar search UX polish: live filter, X clear, group separator, anchored popover below trigger | 2026-04-17 | 4e8c0f0 | [260417-lqq-navbar-search-ux-polish-live-filter-on-t](./quick/260417-lqq-navbar-search-ux-polish-live-filter-on-t/) |
+| 260417-mg2 | Fix navbar palette: wire Payroll/Housing filter and stop filtering dropdown items when active table registered | 2026-04-17 | d85cc1c | [260417-mg2-fix-navbar-palette-wire-payroll-housing-](./quick/260417-mg2-fix-navbar-palette-wire-payroll-housing-/) |
+| 260417-mwl | Convert Housing list + Housing detail tenants to AG Grid for parity with Register/Departments | 2026-04-17 | 7f84467 | [260417-mwl-convert-housing-list-housing-detail-tena](./quick/260417-mwl-convert-housing-list-housing-detail-tena/) |
+| 260417-nbq | Polish Housing AG Grid: restore summary cards, fix column order, avatar size, grid width | 2026-04-17 | b6d5145 | [260417-nbq-polish-housing-ag-grid-restore-summary-c](./quick/260417-nbq-polish-housing-ag-grid-restore-summary-c/) |
+| 260417-v9t | Replace scheduler's top-right toolbar "+" with floating bottom-right "+" per UI-RULES §Floating Create | 2026-04-18 | 04126a2 | [260417-v9t-replace-scheduler-s-top-right-toolbar-ic](./quick/260417-v9t-replace-scheduler-s-top-right-toolbar-ic/) |
+| 260417-vmj | Portal scheduler History button + week navigator into workspace navbar filter slot (History first) | 2026-04-18 | dd3978c | [260417-vmj-portal-scheduler-history-button-week-nav](./quick/260417-vmj-portal-scheduler-history-button-week-nav/) |
+| 260417-vw8 | Remove Housing detail stat cards + portal Payroll Comparison view toggle into workspace navbar | 2026-04-18 | 1db4405 | [260417-vw8-full-screen-tables-in-scheduler-payroll-](./quick/260417-vw8-full-screen-tables-in-scheduler-payroll-/) |
+| 260417-wd1 | Shrink Payroll Comp view toggle to icons; move to right-side navbar action slot (after search, left of avatar) | 2026-04-18 | 73bfdb9 | [260417-wd1-payroll-comp-view-toggle-make-icon-only-](./quick/260417-wd1-payroll-comp-view-toggle-make-icon-only-/) |
+| 260417-wgi | Lock navbar search centered via absolute positioning; move Payroll Comp toggle back to filter slot before Filters | 2026-04-18 | b0de5be | [260417-wgi-lock-navbar-search-centered-move-payroll](./quick/260417-wgi-lock-navbar-search-centered-move-payroll/) |
+| 260417-wi8 | Match navbar toggle + Filters button height to search bar (h-10) | 2026-04-18 | 631b111 | [260417-wi8-match-navbar-toggle-filters-height](./quick/260417-wi8-match-navbar-toggle-filters-height/) |
+| 260417-wjx | Cap navbar filter slot so Filters can't touch centered search (1rem gap) | 2026-04-18 | fd9eb50 | [260417-wjx-cap-navbar-filter-slot-width](./quick/260417-wjx-cap-navbar-filter-slot-width/) |
+| 260417-wm0 | Remove active-count badge from navbar Filters button (keep chip summary) | 2026-04-18 | 0ddf378 | [260417-wm0-remove-filters-active-count-badge](./quick/260417-wm0-remove-filters-active-count-badge/) |
+| 260417-wpd | Merge Payroll Comp + Payroll Data into one sidebar entry with 3-way toggle (Data \| Dept \| Employee) | 2026-04-18 | d68973b | [260417-wpd-merge-payroll-comp-data-3way-toggle](./quick/260417-wpd-merge-payroll-comp-data-3way-toggle/) |
+| 260417-wsh | Drop "Filters" label when button is active; keep icon + chip summary | 2026-04-18 | 3ecfcea | [260417-wsh-hide-filters-label-when-active](./quick/260417-wsh-hide-filters-label-when-active/) |
+| 260417-wti | Rename Payroll Comp to Payroll in UI navigation | 2026-04-18 | a370d76 | [260417-wti-rename-payroll-comp-to-payroll](./quick/260417-wti-rename-payroll-comp-to-payroll/) |
+| 260417-wvf | Remove padding around Housing list grid to match Payroll edge-to-edge | 2026-04-18 | 94dc613 | [260417-wvf-housing-list-edge-to-edge](./quick/260417-wvf-housing-list-edge-to-edge/) |
+| 260417-wyc | Inline tenants count in Housing detail header; edge-to-edge grid | 2026-04-18 | 0ec86b2 | [260417-wyc-housing-detail-inline-tenants-count](./quick/260417-wyc-housing-detail-inline-tenants-count/) |
+| 260417-x0t | Kill ghost zebra stripes in Housing detail tenants grid (autoHeight + sizeColumnsToFit) | 2026-04-18 | e95b035 | [260417-x0t-housing-detail-tenants-no-ghost-zebra](./quick/260417-x0t-housing-detail-tenants-no-ghost-zebra/) |
+| 260417-x3h | Remove global ghost zebra CSS fill; empty grid area now flat across all list views | 2026-04-18 | a690f77 | [260417-x3h-remove-ghost-zebra-css-globally](./quick/260417-x3h-remove-ghost-zebra-css-globally/) |
+| 260417-x5e | All AG Grid list views fit to width and refit on sidebar toggle | 2026-04-18 | 3693fb6 | [260417-x5e-grids-fit-width-on-resize](./quick/260417-x5e-grids-fit-width-on-resize/) |
+| 260417-x8e | Unpin TOTAL row on payroll grids; render as last scrolling row | 2026-04-18 | ebc6c37 | [260417-x8e-unpin-payroll-total-rows](./quick/260417-x8e-unpin-payroll-total-rows/) |
+| 260417-xat | Pretty pay-period filter labels; widen navbar filter popover | 2026-04-18 | 073657a | [260417-xat-pretty-pay-period-filter](./quick/260417-xat-pretty-pay-period-filter/) |
+| 260418-tz1 | Fix FormDateField timezone off-by-one in HST (UTC parse of yyyy-MM-dd) | 2026-04-18 | 23e62a6 | [260418-tz1-fix-date-picker-timezone](./quick/260418-tz1-fix-date-picker-timezone/) |
+| 260418-tz2 | Add datetime form field (hh:mm) for scheduler/task-tracker timestamp columns | 2026-04-18 | 6246d06 | [260418-tz2-add-datetime-field](./quick/260418-tz2-add-datetime-field/) |
+| 260418-tz3 | Time picker to Shadcn Selects (HH + MM) for consistent dropdown styling | 2026-04-18 | 36737ab | [260418-tz3-time-picker-shadcn-select](./quick/260418-tz3-time-picker-shadcn-select/) |
+| 260420-kd0 | Adopt Kimbie Dark palette app-wide for dark mode (light untouched, emerald brand preserved) | 2026-04-20 | 9ef3d6e | [260420-kd0-adopt-kimbie-dark-app-wide](./quick/260420-kd0-adopt-kimbie-dark-app-wide/) |
+| 260420-mb0 | Mobile navbar + drawer fixes: restore search, fix avatar to org-initials profile menu, drop overlay backdrop-blur, remove redundant mobile brand | 2026-04-20 | fbf529b | [260420-mb0-mobile-navbar-drawer-fixes](./quick/260420-mb0-mobile-navbar-drawer-fixes/) |
 
 ## Session Continuity
 

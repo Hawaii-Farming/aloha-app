@@ -40,7 +40,7 @@ export const hrHousingConfig: CrudModuleConfig<typeof hrHousingSchema> = {
       .replace(/^_|_$/g, '');
   },
 
-  viewType: { list: 'custom' },
+  viewType: { list: 'custom', detail: 'custom' },
 
   views: {
     list: 'app_hr_housing',
@@ -53,6 +53,7 @@ export const hrHousingConfig: CrudModuleConfig<typeof hrHousingSchema> = {
 
   customViews: {
     list: () => import('~/components/ag-grid/housing-map-view'),
+    detail: () => import('~/components/crud/housing-detail-view'),
   },
 
   search: {

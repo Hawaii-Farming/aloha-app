@@ -57,6 +57,7 @@ type FormFieldType =
   | 'textarea'
   | 'number'
   | 'date'
+  | 'datetime'
   | 'boolean'
   | 'select'
   | 'radio'

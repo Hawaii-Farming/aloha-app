@@ -1,10 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'node:path';
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+ * Load environment variables from the repo-root `.env` so auth.setup and
+ * per-test defaults can read E2E_USER_EMAIL, E2E_USER_PASSWORD,
+ * E2E_ACCOUNT_SLUG without requiring the user to export them in the shell.
  */
-// require('dotenv').config();
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -33,8 +36,9 @@ export default defineConfig({
     trace: 'on',
     navigationTimeout: 15 * 1000,
 
-    /* Reuse auth state saved by globalSetup */
-    storageState: 'e2e/.auth/user.json',
+    /* Reuse auth state saved by globalSetup.
+     * Path is relative to this config file (e2e/), not the repo root. */
+    storageState: '.auth/user.json',
   },
 
   // test timeout set to 2 minutes
@@ -70,15 +74,16 @@ export default defineConfig({
     // },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: process.env.PLAYWRIGHT_SERVER_COMMAND
-    ? {
-        cwd: '../',
-        command: process.env.PLAYWRIGHT_SERVER_COMMAND,
-        url: 'http://localhost:5173',
-        reuseExistingServer: !process.env.CI,
-        stdout: 'pipe',
-        stderr: 'pipe',
-      }
-    : undefined,
+  /* Run your local dev server before starting the tests.
+   * Defaults to `pnpm dev` (Vite HMR) for local runs; CI can override via
+   * PLAYWRIGHT_SERVER_COMMAND (e.g. `pnpm start` for the built server). */
+  webServer: {
+    cwd: '../',
+    command: process.env.PLAYWRIGHT_SERVER_COMMAND ?? 'pnpm dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+    stdout: 'pipe',
+    stderr: 'pipe',
+    timeout: 120 * 1000,
+  },
 });

@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';
 
 import { useFetcher, useRevalidator } from 'react-router';
@@ -36,7 +37,10 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
 
   const isSubmitting = fetcher.state !== 'idle';
 
-  const handleApprove = () => {
+  const handleApprove = (event: MouseEvent<HTMLButtonElement>) => {
+    // Prevent the AG Grid row-click-to-detail handler from firing when an
+    // action button inside the row is clicked.
+    event.stopPropagation();
     hasHandledCompletion.current = false;
     fetcher.submit(
       JSON.stringify({
@@ -53,7 +57,14 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
     );
   };
 
-  const handleDenyConfirm = () => {
+  const handleDenyTriggerClick = (event: MouseEvent<HTMLButtonElement>) => {
+    // Stop the click from bubbling to the row-click handler; let Radix
+    // handle opening the popover.
+    event.stopPropagation();
+  };
+
+  const handleDenyConfirm = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     hasHandledCompletion.current = false;
     fetcher.submit(
       JSON.stringify({
@@ -74,7 +85,10 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
   };
 
   return (
-    <div className="flex h-full items-center justify-center gap-1">
+    <div
+      className="flex h-full items-center justify-center gap-1"
+      onClick={(event) => event.stopPropagation()}
+    >
       <Button
         size="icon"
         variant="ghost"
@@ -93,6 +107,7 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
             variant="ghost"
             className="h-7 w-7 text-red-500 hover:bg-red-500/10 hover:text-red-400 dark:text-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
             disabled={isSubmitting}
+            onClick={handleDenyTriggerClick}
             data-test="deny-time-off"
           >
             <XCircle className="h-4 w-4" />

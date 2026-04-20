@@ -15,6 +15,7 @@ const apiRoutes = [
   route('api/schedule-history', 'routes/api/schedule-history.ts'),
   route('api/schedule-by-period', 'routes/api/schedule-by-period.ts'),
   route('api/housing-tenants', 'routes/api/housing-tenants.ts'),
+  route('api/housing-rooms', 'routes/api/housing-rooms.ts'),
 ];
 
 const authRoutes = [route('auth/sign-out', 'routes/auth/sign-out.ts')];

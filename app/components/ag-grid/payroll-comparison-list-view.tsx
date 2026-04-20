@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import { useLoaderData, useSearchParams } from 'react-router';
 
@@ -14,49 +14,40 @@ import type {
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
-import { PayPeriodFilter } from '~/components/ag-grid/pay-period-filter';
 import {
   CurrencyRenderer,
   hoursFormatter,
 } from '~/components/ag-grid/payroll-formatters';
 import { PayrollViewToggle } from '~/components/ag-grid/payroll-view-toggle';
-import { TableSearchInput } from '~/components/ag-grid/table-search-input';
+import { NavbarFilterButton } from '~/components/navbar-filter-button';
 import type { ListViewProps } from '~/lib/crud/types';
+import { formatPayPeriodLabel } from '~/lib/format/pay-period';
 
 type RowData = Record<string, unknown>;
-
-function fmtCurrency(v: number) {
-  const abs = Math.abs(v);
-  const formatted = abs.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  return v < 0 ? `($${formatted})` : `$${formatted}`;
-}
 
 function EmployeeDeptRenderer(props: CustomCellRendererProps) {
   const data = props.data as RowData | undefined;
   if (!data) return null;
 
   const fullName = String(data.full_name ?? data.employee_name ?? '');
-  const dept = data.department_name ? String(data.department_name) : '';
-
-  if (props.node.rowPinned === 'bottom') {
-    return <span className="font-bold">{fullName}</span>;
-  }
+  const pinned = props.node.rowPinned === 'bottom';
 
   return (
-    <div className="flex h-full flex-col justify-center leading-tight">
-      <span className="text-sm font-medium">{fullName}</span>
-      {dept && <span className="text-muted-foreground text-xs">{dept}</span>}
-    </div>
+    <span
+      className={`flex h-full items-center truncate text-sm ${pinned ? 'font-bold' : 'font-medium'}`}
+    >
+      {fullName}
+    </span>
   );
 }
 
@@ -65,171 +56,12 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
   return <AvatarRenderer {...props} />;
 }
 
-/** Inline detail table — shows individual payroll records */
-function PayrollDetailInner({ data }: { data: RowData }) {
-  const parentData = (data._parentData ?? data) as RowData;
-  const unsorted = parentData._detailRows as RowData[] | undefined;
-  // Show employee name column when expanding a department row
-  const isDeptGroup = Boolean(parentData.employee_count);
-  const rawRows = unsorted
-    ? [...unsorted].sort((a, b) =>
-        String(b.check_date ?? '').localeCompare(String(a.check_date ?? '')),
-      )
-    : undefined;
-
-  if (!rawRows || rawRows.length === 0) {
-    return (
-      <div className="text-muted-foreground px-6 py-4 text-sm">
-        No payroll records found.
-      </div>
-    );
-  }
-
-  const sumField = (field: string) =>
-    rawRows.reduce((sum, r) => sum + (Number(r[field]) || 0), 0);
-
-  return (
-    <div
-      className="border-border/40 mx-4 mt-2 mb-4 overflow-y-auto rounded-lg border"
-      style={{
-        height: '360px',
-        background:
-          'repeating-linear-gradient(0deg, transparent, transparent 27px, color-mix(in srgb, var(--color-border) 15%, transparent) 27px, color-mix(in srgb, var(--color-border) 15%, transparent) 28px)',
-        backgroundPositionY: '32px',
-      }}
-    >
-      <table
-        className="w-full text-xs"
-        style={{ borderCollapse: 'separate', borderSpacing: 0 }}
-      >
-        <thead className="sticky top-0 z-10">
-          <tr className="bg-muted/90 text-muted-foreground border-border/40 border-b text-[11px] tracking-wider uppercase backdrop-blur-sm">
-            {isDeptGroup && (
-              <th className="border-border/15 border-r px-3 py-2 text-left font-semibold">
-                Employee
-              </th>
-            )}
-            <th className="border-border/15 w-[110px] border-r px-3 py-2 text-left font-semibold">
-              Check Date
-            </th>
-            <th className="border-border/15 w-[200px] border-r px-3 py-2 text-left font-semibold">
-              Pay Period
-            </th>
-            <th className="border-border/15 w-[80px] border-r px-3 py-2 text-right font-semibold">
-              Reg Hrs
-            </th>
-            <th className="border-border/15 w-[80px] border-r px-3 py-2 text-right font-semibold">
-              OT Hrs
-            </th>
-            <th className="border-border/15 w-[80px] border-r px-3 py-2 text-right font-semibold">
-              Total Hrs
-            </th>
-            <th className="border-border/15 w-[120px] border-r px-3 py-2 text-right font-semibold">
-              Gross Wage
-            </th>
-            <th className="w-[120px] px-3 py-2 text-right font-semibold">
-              Net Pay
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rawRows.map((row, i) => {
-            const otHrs = Number(row.overtime_hours) || 0;
-            const isEven = i % 2 === 0;
-            return (
-              <tr
-                key={String(row.id ?? i)}
-                className="group transition-colors"
-                style={{
-                  background: isEven
-                    ? 'transparent'
-                    : 'var(--color-muted, rgba(128,128,128,0.06))',
-                }}
-              >
-                {isDeptGroup && (
-                  <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5 font-medium">
-                    {String(row.employee_name ?? row.full_name ?? '')}
-                  </td>
-                )}
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5">
-                  <span className="inline-block rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-600 shadow-sm dark:text-emerald-400">
-                    {String(row.check_date ?? '')}
-                  </span>
-                </td>
-                <td className="text-muted-foreground border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5">
-                  {String(row.pay_period_start ?? '')} –{' '}
-                  {String(row.pay_period_end ?? '')}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5 text-right tabular-nums">
-                  {(Number(row.regular_hours) || 0).toFixed(1)}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5 text-right tabular-nums">
-                  {otHrs > 0 ? (
-                    <span className="font-semibold text-amber-500">
-                      {otHrs.toFixed(1)}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground/40">—</span>
-                  )}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5 text-right font-semibold tabular-nums">
-                  {(Number(row.total_hours) || 0).toFixed(1)}
-                </td>
-                <td className="border-border/10 group-hover:bg-primary/5 border-r px-3 py-1.5 text-right font-mono tabular-nums">
-                  {fmtCurrency(Number(row.gross_wage) || 0)}
-                </td>
-                <td className="group-hover:bg-primary/5 px-3 py-1.5 text-right font-mono tabular-nums">
-                  {fmtCurrency(Number(row.net_pay) || 0)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-        <tfoot className="sticky bottom-0 z-10">
-          <tr className="bg-muted/90 border-border/40 border-t font-semibold backdrop-blur-sm">
-            <td
-              className="border-border/15 border-r px-3 py-2 text-[11px] tracking-wider uppercase"
-              colSpan={isDeptGroup ? 3 : 2}
-            >
-              <span className="text-primary">{rawRows.length}</span> record
-              {rawRows.length !== 1 ? 's' : ''}
-            </td>
-            <td className="border-border/15 border-r px-3 py-2 text-right tabular-nums">
-              {sumField('regular_hours').toFixed(1)}
-            </td>
-            <td className="border-border/15 border-r px-3 py-2 text-right tabular-nums">
-              {sumField('overtime_hours') > 0 ? (
-                <span className="text-amber-500">
-                  {sumField('overtime_hours').toFixed(1)}
-                </span>
-              ) : (
-                '0.0'
-              )}
-            </td>
-            <td className="border-border/15 border-r px-3 py-2 text-right tabular-nums">
-              {sumField('total_hours').toFixed(1)}
-            </td>
-            <td className="border-border/15 border-r px-3 py-2 text-right font-mono tabular-nums">
-              {fmtCurrency(sumField('gross_wage'))}
-            </td>
-            <td className="px-3 py-2 text-right font-mono tabular-nums">
-              {fmtCurrency(sumField('net_pay'))}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  );
-}
-
 // --- Column definitions ---
 
 const byDeptColDefs: ColDef[] = [
   {
     field: 'department_name',
     headerName: 'Department',
-    sortable: true,
-    filter: true,
     minWidth: 250,
   },
   {
@@ -312,8 +144,6 @@ const byEmployeeColDefs: ColDef[] = [
     field: 'full_name',
     headerName: 'Employee',
     cellRenderer: EmployeeDeptRenderer,
-    sortable: true,
-    filter: true,
     minWidth: 250,
     pinned: 'left',
   },
@@ -455,14 +285,23 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   const loaderData = useLoaderData() as RowData;
   const payPeriods = (loaderData.payPeriods ?? []) as RowData[];
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const currentView = searchParams.get('view') ?? 'by_task';
   const isByEmployee = currentView === 'by_employee';
+  const periodStart = searchParams.get('period_start') ?? '';
+  const periodEnd = searchParams.get('period_end') ?? '';
+  const periodValue =
+    periodStart && periodEnd ? `${periodStart}|${periodEnd}` : '';
+
+  const subModuleSlug = 'payroll_comp';
+  const { query } = useActiveTableSearch();
+  useRegisterActiveTable(
+    subModuleSlug,
+    props.subModuleDisplayName ?? 'Payroll Comparison',
+  );
 
   const gridRef = useRef<AgGridReact>(null);
-  const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const rawRows = tableData.data as RowData[];
 
@@ -507,37 +346,11 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     ];
   }, [groupedRows, isByEmployee]);
 
-  // Detail row expansion (by_employee only)
-  const detailComponent = useMemo(
-    () =>
-      function DetailRenderer({ data }: { data: RowData }) {
-        return <PayrollDetailInner data={data} />;
-      },
-    [],
-  );
-
-  const {
-    rowData: detailRowData,
-    isFullWidthRow,
-    fullWidthCellRenderer,
-    handleRowClicked: handleDetailRowClicked,
-    getRowId,
-  } = useDetailRow({
-    sourceData: groupedRows,
-    pkColumn: isByEmployee ? 'hr_employee_id' : 'department_name',
-    detailComponent,
-    gridRef,
-  });
-
-  const getRowHeight = useCallback((params: { data?: RowData }) => {
-    if (params.data?._isDetailRow) {
-      return 400;
-    }
-    return 52;
-  }, []);
-
   const getRowStyle = useCallback((params: RowClassParams) => {
-    if (params.node.rowPinned === 'bottom') {
+    const d = params.data as
+      | { full_name?: string; department_name?: string }
+      | undefined;
+    if (d?.full_name === 'TOTAL' || d?.department_name === 'TOTAL') {
       return { fontWeight: 'bold', background: 'var(--color-muted)' };
     }
     return undefined;
@@ -580,37 +393,48 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
-  const rowData = detailRowData as RowData[];
+  const rowData = [...groupedRows, ...totalsRow];
 
   return (
     <div
       className="flex min-h-0 flex-1 flex-col"
       data-test="payroll-comparison-list-view"
     >
-      {/* Toolbar */}
-      <div className="flex shrink-0 items-center justify-between gap-4 pb-4">
-        <div className="flex items-center gap-2">
-          <PayrollViewToggle />
-          <PayPeriodFilter periods={payPeriods} />
-        </div>
+      <PayrollViewToggle />
 
-        <div className="flex items-center gap-2">
-          <TableSearchInput
-            value={searchValue}
-            onChange={(value) => {
-              setSearchValue(value);
-              if (searchDebounceRef.current)
-                clearTimeout(searchDebounceRef.current);
-              searchDebounceRef.current = setTimeout(
-                () => setSearchValue(value),
-                300,
-              );
-            }}
-            placeholder="Search payroll..."
-            data-test="payroll-comparison-search"
-          />
-        </div>
-      </div>
+      <NavbarFilterButton
+        testKey="payroll-comparison-filter"
+        filters={[
+          {
+            key: 'period',
+            label: 'Pay Period',
+            allLabel: 'All Pay Periods',
+            value: periodValue,
+            onChange: (v) => {
+              const next = new URLSearchParams(searchParams);
+              if (v === '') {
+                next.delete('period_start');
+                next.delete('period_end');
+              } else {
+                const [start, end] = v.split('|');
+                if (start && end) {
+                  next.set('period_start', start);
+                  next.set('period_end', end);
+                }
+              }
+              setSearchParams(next, { preventScrollReset: true });
+            },
+            options: payPeriods.map((p) => {
+              const start = String(p.pay_period_start ?? '');
+              const end = String(p.pay_period_end ?? '');
+              return {
+                value: `${start}|${end}`,
+                label: formatPayPeriodLabel(start, end),
+              };
+            }),
+          },
+        ]}
+      />
 
       {/* Grid */}
       <div className="flex min-h-0 flex-1 flex-col">
@@ -618,15 +442,9 @@ export default function PayrollComparisonListView(props: ListViewProps) {
           gridRef={gridRef}
           colDefs={colDefs}
           rowData={rowData}
-          pinnedBottomRowData={totalsRow}
-          quickFilterText={searchValue}
+          quickFilterText={query}
           pagination={false}
           getRowStyle={getRowStyle}
-          onRowClicked={handleDetailRowClicked}
-          isFullWidthRow={isFullWidthRow}
-          fullWidthCellRenderer={fullWidthCellRenderer}
-          getRowId={getRowId}
-          getRowHeight={getRowHeight}
           onGridReady={handleGridReady}
           onColumnMoved={handleColumnMoved}
           onColumnResized={handleColumnResized}

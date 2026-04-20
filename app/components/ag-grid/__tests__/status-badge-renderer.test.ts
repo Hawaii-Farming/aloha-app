@@ -1,33 +1,26 @@
 import { describe, expect, it } from 'vitest';
 
-import { getStatusVariant } from '../cell-renderers/status-badge-renderer';
+import { StatusBadgeRenderer } from '../cell-renderers/status-badge-renderer';
 
-describe('getStatusVariant', () => {
-  it('maps approved to success variant', () => {
-    expect(getStatusVariant('approved')).toBe('success');
+describe('StatusBadgeRenderer', () => {
+  it('is exported as a function', () => {
+    expect(typeof StatusBadgeRenderer).toBe('function');
   });
 
-  it('maps active to success variant', () => {
-    expect(getStatusVariant('active')).toBe('success');
+  it('returns null for falsy values (null, undefined, empty string)', () => {
+    expect(StatusBadgeRenderer({ value: null } as never)).toBeNull();
+    expect(StatusBadgeRenderer({ value: undefined } as never)).toBeNull();
+    expect(StatusBadgeRenderer({ value: '' } as never)).toBeNull();
   });
 
-  it('maps pending to warning variant', () => {
-    expect(getStatusVariant('pending')).toBe('warning');
-  });
-
-  it('maps denied to destructive variant', () => {
-    expect(getStatusVariant('denied')).toBe('destructive');
-  });
-
-  it('maps rejected to destructive variant', () => {
-    expect(getStatusVariant('rejected')).toBe('destructive');
-  });
-
-  it('maps inactive to outline variant', () => {
-    expect(getStatusVariant('inactive')).toBe('outline');
-  });
-
-  it('falls back to secondary for unknown status', () => {
-    expect(getStatusVariant('unknown')).toBe('secondary');
+  it('returns a JSX span element for a non-empty string value', () => {
+    const out = StatusBadgeRenderer({ value: 'approved' } as never) as {
+      type: string;
+      props: { className: string; children: string };
+    } | null;
+    expect(out).not.toBeNull();
+    expect(out!.type).toBe('span');
+    expect(out!.props.className).toContain('capitalize');
+    expect(out!.props.children).toBe('approved');
   });
 });

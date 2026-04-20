@@ -20,7 +20,7 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, History, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
@@ -36,7 +36,7 @@ import {
 } from '~/components/ag-grid/column-state';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
-import { TableSearchInput } from '~/components/ag-grid/table-search-input';
+import { SchedulerNavbarTools } from '~/components/ag-grid/scheduler-navbar-tools';
 import { CreatePanel } from '~/components/crud/create-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
@@ -290,9 +290,7 @@ export default function SchedulerListView(props: ListViewProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [searchValue, setSearchValue] = useState('');
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentWeek = searchParams.get('week') ?? getCurrentWeekStart();
 
@@ -358,8 +356,6 @@ export default function SchedulerListView(props: ListViewProps) {
         field: 'full_name',
         cellRenderer: SchedulerEmployeeRenderer,
         minWidth: 220,
-        sortable: true,
-        filter: true,
         pinned: 'left' as const,
       },
       ...['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({
@@ -389,7 +385,6 @@ export default function SchedulerListView(props: ListViewProps) {
         headerName: 'Total Hrs',
         field: 'total_hours',
         cellRenderer: HoursHeatmapRenderer,
-        sortable: true,
         type: 'numericColumn',
         minWidth: 100,
       },
@@ -409,13 +404,11 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Date',
         field: 'date',
-        sortable: true,
         minWidth: 120,
       },
       {
         headerName: 'Employees',
         field: 'employee_count',
-        sortable: true,
         type: 'numericColumn',
         minWidth: 100,
       },
@@ -423,7 +416,6 @@ export default function SchedulerListView(props: ListViewProps) {
         headerName: 'Total Hours',
         field: 'total_hours',
         cellRenderer: HoursHeatmapRenderer,
-        sortable: true,
         type: 'numericColumn',
         minWidth: 110,
       },
@@ -511,15 +503,14 @@ export default function SchedulerListView(props: ListViewProps) {
     gridRef,
   });
 
+  // Only the expanded detail row (timeline) needs a custom height.
+  // Normal rows return undefined so AG Grid uses the theme default
+  // (driven by `rowVerticalPaddingScale` in ag-grid-theme.ts).
   const getRowHeight = useCallback(
-    (params: { data?: Record<string, unknown> }) => {
-      if (params.data?._isDetailRow) return 330;
-      return 52;
-    },
+    (params: { data?: Record<string, unknown> }) =>
+      params.data?._isDetailRow ? 330 : undefined,
     [],
   );
-
-  const getHistoryRowHeight = useCallback(() => 46, []);
 
   return (
     <>
@@ -527,79 +518,13 @@ export default function SchedulerListView(props: ListViewProps) {
         className="flex min-h-0 flex-1 flex-col"
         data-test="scheduler-list-view"
       >
-        {/* Toolbar — wraps on narrow viewports */}
-        <div className="flex shrink-0 flex-wrap items-center gap-2 pb-4">
-          <TableSearchInput
-            value={searchValue}
-            onChange={(value) => {
-              setSearchValue(value);
-              if (searchDebounceRef.current) {
-                clearTimeout(searchDebounceRef.current);
-              }
-              searchDebounceRef.current = setTimeout(() => {
-                setSearchValue(value);
-              }, 300);
-            }}
-            placeholder="Search scheduler..."
-            data-test="scheduler-search"
-          />
-
-          {/* Week navigator: a single pill with < | date | > */}
-          <div
-            className="border-border bg-background inline-flex items-center overflow-hidden rounded-full border"
-            data-test="week-navigator"
-          >
-            <button
-              type="button"
-              onClick={handlePrev}
-              aria-label="Previous week"
-              className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center transition-colors"
-              data-test="week-nav-prev"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={handleToday}
-              title="Jump to current week"
-              className="text-foreground hover:bg-muted border-border border-x px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
-              data-test="week-nav-today"
-            >
-              {formatWeekLabel(currentWeek)}
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              aria-label="Next week"
-              className="text-muted-foreground hover:text-foreground hover:bg-muted flex h-9 w-9 items-center justify-center transition-colors"
-              data-test="week-nav-next"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="ml-auto flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setHistoryOpen(true)}
-              data-test="history-toggle"
-              aria-label="History"
-              className="h-9 w-9 rounded-full p-0"
-            >
-              <History className="h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="brand"
-              onClick={() => setCreateOpen(true)}
-              data-test="sub-module-create-button"
-              aria-label="Create"
-              className="h-9 w-9 rounded-full p-0"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <SchedulerNavbarTools
+          weekLabel={formatWeekLabel(currentWeek)}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          onToday={handleToday}
+          onHistoryOpen={() => setHistoryOpen(true)}
+        />
 
         {/* Weekly Schedule — full width */}
         <div className="flex min-h-0 flex-1 flex-col">
@@ -608,7 +533,6 @@ export default function SchedulerListView(props: ListViewProps) {
             colDefs={colDefs}
             rowData={detailRowData as RowData[]}
             rowClassRules={otWarningRowClassRules}
-            quickFilterText={searchValue}
             onRowClicked={handleDetailRowClicked}
             isFullWidthRow={isFullWidthRow}
             fullWidthCellRenderer={fullWidthCellRenderer}
@@ -636,12 +560,23 @@ export default function SchedulerListView(props: ListViewProps) {
               rowData={historyData as unknown as RowData[]}
               loading={historyLoading}
               pagination={false}
-              getRowHeight={getHistoryRowHeight}
               emptyMessage="No schedule history found"
             />
           </div>
         </SheetContent>
       </Sheet>
+
+      {(config?.formFields?.length ?? 0) > 0 && (
+        <Button
+          variant="brand"
+          onClick={() => setCreateOpen(true)}
+          data-test="sub-module-create-button"
+          aria-label="Create"
+          className="fixed right-10 bottom-10 z-30 h-14 w-14 rounded-full p-0 shadow-lg"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      )}
 
       <CreatePanel
         open={createOpen}

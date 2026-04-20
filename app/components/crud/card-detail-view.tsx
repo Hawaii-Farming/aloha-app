@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 
-import { useFetcher } from 'react-router';
+import { useFetcher, useNavigate } from 'react-router';
 
-import { Calendar, Clock, Pencil, Trash2, User } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Trash2, User } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -15,10 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@aloha/ui/alert-dialog';
-import { Badge } from '@aloha/ui/badge';
 import { Button } from '@aloha/ui/button';
-import { Card, CardContent } from '@aloha/ui/card';
-import { PageBody } from '@aloha/ui/page';
 import { Separator } from '@aloha/ui/separator';
 import { Trans } from '@aloha/ui/trans';
 import { WorkflowHistory } from '@aloha/ui/workflow-history';
@@ -26,6 +23,7 @@ import { WorkflowStatusBadge } from '@aloha/ui/workflow-status-badge';
 import { WorkflowTransitionButtons } from '@aloha/ui/workflow-transition';
 
 import { EditPanel } from '~/components/crud/edit-panel';
+import { InlineField } from '~/components/crud/inline-field';
 import type {
   CrudModuleConfig,
   DetailViewProps,
@@ -33,16 +31,17 @@ import type {
 } from '~/lib/crud/types';
 import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
 import { AccessGate } from '~/lib/workspace/access-gate';
+import { useHasPermission } from '~/lib/workspace/use-module-access';
 
 function formatDate(value: string): string {
   const d = new Date(value);
-  return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
-/**
- * Build a map from FK field key to the flattened record key that holds the resolved name.
- * e.g. { hr_department_id: 'hr_department_name', compensation_manager_id: 'compensation_manager_id_preferred_name' }
- */
 function buildFkKeyMap(
   config: CrudModuleConfig,
   record: Record<string, unknown>,
@@ -54,9 +53,6 @@ function buildFkKeyMap(
 
   for (const field of fkFields) {
     const label = field.fkLabelColumn!;
-
-    // Try patterns in order of likelihood:
-    // 1. Self-join pattern: field_key + _ + fkLabelColumn (e.g. compensation_manager_id_preferred_name)
     const selfJoinKey = `${field.key}_${label}`;
 
     if (record[selfJoinKey] !== undefined) {
@@ -64,8 +60,6 @@ function buildFkKeyMap(
       continue;
     }
 
-    // 2. Alias pattern: table alias + _ + fkLabelColumn (e.g. hr_department_name)
-    // Strip _id suffix to get the likely alias base
     const baseKey = field.key.replace(/_id$/, '');
     const aliasKey = `${baseKey}_${label}`;
 
@@ -74,7 +68,6 @@ function buildFkKeyMap(
       continue;
     }
 
-    // 3. Search all record keys for one ending with _fkLabelColumn that contains the base
     for (const rk of Object.keys(record)) {
       if (rk.endsWith(`_${label}`) && rk.includes(baseKey)) {
         map[field.key] = rk;
@@ -91,12 +84,10 @@ function resolveFieldValue(
   record: Record<string, unknown>,
   fkKeyMap: Record<string, string>,
 ): string {
-  // For FK fields, use the pre-built map
   const fkRecordKey = fkKeyMap[field.key];
 
   if (field.type === 'fk' && fkRecordKey) {
     const resolved = record[fkRecordKey];
-
     if (resolved) return String(resolved);
   }
 
@@ -111,7 +102,6 @@ function resolveFieldValue(
     return formatDate(str);
   }
 
-  // Proper case for radio/select fields with known options
   if (
     (field.type === 'radio' || field.type === 'select') &&
     field.options?.length
@@ -119,7 +109,6 @@ function resolveFieldValue(
     const option = field.options.find(
       (o) => (typeof o === 'string' ? o : o.value) === str,
     );
-
     if (option) return typeof option === 'string' ? option : option.label;
   }
 
@@ -149,7 +138,6 @@ function getRecordSubtitle(
 ): string | null {
   const select = config.select ?? '';
 
-  // Try common subtitle fields
   if (record['preferred_name'] && record['first_name']) {
     return `"${record['preferred_name']}"`;
   }
@@ -186,7 +174,6 @@ function buildSections(formFields: FormFieldConfig[]): FieldSection[] {
 export function CardDetailView({
   record,
   config,
-  recordId,
   subModuleDisplayName,
   hasWorkflow,
   workflowConfig,
@@ -194,7 +181,9 @@ export function CardDetailView({
   comboboxOptions,
 }: DetailViewProps) {
   const fetcher = useFetcher();
+  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
+  const canEdit = useHasPermission('can_edit');
 
   const handleDelete = useCallback(() => {
     fetcher.submit(
@@ -229,189 +218,183 @@ export function CardDetailView({
 
   return (
     <>
-      <PageBody className="min-h-0 overflow-hidden">
-        <div
-          className="flex min-h-0 flex-1 flex-col"
-          data-test="crud-detail-page"
-        >
-          {/* Identity bar — frozen at top */}
-          <div className="shrink-0 pb-4">
-            <Card>
-              <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
-                    <User className="text-primary h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-semibold">{title}</h2>
-                    {subtitle && (
-                      <p className="text-muted-foreground text-sm">
-                        {subtitle}
-                      </p>
-                    )}
-                  </div>
+      <div
+        className="flex min-h-0 flex-1 flex-col"
+        data-test="crud-detail-page"
+      >
+        {/* Top bar: back + actions */}
+        <div className="border-border flex items-center justify-between border-b px-6 py-3">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
+            </button>
 
-                  {hasWorkflow && workflowConfig && (
-                    <WorkflowStatusBadge
-                      status={record[workflowConfig.statusColumn] as string}
-                      states={workflowConfig.states}
-                    />
-                  )}
-                </div>
+            <div className="bg-border h-5 w-px" />
 
-                <div className="flex items-center gap-2 sm:ml-auto">
-                  {hasWorkflow && workflowConfig && (
-                    <AccessGate permission="can_edit">
-                      <WorkflowTransitionButtons
-                        currentStatus={
-                          record[workflowConfig.statusColumn] as string
-                        }
-                        transitions={workflowConfig.transitions}
-                        states={workflowConfig.states}
-                        onTransition={handleTransition}
-                        disabled={fetcher.state !== 'idle'}
-                      />
-                    </AccessGate>
-                  )}
-
-                  <AccessGate permission="can_edit">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditOpen(true)}
-                    >
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                  </AccessGate>
-
-                  <AccessGate permission="can_delete">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          disabled={isDeleting}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            <Trans i18nKey="common:confirmDelete" />
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            <Trans i18nKey="common:confirmDeleteMessage" />
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>
-                            <Trans i18nKey="common:cancel" />
-                          </AlertDialogCancel>
-                          <AlertDialogAction onClick={handleDelete}>
-                            <Trans i18nKey="common:delete" />
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </AccessGate>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                <User className="text-primary h-4.5 w-4.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-foreground text-sm font-semibold">
+                  {title}
+                </span>
+                {subtitle && (
+                  <span className="text-muted-foreground ml-1.5 text-sm">
+                    {subtitle}
+                  </span>
+                )}
+              </div>
+              {hasWorkflow && workflowConfig && (
+                <WorkflowStatusBadge
+                  status={record[workflowConfig.statusColumn] as string}
+                  states={workflowConfig.states}
+                />
+              )}
+            </div>
           </div>
 
-          {/* Scrollable content */}
-          <div className="min-h-0 flex-1 overflow-y-auto pb-6">
-            <div className="flex flex-col gap-5">
-              {/* Workflow history */}
-              {hasWorkflow && workflowConfig && (
+          <div className="flex items-center gap-2">
+            {hasWorkflow && workflowConfig && (
+              <AccessGate permission="can_edit">
+                <WorkflowTransitionButtons
+                  currentStatus={record[workflowConfig.statusColumn] as string}
+                  transitions={workflowConfig.transitions}
+                  states={workflowConfig.states}
+                  onTransition={handleTransition}
+                  disabled={fetcher.state !== 'idle'}
+                />
+              </AccessGate>
+            )}
+
+            <AccessGate permission="can_edit">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditOpen(true)}
+              >
+                Edit
+              </Button>
+            </AccessGate>
+
+            <AccessGate permission="can_delete">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" disabled={isDeleting}>
+                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      <Trans i18nKey="common:confirmDelete" />
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <Trans i18nKey="common:confirmDeleteMessage" />
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>
+                      <Trans i18nKey="common:cancel" />
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>
+                      <Trans i18nKey="common:delete" />
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </AccessGate>
+          </div>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="px-8 py-8">
+            {/* Workflow history */}
+            {hasWorkflow && workflowConfig && (
+              <div className="mb-8">
                 <WorkflowHistory
                   entries={buildHistoryEntries(record, workflowConfig)}
                 />
-              )}
+              </div>
+            )}
 
-              {/* Sectioned fields */}
-              <Card>
-                <CardContent className="py-4">
-                  <div className="space-y-6">
-                    {sections.map((section, i) => (
-                      <div key={section.title ?? i}>
-                        {i > 0 && <Separator className="mb-6" />}
+            {/* Field sections */}
+            <div className="space-y-8">
+              {sections.map((section, i) => (
+                <div key={section.title ?? i}>
+                  {section.title && (
+                    <div className="mb-4 flex items-center gap-3">
+                      <h2 className="text-foreground text-base font-semibold tracking-wide">
+                        {section.title}
+                      </h2>
+                      <Separator className="flex-1" />
+                    </div>
+                  )}
 
-                        {section.title && (
-                          <h3 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
-                            {section.title}
-                          </h3>
-                        )}
+                  {!section.title && i > 0 && <Separator className="mb-4" />}
 
-                        <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
-                          {section.fields.map((field) => {
-                            const value = resolveFieldValue(
-                              field,
-                              record,
-                              fkKeyMap,
-                            );
-                            const isEmpty = value === '--';
+                  <div className="grid grid-cols-1 gap-x-12 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {section.fields.map((field) => {
+                      const value = resolveFieldValue(field, record, fkKeyMap);
+                      const fkOptionsForField =
+                        field.type === 'fk'
+                          ? (fkOptions?.[field.key] ?? [])
+                          : [];
+                      const comboboxOptionsForField =
+                        field.type === 'combobox'
+                          ? (comboboxOptions?.[field.key] ?? [])
+                          : [];
 
-                            return (
-                              <div key={field.key} className="min-w-0">
-                                <dt className="text-muted-foreground text-xs font-medium">
-                                  {field.label}
-                                </dt>
-                                <dd
-                                  className={`mt-0.5 truncate text-sm ${isEmpty ? 'text-muted-foreground/50' : ''}`}
-                                  title={value}
-                                >
-                                  {field.type === 'boolean' ? (
-                                    <Badge
-                                      variant={
-                                        record[field.key] === true
-                                          ? 'default'
-                                          : 'secondary'
-                                      }
-                                      className="mt-0.5"
-                                    >
-                                      {value}
-                                    </Badge>
-                                  ) : (
-                                    value
-                                  )}
-                                </dd>
-                              </div>
-                            );
-                          })}
+                      return (
+                        <div key={field.key} className="min-w-0">
+                          <dt className="text-muted-foreground mb-1 text-sm font-medium tracking-wider uppercase">
+                            {field.label}
+                          </dt>
+                          <dd>
+                            <InlineField
+                              field={field}
+                              displayValue={value}
+                              rawValue={record[field.key]}
+                              fkOptions={fkOptionsForField}
+                              comboboxOptions={comboboxOptionsForField}
+                              canEdit={canEdit}
+                            />
+                          </dd>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              ))}
+            </div>
 
-              {/* Audit footer */}
-              <div className="text-muted-foreground flex flex-wrap items-center gap-4 px-1 text-xs">
+            {/* Audit footer */}
+            <div className="border-border mt-10 border-t pt-4">
+              <div className="text-muted-foreground flex flex-wrap items-center gap-5 text-xs">
                 {typeof record['created_at'] === 'string' && (
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
                     Created {formatDate(record['created_at'])}
                   </span>
                 )}
                 {typeof record['updated_at'] === 'string' && (
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
                     Updated {formatDate(record['updated_at'])}
                   </span>
                 )}
-                <span className="text-muted-foreground/50">
-                  ID: {String(record[config.pkColumn ?? 'id'] ?? recordId)}
-                </span>
               </div>
             </div>
           </div>
         </div>
-      </PageBody>
+      </div>
 
       <EditPanel
         open={editOpen}

@@ -2,11 +2,15 @@
 import { iconSetMaterial, themeQuartz } from 'ag-grid-community';
 
 /**
- * Returns an AG Grid theme configured with Aloha/Phase-7 Supabase-inspired
- * design tokens for both light and dark modes. Uses the AG Grid v35 Theming
- * API (`themeQuartz.withParams`) — literal hex values only. AG Grid's
- * `withParams` does NOT resolve `var(--...)` references, so values are hard
- * coded to the Aloha palette.
+ * Returns an AG Grid theme configured with Aloha design tokens for both light
+ * and dark modes. Uses the AG Grid v35 Theming API (`themeQuartz.withParams`)
+ * — literal hex values only. AG Grid's `withParams` does NOT resolve
+ * `var(--...)` references, so values are hard coded to the Aloha palette.
+ *
+ * Light mode: Aloha slate/white/emerald.
+ * Dark mode:  Kimbie Dark (warm earth tones) — mirrors the `.dark` block in
+ * `app/styles/shadcn-ui.css`. When DESIGN.md dark tokens change, update both
+ * here and the test below.
  *
  * Font is unified with the rest of the app on Inter Variable (Phase 7
  * migration); AG Grid was the final divergent surface on Geist Variable.
@@ -18,13 +22,16 @@ const shared = {
     "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontSize: 14,
   headerFontSize: 13,
-  headerFontWeight: 500,
+  headerFontWeight: 700,
+  headerVerticalPaddingScale: 1,
   checkboxBorderRadius: 4,
-  rowVerticalPaddingScale: 1.6,
+  rowVerticalPaddingScale: 1.1,
   columnBorder: true,
   iconSize: 12,
   inputFocusBorder: 'solid 1px transparent',
   inputFocusShadow: 'none',
+  wrapperBorder: false,
+  wrapperBorderRadius: 0,
 } as const;
 
 export function getAgGridTheme() {
@@ -37,8 +44,8 @@ export function getAgGridTheme() {
         backgroundColor: '#ffffff',
         foregroundColor: '#0f172a',
         headerBackgroundColor: '#f1f5f9',
-        headerTextColor: '#475569',
-        borderColor: '#e2e8f0',
+        headerTextColor: '#1e293b',
+        borderColor: '#cbd5e1',
         accentColor: '#22c55e',
         rowHoverColor: '#f1f5f9',
         selectedRowBackgroundColor: '#f0fdf4',
@@ -50,15 +57,15 @@ export function getAgGridTheme() {
       {
         ...shared,
         browserColorScheme: 'dark',
-        backgroundColor: '#1e293b',
-        foregroundColor: '#f8fafc',
-        headerBackgroundColor: '#0f172a',
-        headerTextColor: '#cbd5e1',
-        borderColor: '#334155',
+        backgroundColor: '#1e1710',
+        foregroundColor: '#d3af86',
+        headerBackgroundColor: '#15100a',
+        headerTextColor: '#a57a4c',
+        borderColor: '#332618',
         accentColor: '#4ade80',
-        rowHoverColor: '#334155',
-        selectedRowBackgroundColor: 'rgba(34, 197, 94, 0.15)',
-        oddRowBackgroundColor: '#1e293b',
+        rowHoverColor: '#332618',
+        selectedRowBackgroundColor: 'rgba(74, 222, 128, 0.12)',
+        oddRowBackgroundColor: '#1e1710',
       },
       'dark',
     );

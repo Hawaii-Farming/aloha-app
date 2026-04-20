@@ -7,12 +7,14 @@ import { z } from 'zod';
 import { PageLayoutStyle } from '@aloha/ui/page';
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
+import { ActiveTableSearchProvider } from '~/components/active-table-search-context';
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
 import { WorkspaceMobileDrawer } from '~/components/workspace-shell/workspace-mobile-drawer';
 import { WorkspaceMobileHeader } from '~/components/workspace-shell/workspace-mobile-header';
 import { WorkspaceNavbar } from '~/components/workspace-shell/workspace-navbar';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
+import { buildNavbarSearchItems } from '~/lib/workspace/build-search-items';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import type { Route } from '~/types/app/routes/workspace/+types/layout';
 
@@ -39,7 +41,12 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
   const { layoutState, workspace, accountSlug } = props.loaderData;
 
   const user = workspace.user;
-  const userForShell = { email: user.email ?? null };
+
+  const searchItems = buildNavbarSearchItems({
+    account: accountSlug,
+    modules: workspace.navigation.modules,
+    subModules: workspace.navigation.subModules,
+  });
 
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -61,46 +68,49 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
 
   return (
     <SidebarProvider defaultOpen={layoutState.open}>
-      <div className="flex h-svh w-full flex-col">
-        <WorkspaceNavbar
-          account={accountSlug}
-          user={user}
-          orgName={workspace.currentOrg?.org_name ?? null}
-          navigation={workspace.navigation}
-          className="hidden md:flex"
-        />
-        <WorkspaceMobileHeader
-          user={userForShell}
-          onOpenDrawer={() => setDrawerOpen(true)}
-          drawerOpen={drawerOpen}
-          hamburgerRef={hamburgerRef}
-        />
+      <ActiveTableSearchProvider>
+        <div className="flex h-svh w-full flex-col">
+          <WorkspaceNavbar
+            user={user}
+            orgName={workspace.currentOrg?.org_name ?? null}
+            searchItems={searchItems}
+            className="hidden md:flex"
+          />
+          <WorkspaceMobileHeader
+            user={user}
+            orgName={workspace.currentOrg?.org_name ?? null}
+            searchItems={searchItems}
+            onOpenDrawer={() => setDrawerOpen(true)}
+            drawerOpen={drawerOpen}
+            hamburgerRef={hamburgerRef}
+          />
 
-        <div className="flex min-h-0 flex-1 overflow-hidden">
-          <div className="hidden md:block">
-            <WorkspaceSidebar
-              account={accountSlug}
-              navigation={workspace.navigation}
-              orgName={workspace.currentOrg?.org_name ?? null}
-              userEmail={user.email ?? null}
-            />
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            <div className="hidden md:block">
+              <WorkspaceSidebar
+                account={accountSlug}
+                navigation={workspace.navigation}
+                orgName={workspace.currentOrg?.org_name ?? null}
+                userEmail={user.email ?? null}
+              />
+            </div>
+
+            <main className="flex min-h-0 flex-1 flex-col">
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                <Outlet />
+              </div>
+            </main>
           </div>
 
-          <main className="flex min-h-0 flex-1 flex-col">
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
-              <Outlet />
-            </div>
-          </main>
+          <WorkspaceMobileDrawer
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            account={accountSlug}
+            navigation={workspace.navigation}
+            hamburgerRef={hamburgerRef}
+          />
         </div>
-
-        <WorkspaceMobileDrawer
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          account={accountSlug}
-          navigation={workspace.navigation}
-          hamburgerRef={hamburgerRef}
-        />
-      </div>
+      </ActiveTableSearchProvider>
     </SidebarProvider>
   );
 }

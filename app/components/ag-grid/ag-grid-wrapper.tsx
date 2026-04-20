@@ -144,16 +144,29 @@ function AgGridInner({
           defaultState: { pinned: null },
         });
       }
+      // Fit columns to the grid width on mount
+      setTimeout(() => {
+        event.api.sizeColumnsToFit();
+      }, 0);
     },
     [onGridReady, isMobile],
+  );
+
+  // Re-fit columns when the grid container resizes (e.g. sidebar toggle)
+  const handleGridSizeChanged = useCallback(
+    (event: { api: { sizeColumnsToFit: () => void } }) => {
+      event.api.sizeColumnsToFit();
+    },
+    [],
   );
 
   const defaultColDef = useMemo(
     () => ({
       resizable: true,
       sortable: true,
-      filter: true,
-      width: 120,
+      filter: false,
+      minWidth: 100,
+      autoHeaderHeight: true,
     }),
     [],
   );
@@ -204,7 +217,7 @@ function AgGridInner({
       ref={containerRef}
       data-ag-theme-mode={resolvedTheme === 'dark' ? 'dark' : 'light'}
       data-test="ag-grid-wrapper"
-      className="h-full w-full"
+      className="ag-grid-cell-borders h-full w-full"
       style={
         effectiveDomLayout === 'normal'
           ? { height: height ?? '100%' }
@@ -239,6 +252,7 @@ function AgGridInner({
           overlayNoRowsTemplate={emptyMessage ?? 'No records found'}
           rowSelection={rowSelection}
           onGridReady={handleGridReadyWithMobileUnpin}
+          onGridSizeChanged={handleGridSizeChanged}
           onSelectionChanged={onSelectionChanged}
           onColumnMoved={onColumnMoved}
           onColumnResized={onColumnResized}
