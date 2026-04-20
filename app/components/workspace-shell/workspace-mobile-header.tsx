@@ -55,6 +55,7 @@ export function WorkspaceMobileHeader({
       <div className="flex shrink-0 items-center gap-2">
         <NavbarSearch
           items={searchItems}
+          variant="mobile"
           renderTrigger={({ open }) => (
             <button
               type="button"

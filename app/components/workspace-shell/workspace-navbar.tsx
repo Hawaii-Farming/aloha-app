@@ -107,6 +107,7 @@ export function WorkspaceNavbar({
           <div className="pointer-events-auto w-full max-w-md">
             <NavbarSearch
               items={searchItems}
+              variant="desktop"
               renderTrigger={({ open }) => (
                 <button
                   type="button"

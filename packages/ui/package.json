@@ -85,6 +85,7 @@
     "./input-group": "./src/shadcn/input-group.tsx",
     "./button-group": "./src/shadcn/button-group.tsx",
     "./kbd": "./src/shadcn/kbd.tsx",
+    "./hooks/use-mobile": "./src/hooks/use-mobile.tsx",
     "./oauth-provider-logo-image": "./src/kit/oauth-provider-logo-image.tsx",
     "./utils": "./src/lib/utils/index.ts",
     "./if": "./src/kit/if.tsx",

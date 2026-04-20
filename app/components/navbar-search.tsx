@@ -19,6 +19,7 @@ import {
   CommandList,
   CommandSeparator,
 } from '@aloha/ui/command';
+import { useIsMobile } from '@aloha/ui/hooks/use-mobile';
 import { Kbd } from '@aloha/ui/kbd';
 import { Popover, PopoverAnchor, PopoverContent } from '@aloha/ui/popover';
 
@@ -36,6 +37,13 @@ export interface NavbarSearchItem {
 interface NavbarSearchProps {
   renderTrigger?: (props: { open: () => void; isMac: boolean }) => ReactNode;
   items?: NavbarSearchItem[];
+  /**
+   * Restrict this instance to a viewport. When set, the Cmd+K listener and
+   * the Popover only engage when the current viewport matches. Required when
+   * both desktop and mobile headers mount their own NavbarSearch — otherwise
+   * Cmd+K opens both popovers and the hidden trigger anchors to origin.
+   */
+  variant?: 'desktop' | 'mobile';
 }
 
 const GROUP_ORDER = ['Modules', 'Pages', 'Suggestions'] as const;
@@ -43,14 +51,23 @@ const GROUP_ORDER = ['Modules', 'Pages', 'Suggestions'] as const;
 export function NavbarSearch({
   renderTrigger,
   items = [],
+  variant,
 }: NavbarSearchProps = {}) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { activeTable, setQuery, clearQuery } = useActiveTableSearch();
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
+
+  // An instance is "active" only when its declared variant matches the
+  // current viewport. With no variant (legacy callers), always active.
+  const active =
+    variant === undefined ||
+    (variant === 'mobile' ? isMobile : !isMobile);
 
   useEffect(() => {
+    if (!active) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -60,7 +77,7 @@ export function NavbarSearch({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [active]);
 
   // Reset the controlled input each time the popover opens. cmdk clears its
   // internal filter on unmount, but controlled mode requires explicit reset
@@ -122,8 +139,10 @@ export function NavbarSearch({
     }
   };
 
+  // Force-close when the viewport no longer matches this variant (prevents
+  // a stale popover lingering after resize across the md breakpoint).
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={active && open} onOpenChange={(next) => setOpen(next)}>
       <PopoverAnchor asChild>
         {renderTrigger ? (
           renderTrigger({ open: () => setOpen(true), isMac })
