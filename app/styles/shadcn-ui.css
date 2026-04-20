@@ -99,7 +99,9 @@
     --secondary: #332618;
     --secondary-foreground: #d3af86;
 
-    --muted: #1e1710;
+    --muted: #0e0a06; /* Kimbie surface-muted — recessed below page bg so
+                         search triggers and muted surfaces separate from the
+                         #15100a canvas */
     --muted-foreground: #a57a4c;
 
     --accent: #332618;
@@ -114,9 +116,11 @@
 
     --gradient-primary: linear-gradient(
       135deg,
-      #4ade80,
-      #10b981
-    ); /* PRESERVED */
+      #22c55e,
+      #059669
+    ); /* Kimbie-tuned brand moment: green-500 → emerald-600 (same as light).
+          Deeper saturation reads as "brand" on warm cocoa surfaces without
+          the green-400 pop that felt too neon in Kimbie dark. */
 
     --chart-1: #4ade80;
     --chart-2: #10b981;
