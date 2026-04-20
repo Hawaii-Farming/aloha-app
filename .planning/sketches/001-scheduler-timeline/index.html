@@ -6,7 +6,7 @@
 <title>Sketch 001 — Scheduler Weekly Timeline</title>
 <link rel="preconnect" href="https://rsms.me/" />
 <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-<link rel="stylesheet" href="../themes/default.css" />
+<link id="theme-css" rel="stylesheet" href="../themes/default.css" />
 <style>
   /* ──────── Framing: navbar, frame, list-row ──────── */
   body { padding-top: 64px; }
@@ -404,8 +404,13 @@
 
 <!-- Toolbar -->
 <div id="sketch-tools">
-  <span class="label">theme</span>
+  <span class="label">mode</span>
   <button onclick="toggleTheme()">light / dark</button>
+  <span class="label">palette</span>
+  <select id="palette-picker" onchange="swapPalette(this.value)">
+    <option value="default">Aloha (slate)</option>
+    <option value="kimbie-dark">Kimbie Dark</option>
+  </select>
   <span class="label">tz</span>
   <select id="tz-picker" onchange="rerenderAll()">
     <option value="local" selected>Browser local</option>
@@ -437,6 +442,19 @@
   function toggleTheme() {
     document.documentElement.classList.toggle('dark');
     document.body.style.background = 'var(--color-bg)';
+  }
+
+  // ─────────── Palette swap (default ↔ kimbie-dark) ───────────
+  // Kimbie Dark overrides ONLY the .dark block. Light mode stays identical.
+  function swapPalette(name) {
+    const link = document.getElementById('theme-css');
+    link.href = `../themes/${name}.css`;
+    // If currently in light mode, auto-switch to dark so the user actually
+    // sees the Kimbie palette they just picked. Reverse if they pick default
+    // — leave the mode alone so they can still judge either side.
+    if (name === 'kimbie-dark' && !document.documentElement.classList.contains('dark')) {
+      document.documentElement.classList.add('dark');
+    }
   }
 
   // ─────────── Toast ───────────

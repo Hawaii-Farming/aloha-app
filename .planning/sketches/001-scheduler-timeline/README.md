@@ -21,7 +21,8 @@ open .planning/sketches/001-scheduler-timeline/index.html
 ```
 
 Toolbar at bottom-right:
-- **theme** — toggle light/dark
+- **mode** — toggle light/dark
+- **palette** — swap dark palette between **Aloha slate** (DESIGN.md default) and **Kimbie Dark** (warm earth tones from the Kimbie Dark VS Code theme). **Light mode is identical across both palettes — Kimbie only touches `.dark` tokens.** Picking Kimbie auto-flips to dark mode so you can see it immediately.
 - **tz** — re-zone the fake data (Browser local / Honolulu / Chicago / New York / UTC). All times re-render via `toLocaleTimeString` — watch the shift blocks slide as you change tz, and notice the Sun shift jumps days if you flip Honolulu ↔ New York. That's the bug we're fixing in the real app.
 - **hours** — change the displayed hour range (06–20 / 00–24 / 04–22). Only affects Variants A, B, C.
 
@@ -47,3 +48,11 @@ Toolbar at bottom-right:
 - Multi-employee comparison (this is the per-employee detail row; cross-employee comparison stays in the main AG Grid).
 - Overtime / break visualization — would layer onto the winner.
 - Mobile narrow — 330px height assumption + 7 columns implies desktop/tablet only; a mobile variant is a separate sketch.
+
+## Kimbie Dark palette (experimental)
+
+The **palette** dropdown in the toolbar offers a `Kimbie Dark` option for dark mode only. It uses the canonical Kimbie palette (warm browns, cream text, ochre/olive/teal accents) from the Kimbie Dark VS Code theme. Light mode is untouched.
+
+Design call: the Aloha emerald brand `--primary` and gradient are **preserved** in Kimbie dark so the CTA/active-pill still reads as Aloha green. If that clash feels wrong, the alternative is to swap `--primary` to Kimbie's own yellow `#f79a32` — requires a separate sketch round.
+
+Adopting Kimbie app-wide would require rewriting DESIGN.md §2 (dark foundation tokens table), re-auditing §9 (WCAG contrast pairs), and updating the app's global CSS theme block. This sketch is a **feel check** before committing to that.

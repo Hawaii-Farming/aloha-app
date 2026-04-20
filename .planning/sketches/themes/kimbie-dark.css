@@ -1,0 +1,141 @@
+/*
+ * Aloha sketch theme — Kimbie Dark variant
+ *
+ * LIGHT MODE: identical to default.css (light-first identity is untouched)
+ * DARK MODE:  Kimbie Dark palette — warm earth tones (browns, tans, ochres)
+ *             inspired by the Kimbie Dark VS Code theme.
+ *
+ * Brand decision: --primary and --gradient keep their emerald values so the
+ * Aloha green CTA still reads as brand even on Kimbie's warm surfaces.
+ * This preserves brand recognition when toggling between modes.
+ */
+
+/* ──────────────────────────────────────────────────────────────
+ *  :root  =  LIGHT MODE  (unchanged from default.css)
+ * ────────────────────────────────────────────────────────────── */
+:root {
+  --color-bg: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-dim: #94a3b8;
+
+  --color-primary: #22c55e;
+  --color-primary-fg: #ffffff;
+  --color-primary-hover: #16a34a;
+  --color-primary-wash: #f0fdf4;
+  --color-primary-wash-fg: #15803d;
+  --color-gradient: linear-gradient(135deg, #22c55e, #059669);
+
+  --color-amber: #d97706;
+  --color-amber-wash: #fffbeb;
+  --color-amber-border: #fef3c7;
+
+  --color-blue: #2563eb;
+  --color-blue-wash: #eff6ff;
+
+  --color-red: #dc2626;
+  --color-red-wash: #fef2f2;
+
+  --font-sans:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
+    sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', Menlo, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-md: 0.9375rem;
+  --text-lg: 1.0625rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+
+  --shadow-sm:
+    0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --shadow-md:
+    0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-lg:
+    0 12px 32px rgba(15, 23, 42, 0.1), 0 4px 8px rgba(15, 23, 42, 0.06);
+}
+
+/* ──────────────────────────────────────────────────────────────
+ *  .dark  =  KIMBIE DARK
+ *
+ *  Kimbie canonical palette (Heiko Cavelier / VS Code built-in):
+ *    bg            #221a0f    editor background
+ *    surface       #2a1d12    slightly lifted (cards, popovers)
+ *    surface-muted #1c150b    deeper recess
+ *    selection     #5e452b    highlight / active
+ *    border        #423523    hairline
+ *    text          #d3af86    foreground (cream/tan)
+ *    text-muted    #a57a4c    secondary
+ *    text-dim      #7c6246    tertiary
+ *    red           #dc3958
+ *    yellow/orange #f79a32    and #fbe45c
+ *    green         #889b4a    muted olive
+ *    teal/blue     #51bdb2
+ * ────────────────────────────────────────────────────────────── */
+.dark {
+  --color-bg: #221a0f;
+  --color-surface: #2a1d12;
+  --color-surface-muted: #1c150b;
+  --color-border: #423523;
+  --color-border-strong: #5e452b;
+  --color-text: #d3af86;
+  --color-text-muted: #a57a4c;
+  --color-text-dim: #7c6246;
+
+  /* Brand preserved: emerald on warm brown. If brand clash feels wrong,
+   * try switching to Kimbie's own yellow `#f79a32` as the primary. */
+  --color-primary: #4ade80;
+  --color-primary-fg: #052e16;
+  --color-primary-hover: #22c55e;
+  --color-primary-wash: rgba(74, 222, 128, 0.12);
+  --color-primary-wash-fg: #a7d69b;
+  --color-gradient: linear-gradient(135deg, #4ade80, #10b981);
+
+  /* Weekend accent uses Kimbie yellow-orange instead of cool amber */
+  --color-amber: #f79a32;
+  --color-amber-wash: rgba(247, 154, 50, 0.15);
+  --color-amber-border: rgba(247, 154, 50, 0.35);
+
+  --color-blue: #51bdb2;
+  --color-blue-wash: rgba(81, 189, 178, 0.14);
+
+  --color-red: #dc3958;
+  --color-red-wash: rgba(220, 57, 88, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+/* Resets — identical to default.css */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
