@@ -46,23 +46,26 @@
   textarea::placeholder {
     color: theme(--color-muted-foreground);
   }
+}
 
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active,
-  textarea:-webkit-autofill,
-  textarea:-webkit-autofill:hover,
-  textarea:-webkit-autofill:focus,
-  select:-webkit-autofill,
-  select:-webkit-autofill:hover,
-  select:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--foreground);
-    -webkit-box-shadow: 0 0 0 1000px var(--background) inset;
-    box-shadow: 0 0 0 1000px var(--background) inset;
-    caret-color: var(--foreground);
-    transition: background-color 5000s ease-in-out 0s;
-  }
+/* Browser autofill override — must live outside @layer base so it wins
+ * specificity against user-agent styles. Without !important the browser
+ * repaints inputs with a hardcoded white (or pale-yellow) background. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--foreground) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  caret-color: var(--foreground) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 @layer utilities {

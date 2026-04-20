@@ -24,6 +24,7 @@ export function PasswordInput(props: React.ComponentProps<'input'>) {
         data-test="password-input"
         type={showPassword ? 'text' : 'password'}
         placeholder={'************'}
+        className="text-sm"
         {...props}
       />
 

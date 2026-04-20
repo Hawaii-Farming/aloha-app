@@ -23,6 +23,7 @@ export function EmailInput(props: React.ComponentProps<'input'>) {
         required
         type="email"
         placeholder={t('emailPlaceholder')}
+        className="text-sm"
         {...props}
       />
     </InputGroup>
