@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useSearchParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 
 import type {
   ColDef,
@@ -25,6 +25,10 @@ import { Plus } from 'lucide-react';
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 
+import {
+  useActiveTableSearch,
+  useRegisterActiveTable,
+} from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import { HoursHeatmapRenderer } from '~/components/ag-grid/cell-renderers/hours-heatmap-renderer';
@@ -285,6 +289,10 @@ export default function SchedulerListView(props: ListViewProps) {
   const accountSlug = props.accountSlug;
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const params = useParams();
+  const subModuleSlug = params.subModule ?? 'scheduler';
+  useRegisterActiveTable(subModuleSlug, subModuleDisplayName ?? 'Scheduler');
+  const { query } = useActiveTableSearch();
   const gridRef = useRef<AgGridReact>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -539,6 +547,7 @@ export default function SchedulerListView(props: ListViewProps) {
             getRowId={getRowId}
             getRowHeight={getRowHeight}
             pagination={false}
+            quickFilterText={query}
             onGridReady={handleGridReady}
             onColumnMoved={handleColumnMoved}
             onColumnResized={handleColumnResized}
