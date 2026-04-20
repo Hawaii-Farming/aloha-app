@@ -63,8 +63,7 @@ export function NavbarSearch({
   // An instance is "active" only when its declared variant matches the
   // current viewport. With no variant (legacy callers), always active.
   const active =
-    variant === undefined ||
-    (variant === 'mobile' ? isMobile : !isMobile);
+    variant === undefined || (variant === 'mobile' ? isMobile : !isMobile);
 
   useEffect(() => {
     if (!active) return;
@@ -79,19 +78,11 @@ export function NavbarSearch({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [active]);
 
-  // Reset the controlled input each time the popover opens. cmdk clears its
-  // internal filter on unmount, but controlled mode requires explicit reset
-  // so the user starts with an empty palette every time. Justified useEffect
-  // per CLAUDE.md — observing the open→true transition is the only signal
-  // available (Popover does not fire an onOpen callback).
-  const lastOpenRef = useRef(open);
-  useEffect(() => {
-    if (open && !lastOpenRef.current) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- transition guarded by ref; runs only on closed→open
-      setInput('');
-    }
-    lastOpenRef.current = open;
-  }, [open]);
+  const handleOpenChange = (next: boolean) => {
+    // Reset the controlled input on open so the palette starts empty each time.
+    if (next) setInput('');
+    setOpen(next);
+  };
 
   const isMac =
     typeof navigator !== 'undefined' &&
@@ -142,7 +133,7 @@ export function NavbarSearch({
   // Force-close when the viewport no longer matches this variant (prevents
   // a stale popover lingering after resize across the md breakpoint).
   return (
-    <Popover open={active && open} onOpenChange={(next) => setOpen(next)}>
+    <Popover open={active && open} onOpenChange={handleOpenChange}>
       <PopoverAnchor asChild>
         {renderTrigger ? (
           renderTrigger({ open: () => setOpen(true), isMac })

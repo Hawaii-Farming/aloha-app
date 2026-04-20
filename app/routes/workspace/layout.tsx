@@ -8,13 +8,13 @@ import { PageLayoutStyle } from '@aloha/ui/page';
 import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
 import { ActiveTableSearchProvider } from '~/components/active-table-search-context';
-import type { NavbarSearchItem } from '~/components/navbar-search';
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
 import { WorkspaceMobileDrawer } from '~/components/workspace-shell/workspace-mobile-drawer';
 import { WorkspaceMobileHeader } from '~/components/workspace-shell/workspace-mobile-header';
 import { WorkspaceNavbar } from '~/components/workspace-shell/workspace-navbar';
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
+import { buildNavbarSearchItems } from '~/lib/workspace/build-search-items';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 import type { Route } from '~/types/app/routes/workspace/+types/layout';
 
@@ -42,18 +42,11 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
 
   const user = workspace.user;
 
-  const searchItems: NavbarSearchItem[] = [
-    ...workspace.navigation.modules.map((mod) => ({
-      path: `/home/${accountSlug}/${mod.module_slug}`,
-      label: mod.display_name,
-      group: 'Modules',
-    })),
-    ...workspace.navigation.subModules.map((sm) => ({
-      path: `/home/${accountSlug}/${sm.module_slug}/${sm.sub_module_slug}`,
-      label: sm.display_name,
-      group: 'Pages',
-    })),
-  ];
+  const searchItems = buildNavbarSearchItems({
+    account: accountSlug,
+    modules: workspace.navigation.modules,
+    subModules: workspace.navigation.subModules,
+  });
 
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -78,10 +71,9 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
       <ActiveTableSearchProvider>
         <div className="flex h-svh w-full flex-col">
           <WorkspaceNavbar
-            account={accountSlug}
             user={user}
             orgName={workspace.currentOrg?.org_name ?? null}
-            navigation={workspace.navigation}
+            searchItems={searchItems}
             className="hidden md:flex"
           />
           <WorkspaceMobileHeader

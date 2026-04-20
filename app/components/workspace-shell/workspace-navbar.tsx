@@ -10,18 +10,13 @@ import {
   NavbarSearch,
   type NavbarSearchItem,
 } from '~/components/navbar-search';
-import type { AppNavModule, AppNavSubModule } from '~/lib/workspace/types';
 
 import { WorkspaceNavbarProfileMenu } from './workspace-navbar-profile-menu';
 
 interface WorkspaceNavbarProps {
-  account: string;
   user: JwtPayload;
   orgName?: string | null;
-  navigation: {
-    modules: AppNavModule[];
-    subModules: AppNavSubModule[];
-  };
+  searchItems: NavbarSearchItem[];
   className?: string;
 }
 
@@ -68,25 +63,11 @@ function NavbarSidebarHeader() {
 }
 
 export function WorkspaceNavbar({
-  account,
   user,
   orgName,
-  navigation,
+  searchItems,
   className,
 }: WorkspaceNavbarProps) {
-  const searchItems: NavbarSearchItem[] = [
-    ...navigation.modules.map((mod) => ({
-      path: `/home/${account}/${mod.module_slug}`,
-      label: mod.display_name,
-      group: 'Modules',
-    })),
-    ...navigation.subModules.map((sm) => ({
-      path: `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`,
-      label: sm.display_name,
-      group: 'Pages',
-    })),
-  ];
-
   return (
     <header
       data-test="workspace-navbar"

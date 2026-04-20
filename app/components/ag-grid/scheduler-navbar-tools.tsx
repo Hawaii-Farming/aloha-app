@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-
 import { createPortal } from 'react-dom';
 
 import { ChevronLeft, ChevronRight, History } from 'lucide-react';
@@ -14,15 +12,13 @@ interface SchedulerNavbarToolsProps {
   onHistoryOpen: () => void;
 }
 
-// Resolve the navbar slot once on mount. The slot is rendered by
-// WorkspaceNavbar and is stable for the lifetime of the shell.
-function useNavbarFilterSlot(): HTMLElement | null {
-  const [el, setEl] = useState<HTMLElement | null>(null);
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot portal target lookup on mount
-    setEl(document.getElementById('workspace-navbar-filter-slot'));
-  }, []);
-  return el;
+// The slot is rendered by WorkspaceNavbar ahead of the Outlet, so it's
+// already in the DOM when the scheduler renders on the client. SSR returns
+// null (no document), which is fine since createPortal is client-only.
+function getNavbarFilterSlot(): HTMLElement | null {
+  return typeof document === 'undefined'
+    ? null
+    : document.getElementById('workspace-navbar-filter-slot');
 }
 
 export function SchedulerNavbarTools({
@@ -32,7 +28,7 @@ export function SchedulerNavbarTools({
   onToday,
   onHistoryOpen,
 }: SchedulerNavbarToolsProps) {
-  const slot = useNavbarFilterSlot();
+  const slot = getNavbarFilterSlot();
   if (!slot) return null;
 
   return createPortal(
