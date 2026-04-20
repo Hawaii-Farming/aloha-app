@@ -66,7 +66,7 @@ describe('getAgGridTheme', () => {
       expect(params.fontSize).toBe(14);
       expect(params.headerFontSize).toBe(13);
       expect(params.headerFontWeight).toBe(700);
-      expect(params.rowVerticalPaddingScale).toBe(1.6);
+      expect(params.rowVerticalPaddingScale).toBe(1.0);
     });
   });
 
@@ -93,7 +93,7 @@ describe('getAgGridTheme', () => {
       expect(params.fontSize).toBe(14);
       expect(params.headerFontSize).toBe(13);
       expect(params.headerFontWeight).toBe(700);
-      expect(params.rowVerticalPaddingScale).toBe(1.6);
+      expect(params.rowVerticalPaddingScale).toBe(1.0);
     });
   });
 });

@@ -25,7 +25,7 @@ const shared = {
   headerFontWeight: 700,
   headerVerticalPaddingScale: 1,
   checkboxBorderRadius: 4,
-  rowVerticalPaddingScale: 1.6,
+  rowVerticalPaddingScale: 1.0,
   columnBorder: true,
   iconSize: 12,
   inputFocusBorder: 'solid 1px transparent',
