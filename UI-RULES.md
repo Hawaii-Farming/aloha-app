@@ -42,6 +42,8 @@ Canonical hex lookups for the AG Grid theme. AG Grid v35's `themeQuartz.withPara
 | `accentColor`                | `#4ade80` |
 | `rowHoverColor`              | `#334155` |
 
+> **Note (2026-04-20, quick-260420-kd0):** The app-wide dark palette was swapped to Kimbie Dark (see `DESIGN.md §2`). The AG Grid dark theme above intentionally still uses slate-based hex values because `themeQuartz.withParams()` does not resolve CSS vars in AG Grid v35, so these values are hardcoded in `app/components/ag-grid/ag-grid-theme.ts` and asserted by `app/components/ag-grid/__tests__/ag-grid-theme.test.ts`. Syncing the AG Grid theme to Kimbie requires a paired TS + test edit and is tracked as a separate follow-up task (proposed slug `kd0-aggrid-dark-sync`). Until then, AG Grid tables in dark mode render slate-900/800/700 chrome while the rest of the app renders Kimbie warm earth — a known, documented mismatch.
+
 **Shared (both modes)**
 
 | Param                      | Value            |
