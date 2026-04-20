@@ -4,8 +4,8 @@ milestone: v2.0
 milestone_name: Aloha Design System Retheme
 status: completed
 stopped_at: Phase 10 complete — v2.0 Aloha Design System Retheme SHIPPED
-last_updated: "2026-04-11T04:23:50.353Z"
-last_activity: 2026-04-11
+last_updated: "2026-04-20T20:20:03Z"
+last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 4
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-20 - Completed quick task 260420-kd0: Adopt Kimbie Dark palette app-wide for dark mode
+Last activity: 2026-04-20 - Completed quick task 260420-mb0: Mobile navbar + drawer fixes (search + avatar menu + overlay blur removed)
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -182,6 +182,7 @@ None.
 | 260418-tz2 | Add datetime form field (hh:mm) for scheduler/task-tracker timestamp columns | 2026-04-18 | 6246d06 | [260418-tz2-add-datetime-field](./quick/260418-tz2-add-datetime-field/) |
 | 260418-tz3 | Time picker to Shadcn Selects (HH + MM) for consistent dropdown styling | 2026-04-18 | 36737ab | [260418-tz3-time-picker-shadcn-select](./quick/260418-tz3-time-picker-shadcn-select/) |
 | 260420-kd0 | Adopt Kimbie Dark palette app-wide for dark mode (light untouched, emerald brand preserved) | 2026-04-20 | 9ef3d6e | [260420-kd0-adopt-kimbie-dark-app-wide](./quick/260420-kd0-adopt-kimbie-dark-app-wide/) |
+| 260420-mb0 | Mobile navbar + drawer fixes: restore search, fix avatar to org-initials profile menu, drop overlay backdrop-blur, remove redundant mobile brand | 2026-04-20 | fbf529b | [260420-mb0-mobile-navbar-drawer-fixes](./quick/260420-mb0-mobile-navbar-drawer-fixes/) |
 
 ## Session Continuity
 
