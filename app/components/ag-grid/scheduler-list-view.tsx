@@ -506,12 +506,12 @@ export default function SchedulerListView(props: ListViewProps) {
   const getRowHeight = useCallback(
     (params: { data?: Record<string, unknown> }) => {
       if (params.data?._isDetailRow) return 330;
-      return 52;
+      return 44;
     },
     [],
   );
 
-  const getHistoryRowHeight = useCallback(() => 46, []);
+  const getHistoryRowHeight = useCallback(() => 40, []);
 
   return (
     <>
