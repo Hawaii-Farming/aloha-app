@@ -90,11 +90,11 @@
  *    teal/blue     #51bdb2
  * ────────────────────────────────────────────────────────────── */
 .dark {
-  --color-bg: #221a0f;
-  --color-surface: #2a1d12;
-  --color-surface-muted: #1c150b;
-  --color-border: #423523;
-  --color-border-strong: #5e452b;
+  --color-bg: #15100a;
+  --color-surface: #1e1710;
+  --color-surface-muted: #0e0a06;
+  --color-border: #332618;
+  --color-border-strong: #4a3620;
   --color-text: #d3af86;
   --color-text-muted: #a57a4c;
   --color-text-dim: #7c6246;
