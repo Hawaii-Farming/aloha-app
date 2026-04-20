@@ -113,7 +113,7 @@ export function WorkspaceNavbar({
                   onClick={open}
                   data-test="workspace-navbar-search-trigger"
                   aria-label="Open search"
-                  className="bg-muted text-muted-foreground/60 hover:bg-muted/80 hover:text-muted-foreground/80 flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 transition-colors dark:bg-slate-700"
+                  className="bg-muted text-muted-foreground/60 hover:bg-muted/80 hover:text-muted-foreground/80 flex w-full items-center gap-2 rounded-2xl px-4 py-2.5 transition-colors"
                 >
                   <Search size={16} />
                   <span className="text-sm">Search...</span>
