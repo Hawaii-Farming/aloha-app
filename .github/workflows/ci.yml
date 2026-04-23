@@ -66,6 +66,18 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # The Supabase schema now lives in the aloha-data-migrations repo. Pull
+      # its `supabase/` tree into place so `supabase start` / `db reset` can
+      # spin up a local stack identical to production for the E2E tests.
+      - name: Checkout schema from aloha-data-migrations
+        uses: actions/checkout@v5
+        with:
+          repository: Hawaii-Farming/aloha-data-migrations
+          path: _schema
+          ref: main
+
+      - run: cp -r _schema/supabase ./supabase
+
       - uses: supabase/setup-cli@v1
         with:
           version: latest
