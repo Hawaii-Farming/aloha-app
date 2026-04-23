@@ -10,7 +10,7 @@ import type {
 
 /**
  * Server-side guard: verifies the current user has access to the requested module.
- * Queries the app_navigation view (which pre-filters by auth.uid() and all 3 layers).
+ * Queries the hr_rba_navigation view (which pre-filters by auth.uid() and all 3 layers).
  * If no row is returned, the user has no access — throws 403 Response.
  */
 export async function requireModuleAccess(params: {
@@ -19,7 +19,7 @@ export async function requireModuleAccess(params: {
   orgSlug: string;
 }): Promise<NavModule> {
   const { data, error } = await params.client
-    .from('app_navigation' as never)
+    .from('hr_rba_navigation' as never)
     .select('*')
     .eq('org_id', params.orgSlug)
     .eq('module_slug', params.moduleSlug)
@@ -56,7 +56,7 @@ export async function requireModuleAccess(params: {
 
 /**
  * Server-side guard: verifies the current user has access to the requested sub-module.
- * Queries the app_navigation view filtered by org + module + sub-module.
+ * Queries the hr_rba_navigation view filtered by org + module + sub-module.
  * If no row is returned, the user has no access — throws 403 Response.
  */
 export async function requireSubModuleAccess(params: {
@@ -66,7 +66,7 @@ export async function requireSubModuleAccess(params: {
   orgSlug: string;
 }): Promise<NavSubModule> {
   const { data, error } = await params.client
-    .from('app_navigation' as never)
+    .from('hr_rba_navigation' as never)
     .select('*')
     .eq('org_id', params.orgSlug)
     .eq('module_slug', params.moduleSlug)

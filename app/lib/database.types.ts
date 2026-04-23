@@ -3047,7 +3047,7 @@ export type Database = {
             foreignKeyName: "hr_module_access_org_module_id_fkey"
             columns: ["org_module_id"]
             isOneToOne: false
-            referencedRelation: "app_navigation"
+            referencedRelation: "hr_rba_navigation"
             referencedColumns: ["module_id"]
           },
           {
@@ -5303,7 +5303,7 @@ export type Database = {
             foreignKeyName: "ops_template_org_module_id_fkey"
             columns: ["org_module_id"]
             isOneToOne: false
-            referencedRelation: "app_navigation"
+            referencedRelation: "hr_rba_navigation"
             referencedColumns: ["module_id"]
           },
           {
@@ -6150,7 +6150,7 @@ export type Database = {
             foreignKeyName: "org_module_sys_module_id_fkey"
             columns: ["sys_module_id"]
             isOneToOne: false
-            referencedRelation: "app_navigation"
+            referencedRelation: "hr_rba_navigation"
             referencedColumns: ["module_slug"]
           },
           {
@@ -6392,7 +6392,7 @@ export type Database = {
             foreignKeyName: "org_sub_module_sys_module_id_fkey"
             columns: ["sys_module_id"]
             isOneToOne: false
-            referencedRelation: "app_navigation"
+            referencedRelation: "hr_rba_navigation"
             referencedColumns: ["module_slug"]
           },
           {
@@ -6406,7 +6406,7 @@ export type Database = {
             foreignKeyName: "org_sub_module_sys_sub_module_id_fkey"
             columns: ["sys_sub_module_id"]
             isOneToOne: false
-            referencedRelation: "app_navigation"
+            referencedRelation: "hr_rba_navigation"
             referencedColumns: ["sub_module_slug"]
           },
           {
@@ -8554,7 +8554,7 @@ export type Database = {
             foreignKeyName: "sys_sub_module_sys_module_id_fkey"
             columns: ["sys_module_id"]
             isOneToOne: false
-            referencedRelation: "app_navigation"
+            referencedRelation: "hr_rba_navigation"
             referencedColumns: ["module_slug"]
           },
           {
@@ -9050,7 +9050,7 @@ export type Database = {
           },
         ]
       }
-      app_navigation: {
+      hr_rba_navigation: {
         Row: {
           can_delete: boolean | null
           can_edit: boolean | null
