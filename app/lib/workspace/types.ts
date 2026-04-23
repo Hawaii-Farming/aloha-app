@@ -1,4 +1,4 @@
-/** Row shape from app_navigation view */
+/** Row shape from hr_rba_navigation view */
 export interface AppNavigationRow {
   org_id: string;
   module_id: string;
@@ -14,7 +14,7 @@ export interface AppNavigationRow {
   can_verify: boolean;
 }
 
-/** Module derived from app_navigation rows (grouped by module_slug) */
+/** Module derived from hr_rba_navigation rows (grouped by module_slug) */
 export interface AppNavModule {
   module_id: string;
   org_id: string;
@@ -26,7 +26,7 @@ export interface AppNavModule {
   can_verify: boolean;
 }
 
-/** Sub-module derived from app_navigation rows */
+/** Sub-module derived from hr_rba_navigation rows */
 export interface AppNavSubModule {
   sub_module_id: string;
   org_id: string;

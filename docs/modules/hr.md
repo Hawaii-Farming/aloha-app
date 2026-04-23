@@ -2,7 +2,7 @@
 
 **Status:** HR is the only enabled module right now; all others are provisioned but disabled. Seven HR sub-modules are enabled: Register, Scheduler, Time Off, Payroll Comp, Payroll Data, Employee Review, Housing.
 
-**Module gate:** query `app_navigation` once per session; only rows with `module_slug = 'human_resources'` appear. `can_edit` / `can_delete` / `can_verify` flags ride on each row.
+**Module gate:** query `hr_rba_navigation` once per session; only rows with `module_slug = 'human_resources'` appear. `can_edit` / `can_delete` / `can_verify` flags ride on each row.
 
 ---
 

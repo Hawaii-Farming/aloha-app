@@ -69,14 +69,14 @@ export async function loadOrgWorkspace(params: {
   // Single view query — not in generated types, use queryUntypedView helper
   const { data: navRows, error: navError } = await queryUntypedView(
     params.client,
-    'app_navigation',
+    'hr_rba_navigation',
   )
     .select('*')
     .eq('org_id', params.orgSlug);
 
   if (navError) {
     console.error(
-      `[loadOrgWorkspace] app_navigation query failed for org ${params.orgSlug}:`,
+      `[loadOrgWorkspace] hr_rba_navigation query failed for org ${params.orgSlug}:`,
       navError,
     );
     throw new Response('Failed to load workspace navigation', { status: 500 });

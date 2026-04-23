@@ -449,7 +449,7 @@ See `.planning/PROJECT.md` for current milestone scope, requirements, and constr
 - Location: `supabase/schemas/`, `supabase/migrations/`, `app/lib/database.types.ts` (generated)
 - Contains: PostgreSQL 15 tables, RLS policies, views, functions, TypeScript types
 - Accessed via: `getSupabaseServerClient(request)` (server), `useSupabase()` hook (client)
-- Views enforce tenant isolation: `app_org_context`, `app_navigation`, `app_user_orgs`
+- Views enforce tenant isolation: `app_org_context`, `hr_rba_navigation`, `app_user_orgs`
 - Purpose: App-wide and feature-specific settings
 - Location: `app/config/*.config.ts` and `app/config/*.config.tsx`
 - Contains: App metadata, feature flags, auth providers, module-to-icon mappings, workspace navigation structure
@@ -488,7 +488,7 @@ See `.planning/PROJECT.md` for current milestone scope, requirements, and constr
 - Returns: `{ success: true, data }` or `{ success: false, errors | error }`
 - Purpose: Enforce tenant isolation and permission checks
 - Location: `supabase/schemas/*.sql`
-- Examples: `app_org_context` (current org), `app_navigation` (modules user can access), `app_user_orgs` (all orgs user belongs to)
+- Examples: `app_org_context` (current org), `hr_rba_navigation` (modules user can access), `app_user_orgs` (all orgs user belongs to)
 - Pattern: Views use `auth.uid()` and `hr_employee` membership to automatically filter rows
 - Usage: Loaders query views (not in generated types, use `queryUntypedView()` helper), cast result to app types
 - Purpose: Prevent cross-site request forgery on form submissions
