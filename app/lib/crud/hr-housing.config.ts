@@ -43,8 +43,9 @@ export const hrHousingConfig: CrudModuleConfig<typeof hrHousingSchema> = {
   viewType: { list: 'custom', detail: 'custom' },
 
   views: {
-    list: 'org_site_housing',
-    detail: 'org_site_housing',
+    // Wrapping view exposes derived tenant_count / available_beds.
+    list: 'org_site_housing_tenant_count',
+    detail: 'org_site_housing_tenant_count',
   },
 
   columns: housingColumns,
