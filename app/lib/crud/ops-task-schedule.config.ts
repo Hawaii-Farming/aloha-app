@@ -64,7 +64,7 @@ export const opsTaskScheduleConfig: CrudModuleConfig<
       type: 'fk',
       required: true,
       fkTable: 'ops_task',
-      fkLabelColumn: 'name',
+      fkLabelColumn: 'id',
     },
     {
       key: 'start_time',

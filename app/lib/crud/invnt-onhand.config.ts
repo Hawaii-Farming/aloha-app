@@ -62,7 +62,7 @@ export const invntOnhandConfig: CrudModuleConfig<typeof invntOnhandSchema> = {
       type: 'fk',
       required: true,
       fkTable: 'invnt_item',
-      fkLabelColumn: 'name',
+      fkLabelColumn: 'id',
     },
     { key: 'onhand_date', label: 'Date', type: 'date', required: true },
     {

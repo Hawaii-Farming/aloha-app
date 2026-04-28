@@ -33,7 +33,7 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
   }
   /* eslint-enable react-hooks/refs */
 
-  if (status !== 'pending' || !id) return null;
+  if (status !== 'Pending' || !id) return null;
 
   const isSubmitting = fetcher.state !== 'idle';
 
@@ -47,7 +47,7 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
         intent: 'bulk_transition',
         ids: [id],
         statusColumn: 'status',
-        newStatus: 'approved',
+        newStatus: 'Approved',
         transitionFields: {
           reviewed_by: 'currentEmployee',
           reviewed_at: 'now',
@@ -71,7 +71,7 @@ function TimeOffActionsRenderer(props: CustomCellRendererProps) {
         intent: 'bulk_transition',
         ids: [id],
         statusColumn: 'status',
-        newStatus: 'denied',
+        newStatus: 'Denied',
         transitionFields: {
           reviewed_by: 'currentEmployee',
           reviewed_at: 'now',

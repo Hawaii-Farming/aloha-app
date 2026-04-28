@@ -147,7 +147,6 @@ function groupByEmployee(rows: RowData[]): RowData[] {
         profile_photo_url: row.profile_photo_url,
         department_name: row.department_name,
         compensation_manager_id: row.compensation_manager_id,
-        compensation_manager_name: row.compensation_manager_name,
         regular_hours: Number(row.regular_hours) || 0,
         overtime_hours: Number(row.overtime_hours) || 0,
         total_hours: Number(row.total_hours) || 0,
@@ -349,7 +348,7 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
             },
             options: managers.map((m) => ({
               value: String(m.compensation_manager_id),
-              label: String(m.compensation_manager_name ?? 'Unknown'),
+              label: String(m.compensation_manager_id ?? 'Unknown'),
             })),
           },
           {

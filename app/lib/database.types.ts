@@ -39,6 +39,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      auth_link_log: {
+        Row: {
+          auth_user_id: string
+          employee_id: string
+          id: string
+          linked_at: string
+        }
+        Insert: {
+          auth_user_id: string
+          employee_id: string
+          id?: string
+          linked_at?: string
+        }
+        Update: {
+          auth_user_id?: string
+          employee_id?: string
+          id?: string
+          linked_at?: string
+        }
+        Relationships: []
+      }
+      fin_expense: {
+        Row: {
+          account_name: string | null
+          account_ref: string | null
+          amount: number | null
+          class_name: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          effective_amount: number | null
+          farm_id: string | null
+          id: string
+          is_credit: boolean
+          is_deleted: boolean
+          macro_category: string | null
+          notes: string | null
+          org_id: string
+          payee_name: string | null
+          txn_date: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          account_name?: string | null
+          account_ref?: string | null
+          amount?: number | null
+          class_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          effective_amount?: number | null
+          farm_id?: string | null
+          id?: string
+          is_credit?: boolean
+          is_deleted?: boolean
+          macro_category?: string | null
+          notes?: string | null
+          org_id: string
+          payee_name?: string | null
+          txn_date: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          account_name?: string | null
+          account_ref?: string | null
+          amount?: number | null
+          class_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          effective_amount?: number | null
+          farm_id?: string | null
+          id?: string
+          is_credit?: boolean
+          is_deleted?: boolean
+          macro_category?: string | null
+          notes?: string | null
+          org_id?: string
+          payee_name?: string | null
+          txn_date?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fin_expense_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fin_expense_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fsafe_lab: {
         Row: {
           created_at: string
@@ -46,7 +148,6 @@ export type Database = {
           description: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -57,7 +158,6 @@ export type Database = {
           description?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -68,7 +168,6 @@ export type Database = {
           description?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -101,7 +200,6 @@ export type Database = {
           result_type: string
           test_description: string | null
           test_methods: Json
-          test_name: string
           updated_at: string
           updated_by: string | null
         }
@@ -122,7 +220,6 @@ export type Database = {
           result_type: string
           test_description?: string | null
           test_methods?: Json
-          test_name: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -143,7 +240,6 @@ export type Database = {
           result_type?: string
           test_description?: string | null
           test_methods?: Json
-          test_name?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -230,13 +326,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fsafe_pest_result_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -405,13 +494,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fsafe_result_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -588,6 +670,267 @@ export type Database = {
           },
         ]
       }
+      grow_cuke_gh_row_planting: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          grow_variety_id: string
+          grow_variety_id_2: string | null
+          id: string
+          is_deleted: boolean
+          notes: string | null
+          num_bags: number | null
+          org_id: string
+          org_site_cuke_gh_row_id: string
+          plants_per_bag: number
+          scenario: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          grow_variety_id: string
+          grow_variety_id_2?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          num_bags?: number | null
+          org_id: string
+          org_site_cuke_gh_row_id: string
+          plants_per_bag: number
+          scenario: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          grow_variety_id?: string
+          grow_variety_id_2?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          num_bags?: number | null
+          org_id?: string
+          org_site_cuke_gh_row_id?: string
+          plants_per_bag?: number
+          scenario?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_grow_cuke_gh_row_planting_row"
+            columns: ["org_site_cuke_gh_row_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_cuke_gh_row"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_grow_cuke_gh_row_planting_variety_primary"
+            columns: ["grow_variety_id"]
+            isOneToOne: false
+            referencedRelation: "grow_variety"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_grow_cuke_gh_row_planting_variety_secondary"
+            columns: ["grow_variety_id_2"]
+            isOneToOne: false
+            referencedRelation: "grow_variety"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_cuke_gh_row_planting_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_cuke_gh_row_planting_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_cuke_rotation: {
+        Row: {
+          anchor_week_start: string | null
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          id: string
+          is_anchor: boolean
+          is_deleted: boolean
+          notes: string | null
+          org_id: string
+          site_id: string
+          slot_num: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          anchor_week_start?: string | null
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          id?: string
+          is_anchor?: boolean
+          is_deleted?: boolean
+          notes?: string | null
+          org_id: string
+          site_id: string
+          slot_num: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          anchor_week_start?: string | null
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          id?: string
+          is_anchor?: boolean
+          is_deleted?: boolean
+          notes?: string | null
+          org_id?: string
+          site_id?: string
+          slot_num?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_cuke_rotation_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_cuke_gh"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_cuke_seed_batch: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          grow_trial_type_id: string | null
+          id: string
+          invnt_item_id: string | null
+          invnt_lot_id: string | null
+          is_deleted: boolean
+          next_bag_change_date: string | null
+          notes: string | null
+          ops_task_tracker_id: string | null
+          org_id: string
+          rows_4_per_bag: number
+          rows_5_per_bag: number
+          seeding_date: string
+          seeds: number
+          site_id: string | null
+          status: string
+          transplant_date: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          grow_trial_type_id?: string | null
+          id?: string
+          invnt_item_id?: string | null
+          invnt_lot_id?: string | null
+          is_deleted?: boolean
+          next_bag_change_date?: string | null
+          notes?: string | null
+          ops_task_tracker_id?: string | null
+          org_id: string
+          rows_4_per_bag?: number
+          rows_5_per_bag?: number
+          seeding_date: string
+          seeds: number
+          site_id?: string | null
+          status?: string
+          transplant_date: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          grow_trial_type_id?: string | null
+          id?: string
+          invnt_item_id?: string | null
+          invnt_lot_id?: string | null
+          is_deleted?: boolean
+          next_bag_change_date?: string | null
+          notes?: string | null
+          ops_task_tracker_id?: string | null
+          org_id?: string
+          rows_4_per_bag?: number
+          rows_5_per_bag?: number
+          seeding_date?: string
+          seeds?: number
+          site_id?: string | null
+          status?: string
+          transplant_date?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_cuke_seed_batch_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_cuke_seed_batch_grow_trial_type_id_fkey"
+            columns: ["grow_trial_type_id"]
+            isOneToOne: false
+            referencedRelation: "grow_trial_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_cuke_seed_batch_invnt_item_id_fkey"
+            columns: ["invnt_item_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_item"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_cuke_seed_batch_invnt_item_id_fkey"
+            columns: ["invnt_item_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_item_summary"
+            referencedColumns: ["invnt_item_id"]
+          },
+          {
+            foreignKeyName: "grow_cuke_seed_batch_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_cuke_seed_batch_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_cuke_gh"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grow_cycle_pattern: {
         Row: {
           created_at: string
@@ -596,7 +939,6 @@ export type Database = {
           farm_id: string
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -608,7 +950,6 @@ export type Database = {
           farm_id: string
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -620,7 +961,6 @@ export type Database = {
           farm_id?: string
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -649,7 +989,6 @@ export type Database = {
           description: string | null
           id: string
           is_deleted: boolean
-          name: string
           updated_at: string
           updated_by: string | null
         }
@@ -659,7 +998,6 @@ export type Database = {
           description?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -669,7 +1007,6 @@ export type Database = {
           description?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -679,7 +1016,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
-          equipment_id: string
+          equipment_id: string | null
           farm_id: string
           grow_fertigation_recipe_id: string
           id: string
@@ -694,7 +1031,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
-          equipment_id: string
+          equipment_id?: string | null
           farm_id: string
           grow_fertigation_recipe_id: string
           id?: string
@@ -709,7 +1046,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
-          equipment_id?: string
+          equipment_id?: string | null
           farm_id?: string
           grow_fertigation_recipe_id?: string
           id?: string
@@ -762,7 +1099,7 @@ export type Database = {
             columns: ["volume_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -774,7 +1111,6 @@ export type Database = {
           farm_id: string
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -786,7 +1122,6 @@ export type Database = {
           farm_id: string
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -798,7 +1133,6 @@ export type Database = {
           farm_id?: string
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -828,7 +1162,7 @@ export type Database = {
           burn_uom: string | null
           created_at: string
           created_by: string | null
-          equipment_id: string
+          equipment_id: string | null
           farm_id: string
           grow_fertigation_recipe_id: string
           id: string
@@ -847,7 +1181,7 @@ export type Database = {
           burn_uom?: string | null
           created_at?: string
           created_by?: string | null
-          equipment_id: string
+          equipment_id?: string | null
           farm_id: string
           grow_fertigation_recipe_id: string
           id?: string
@@ -866,7 +1200,7 @@ export type Database = {
           burn_uom?: string | null
           created_at?: string
           created_by?: string | null
-          equipment_id?: string
+          equipment_id?: string | null
           farm_id?: string
           grow_fertigation_recipe_id?: string
           id?: string
@@ -884,14 +1218,14 @@ export type Database = {
             columns: ["application_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "grow_fertigation_recipe_item_burn_uom_fkey"
             columns: ["burn_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "grow_fertigation_recipe_item_equipment_id_fkey"
@@ -1000,13 +1334,6 @@ export type Database = {
             foreignKeyName: "grow_fertigation_recipe_site_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_fertigation_recipe_site_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -1014,7 +1341,6 @@ export type Database = {
       }
       grow_grade: {
         Row: {
-          code: string
           created_at: string
           created_by: string | null
           farm_id: string
@@ -1026,7 +1352,6 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
-          code: string
           created_at?: string
           created_by?: string | null
           farm_id: string
@@ -1038,7 +1363,6 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
-          code?: string
           created_at?: string
           created_by?: string | null
           farm_id?: string
@@ -1075,9 +1399,11 @@ export type Database = {
           grow_variety_id: string | null
           id: string
           is_deleted: boolean
-          name: string
+          is_tare_calculated: boolean
           org_id: string
-          tare_weight: number
+          tare_formula: string | null
+          tare_formula_inputs: Json | null
+          tare_weight: number | null
           updated_at: string
           updated_by: string | null
           weight_uom: string
@@ -1090,9 +1416,11 @@ export type Database = {
           grow_variety_id?: string | null
           id: string
           is_deleted?: boolean
-          name: string
+          is_tare_calculated?: boolean
           org_id: string
-          tare_weight: number
+          tare_formula?: string | null
+          tare_formula_inputs?: Json | null
+          tare_weight?: number | null
           updated_at?: string
           updated_by?: string | null
           weight_uom: string
@@ -1105,9 +1433,11 @@ export type Database = {
           grow_variety_id?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
+          is_tare_calculated?: boolean
           org_id?: string
-          tare_weight?: number
+          tare_formula?: string | null
+          tare_formula_inputs?: Json | null
+          tare_weight?: number | null
           updated_at?: string
           updated_by?: string | null
           weight_uom?: string
@@ -1146,7 +1476,7 @@ export type Database = {
             columns: ["weight_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1156,9 +1486,10 @@ export type Database = {
           created_by: string | null
           farm_id: string
           gross_weight: number
+          grow_cuke_seed_batch_id: string | null
           grow_grade_id: string | null
           grow_harvest_container_id: string
-          grow_seed_batch_id: string
+          grow_lettuce_seed_batch_id: string | null
           harvest_date: string
           id: string
           is_deleted: boolean
@@ -1176,9 +1507,10 @@ export type Database = {
           created_by?: string | null
           farm_id: string
           gross_weight: number
+          grow_cuke_seed_batch_id?: string | null
           grow_grade_id?: string | null
           grow_harvest_container_id: string
-          grow_seed_batch_id: string
+          grow_lettuce_seed_batch_id?: string | null
           harvest_date: string
           id?: string
           is_deleted?: boolean
@@ -1196,9 +1528,10 @@ export type Database = {
           created_by?: string | null
           farm_id?: string
           gross_weight?: number
+          grow_cuke_seed_batch_id?: string | null
           grow_grade_id?: string | null
           grow_harvest_container_id?: string
-          grow_seed_batch_id?: string
+          grow_lettuce_seed_batch_id?: string | null
           harvest_date?: string
           id?: string
           is_deleted?: boolean
@@ -1220,6 +1553,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "grow_harvest_weight_grow_cuke_seed_batch_id_fkey"
+            columns: ["grow_cuke_seed_batch_id"]
+            isOneToOne: false
+            referencedRelation: "grow_cuke_seed_batch"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "grow_harvest_weight_grow_grade_id_fkey"
             columns: ["grow_grade_id"]
             isOneToOne: false
@@ -1234,10 +1574,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "grow_harvest_weight_grow_seed_batch_id_fkey"
-            columns: ["grow_seed_batch_id"]
+            foreignKeyName: "grow_harvest_weight_grow_lettuce_seed_batch_id_fkey"
+            columns: ["grow_lettuce_seed_batch_id"]
             isOneToOne: false
-            referencedRelation: "grow_seed_batch"
+            referencedRelation: "grow_lettuce_seed_batch"
             referencedColumns: ["id"]
           },
           {
@@ -1258,13 +1598,6 @@ export type Database = {
             foreignKeyName: "grow_harvest_weight_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_harvest_weight_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -1273,7 +1606,308 @@ export type Database = {
             columns: ["weight_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_lettuce_seed_batch: {
+        Row: {
+          batch_code: string
+          created_at: string
+          created_by: string | null
+          estimated_harvest_date: string
+          farm_id: string
+          grow_cycle_pattern_id: string | null
+          grow_lettuce_seed_mix_id: string | null
+          grow_trial_type_id: string | null
+          id: string
+          invnt_item_id: string | null
+          invnt_lot_id: string | null
+          is_deleted: boolean
+          notes: string | null
+          number_of_rows: number
+          number_of_units: number
+          ops_task_tracker_id: string | null
+          org_id: string
+          seeding_date: string
+          seeding_uom: string
+          seeds_per_unit: number
+          site_id: string | null
+          status: string
+          transplant_date: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          batch_code: string
+          created_at?: string
+          created_by?: string | null
+          estimated_harvest_date: string
+          farm_id: string
+          grow_cycle_pattern_id?: string | null
+          grow_lettuce_seed_mix_id?: string | null
+          grow_trial_type_id?: string | null
+          id?: string
+          invnt_item_id?: string | null
+          invnt_lot_id?: string | null
+          is_deleted?: boolean
+          notes?: string | null
+          number_of_rows: number
+          number_of_units: number
+          ops_task_tracker_id?: string | null
+          org_id: string
+          seeding_date: string
+          seeding_uom: string
+          seeds_per_unit: number
+          site_id?: string | null
+          status?: string
+          transplant_date: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          batch_code?: string
+          created_at?: string
+          created_by?: string | null
+          estimated_harvest_date?: string
+          farm_id?: string
+          grow_cycle_pattern_id?: string | null
+          grow_lettuce_seed_mix_id?: string | null
+          grow_trial_type_id?: string | null
+          id?: string
+          invnt_item_id?: string | null
+          invnt_lot_id?: string | null
+          is_deleted?: boolean
+          notes?: string | null
+          number_of_rows?: number
+          number_of_units?: number
+          ops_task_tracker_id?: string | null
+          org_id?: string
+          seeding_date?: string
+          seeding_uom?: string
+          seeds_per_unit?: number
+          site_id?: string | null
+          status?: string
+          transplant_date?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_grow_cycle_pattern_id_fkey"
+            columns: ["grow_cycle_pattern_id"]
+            isOneToOne: false
+            referencedRelation: "grow_cycle_pattern"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_grow_lettuce_seed_mix_id_fkey"
+            columns: ["grow_lettuce_seed_mix_id"]
+            isOneToOne: false
+            referencedRelation: "grow_lettuce_seed_mix"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_grow_trial_type_id_fkey"
+            columns: ["grow_trial_type_id"]
+            isOneToOne: false
+            referencedRelation: "grow_trial_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_invnt_item_id_fkey"
+            columns: ["invnt_item_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_item"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_invnt_item_id_fkey"
+            columns: ["invnt_item_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_item_summary"
+            referencedColumns: ["invnt_item_id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_invnt_lot_id_fkey"
+            columns: ["invnt_lot_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_lot"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_ops_task_tracker_id_fkey"
+            columns: ["ops_task_tracker_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_tracker"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_seeding_uom_fkey"
+            columns: ["seeding_uom"]
+            isOneToOne: false
+            referencedRelation: "sys_uom"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_batch_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "org_site"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_lettuce_seed_mix: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          farm_id: string
+          id: string
+          is_deleted: boolean
+          org_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          farm_id: string
+          id: string
+          is_deleted?: boolean
+          org_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          farm_id?: string
+          id?: string
+          is_deleted?: boolean
+          org_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_lettuce_seed_mix_item: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          grow_lettuce_seed_mix_id: string
+          id: string
+          invnt_item_id: string
+          invnt_lot_id: string | null
+          is_deleted: boolean
+          org_id: string
+          percentage: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          grow_lettuce_seed_mix_id: string
+          id?: string
+          invnt_item_id: string
+          invnt_lot_id?: string | null
+          is_deleted?: boolean
+          org_id: string
+          percentage: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          grow_lettuce_seed_mix_id?: string
+          id?: string
+          invnt_item_id?: string
+          invnt_lot_id?: string | null
+          is_deleted?: boolean
+          org_id?: string
+          percentage?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_item_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_item_grow_lettuce_seed_mix_id_fkey"
+            columns: ["grow_lettuce_seed_mix_id"]
+            isOneToOne: false
+            referencedRelation: "grow_lettuce_seed_mix"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_item_invnt_item_id_fkey"
+            columns: ["invnt_item_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_item"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_item_invnt_item_id_fkey"
+            columns: ["invnt_item_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_item_summary"
+            referencedColumns: ["invnt_item_id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_item_invnt_lot_id_fkey"
+            columns: ["invnt_lot_id"]
+            isOneToOne: false
+            referencedRelation: "invnt_lot"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_lettuce_seed_mix_item_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1373,7 +2007,7 @@ export type Database = {
             columns: ["reading_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1471,13 +2105,6 @@ export type Database = {
             foreignKeyName: "grow_monitoring_result_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_monitoring_result_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -1490,7 +2117,6 @@ export type Database = {
           description: string | null
           id: string
           is_deleted: boolean
-          name: string
           updated_at: string
           updated_by: string | null
         }
@@ -1500,7 +2126,6 @@ export type Database = {
           description?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -1510,7 +2135,6 @@ export type Database = {
           description?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -1611,325 +2235,7 @@ export type Database = {
             foreignKeyName: "grow_scout_result_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_scout_result_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
             referencedRelation: "org_site"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      grow_seed_batch: {
-        Row: {
-          batch_code: string
-          created_at: string
-          created_by: string | null
-          estimated_harvest_date: string
-          farm_id: string
-          grow_cycle_pattern_id: string | null
-          grow_seed_mix_id: string | null
-          grow_trial_type_id: string | null
-          id: string
-          invnt_item_id: string | null
-          invnt_lot_id: string | null
-          is_deleted: boolean
-          notes: string | null
-          number_of_rows: number
-          number_of_units: number
-          ops_task_tracker_id: string | null
-          org_id: string
-          seeding_date: string
-          seeding_uom: string
-          seeds_per_unit: number
-          site_id: string | null
-          status: string
-          transplant_date: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          batch_code: string
-          created_at?: string
-          created_by?: string | null
-          estimated_harvest_date: string
-          farm_id: string
-          grow_cycle_pattern_id?: string | null
-          grow_seed_mix_id?: string | null
-          grow_trial_type_id?: string | null
-          id?: string
-          invnt_item_id?: string | null
-          invnt_lot_id?: string | null
-          is_deleted?: boolean
-          notes?: string | null
-          number_of_rows: number
-          number_of_units: number
-          ops_task_tracker_id?: string | null
-          org_id: string
-          seeding_date: string
-          seeding_uom: string
-          seeds_per_unit: number
-          site_id?: string | null
-          status?: string
-          transplant_date: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          batch_code?: string
-          created_at?: string
-          created_by?: string | null
-          estimated_harvest_date?: string
-          farm_id?: string
-          grow_cycle_pattern_id?: string | null
-          grow_seed_mix_id?: string | null
-          grow_trial_type_id?: string | null
-          id?: string
-          invnt_item_id?: string | null
-          invnt_lot_id?: string | null
-          is_deleted?: boolean
-          notes?: string | null
-          number_of_rows?: number
-          number_of_units?: number
-          ops_task_tracker_id?: string | null
-          org_id?: string
-          seeding_date?: string
-          seeding_uom?: string
-          seeds_per_unit?: number
-          site_id?: string | null
-          status?: string
-          transplant_date?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "grow_seed_batch_farm_id_fkey"
-            columns: ["farm_id"]
-            isOneToOne: false
-            referencedRelation: "org_farm"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_grow_cycle_pattern_id_fkey"
-            columns: ["grow_cycle_pattern_id"]
-            isOneToOne: false
-            referencedRelation: "grow_cycle_pattern"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_grow_seed_mix_id_fkey"
-            columns: ["grow_seed_mix_id"]
-            isOneToOne: false
-            referencedRelation: "grow_seed_mix"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_grow_trial_type_id_fkey"
-            columns: ["grow_trial_type_id"]
-            isOneToOne: false
-            referencedRelation: "grow_trial_type"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_invnt_item_id_fkey"
-            columns: ["invnt_item_id"]
-            isOneToOne: false
-            referencedRelation: "invnt_item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_invnt_item_id_fkey"
-            columns: ["invnt_item_id"]
-            isOneToOne: false
-            referencedRelation: "invnt_item_summary"
-            referencedColumns: ["invnt_item_id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_invnt_lot_id_fkey"
-            columns: ["invnt_lot_id"]
-            isOneToOne: false
-            referencedRelation: "invnt_lot"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_ops_task_tracker_id_fkey"
-            columns: ["ops_task_tracker_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_tracker"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_seeding_uom_fkey"
-            columns: ["seeding_uom"]
-            isOneToOne: false
-            referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_batch_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "org_site"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      grow_seed_mix: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          description: string | null
-          farm_id: string
-          id: string
-          is_deleted: boolean
-          name: string
-          org_id: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          farm_id: string
-          id: string
-          is_deleted?: boolean
-          name: string
-          org_id: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          farm_id?: string
-          id?: string
-          is_deleted?: boolean
-          name?: string
-          org_id?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "grow_seed_mix_farm_id_fkey"
-            columns: ["farm_id"]
-            isOneToOne: false
-            referencedRelation: "org_farm"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_mix_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      grow_seed_mix_item: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          farm_id: string
-          grow_seed_mix_id: string
-          id: string
-          invnt_item_id: string
-          invnt_lot_id: string | null
-          is_deleted: boolean
-          org_id: string
-          percentage: number
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          farm_id: string
-          grow_seed_mix_id: string
-          id?: string
-          invnt_item_id: string
-          invnt_lot_id?: string | null
-          is_deleted?: boolean
-          org_id: string
-          percentage: number
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          farm_id?: string
-          grow_seed_mix_id?: string
-          id?: string
-          invnt_item_id?: string
-          invnt_lot_id?: string | null
-          is_deleted?: boolean
-          org_id?: string
-          percentage?: number
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "grow_seed_mix_item_farm_id_fkey"
-            columns: ["farm_id"]
-            isOneToOne: false
-            referencedRelation: "org_farm"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_mix_item_grow_seed_mix_id_fkey"
-            columns: ["grow_seed_mix_id"]
-            isOneToOne: false
-            referencedRelation: "grow_seed_mix"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_mix_item_invnt_item_id_fkey"
-            columns: ["invnt_item_id"]
-            isOneToOne: false
-            referencedRelation: "invnt_item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_mix_item_invnt_item_id_fkey"
-            columns: ["invnt_item_id"]
-            isOneToOne: false
-            referencedRelation: "invnt_item_summary"
-            referencedColumns: ["invnt_item_id"]
-          },
-          {
-            foreignKeyName: "grow_seed_mix_item_invnt_lot_id_fkey"
-            columns: ["invnt_lot_id"]
-            isOneToOne: false
-            referencedRelation: "invnt_lot"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "grow_seed_mix_item_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
             referencedColumns: ["id"]
           },
         ]
@@ -1938,20 +2244,20 @@ export type Database = {
         Row: {
           application_method: Json
           application_per_burn: number
-          application_uom: string
-          burn_uom: string
+          application_uom: string | null
+          burn_uom: string | null
           created_at: string
           created_by: string | null
-          effective_date: string
-          epa_registration: string
+          effective_date: string | null
+          epa_registration: string | null
           expiration_date: string | null
           external_label_url: string
-          farm_id: string
+          farm_id: string | null
           id: string
-          invnt_item_id: string
+          invnt_item_id: string | null
           is_deleted: boolean
-          label_date: string
-          maximum_quantity_per_acre: number
+          label_date: string | null
+          maximum_quantity_per_acre: number | null
           org_id: string
           phi_days: number
           rei_hours: number
@@ -1961,24 +2267,24 @@ export type Database = {
         }
         Insert: {
           application_method?: Json
-          application_per_burn: number
-          application_uom: string
-          burn_uom: string
+          application_per_burn?: number
+          application_uom?: string | null
+          burn_uom?: string | null
           created_at?: string
           created_by?: string | null
-          effective_date: string
-          epa_registration: string
+          effective_date?: string | null
+          epa_registration?: string | null
           expiration_date?: string | null
           external_label_url: string
-          farm_id: string
+          farm_id?: string | null
           id?: string
-          invnt_item_id: string
+          invnt_item_id?: string | null
           is_deleted?: boolean
-          label_date: string
-          maximum_quantity_per_acre: number
+          label_date?: string | null
+          maximum_quantity_per_acre?: number | null
           org_id: string
-          phi_days: number
-          rei_hours: number
+          phi_days?: number
+          rei_hours?: number
           target_pest_disease?: Json
           updated_at?: string
           updated_by?: string | null
@@ -1986,20 +2292,20 @@ export type Database = {
         Update: {
           application_method?: Json
           application_per_burn?: number
-          application_uom?: string
-          burn_uom?: string
+          application_uom?: string | null
+          burn_uom?: string | null
           created_at?: string
           created_by?: string | null
-          effective_date?: string
-          epa_registration?: string
+          effective_date?: string | null
+          epa_registration?: string | null
           expiration_date?: string | null
           external_label_url?: string
-          farm_id?: string
+          farm_id?: string | null
           id?: string
-          invnt_item_id?: string
+          invnt_item_id?: string | null
           is_deleted?: boolean
-          label_date?: string
-          maximum_quantity_per_acre?: number
+          label_date?: string | null
+          maximum_quantity_per_acre?: number | null
           org_id?: string
           phi_days?: number
           rei_hours?: number
@@ -2013,14 +2319,14 @@ export type Database = {
             columns: ["application_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "grow_spray_compliance_burn_uom_fkey"
             columns: ["burn_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "grow_spray_compliance_farm_id_fkey"
@@ -2056,7 +2362,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
-          equipment_id: string
+          equipment_id: string | null
           farm_id: string
           id: string
           is_deleted: boolean
@@ -2070,7 +2376,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
-          equipment_id: string
+          equipment_id?: string | null
           farm_id: string
           id?: string
           is_deleted?: boolean
@@ -2084,7 +2390,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
-          equipment_id?: string
+          equipment_id?: string | null
           farm_id?: string
           id?: string
           is_deleted?: boolean
@@ -2129,7 +2435,7 @@ export type Database = {
             columns: ["water_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2191,7 +2497,7 @@ export type Database = {
             columns: ["application_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "grow_spray_input_farm_id_fkey"
@@ -2313,7 +2619,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           farm_id: string
-          grow_seed_batch_id: string
+          grow_cuke_seed_batch_id: string | null
+          grow_lettuce_seed_batch_id: string | null
           id: string
           is_deleted: boolean
           ops_task_tracker_id: string
@@ -2325,7 +2632,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           farm_id: string
-          grow_seed_batch_id: string
+          grow_cuke_seed_batch_id?: string | null
+          grow_lettuce_seed_batch_id?: string | null
           id?: string
           is_deleted?: boolean
           ops_task_tracker_id: string
@@ -2337,7 +2645,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           farm_id?: string
-          grow_seed_batch_id?: string
+          grow_cuke_seed_batch_id?: string | null
+          grow_lettuce_seed_batch_id?: string | null
           id?: string
           is_deleted?: boolean
           ops_task_tracker_id?: string
@@ -2354,10 +2663,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "grow_task_seed_batch_grow_seed_batch_id_fkey"
-            columns: ["grow_seed_batch_id"]
+            foreignKeyName: "grow_task_seed_batch_grow_cuke_seed_batch_id_fkey"
+            columns: ["grow_cuke_seed_batch_id"]
             isOneToOne: false
-            referencedRelation: "grow_seed_batch"
+            referencedRelation: "grow_cuke_seed_batch"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_task_seed_batch_grow_lettuce_seed_batch_id_fkey"
+            columns: ["grow_lettuce_seed_batch_id"]
+            isOneToOne: false
+            referencedRelation: "grow_lettuce_seed_batch"
             referencedColumns: ["id"]
           },
           {
@@ -2384,7 +2700,6 @@ export type Database = {
           farm_id: string
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -2396,7 +2711,6 @@ export type Database = {
           farm_id: string
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -2408,7 +2722,6 @@ export type Database = {
           farm_id?: string
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -2432,7 +2745,6 @@ export type Database = {
       }
       grow_variety: {
         Row: {
-          code: string
           created_at: string
           created_by: string | null
           description: string | null
@@ -2445,7 +2757,6 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
-          code: string
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -2458,7 +2769,6 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
-          code?: string
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -2494,7 +2804,6 @@ export type Database = {
           description: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -2505,7 +2814,6 @@ export type Database = {
           description?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -2516,7 +2824,6 @@ export type Database = {
           description?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -2668,14 +2975,15 @@ export type Database = {
           date_of_birth: string | null
           email: string | null
           end_date: string | null
+          ethnicity: string | null
           first_name: string
           gender: string | null
+          housing_id: string | null
           hr_department_id: string | null
-          hr_title_id: string | null
           hr_work_authorization_id: string | null
           id: string
           is_deleted: boolean
-          is_minority: boolean
+          is_manager: boolean
           is_primary_org: boolean
           last_name: string
           org_id: string
@@ -2687,7 +2995,6 @@ export type Database = {
           phone: string | null
           preferred_name: string | null
           profile_photo_url: string | null
-          site_id: string | null
           start_date: string | null
           sys_access_level_id: string
           team_lead_id: string | null
@@ -2704,14 +3011,15 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           end_date?: string | null
+          ethnicity?: string | null
           first_name: string
           gender?: string | null
+          housing_id?: string | null
           hr_department_id?: string | null
-          hr_title_id?: string | null
           hr_work_authorization_id?: string | null
           id: string
           is_deleted?: boolean
-          is_minority?: boolean
+          is_manager?: boolean
           is_primary_org?: boolean
           last_name: string
           org_id: string
@@ -2723,7 +3031,6 @@ export type Database = {
           phone?: string | null
           preferred_name?: string | null
           profile_photo_url?: string | null
-          site_id?: string | null
           start_date?: string | null
           sys_access_level_id: string
           team_lead_id?: string | null
@@ -2740,14 +3047,15 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           end_date?: string | null
+          ethnicity?: string | null
           first_name?: string
           gender?: string | null
+          housing_id?: string | null
           hr_department_id?: string | null
-          hr_title_id?: string | null
           hr_work_authorization_id?: string | null
           id?: string
           is_deleted?: boolean
-          is_minority?: boolean
+          is_manager?: boolean
           is_primary_org?: boolean
           last_name?: string
           org_id?: string
@@ -2759,7 +3067,6 @@ export type Database = {
           phone?: string | null
           preferred_name?: string | null
           profile_photo_url?: string | null
-          site_id?: string | null
           start_date?: string | null
           sys_access_level_id?: string
           team_lead_id?: string | null
@@ -2798,17 +3105,17 @@ export type Database = {
             referencedColumns: ["hr_employee_id"]
           },
           {
+            foreignKeyName: "hr_employee_housing_id_fkey"
+            columns: ["housing_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_housing"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "hr_employee_hr_department_id_fkey"
             columns: ["hr_department_id"]
             isOneToOne: false
             referencedRelation: "hr_department"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_employee_hr_title_id_fkey"
-            columns: ["hr_title_id"]
-            isOneToOne: false
-            referencedRelation: "hr_title"
             referencedColumns: ["id"]
           },
           {
@@ -2823,20 +3130,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_employee_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_employee_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
           {
@@ -3048,6 +3341,13 @@ export type Database = {
             columns: ["org_module_id"]
             isOneToOne: false
             referencedRelation: "hr_rba_navigation"
+            referencedColumns: ["module_display_name"]
+          },
+          {
+            foreignKeyName: "hr_module_access_org_module_id_fkey"
+            columns: ["org_module_id"]
+            isOneToOne: false
+            referencedRelation: "hr_rba_navigation"
             referencedColumns: ["module_id"]
           },
           {
@@ -3070,6 +3370,8 @@ export type Database = {
           comp_plus: number
           created_at: string
           created_by: string | null
+          discretionary_overtime_hours: number
+          discretionary_overtime_pay: number
           employee_name: string
           fit: number
           funeral_hours: number
@@ -3135,6 +3437,8 @@ export type Database = {
           comp_plus?: number
           created_at?: string
           created_by?: string | null
+          discretionary_overtime_hours?: number
+          discretionary_overtime_pay?: number
           employee_name: string
           fit?: number
           funeral_hours?: number
@@ -3200,6 +3504,8 @@ export type Database = {
           comp_plus?: number
           created_at?: string
           created_by?: string | null
+          discretionary_overtime_hours?: number
+          discretionary_overtime_pay?: number
           employee_name?: string
           fit?: number
           funeral_hours?: number
@@ -3415,50 +3721,6 @@ export type Database = {
           },
         ]
       }
-      hr_title: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          description: string | null
-          id: string
-          is_deleted: boolean
-          name: string
-          org_id: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id: string
-          is_deleted?: boolean
-          name: string
-          org_id: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          is_deleted?: boolean
-          name?: string
-          org_id?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "hr_title_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       hr_travel_request: {
         Row: {
           created_at: string
@@ -3588,7 +3850,6 @@ export type Database = {
           description: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -3599,7 +3860,6 @@ export type Database = {
           description?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -3610,7 +3870,6 @@ export type Database = {
           description?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -3694,7 +3953,6 @@ export type Database = {
           maint_part_number: string | null
           maint_part_type: string | null
           manufacturer: string | null
-          name: string
           onhand_uom: string | null
           order_per_pallet: number
           order_uom: string | null
@@ -3735,7 +3993,6 @@ export type Database = {
           maint_part_number?: string | null
           maint_part_type?: string | null
           manufacturer?: string | null
-          name: string
           onhand_uom?: string | null
           order_per_pallet?: number
           order_uom?: string | null
@@ -3776,7 +4033,6 @@ export type Database = {
           maint_part_number?: string | null
           maint_part_type?: string | null
           manufacturer?: string | null
-          name?: string
           onhand_uom?: string | null
           order_per_pallet?: number
           order_uom?: string | null
@@ -3799,7 +4055,7 @@ export type Database = {
             columns: ["burn_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_item_equipment_id_fkey"
@@ -3848,27 +4104,20 @@ export type Database = {
             columns: ["onhand_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_item_order_uom_fkey"
             columns: ["order_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_item_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invnt_item_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -4015,7 +4264,7 @@ export type Database = {
             columns: ["burn_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_onhand_farm_id_fkey"
@@ -4050,7 +4299,7 @@ export type Database = {
             columns: ["onhand_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_onhand_org_id_fkey"
@@ -4173,7 +4422,7 @@ export type Database = {
             columns: ["burn_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_po_farm_id_fkey"
@@ -4215,7 +4464,7 @@ export type Database = {
             columns: ["order_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_po_ordered_by_fkey"
@@ -4369,7 +4618,7 @@ export type Database = {
             columns: ["received_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -4382,7 +4631,6 @@ export type Database = {
           email: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           payment_terms: string | null
           phone: string | null
@@ -4397,7 +4645,6 @@ export type Database = {
           email?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           payment_terms?: string | null
           phone?: string | null
@@ -4412,7 +4659,6 @@ export type Database = {
           email?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           payment_terms?: string | null
           phone?: string | null
@@ -4547,13 +4793,6 @@ export type Database = {
             foreignKeyName: "maint_request_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maint_request_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -4643,7 +4882,7 @@ export type Database = {
             columns: ["uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -4721,7 +4960,6 @@ export type Database = {
           description: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -4732,7 +4970,6 @@ export type Database = {
           description?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -4743,7 +4980,6 @@ export type Database = {
           description?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -4919,8 +5155,8 @@ export type Database = {
           farm_id: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
+          qb_account: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -4931,8 +5167,8 @@ export type Database = {
           farm_id?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
+          qb_account?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -4943,8 +5179,8 @@ export type Database = {
           farm_id?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
+          qb_account?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -4978,6 +5214,7 @@ export type Database = {
           org_id: string
           start_time: string
           stop_time: string | null
+          total_hours: number | null
           updated_at: string
           updated_by: string | null
         }
@@ -4993,6 +5230,7 @@ export type Database = {
           org_id: string
           start_time: string
           stop_time?: string | null
+          total_hours?: number | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -5008,6 +5246,7 @@ export type Database = {
           org_id?: string
           start_time?: string
           stop_time?: string | null
+          total_hours?: number | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -5039,6 +5278,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ops_task"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ops_task_schedule_ops_task_id_fkey"
+            columns: ["ops_task_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["task"]
           },
           {
             foreignKeyName: "ops_task_schedule_ops_task_tracker_id_fkey"
@@ -5109,6 +5355,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ops_task_template_ops_task_id_fkey"
+            columns: ["ops_task_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["task"]
+          },
+          {
             foreignKeyName: "ops_task_template_ops_template_id_fkey"
             columns: ["ops_template_id"]
             isOneToOne: false
@@ -5133,6 +5386,7 @@ export type Database = {
           is_completed: boolean
           is_deleted: boolean
           notes: string | null
+          number_of_people: number | null
           ops_task_id: string
           org_id: string
           sales_product_id: string | null
@@ -5152,6 +5406,7 @@ export type Database = {
           is_completed?: boolean
           is_deleted?: boolean
           notes?: string | null
+          number_of_people?: number | null
           ops_task_id: string
           org_id: string
           sales_product_id?: string | null
@@ -5171,6 +5426,7 @@ export type Database = {
           is_completed?: boolean
           is_deleted?: boolean
           notes?: string | null
+          number_of_people?: number | null
           ops_task_id?: string
           org_id?: string
           sales_product_id?: string | null
@@ -5198,6 +5454,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ops_task_tracker_ops_task_id_fkey"
+            columns: ["ops_task_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["task"]
+          },
+          {
             foreignKeyName: "ops_task_tracker_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -5209,13 +5472,6 @@ export type Database = {
             columns: ["sales_product_id"]
             isOneToOne: false
             referencedRelation: "sales_product"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ops_task_tracker_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -5250,7 +5506,6 @@ export type Database = {
           farm_id: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           org_module_id: string | null
           updated_at: string
@@ -5264,7 +5519,6 @@ export type Database = {
           farm_id?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           org_module_id?: string | null
           updated_at?: string
@@ -5278,7 +5532,6 @@ export type Database = {
           farm_id?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           org_module_id?: string | null
           updated_at?: string
@@ -5298,6 +5551,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ops_template_org_module_id_fkey"
+            columns: ["org_module_id"]
+            isOneToOne: false
+            referencedRelation: "hr_rba_navigation"
+            referencedColumns: ["module_display_name"]
           },
           {
             foreignKeyName: "ops_template_org_module_id_fkey"
@@ -5419,7 +5679,7 @@ export type Database = {
           is_deleted: boolean
           ops_task_tracker_id: string
           ops_template_id: string
-          ops_template_question_id: string
+          ops_template_question_id: string | null
           org_id: string
           response_boolean: boolean | null
           response_enum: string | null
@@ -5438,7 +5698,7 @@ export type Database = {
           is_deleted?: boolean
           ops_task_tracker_id: string
           ops_template_id: string
-          ops_template_question_id: string
+          ops_template_question_id?: string | null
           org_id: string
           response_boolean?: boolean | null
           response_enum?: string | null
@@ -5457,7 +5717,7 @@ export type Database = {
           is_deleted?: boolean
           ops_task_tracker_id?: string
           ops_template_id?: string
-          ops_template_question_id?: string
+          ops_template_question_id?: string | null
           org_id?: string
           response_boolean?: boolean | null
           response_enum?: string | null
@@ -5508,13 +5768,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ops_template_result_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -5800,7 +6053,6 @@ export type Database = {
           description: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -5811,7 +6063,6 @@ export type Database = {
           description?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -5822,7 +6073,6 @@ export type Database = {
           description?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -5937,7 +6187,6 @@ export type Database = {
       }
       org_equipment: {
         Row: {
-          code: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -5947,17 +6196,14 @@ export type Database = {
           manual_url: string | null
           manufacturer: string | null
           model: string | null
-          name: string
           org_id: string
           purchase_date: string | null
           serial_number: string | null
-          site_id: string | null
           type: string | null
           updated_at: string
           updated_by: string | null
         }
         Insert: {
-          code?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -5967,17 +6213,14 @@ export type Database = {
           manual_url?: string | null
           manufacturer?: string | null
           model?: string | null
-          name: string
           org_id: string
           purchase_date?: string | null
           serial_number?: string | null
-          site_id?: string | null
           type?: string | null
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
-          code?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -5987,11 +6230,9 @@ export type Database = {
           manual_url?: string | null
           manufacturer?: string | null
           model?: string | null
-          name?: string
           org_id?: string
           purchase_date?: string | null
           serial_number?: string | null
-          site_id?: string | null
           type?: string | null
           updated_at?: string
           updated_by?: string | null
@@ -6011,20 +6252,6 @@ export type Database = {
             referencedRelation: "org"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "org_equipment_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "org_equipment_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
-            referencedRelation: "org_site"
-            referencedColumns: ["id"]
-          },
         ]
       }
       org_farm: {
@@ -6034,7 +6261,6 @@ export type Database = {
           growing_uom: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -6047,7 +6273,6 @@ export type Database = {
           growing_uom?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -6060,7 +6285,6 @@ export type Database = {
           growing_uom?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -6073,7 +6297,7 @@ export type Database = {
             columns: ["growing_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "org_farm_org_id_fkey"
@@ -6087,14 +6311,14 @@ export type Database = {
             columns: ["volume_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "org_farm_weighing_uom_fkey"
             columns: ["weighing_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -6102,7 +6326,6 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
-          display_name: string
           display_order: number
           id: string
           is_deleted: boolean
@@ -6115,7 +6338,6 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
-          display_name: string
           display_order?: number
           id: string
           is_deleted?: boolean
@@ -6128,7 +6350,6 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
-          display_name?: string
           display_order?: number
           id?: string
           is_deleted?: boolean
@@ -6175,7 +6396,6 @@ export type Database = {
           is_deleted: boolean
           latitude: number | null
           longitude: number | null
-          max_beds: number | null
           monitoring_stations: Json
           name: string
           notes: string | null
@@ -6199,7 +6419,6 @@ export type Database = {
           is_deleted?: boolean
           latitude?: number | null
           longitude?: number | null
-          max_beds?: number | null
           monitoring_stations?: Json
           name: string
           notes?: string | null
@@ -6223,7 +6442,6 @@ export type Database = {
           is_deleted?: boolean
           latitude?: number | null
           longitude?: number | null
-          max_beds?: number | null
           monitoring_stations?: Json
           name?: string
           notes?: string | null
@@ -6262,13 +6480,6 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "org_site_site_id_parent_fkey"
-            columns: ["site_id_parent"]
-            isOneToOne: false
-            referencedRelation: "app_hr_housing"
             referencedColumns: ["id"]
           },
           {
@@ -6327,11 +6538,314 @@ export type Database = {
           },
         ]
       }
+      org_site_cuke_gh: {
+        Row: {
+          acres: number | null
+          blocks_vertical: boolean
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          farm_section: string
+          id: string
+          is_deleted: boolean
+          layout_grid_col: number
+          layout_grid_row: number
+          layout_stack_pos: number | null
+          org_id: string
+          rows_orientation: string
+          sidewalk_position: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          acres?: number | null
+          blocks_vertical?: boolean
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          farm_section: string
+          id: string
+          is_deleted?: boolean
+          layout_grid_col: number
+          layout_grid_row: number
+          layout_stack_pos?: number | null
+          org_id: string
+          rows_orientation: string
+          sidewalk_position: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          acres?: number | null
+          blocks_vertical?: boolean
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          farm_section?: string
+          id?: string
+          is_deleted?: boolean
+          layout_grid_col?: number
+          layout_grid_row?: number
+          layout_stack_pos?: number | null
+          org_id?: string
+          rows_orientation?: string
+          sidewalk_position?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_site_cuke_gh_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_site_cuke_gh_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_site_cuke_gh_block: {
+        Row: {
+          block_number: number
+          created_at: string
+          created_by: string | null
+          direction: string
+          farm_id: string
+          id: string
+          is_deleted: boolean
+          name: string
+          org_id: string
+          row_number_from: number
+          row_number_to: number
+          site_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          block_number: number
+          created_at?: string
+          created_by?: string | null
+          direction: string
+          farm_id: string
+          id?: string
+          is_deleted?: boolean
+          name: string
+          org_id: string
+          row_number_from: number
+          row_number_to: number
+          site_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          block_number?: number
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          farm_id?: string
+          id?: string
+          is_deleted?: boolean
+          name?: string
+          org_id?: string
+          row_number_from?: number
+          row_number_to?: number
+          site_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_site_cuke_gh_block_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_site_cuke_gh_block_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_site_cuke_gh_block_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_cuke_gh"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_site_cuke_gh_row: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          id: string
+          is_deleted: boolean
+          notes: string | null
+          org_id: string
+          row_number: number
+          site_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id: string
+          row_number: number
+          site_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id?: string
+          row_number?: number
+          site_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_site_cuke_gh_row_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_site_cuke_gh_row_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_site_cuke_gh_row_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_cuke_gh"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_site_housing: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_deleted: boolean
+          maximum_beds: number | null
+          notes: string | null
+          org_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id: string
+          is_deleted?: boolean
+          maximum_beds?: number | null
+          notes?: string | null
+          org_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          maximum_beds?: number | null
+          notes?: string | null
+          org_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_site_housing_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_site_housing_area: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          housing_id: string
+          id: string
+          is_deleted: boolean
+          org_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          housing_id: string
+          id: string
+          is_deleted?: boolean
+          org_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          housing_id?: string
+          id?: string
+          is_deleted?: boolean
+          org_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_site_housing_area_housing_id_fkey"
+            columns: ["housing_id"]
+            isOneToOne: false
+            referencedRelation: "org_site_housing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_site_housing_area_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_sub_module: {
         Row: {
           created_at: string
           created_by: string | null
-          display_name: string
           display_order: number
           id: string
           is_deleted: boolean
@@ -6346,7 +6860,6 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
-          display_name: string
           display_order?: number
           id: string
           is_deleted?: boolean
@@ -6361,7 +6874,6 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
-          display_name?: string
           display_order?: number
           id?: string
           is_deleted?: boolean
@@ -6427,7 +6939,7 @@ export type Database = {
           dryer_temperature: number | null
           farm_id: string
           greenhouse_temperature: number | null
-          grow_seed_batch_id: string | null
+          grow_lettuce_seed_batch_id: string | null
           id: string
           invnt_item_id: string | null
           is_deleted: boolean
@@ -6453,7 +6965,7 @@ export type Database = {
           dryer_temperature?: number | null
           farm_id: string
           greenhouse_temperature?: number | null
-          grow_seed_batch_id?: string | null
+          grow_lettuce_seed_batch_id?: string | null
           id?: string
           invnt_item_id?: string | null
           is_deleted?: boolean
@@ -6479,7 +6991,7 @@ export type Database = {
           dryer_temperature?: number | null
           farm_id?: string
           greenhouse_temperature?: number | null
-          grow_seed_batch_id?: string | null
+          grow_lettuce_seed_batch_id?: string | null
           id?: string
           invnt_item_id?: string | null
           is_deleted?: boolean
@@ -6506,10 +7018,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pack_dryer_result_grow_seed_batch_id_fkey"
-            columns: ["grow_seed_batch_id"]
+            foreignKeyName: "pack_dryer_result_grow_lettuce_seed_batch_id_fkey"
+            columns: ["grow_lettuce_seed_batch_id"]
             isOneToOne: false
-            referencedRelation: "grow_seed_batch"
+            referencedRelation: "grow_lettuce_seed_batch"
             referencedColumns: ["id"]
           },
           {
@@ -6531,7 +7043,7 @@ export type Database = {
             columns: ["moisture_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "pack_dryer_result_org_id_fkey"
@@ -6551,13 +7063,6 @@ export type Database = {
             foreignKeyName: "pack_dryer_result_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pack_dryer_result_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -6566,7 +7071,7 @@ export type Database = {
             columns: ["temperature_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -6711,7 +7216,6 @@ export type Database = {
           id: string
           is_active: boolean
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -6725,7 +7229,6 @@ export type Database = {
           id: string
           is_active?: boolean
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -6739,7 +7242,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -7028,13 +7530,6 @@ export type Database = {
             foreignKeyName: "pack_shelf_life_site_id_fkey"
             columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "app_hr_housing"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pack_shelf_life_site_id_fkey"
-            columns: ["site_id"]
-            isOneToOne: false
             referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
@@ -7055,7 +7550,6 @@ export type Database = {
           id: string
           is_active: boolean
           is_deleted: boolean
-          name: string
           org_id: string
           response_type: string
           updated_at: string
@@ -7075,7 +7569,6 @@ export type Database = {
           id: string
           is_active?: boolean
           is_deleted?: boolean
-          name: string
           org_id: string
           response_type: string
           updated_at?: string
@@ -7095,7 +7588,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_deleted?: boolean
-          name?: string
           org_id?: string
           response_type?: string
           updated_at?: string
@@ -7288,7 +7780,6 @@ export type Database = {
           is_active: boolean
           is_deleted: boolean
           maximum_spaces: number
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -7300,7 +7791,6 @@ export type Database = {
           is_active?: boolean
           is_deleted?: boolean
           maximum_spaces: number
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -7312,7 +7802,6 @@ export type Database = {
           is_active?: boolean
           is_deleted?: boolean
           maximum_spaces?: number
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -7335,7 +7824,6 @@ export type Database = {
           id: string
           is_active: boolean
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -7347,7 +7835,6 @@ export type Database = {
           id: string
           is_active?: boolean
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -7359,7 +7846,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -7388,7 +7874,6 @@ export type Database = {
           is_deleted: boolean
           island: string | null
           location: string | null
-          name: string
           org_id: string
           sales_customer_id: string | null
           updated_at: string
@@ -7407,7 +7892,6 @@ export type Database = {
           is_deleted?: boolean
           island?: string | null
           location?: string | null
-          name: string
           org_id: string
           sales_customer_id?: string | null
           updated_at?: string
@@ -7426,7 +7910,6 @@ export type Database = {
           is_deleted?: boolean
           island?: string | null
           location?: string | null
-          name?: string
           org_id?: string
           sales_customer_id?: string | null
           updated_at?: string
@@ -7667,7 +8150,6 @@ export type Database = {
           id: string
           is_active: boolean
           is_deleted: boolean
-          name: string
           org_id: string
           qb_account: string | null
           sales_customer_group_id: string | null
@@ -7684,7 +8166,6 @@ export type Database = {
           id: string
           is_active?: boolean
           is_deleted?: boolean
-          name: string
           org_id: string
           qb_account?: string | null
           sales_customer_group_id?: string | null
@@ -7701,7 +8182,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_deleted?: boolean
-          name?: string
           org_id?: string
           qb_account?: string | null
           sales_customer_group_id?: string | null
@@ -7739,7 +8219,6 @@ export type Database = {
           created_by: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -7749,7 +8228,6 @@ export type Database = {
           created_by?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -7759,7 +8237,6 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -7780,7 +8257,6 @@ export type Database = {
           created_by: string | null
           id: string
           is_deleted: boolean
-          name: string
           org_id: string
           updated_at: string
           updated_by: string | null
@@ -7790,7 +8266,6 @@ export type Database = {
           created_by?: string | null
           id: string
           is_deleted?: boolean
-          name: string
           org_id: string
           updated_at?: string
           updated_by?: string | null
@@ -7800,7 +8275,6 @@ export type Database = {
           created_by?: string | null
           id?: string
           is_deleted?: boolean
-          name?: string
           org_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -7808,6 +8282,87 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "sales_fob_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_invoice: {
+        Row: {
+          cases: number | null
+          created_at: string
+          created_by: string | null
+          customer_group: string | null
+          customer_name: string
+          dollars: number
+          farm_id: string | null
+          grade: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string
+          is_deleted: boolean
+          notes: string | null
+          org_id: string
+          pounds: number | null
+          product_code: string | null
+          updated_at: string
+          updated_by: string | null
+          variety: string | null
+        }
+        Insert: {
+          cases?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_group?: string | null
+          customer_name: string
+          dollars: number
+          farm_id?: string | null
+          grade?: string | null
+          id?: string
+          invoice_date: string
+          invoice_number: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id: string
+          pounds?: number | null
+          product_code?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          variety?: string | null
+        }
+        Update: {
+          cases?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_group?: string | null
+          customer_name?: string
+          dollars?: number
+          farm_id?: string | null
+          grade?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id?: string
+          pounds?: number | null
+          product_code?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          variety?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_invoice_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_invoice_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
@@ -8130,7 +8685,6 @@ export type Database = {
           case_length: number | null
           case_net_weight: number | null
           case_width: number | null
-          code: string
           created_at: string
           created_by: string | null
           description: string | null
@@ -8174,7 +8728,6 @@ export type Database = {
           case_length?: number | null
           case_net_weight?: number | null
           case_width?: number | null
-          code: string
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -8218,7 +8771,6 @@ export type Database = {
           case_length?: number | null
           case_net_weight?: number | null
           case_width?: number | null
-          code?: string
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -8263,7 +8815,7 @@ export type Database = {
             columns: ["dimension_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "sales_product_farm_id_fkey"
@@ -8298,7 +8850,7 @@ export type Database = {
             columns: ["item_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "sales_product_org_id_fkey"
@@ -8312,21 +8864,21 @@ export type Database = {
             columns: ["pack_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "sales_product_temperature_uom_fkey"
             columns: ["temperature_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "sales_product_weight_uom_fkey"
             columns: ["weight_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -8436,7 +8988,6 @@ export type Database = {
           id: string
           is_deleted: boolean
           level: number
-          name: string
           updated_at: string
           updated_by: string | null
         }
@@ -8448,7 +8999,6 @@ export type Database = {
           id: string
           is_deleted?: boolean
           level: number
-          name: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -8460,7 +9010,6 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           level?: number
-          name?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -8474,7 +9023,6 @@ export type Database = {
           display_order: number
           id: string
           is_deleted: boolean
-          name: string
           updated_at: string
           updated_by: string | null
         }
@@ -8485,7 +9033,6 @@ export type Database = {
           display_order?: number
           id: string
           is_deleted?: boolean
-          name: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -8496,7 +9043,6 @@ export type Database = {
           display_order?: number
           id?: string
           is_deleted?: boolean
-          name?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -8510,7 +9056,6 @@ export type Database = {
           display_order: number
           id: string
           is_deleted: boolean
-          name: string
           sys_access_level_id: string
           sys_module_id: string
           updated_at: string
@@ -8523,7 +9068,6 @@ export type Database = {
           display_order?: number
           id: string
           is_deleted?: boolean
-          name: string
           sys_access_level_id: string
           sys_module_id: string
           updated_at?: string
@@ -8536,7 +9080,6 @@ export type Database = {
           display_order?: number
           id?: string
           is_deleted?: boolean
-          name?: string
           sys_access_level_id?: string
           sys_module_id?: string
           updated_at?: string
@@ -8569,31 +9112,28 @@ export type Database = {
       sys_uom: {
         Row: {
           category: string
-          code: string
           created_at: string
           created_by: string | null
+          id: string
           is_deleted: boolean
-          name: string
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           category: string
-          code: string
           created_at?: string
           created_by?: string | null
+          id: string
           is_deleted?: boolean
-          name: string
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           category?: string
-          code?: string
           created_at?: string
           created_by?: string | null
+          id?: string
           is_deleted?: boolean
-          name?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -8601,454 +9141,267 @@ export type Database = {
       }
     }
     Views: {
-      app_hr_employee_reviews: {
+      fin_expense_v: {
         Row: {
-          attendance: number | null
-          average: number | null
+          account_name: string | null
+          account_ref: string | null
+          amount: number | null
+          class_name: string | null
           created_at: string | null
           created_by: string | null
-          department_name: string | null
-          engagement: number | null
-          full_name: string | null
-          hr_employee_id: string | null
+          description: string | null
+          effective_amount: number | null
+          farm_id: string | null
           id: string | null
+          is_credit: boolean | null
           is_deleted: boolean | null
-          is_locked: boolean | null
-          lead_id: string | null
-          lead_name: string | null
+          macro_category: string | null
+          month: number | null
           notes: string | null
           org_id: string | null
-          productivity: number | null
-          profile_photo_url: string | null
-          quality: number | null
-          quarter_label: string | null
-          review_quarter: number | null
-          review_year: number | null
-          start_date: string | null
+          payee_name: string | null
+          txn_date: string | null
           updated_at: string | null
           updated_by: string | null
-          work_authorization_name: string | null
+          year: number | null
+        }
+        Insert: {
+          account_name?: string | null
+          account_ref?: string | null
+          amount?: number | null
+          class_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          effective_amount?: number | null
+          farm_id?: string | null
+          id?: string | null
+          is_credit?: boolean | null
+          is_deleted?: boolean | null
+          macro_category?: string | null
+          month?: never
+          notes?: string | null
+          org_id?: string | null
+          payee_name?: string | null
+          txn_date?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          year?: never
+        }
+        Update: {
+          account_name?: string | null
+          account_ref?: string | null
+          amount?: number | null
+          class_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          effective_amount?: number | null
+          farm_id?: string | null
+          id?: string | null
+          is_credit?: boolean | null
+          is_deleted?: boolean | null
+          macro_category?: string | null
+          month?: never
+          notes?: string | null
+          org_id?: string | null
+          payee_name?: string | null
+          txn_date?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          year?: never
         }
         Relationships: [
           {
-            foreignKeyName: "fk_hr_employee_review_employee"
-            columns: ["hr_employee_id"]
+            foreignKeyName: "fin_expense_farm_id_fkey"
+            columns: ["farm_id"]
             isOneToOne: false
-            referencedRelation: "hr_employee"
+            referencedRelation: "org_farm"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_hr_employee_review_employee"
-            columns: ["hr_employee_id"]
+            foreignKeyName: "fin_expense_org_id_fkey"
+            columns: ["org_id"]
             isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
+            referencedRelation: "org"
+            referencedColumns: ["id"]
           },
+        ]
+      }
+      grow_cuke_harvest: {
+        Row: {
+          days_since_seed: number | null
+          farm_id: string | null
+          grade: string | null
+          greenhouse: string | null
+          greenhouse_net_weight: number | null
+          gross_weight: number | null
+          grow_cuke_seed_batch_id: string | null
+          harvest_date: string | null
+          id: string | null
+          number_of_containers: number | null
+          org_id: string | null
+          seeding_date: string | null
+          site_id: string | null
+          variety: string | null
+          weight_uom: string | null
+        }
+        Relationships: [
           {
-            foreignKeyName: "fk_hr_employee_review_lead"
-            columns: ["lead_id"]
+            foreignKeyName: "grow_harvest_weight_farm_id_fkey"
+            columns: ["farm_id"]
             isOneToOne: false
-            referencedRelation: "hr_employee"
+            referencedRelation: "org_farm"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_hr_employee_review_lead"
-            columns: ["lead_id"]
+            foreignKeyName: "grow_harvest_weight_grow_cuke_seed_batch_id_fkey"
+            columns: ["grow_cuke_seed_batch_id"]
             isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_employee_review_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
+            referencedRelation: "grow_cuke_seed_batch"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_employee_review_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: "grow_harvest_weight_grow_grade_id_fkey"
+            columns: ["grade"]
             isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
+            referencedRelation: "grow_grade"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_employee_review_org_id_fkey"
+            foreignKeyName: "grow_harvest_weight_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_employee_review_updated_by_fkey"
-            columns: ["updated_by"]
+            foreignKeyName: "grow_harvest_weight_site_id_fkey"
+            columns: ["site_id"]
             isOneToOne: false
-            referencedRelation: "hr_employee"
+            referencedRelation: "org_site"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_employee_review_updated_by_fkey"
-            columns: ["updated_by"]
+            foreignKeyName: "grow_harvest_weight_weight_uom_fkey"
+            columns: ["weight_uom"]
             isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
+            referencedRelation: "sys_uom"
+            referencedColumns: ["id"]
           },
         ]
       }
-      app_hr_hours_comparison: {
+      grow_lettuce_harvest: {
         Row: {
-          department_name: string | null
-          full_name: string | null
-          hr_employee_id: string | null
+          boards_per_pond: number | null
+          farm_id: string | null
+          greenhouse_net_weight: number | null
+          gross_weight: number | null
+          grow_lettuce_seed_batch_id: string | null
+          harvest_date: string | null
+          id: string | null
           org_id: string | null
-          pay_period_end: string | null
-          pay_period_start: string | null
-          payroll_hours: number | null
-          profile_photo_url: string | null
-          scheduled_hours: number | null
-          variance: number | null
+          pond: string | null
+          pounds_per_board: number | null
+          seed_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_harvest_weight_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_harvest_weight_grow_lettuce_seed_batch_id_fkey"
+            columns: ["grow_lettuce_seed_batch_id"]
+            isOneToOne: false
+            referencedRelation: "grow_lettuce_seed_batch"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_harvest_weight_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_spray_restriction: {
+        Row: {
+          end_time: string | null
+          farm_id: string | null
+          ops_task_tracker_id: string | null
+          org_id: string | null
+          restriction_date: string | null
+          restriction_stop: string | null
+          restriction_type: string | null
+          restriction_value: number | null
+          site_id: string | null
+          spray_stop: string | null
+          start_time: string | null
         }
         Relationships: []
       }
-      app_hr_housing: {
-        Row: {
-          available_beds: number | null
-          id: string | null
-          is_active: boolean | null
-          max_beds: number | null
-          name: string | null
-          notes: string | null
-          org_id: string | null
-          tenant_count: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "org_site_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      app_hr_payroll_by_comp_manager: {
+      hr_payroll_by_task: {
         Row: {
           check_date: string | null
           compensation_manager_id: string | null
-          compensation_manager_name: string | null
-          department_name: string | null
-          full_name: string | null
-          gross_wage: number | null
+          discretionary_overtime_hours: number | null
+          discretionary_overtime_pay: number | null
           hr_employee_id: string | null
-          id: string | null
-          net_pay: number | null
+          is_manager: boolean | null
           org_id: string | null
-          overtime_hours: number | null
-          pay_period_end: string | null
-          pay_period_start: string | null
-          preferred_name: string | null
-          profile_photo_url: string | null
-          regular_hours: number | null
-          total_hours: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_hr_employee_compensation_manager"
-            columns: ["compensation_manager_id"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_hr_employee_compensation_manager"
-            columns: ["compensation_manager_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
-            columns: ["hr_employee_id"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
-            columns: ["hr_employee_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      app_hr_payroll_by_employee: {
-        Row: {
-          department_name: string | null
-          full_name: string | null
-          hr_employee_id: string | null
-          org_id: string | null
-          pay_period_end: string | null
-          pay_period_start: string | null
-          preferred_name: string | null
-          profile_photo_url: string | null
-          total_gross_wage: number | null
-          total_hours: number | null
-          total_net_pay: number | null
-          total_overtime_hours: number | null
-          total_regular_hours: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
-            columns: ["hr_employee_id"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
-            columns: ["hr_employee_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      app_hr_payroll_by_task: {
-        Row: {
-          department_name: string | null
-          employee_count: number | null
-          hr_department_id: string | null
-          org_id: string | null
-          pay_period_end: string | null
-          pay_period_start: string | null
-          total_gross_wage: number | null
-          total_hours: number | null
-          total_net_pay: number | null
-          total_overtime_hours: number | null
-          total_regular_hours: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "hr_payroll_hr_department_id_fkey"
-            columns: ["hr_department_id"]
-            isOneToOne: false
-            referencedRelation: "hr_department"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      app_hr_payroll_detail: {
-        Row: {
-          admin_fees: number | null
-          auto_allowance: number | null
-          auto_deduction: number | null
-          bonus_pay: number | null
-          check_date: string | null
-          child_support: number | null
-          comp_plus: number | null
-          created_at: string | null
-          department_name: string | null
-          employee_name: string | null
-          fit: number | null
-          full_name: string | null
-          funeral_hours: number | null
-          funeral_pay: number | null
-          gross_wage: number | null
-          hawaii_get: number | null
-          hds_dental: number | null
-          health_benefits: number | null
-          holiday_hours: number | null
-          holiday_pay: number | null
-          hourly_rate: number | null
-          hr_department_id: string | null
-          hr_employee_id: string | null
-          hr_work_authorization_id: string | null
-          id: string | null
-          invoice_number: string | null
-          is_deleted: boolean | null
-          is_standard: boolean | null
-          labor_tax: number | null
-          medicare: number | null
-          net_pay: number | null
-          org_id: string | null
-          other_charges: number | null
-          other_health_charges: number | null
-          other_pay: number | null
-          other_tax: number | null
-          overtime_hours: number | null
-          overtime_pay: number | null
-          overtime_threshold: number | null
-          pay_period_end: string | null
-          pay_period_start: string | null
-          pay_structure: string | null
-          payroll_id: string | null
-          payroll_processor: string | null
-          per_diem: number | null
-          pre_tax_401k: number | null
-          preferred_name: string | null
-          profile_photo_url: string | null
-          program_fees: number | null
-          pto_hours: number | null
-          pto_hours_accrued: number | null
-          pto_pay: number | null
           regular_hours: number | null
           regular_pay: number | null
-          salary: number | null
-          sick_hours: number | null
-          sick_pay: number | null
-          sit: number | null
-          social_security: number | null
-          tdi: number | null
+          scheduled_hours: number | null
+          status: string | null
+          task: string | null
           total_cost: number | null
           total_hours: number | null
-          updated_at: string | null
-          wc: string | null
-          work_authorization_name: string | null
-          workers_compensation: number | null
+          workers_compensation_code: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "hr_payroll_hr_department_id_fkey"
-            columns: ["hr_department_id"]
-            isOneToOne: false
-            referencedRelation: "hr_department"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
-            columns: ["hr_employee_id"]
+            foreignKeyName: "fk_hr_employee_compensation_manager"
+            columns: ["compensation_manager_id"]
             isOneToOne: false
             referencedRelation: "hr_employee"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
-            columns: ["hr_employee_id"]
+            foreignKeyName: "fk_hr_employee_compensation_manager"
+            columns: ["compensation_manager_id"]
             isOneToOne: false
             referencedRelation: "ops_task_weekly_schedule"
             referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_hr_work_authorization_id_fkey"
-            columns: ["hr_work_authorization_id"]
-            isOneToOne: false
-            referencedRelation: "hr_work_authorization"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_payroll_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
           },
         ]
       }
-      app_hr_time_off_requests: {
+      hr_payroll_employee_comparison: {
         Row: {
-          compensation_manager_name: string | null
-          created_at: string | null
-          denial_reason: string | null
-          department_name: string | null
-          end_date: string | null
-          full_name: string | null
+          check_date: string | null
+          compensation_manager_id: string | null
+          discretionary_overtime_hours: number | null
+          discretionary_overtime_pay: number | null
+          discretionary_overtime_pay_delta: number | null
+          hours_delta: number | null
           hr_employee_id: string | null
-          id: string | null
-          is_deleted: boolean | null
-          non_pto_days: number | null
-          notes: string | null
           org_id: string | null
-          preferred_name: string | null
-          profile_photo_url: string | null
-          pto_days: number | null
-          request_reason: string | null
-          requested_at: string | null
-          requested_by: string | null
-          requested_by_name: string | null
-          return_date: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          reviewed_by_name: string | null
-          sick_leave_days: number | null
-          start_date: string | null
+          other_pay_delta: number | null
+          regular_pay: number | null
+          regular_pay_delta: number | null
+          scheduled_hours: number | null
           status: string | null
-          updated_at: string | null
-          work_authorization_name: string | null
+          task: string | null
+          total_cost: number | null
+          total_cost_delta: number | null
+          total_hours: number | null
+          workers_compensation_code: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_hr_time_off_request_employee"
-            columns: ["hr_employee_id"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_hr_time_off_request_employee"
-            columns: ["hr_employee_id"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "fk_hr_time_off_request_requested_by"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_hr_time_off_request_requested_by"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "fk_hr_time_off_request_reviewed_by"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "hr_employee"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_hr_time_off_request_reviewed_by"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "ops_task_weekly_schedule"
-            referencedColumns: ["hr_employee_id"]
-          },
-          {
-            foreignKeyName: "hr_time_off_request_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       hr_rba_navigation: {
         Row: {
@@ -9074,22 +9427,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      grow_spray_restriction: {
-        Row: {
-          end_time: string | null
-          farm_id: string | null
-          ops_task_tracker_id: string | null
-          org_id: string | null
-          restriction_date: string | null
-          restriction_stop: string | null
-          restriction_type: string | null
-          restriction_value: number | null
-          site_id: string | null
-          spray_stop: string | null
-          start_time: string | null
-        }
-        Relationships: []
       }
       invnt_item_summary: {
         Row: {
@@ -9126,7 +9463,7 @@ export type Database = {
             columns: ["burn_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_item_farm_id_fkey"
@@ -9161,14 +9498,14 @@ export type Database = {
             columns: ["onhand_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_item_order_uom_fkey"
             columns: ["order_uom"]
             isOneToOne: false
             referencedRelation: "sys_uom"
-            referencedColumns: ["code"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "invnt_item_org_id_fkey"
@@ -9181,11 +9518,7 @@ export type Database = {
       }
       ops_task_weekly_schedule: {
         Row: {
-          department_name: string | null
-          farm_id: string | null
-          farm_name: string | null
           friday: string | null
-          full_name: string | null
           hr_department_id: string | null
           hr_employee_id: string | null
           hr_work_authorization_id: string | null
@@ -9193,7 +9526,6 @@ export type Database = {
           monday: string | null
           org_id: string | null
           ot_threshold_weekly: number | null
-          profile_photo_url: string | null
           saturday: string | null
           sunday: string | null
           task: string | null
@@ -9202,7 +9534,6 @@ export type Database = {
           tuesday: string | null
           wednesday: string | null
           week_start_date: string | null
-          work_authorization_name: string | null
         }
         Relationships: [
           {
@@ -9220,14 +9551,103 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "ops_task_schedule_farm_id_fkey"
+            foreignKeyName: "ops_task_schedule_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_invoice_v: {
+        Row: {
+          cases: number | null
+          created_at: string | null
+          created_by: string | null
+          customer_group: string | null
+          customer_name: string | null
+          dollars: number | null
+          dow: number | null
+          farm_id: string | null
+          grade: string | null
+          id: string | null
+          invoice_date: string | null
+          invoice_number: string | null
+          is_deleted: boolean | null
+          iso_week: number | null
+          iso_year: number | null
+          month: number | null
+          notes: string | null
+          org_id: string | null
+          pounds: number | null
+          product_code: string | null
+          updated_at: string | null
+          updated_by: string | null
+          variety: string | null
+          year: number | null
+        }
+        Insert: {
+          cases?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_group?: string | null
+          customer_name?: string | null
+          dollars?: number | null
+          dow?: never
+          farm_id?: string | null
+          grade?: string | null
+          id?: string | null
+          invoice_date?: string | null
+          invoice_number?: string | null
+          is_deleted?: boolean | null
+          iso_week?: never
+          iso_year?: never
+          month?: never
+          notes?: string | null
+          org_id?: string | null
+          pounds?: number | null
+          product_code?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          variety?: string | null
+          year?: never
+        }
+        Update: {
+          cases?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_group?: string | null
+          customer_name?: string | null
+          dollars?: number | null
+          dow?: never
+          farm_id?: string | null
+          grade?: string | null
+          id?: string | null
+          invoice_date?: string | null
+          invoice_number?: string | null
+          is_deleted?: boolean | null
+          iso_week?: never
+          iso_year?: never
+          month?: never
+          notes?: string | null
+          org_id?: string | null
+          pounds?: number | null
+          product_code?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          variety?: string | null
+          year?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_invoice_farm_id_fkey"
             columns: ["farm_id"]
             isOneToOne: false
             referencedRelation: "org_farm"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "ops_task_schedule_org_id_fkey"
+            foreignKeyName: "sales_invoice_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"

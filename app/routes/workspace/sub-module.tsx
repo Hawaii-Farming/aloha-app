@@ -134,18 +134,14 @@ export const loader = async (args: {
       }
       query = query.order('employee_name');
     } else if (subModuleSlug === 'payroll_comp_manager') {
-      const periodStart = url.searchParams.get('period_start');
-      const periodEnd = url.searchParams.get('period_end');
+      // hr_payroll_employee_comparison auto-anchors to the most recent
+      // is_standard=TRUE HRB check_date and exposes deltas vs the prior
+      // period — no explicit period filtering needed at the query level.
       const managerId = url.searchParams.get('manager');
-      if (periodStart && periodEnd) {
-        query = query
-          .eq('pay_period_start', periodStart)
-          .eq('pay_period_end', periodEnd);
-      }
       if (managerId) {
         query = query.eq('compensation_manager_id', managerId);
       }
-      query = query.order('full_name');
+      query = query.order('hr_employee_id');
     } else if (subModuleSlug === 'hours_comp') {
       let periodStart = url.searchParams.get('period_start');
       let periodEnd = url.searchParams.get('period_end');
@@ -199,7 +195,7 @@ export const loader = async (args: {
       if (quarter) query = query.eq('review_quarter', parseInt(quarter, 10));
       query = query.order('full_name');
     } else if (subModuleSlug === 'housing') {
-      query = query.order('name');
+      query = query.order('id');
     } else {
       // Generic fallback for future custom views
       query = query.order('created_at', { ascending: false });
@@ -218,9 +214,9 @@ export const loader = async (args: {
     if (subModuleSlug === 'payroll_comp_manager') {
       const { data: mgrData } = await queryUntypedView(
         client,
-        'app_hr_payroll_by_comp_manager',
+        'hr_payroll_employee_comparison',
       )
-        .select('compensation_manager_id, compensation_manager_name')
+        .select('compensation_manager_id')
         .eq('org_id', accountSlug);
       const mgrSeen = new Set<string>();
       managers = castRows(mgrData).filter((r) => {

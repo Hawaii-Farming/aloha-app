@@ -13,7 +13,6 @@ const hrEmployeeSchema = z.object({
   email: z.string().optional(),
   company_email: z.string().optional(),
   hr_department_id: z.string().optional(),
-  hr_title_id: z.string().optional(),
   sys_access_level_id: z.string().min(1, 'Access level is required'),
   team_lead_id: z.string().optional(),
   compensation_manager_id: z.string().optional(),
@@ -52,10 +51,9 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
 
   select: [
     '*',
-    'hr_department:hr_department!hr_department_id(name)',
-    'hr_work_authorization:hr_work_authorization!hr_work_authorization_id(name)',
-    'hr_title:hr_title!hr_title_id(name)',
-    'housing_site:org_site!site_id(name)',
+    'hr_department:hr_department!hr_department_id(name:id)',
+    'hr_work_authorization:hr_work_authorization!hr_work_authorization_id(name:id)',
+    'housing_site:org_site!site_id(name:id)',
   ].join(', '),
 
   selfJoins: {
@@ -114,7 +112,6 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       render: 'email',
       priority: 'low',
     },
-    { key: 'hr_title_name', label: 'Title', sortable: true, priority: 'low' },
     {
       key: 'date_of_birth',
       label: 'DOB',
@@ -150,8 +147,8 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       label: 'Gender',
       type: 'radio',
       options: [
-        { value: 'male', label: 'Male' },
-        { value: 'female', label: 'Female' },
+        { value: 'Male', label: 'Male' },
+        { value: 'Female', label: 'Female' },
       ],
     },
     { key: 'date_of_birth', label: 'Date of Birth', type: 'date' },
@@ -172,7 +169,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       label: 'Access Level',
       type: 'fk',
       fkTable: 'sys_access_level',
-      fkLabelColumn: 'name',
+      fkLabelColumn: 'id',
       fkOrgScoped: false,
       fkOrderColumn: 'level',
       required: true,
@@ -182,14 +179,14 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       label: 'Department',
       type: 'fk',
       fkTable: 'hr_department',
-      fkLabelColumn: 'name',
+      fkLabelColumn: 'id',
     },
     {
       key: 'hr_work_authorization_id',
       label: 'Work Authorization',
       type: 'fk',
       fkTable: 'hr_work_authorization',
-      fkLabelColumn: 'name',
+      fkLabelColumn: 'id',
     },
     {
       key: 'compensation_manager_id',
@@ -197,7 +194,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       type: 'fk',
       fkTable: 'hr_employee',
       fkLabelColumn: 'preferred_name',
-      fkFilter: { sys_access_level_id: 'manager' },
+      fkFilter: { sys_access_level_id: 'Manager' },
     },
     {
       key: 'team_lead_id',
@@ -205,14 +202,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       type: 'fk',
       fkTable: 'hr_employee',
       fkLabelColumn: 'preferred_name',
-      fkFilter: { sys_access_level_id: 'team_lead' },
-    },
-    {
-      key: 'hr_title_id',
-      label: 'Title',
-      type: 'fk',
-      fkTable: 'hr_title',
-      fkLabelColumn: 'name',
+      fkFilter: { sys_access_level_id: 'Team Lead' },
     },
 
     // --- Employment ---
@@ -230,8 +220,8 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       label: 'Pay Structure',
       type: 'radio',
       options: [
-        { value: 'hourly', label: 'Hourly' },
-        { value: 'salary', label: 'Salary' },
+        { value: 'Hourly', label: 'Hourly' },
+        { value: 'Salary', label: 'Salary' },
       ],
       section: 'Compensation',
     },
@@ -253,7 +243,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       label: 'Housing',
       type: 'fk',
       fkTable: 'org_site',
-      fkLabelColumn: 'name',
+      fkLabelColumn: 'id',
       fkFilter: { org_site_category_id: 'housing' },
     },
   ],

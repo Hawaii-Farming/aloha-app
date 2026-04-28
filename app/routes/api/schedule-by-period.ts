@@ -19,7 +19,7 @@ export const loader = async ({ request }: { request: Request }) => {
   const { data, error } = await client
     .from('ops_task_schedule' as never)
     .select(
-      'id, start_time, stop_time, hr_employee_id, org_id, hr_employee!inner(hr_department(name)), ops_task!inner(name)',
+      'id, start_time, stop_time, hr_employee_id, org_id, hr_employee!inner(hr_department(name:id)), ops_task!inner(name:id)',
     )
     .eq('org_id', orgId)
     .eq('hr_employee_id', employeeId)

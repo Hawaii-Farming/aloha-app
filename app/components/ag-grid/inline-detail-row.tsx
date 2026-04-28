@@ -125,7 +125,6 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
   };
 
   const department = resolve('hr_department_id');
-  const title = resolve('hr_title_id');
   const workAuth = resolve('hr_work_authorization_id');
   const manager = resolve('compensation_manager_id');
   const teamLead = resolve('team_lead_id');
@@ -176,11 +175,6 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
         {/* Row 1: Name + badges */}
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold">{fullName}</span>
-          {title && (
-            <Badge variant="secondary" className="text-[11px]">
-              {title}
-            </Badge>
-          )}
           {workAuth && (
             <Badge variant="outline" className="text-[11px]">
               {workAuth}

@@ -35,9 +35,9 @@ function formatDate(value: string): string {
 
 function StatusIcon({ status }: { status: string }) {
   switch (status) {
-    case 'approved':
+    case 'Approved':
       return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
-    case 'denied':
+    case 'Denied':
       return <XCircle className="h-4 w-4 text-red-500" />;
     default:
       return <Clock className="h-4 w-4 text-amber-500" />;
@@ -45,8 +45,8 @@ function StatusIcon({ status }: { status: string }) {
 }
 
 function statusVariant(status: string): 'success' | 'destructive' | 'warning' {
-  if (status === 'approved') return 'success';
-  if (status === 'denied') return 'destructive';
+  if (status === 'Approved') return 'success';
+  if (status === 'Denied') return 'destructive';
   return 'warning';
 }
 
@@ -73,10 +73,10 @@ export function TimeOffDetailRow({ data }: TimeOffDetailRowProps) {
   const fullName = (data['full_name'] as string) ?? '';
   const photoUrl = data['profile_photo_url'] as string | undefined;
   const initials = getInitials(fullName);
-  const status = (data['status'] as string) ?? 'pending';
+  const status = (data['status'] as string) ?? 'Pending';
   const deptName = data['department_name'] as string | undefined;
   const workAuth = data['work_authorization_name'] as string | undefined;
-  const compManager = data['compensation_manager_name'] as string | undefined;
+  const compManager = data['compensation_manager_id'] as string | undefined;
 
   const startDate = data['start_date'] as string | undefined;
   const returnDate = data['return_date'] as string | undefined;

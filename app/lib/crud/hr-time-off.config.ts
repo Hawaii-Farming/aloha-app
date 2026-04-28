@@ -22,7 +22,7 @@ const hrTimeOffSchema = z.object({
 const timeOffColumns: ColumnConfig[] = [
   { key: 'full_name', label: 'Employee', sortable: true },
   {
-    key: 'compensation_manager_name',
+    key: 'compensation_manager_id',
     label: 'Comp Manager',
   },
   {
@@ -141,7 +141,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       key: 'status',
       label: 'Status',
       type: 'select',
-      options: ['pending', 'approved', 'denied'],
+      options: ['Pending', 'Approved', 'Denied'],
     },
   ],
 
@@ -180,21 +180,21 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   workflow: {
     statusColumn: 'status',
     states: {
-      pending: { label: 'Pending', color: 'warning' },
-      approved: { label: 'Approved', color: 'success' },
-      denied: { label: 'Denied', color: 'destructive' },
+      Pending: { label: 'Pending', color: 'warning' },
+      Approved: { label: 'Approved', color: 'success' },
+      Denied: { label: 'Denied', color: 'destructive' },
     },
     transitions: {
-      pending: ['approved', 'denied'],
-      approved: [],
-      denied: ['pending'],
+      Pending: ['Approved', 'Denied'],
+      Approved: [],
+      Denied: ['Pending'],
     },
     transitionFields: {
-      approved: {
+      Approved: {
         reviewed_by: 'currentEmployee',
         reviewed_at: 'now',
       },
-      denied: {
+      Denied: {
         reviewed_by: 'currentEmployee',
         reviewed_at: 'now',
       },

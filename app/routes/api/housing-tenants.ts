@@ -16,7 +16,7 @@ export const loader = async ({ request }: { request: Request }) => {
   const { data, error } = await client
     .from('hr_employee' as never)
     .select(
-      'id, first_name, last_name, profile_photo_url, start_date, hr_department(name), hr_work_authorization(name)',
+      'id, first_name, last_name, profile_photo_url, start_date, hr_department(name:id), hr_work_authorization(name:id)',
     )
     .eq('org_id', orgId)
     .eq('site_id', siteId)

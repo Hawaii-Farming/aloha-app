@@ -15,11 +15,11 @@ export const loader = async ({ request }: { request: Request }) => {
 
   const { data, error } = await client
     .from('org_site' as never)
-    .select('id, name, max_beds, notes')
+    .select('id, name:id, max_beds, notes')
     .eq('org_id', orgId)
     .eq('site_id_parent', siteId)
     .eq('is_deleted', false)
-    .order('name');
+    .order('id');
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
