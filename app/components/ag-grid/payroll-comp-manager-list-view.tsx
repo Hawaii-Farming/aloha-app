@@ -196,7 +196,7 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
   const navigate = useNavigate();
   const { account } = useParams();
 
-  const subModuleSlug = 'payroll_comp_manager';
+  const subModuleSlug = 'Payroll Comp Manager';
   const { query } = useActiveTableSearch();
   useRegisterActiveTable(
     subModuleSlug,

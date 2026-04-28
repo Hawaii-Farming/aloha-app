@@ -1,13 +1,11 @@
-/** Row shape from hr_rba_navigation view */
+/** Row shape from hr_rba_navigation view. The Proper Case `id` is also
+ *  the display name, URL segment, and registry/icon lookup key — there
+ *  are no separate slug or display_name columns. */
 export interface AppNavigationRow {
   org_id: string;
   module_id: string;
-  module_slug: string;
-  module_display_name: string;
   module_display_order: number;
   sub_module_id: string;
-  sub_module_slug: string;
-  sub_module_display_name: string;
   sub_module_display_order: number;
   can_edit: boolean;
   can_delete: boolean;

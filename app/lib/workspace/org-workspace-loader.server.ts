@@ -104,13 +104,17 @@ function deriveNavigation(
   const moduleMap = new Map<string, AppNavModule>();
   const subModules: AppNavSubModule[] = [];
 
+  // The display-name PK IS the URL segment now — there's no separate slug.
+  // We keep the property names `module_slug` / `sub_module_slug` on the
+  // navigation objects to avoid touching every consumer; the values are
+  // simply the Proper Case ids.
   for (const row of rows) {
-    if (!moduleMap.has(row.module_slug)) {
-      moduleMap.set(row.module_slug, {
+    if (!moduleMap.has(row.module_id)) {
+      moduleMap.set(row.module_id, {
         module_id: row.module_id,
         org_id: orgId,
-        module_slug: row.module_slug,
-        display_name: row.module_display_name,
+        module_slug: row.module_id,
+        display_name: row.module_id,
         display_order: row.module_display_order,
         can_edit: row.can_edit,
         can_delete: row.can_delete,
@@ -118,21 +122,19 @@ function deriveNavigation(
       });
     }
 
-    // payroll_data is merged under payroll_comp's 3-way toggle (Data | By Dept | By Employee)
-    // — hide its own sidebar/search entry. Route stays accessible via the toggle.
-    if (row.sub_module_slug === 'payroll_data') continue;
+    // "Payroll Data" is merged under "Payroll Comp"'s 3-way toggle — hide its
+    // own sidebar/search entry. Route stays accessible via the toggle.
+    if (row.sub_module_id === 'Payroll Data') continue;
 
-    // Rename payroll_comp → "Payroll" in UI (DB display name is "Payroll Comp").
+    // Rename "Payroll Comp" → "Payroll" in the UI for brevity.
     const displayName =
-      row.sub_module_slug === 'payroll_comp'
-        ? 'Payroll'
-        : row.sub_module_display_name;
+      row.sub_module_id === 'Payroll Comp' ? 'Payroll' : row.sub_module_id;
 
     subModules.push({
       sub_module_id: row.sub_module_id,
       org_id: orgId,
-      module_slug: row.module_slug,
-      sub_module_slug: row.sub_module_slug,
+      module_slug: row.module_id,
+      sub_module_slug: row.sub_module_id,
       display_name: displayName,
       display_order: row.sub_module_display_order,
     });

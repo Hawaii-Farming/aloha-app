@@ -138,7 +138,7 @@ export default function PayrollHoursListView(props: ListViewProps) {
   const navigate = useNavigate();
   const { account } = useParams();
 
-  const subModuleSlug = 'hours_comp';
+  const subModuleSlug = 'Hours Comp';
   const { query } = useActiveTableSearch();
   useRegisterActiveTable(
     subModuleSlug,

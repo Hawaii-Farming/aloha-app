@@ -293,7 +293,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   const periodValue =
     periodStart && periodEnd ? `${periodStart}|${periodEnd}` : '';
 
-  const subModuleSlug = 'payroll_comp';
+  const subModuleSlug = 'Payroll Comp';
   const { query } = useActiveTableSearch();
   useRegisterActiveTable(
     subModuleSlug,

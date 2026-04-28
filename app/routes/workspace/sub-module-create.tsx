@@ -129,21 +129,11 @@ export const action = async (args: {
     request: args.request,
   });
 
-  // Auto-resolve housing category ID for org_site creates
-  if (!recordId && subModuleSlug === 'housing') {
-    const { data: catData } = await client
-      .from('org_site_category' as never)
-      .select('id')
-      .eq('category_name', 'housing')
-      .is('sub_category_name', null)
-      .single();
-    if (catData) {
-      formData.org_site_category_id = (catData as Record<string, unknown>).id;
-    }
-  }
+  // Housing creates now hit org_site_housing directly — no category
+  // resolution needed since the table is housing-only by definition.
 
   // Prevent editing locked employee reviews (T-06-09)
-  if (recordId && subModuleSlug === 'employee_review') {
+  if (recordId && subModuleSlug === 'Employee Review') {
     const { data: existing } = await client
       .from('hr_employee_review' as never)
       .select('is_locked')

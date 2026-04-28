@@ -66,9 +66,9 @@ export const loader = async (args: {
     // for payroll_data default period selection)
     let payPeriods: Record<string, unknown>[] = [];
     if (
-      subModuleSlug.startsWith('payroll_') ||
-      subModuleSlug === 'payroll_comp' ||
-      subModuleSlug === 'hours_comp'
+      subModuleSlug.startsWith('Payroll') ||
+      subModuleSlug === 'Payroll Comp' ||
+      subModuleSlug === 'Hours Comp'
     ) {
       const { data: periodData } = await queryUntypedView(client, 'hr_payroll')
         .select('pay_period_start, pay_period_end')
@@ -86,7 +86,7 @@ export const loader = async (args: {
 
     // Load distinct review years for YearQuarterFilter
     let reviewYears: number[] = [];
-    if (subModuleSlug === 'employee_review') {
+    if (subModuleSlug === 'Employee Review') {
       const { data: yearData } = await queryUntypedView(
         client,
         'app_hr_employee_reviews',
@@ -109,7 +109,7 @@ export const loader = async (args: {
       .eq('org_id', accountSlug);
 
     // Slug-specific query params
-    if (subModuleSlug === 'scheduler') {
+    if (subModuleSlug === 'Scheduler') {
       const weekStart = url.searchParams.get('week') ?? getCurrentWeekStart();
       query = query.eq('week_start_date', weekStart);
       const deptFilter = url.searchParams.get('dept') ?? null;
@@ -118,8 +118,8 @@ export const loader = async (args: {
       }
       query = query.order('full_name');
     } else if (
-      subModuleSlug === 'payroll_comparison' ||
-      subModuleSlug === 'payroll_comp'
+      subModuleSlug === 'Payroll Comparison' ||
+      subModuleSlug === 'Payroll Comp'
     ) {
       // Both views use detail data for client-side grouping + inline detail tables
       query = queryUntypedView(client, 'app_hr_payroll_detail')
@@ -133,7 +133,7 @@ export const loader = async (args: {
           .eq('pay_period_end', periodEnd);
       }
       query = query.order('employee_name');
-    } else if (subModuleSlug === 'payroll_comp_manager') {
+    } else if (subModuleSlug === 'Payroll Comp Manager') {
       // hr_payroll_employee_comparison auto-anchors to the most recent
       // is_standard=TRUE HRB check_date and exposes deltas vs the prior
       // period — no explicit period filtering needed at the query level.
@@ -142,7 +142,7 @@ export const loader = async (args: {
         query = query.eq('compensation_manager_id', managerId);
       }
       query = query.order('hr_employee_id');
-    } else if (subModuleSlug === 'hours_comp') {
+    } else if (subModuleSlug === 'Hours Comp') {
       let periodStart = url.searchParams.get('period_start');
       let periodEnd = url.searchParams.get('period_end');
 
@@ -163,7 +163,7 @@ export const loader = async (args: {
           .eq('pay_period_end', periodEnd);
       }
       query = query.order('full_name');
-    } else if (subModuleSlug === 'payroll_data') {
+    } else if (subModuleSlug === 'Payroll Data') {
       let periodStart = url.searchParams.get('period_start');
       let periodEnd = url.searchParams.get('period_end');
       const employeeId = url.searchParams.get('employee');
@@ -188,13 +188,13 @@ export const loader = async (args: {
         query = query.eq('hr_employee_id', employeeId);
       }
       query = query.order('full_name');
-    } else if (subModuleSlug === 'employee_review') {
+    } else if (subModuleSlug === 'Employee Review') {
       const year = url.searchParams.get('year');
       const quarter = url.searchParams.get('quarter');
       if (year) query = query.eq('review_year', parseInt(year, 10));
       if (quarter) query = query.eq('review_quarter', parseInt(quarter, 10));
       query = query.order('full_name');
-    } else if (subModuleSlug === 'housing') {
+    } else if (subModuleSlug === 'Housing') {
       query = query.order('id');
     } else {
       // Generic fallback for future custom views
@@ -211,7 +211,7 @@ export const loader = async (args: {
 
     // Load distinct managers for payroll_comp_manager
     let managers: Record<string, unknown>[] = [];
-    if (subModuleSlug === 'payroll_comp_manager') {
+    if (subModuleSlug === 'Payroll Comp Manager') {
       const { data: mgrData } = await queryUntypedView(
         client,
         'hr_payroll_employee_comparison',
@@ -229,7 +229,7 @@ export const loader = async (args: {
 
     // Load employee options for payroll_data employee filter
     let employees: Array<{ value: string; label: string }> = [];
-    if (subModuleSlug === 'payroll_data') {
+    if (subModuleSlug === 'Payroll Data') {
       const { data: empData } = await client
         .from('hr_employee' as never)
         .select('id, first_name, last_name')
@@ -444,7 +444,7 @@ export default function SubModulePage(props: {
     accountSlug,
     filterSlot: typedConfig.workflow ? (
       <StatusFilterTabs workflow={typedConfig.workflow} />
-    ) : subModuleSlug === 'payroll_data' ? (
+    ) : subModuleSlug === 'Payroll Data' ? (
       <Suspense fallback={null}>
         <LazyPayrollDataFilterBar />
       </Suspense>
@@ -459,7 +459,7 @@ export default function SubModulePage(props: {
         </div>
       }
     >
-      {subModuleSlug === 'payroll_data' && <PayrollViewToggle />}
+      {subModuleSlug === 'Payroll Data' && <PayrollViewToggle />}
       <ViewComponent {...viewProps} />
     </Suspense>
   );

@@ -22,7 +22,7 @@ export async function requireModuleAccess(params: {
     .from('hr_rba_navigation' as never)
     .select('*')
     .eq('org_id', params.orgSlug)
-    .eq('module_slug', params.moduleSlug)
+    .eq('module_id', params.moduleSlug)
     .limit(1)
     .maybeSingle();
 
@@ -45,8 +45,8 @@ export async function requireModuleAccess(params: {
   return {
     module_id: row.module_id,
     org_id: row.org_id,
-    module_slug: row.module_slug,
-    display_name: row.module_display_name,
+    module_slug: row.module_id,
+    display_name: row.module_id,
     display_order: row.module_display_order,
     can_edit: row.can_edit,
     can_delete: row.can_delete,
@@ -69,8 +69,8 @@ export async function requireSubModuleAccess(params: {
     .from('hr_rba_navigation' as never)
     .select('*')
     .eq('org_id', params.orgSlug)
-    .eq('module_slug', params.moduleSlug)
-    .eq('sub_module_slug', params.subModuleSlug)
+    .eq('module_id', params.moduleSlug)
+    .eq('sub_module_id', params.subModuleSlug)
     .maybeSingle();
 
   if (error && error.code !== 'PGRST116') {
@@ -90,9 +90,9 @@ export async function requireSubModuleAccess(params: {
   return {
     sub_module_id: row.sub_module_id,
     org_id: row.org_id,
-    module_slug: row.module_slug,
-    sub_module_slug: row.sub_module_slug,
-    display_name: row.sub_module_display_name,
+    module_slug: row.module_id,
+    sub_module_slug: row.sub_module_id,
+    display_name: row.sub_module_id,
     display_order: row.sub_module_display_order,
   };
 }

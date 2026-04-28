@@ -64,91 +64,94 @@ import {
 
 type IconComponent = React.ComponentType<{ className?: string }>;
 
+// Keys are sys_module.id / sys_sub_module.id values — Proper Case display
+// names that double as URL segments. The id flows straight from the URL
+// param into these lookups.
 const moduleIcons: Record<string, IconComponent> = {
-  operations: Factory,
-  grow: Leaf,
-  pack: Package,
-  food_safety: ShieldCheck,
-  maintenance: Wrench,
-  inventory: Warehouse,
-  sales: ShoppingCart,
-  human_resources: Users,
+  Operations: Factory,
+  Grow: Leaf,
+  Pack: Package,
+  'Food Safety': ShieldCheck,
+  Maintenance: Wrench,
+  Inventory: Warehouse,
+  Sales: ShoppingCart,
+  'Human Resources': Users,
 };
 
 const subModuleIcons: Record<string, IconComponent> = {
   // Operations
-  action_items: CircleCheckBig,
-  sites: MapPin,
-  flags: Flag,
-  variables: Variable,
-  sops: BookOpen,
-  faq: CircleHelp,
+  'Action Items': CircleCheckBig,
+  Sites: MapPin,
+  Flags: Flag,
+  Variables: Variable,
+  Sops: BookOpen,
+  Faq: CircleHelp,
 
   // Grow
-  cuke_calendar: CalendarDays,
-  cuke_seeding: Sprout,
-  cuke_sched: CalendarCheck,
-  cuke_harvest: Scissors,
-  lettuce_seeding: Vegan,
-  lettuce_yield: Scale,
-  fertilizer_sched: Droplets,
-  scouting: Search,
-  spraying_sched: SprayCan,
-  chemistry: Beaker,
+  'Cuke Calendar': CalendarDays,
+  'Cuke Seeding': Sprout,
+  'Cuke Sched': CalendarCheck,
+  'Cuke Harvest': Scissors,
+  'Lettuce Seeding': Vegan,
+  'Lettuce Yield': Scale,
+  'Fertilizer Sched': Droplets,
+  Scouting: Search,
+  'Spraying Sched': SprayCan,
+  Chemistry: Beaker,
 
   // Pack
-  cuke_pack: PackageOpen,
-  lettuce_p_h: Thermometer,
-  lettuce_pack: ListChecks,
-  shelf_life: Timer,
-  moisture: Droplet,
+  'Cuke Pack': PackageOpen,
+  'Lettuce P&H': Thermometer,
+  'Lettuce Pack': ListChecks,
+  'Shelf Life': Timer,
+  Moisture: Droplet,
 
   // Food Safety
-  fsafe_logs: ClipboardList,
-  corrective_actions: ClipboardPen,
-  pest_activity: Bug,
-  staff_training: GraduationCap,
-  visitors_log: Notebook,
-  customer_communication: MessageSquare,
+  'Fsafe Logs': ClipboardList,
+  'Corrective Actions': ClipboardPen,
+  'Pest Activity': Bug,
+  'Staff Training': GraduationCap,
+  'Visitors Log': Notebook,
+  'Customer Communication': MessageSquare,
 
   // Maintenance
-  maint_request: Hammer,
-  fuel_log: Fuel,
-  maint_inventory: ListOrdered,
-  house_inspection: Home,
+  'Maint Request': Hammer,
+  'Fuel Log': Fuel,
+  'Maint Inventory': ListOrdered,
+  'House Inspection': Home,
 
   // Inventory
-  wto: Truck,
-  orders: Receipt,
-  budget: DollarSign,
-  procurement: CreditCard,
+  Wto: Truck,
+  Orders: Receipt,
+  Budget: DollarSign,
+  Procurement: CreditCard,
 
   // Sales
-  po_s: FileText,
-  palletization: Grid3x3,
-  price_product_spec: Tags,
-  customers: Store,
-  crm: Handshake,
-  markup: Percent,
-  ext_prices: CircleDollarSign,
-  price_grid: FileSpreadsheet,
+  "Po'S": FileText,
+  Palletization: Grid3x3,
+  'Price & Product Spec': Tags,
+  Customers: Store,
+  Crm: Handshake,
+  Markup: Percent,
+  'Ext Prices': CircleDollarSign,
+  'Price Grid': FileSpreadsheet,
 
   // Human Resources
-  register: Contact,
-  scheduler: CalendarClock,
-  time_off: CalendarOff,
-  hours_comp: Clock,
-  payroll_comp: BadgeDollarSign,
-  payroll_comp_manager: Wallet,
-  payroll_data: Gauge,
-  housing: BedDouble,
-  employee_review: UserCheck,
+  Register: Contact,
+  Scheduler: CalendarClock,
+  'Time Off': CalendarOff,
+  'Hours Comp': Clock,
+  'Payroll Comp': BadgeDollarSign,
+  'Payroll Comp Manager': Wallet,
+  'Payroll Data': Gauge,
+  Housing: BedDouble,
+  'Employee Review': UserCheck,
 };
 
-export function getModuleIcon(moduleSlug: string): IconComponent {
-  return moduleIcons[moduleSlug] ?? Settings;
+export function getModuleIcon(moduleId: string): IconComponent {
+  return moduleIcons[moduleId] ?? Settings;
 }
 
-export function getSubModuleIcon(subModuleSlug: string): IconComponent {
-  return subModuleIcons[subModuleSlug] ?? Settings;
+export function getSubModuleIcon(subModuleId: string): IconComponent {
+  return subModuleIcons[subModuleId] ?? Settings;
 }

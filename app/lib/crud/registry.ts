@@ -22,39 +22,38 @@ import { opsTemplateConfig } from './ops-template.config';
 import { orgSiteConfig } from './org-site.config';
 
 /**
- * Maps sub-module slugs (from URL params) to their CRUD configs.
+ * Maps sub_module_id (URL segment + display name) to its CRUD config.
  *
- * Each entry maps the sys_sub_module_id (used in URL routing)
- * to the CrudModuleConfig that tells the factory which Supabase
- * table/view to query and how to render columns/forms.
+ * Keys are the Proper Case sys_sub_module.id values — they flow straight
+ * from URL params to this lookup with no transformation.
  */
 const registry = new Map<string, CrudModuleConfig>([
-  ['register', hrEmployeeConfig],
-  ['departments', hrDepartmentConfig],
-  ['employees', hrEmployeeConfig],
-  ['time_off', hrTimeOffConfig],
-  ['payroll', hrPayrollConfig],
-  ['payroll_comp', hrPayrollComparisonConfig],
-  ['payroll_comparison', hrPayrollComparisonConfig],
-  ['payroll_comp_manager', hrPayrollCompManagerConfig],
-  ['payroll_data', hrPayrollDataConfig],
-  ['hours_comp', hrPayrollHoursConfig],
-  ['products', invntItemConfig],
-  ['stock_counts', invntOnhandConfig],
-  ['warehouses', orgSiteConfig],
-  ['seed_batches', growSeedBatchConfig],
-  ['harvests', growHarvestWeightConfig],
-  ['inspections', fsafeResultConfig],
-  ['incidents', fsafeTestHoldConfig],
-  ['scheduler', opsTaskScheduleConfig],
-  ['task_tracking', opsTaskTrackerConfig],
-  ['checklists', opsTemplateConfig],
-  ['housing', hrHousingConfig],
-  ['employee_review', hrEmployeeReviewConfig],
+  ['Register', hrEmployeeConfig],
+  ['Departments', hrDepartmentConfig],
+  ['Employees', hrEmployeeConfig],
+  ['Time Off', hrTimeOffConfig],
+  ['Payroll', hrPayrollConfig],
+  ['Payroll Comp', hrPayrollComparisonConfig],
+  ['Payroll Comparison', hrPayrollComparisonConfig],
+  ['Payroll Comp Manager', hrPayrollCompManagerConfig],
+  ['Payroll Data', hrPayrollDataConfig],
+  ['Hours Comp', hrPayrollHoursConfig],
+  ['Products', invntItemConfig],
+  ['Stock Counts', invntOnhandConfig],
+  ['Warehouses', orgSiteConfig],
+  ['Seed Batches', growSeedBatchConfig],
+  ['Harvests', growHarvestWeightConfig],
+  ['Inspections', fsafeResultConfig],
+  ['Incidents', fsafeTestHoldConfig],
+  ['Scheduler', opsTaskScheduleConfig],
+  ['Task Tracking', opsTaskTrackerConfig],
+  ['Checklists', opsTemplateConfig],
+  ['Housing', hrHousingConfig],
+  ['Employee Review', hrEmployeeReviewConfig],
 ]);
 
 export function getModuleConfig(
-  subModuleSlug: string,
+  subModuleId: string,
 ): CrudModuleConfig | undefined {
-  return registry.get(subModuleSlug);
+  return registry.get(subModuleId);
 }
