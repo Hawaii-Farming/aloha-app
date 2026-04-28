@@ -121,8 +121,8 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   },
 
   views: {
-    list: 'hr_time_off_request',
-    detail: 'hr_time_off_request',
+    list: 'app_hr_time_off_requests',
+    detail: 'app_hr_time_off_requests',
   },
 
   columns: timeOffColumns,

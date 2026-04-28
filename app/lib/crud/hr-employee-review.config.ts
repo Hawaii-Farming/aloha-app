@@ -24,8 +24,8 @@ export const hrEmployeeReviewConfig: CrudModuleConfig<
   orgScoped: true,
 
   views: {
-    list: 'hr_employee_review',
-    detail: 'hr_employee_review',
+    list: 'app_hr_employee_reviews',
+    detail: 'app_hr_employee_reviews',
   },
 
   columns: [

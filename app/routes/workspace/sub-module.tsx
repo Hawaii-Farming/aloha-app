@@ -89,7 +89,7 @@ export const loader = async (args: {
     if (subModuleSlug === 'Employee Review') {
       const { data: yearData } = await queryUntypedView(
         client,
-        'hr_employee_review',
+        'app_hr_employee_reviews',
       )
         .select('review_year')
         .eq('org_id', accountSlug);
