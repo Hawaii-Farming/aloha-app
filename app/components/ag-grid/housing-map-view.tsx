@@ -50,16 +50,20 @@ interface AccommodationRow {
 }
 
 function parseHousingSite(row: RowData): HousingSite {
+  // org_site_housing's id IS the display name. The base row has no
+  // tenant_count / available_beds; those are derived elsewhere or via
+  // a future view wrapping this table.
+  const id = String(row.id ?? '');
   return {
-    id: String(row.id ?? ''),
-    name: String(row.name ?? ''),
-    maxBeds: row.max_beds != null ? Number(row.max_beds) : null,
+    id,
+    name: id,
+    maxBeds: row.maximum_beds != null ? Number(row.maximum_beds) : null,
     tenantCount: Number(row.tenant_count ?? 0),
     availableBeds: Number(row.available_beds ?? 0),
     notes: row.notes ? String(row.notes) : null,
-    isActive: row.is_active !== false,
-    parentId: row.site_id_parent ? String(row.site_id_parent) : null,
-    parentName: row.parent_name ? String(row.parent_name) : null,
+    isActive: row.is_deleted === false || row.is_deleted == null,
+    parentId: null,
+    parentName: null,
   };
 }
 

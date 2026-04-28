@@ -25,7 +25,7 @@ const hrEmployeeSchema = z.object({
   wc: z.string().optional(),
   payroll_processor: z.string().optional(),
   pay_delivery_method: z.string().optional(),
-  site_id: z.string().optional(),
+  housing_id: z.string().optional(),
 });
 
 export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
@@ -53,7 +53,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     '*',
     'hr_department:hr_department!hr_department_id(name:id)',
     'hr_work_authorization:hr_work_authorization!hr_work_authorization_id(name:id)',
-    'housing_site:org_site!site_id(name:id)',
+    'housing:org_site_housing!housing_id(name:id)',
   ].join(', '),
 
   selfJoins: {
@@ -239,12 +239,11 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       type: 'combobox',
     },
     {
-      key: 'site_id',
+      key: 'housing_id',
       label: 'Housing',
       type: 'fk',
-      fkTable: 'org_site',
+      fkTable: 'org_site_housing',
       fkLabelColumn: 'id',
-      fkFilter: { org_site_category_id: 'housing' },
     },
   ],
 

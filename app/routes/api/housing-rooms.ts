@@ -13,11 +13,14 @@ export const loader = async ({ request }: { request: Request }) => {
     return new Response('siteId and orgId are required', { status: 400 });
   }
 
+  // Rooms are now `org_site_housing_area` rows scoped by housing_id.
+  // The current schema only carries id + housing_id; max_beds and notes
+  // are properties of the parent org_site_housing record, not the area.
   const { data, error } = await client
-    .from('org_site' as never)
-    .select('id, name:id, max_beds, notes')
+    .from('org_site_housing_area' as never)
+    .select('id')
     .eq('org_id', orgId)
-    .eq('site_id_parent', siteId)
+    .eq('housing_id', siteId)
     .eq('is_deleted', false)
     .order('id');
 
@@ -28,9 +31,9 @@ export const loader = async ({ request }: { request: Request }) => {
   const rows = castRows(data);
   const rooms = rows.map((row) => ({
     id: String(row.id ?? ''),
-    name: String(row.name ?? ''),
-    max_beds: row.max_beds != null ? Number(row.max_beds) : null,
-    notes: row.notes ? String(row.notes) : null,
+    name: String(row.id ?? ''),
+    max_beds: null,
+    notes: null,
   }));
 
   return Response.json({ data: rooms });

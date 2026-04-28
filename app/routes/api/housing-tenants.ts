@@ -19,7 +19,7 @@ export const loader = async ({ request }: { request: Request }) => {
       'id, first_name, last_name, profile_photo_url, start_date, hr_department(name:id), hr_work_authorization(name:id)',
     )
     .eq('org_id', orgId)
-    .eq('site_id', siteId)
+    .eq('housing_id', siteId)
     .eq('is_deleted', false)
     .order('last_name');
 

@@ -134,7 +134,7 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
   const startDate = resolve('start_date');
   const payStructure = resolve('pay_structure');
   const otThreshold = resolve('overtime_threshold');
-  const housing = resolve('site_id');
+  const housing = resolve('housing_id');
   const gender = resolve('gender');
 
   return (
