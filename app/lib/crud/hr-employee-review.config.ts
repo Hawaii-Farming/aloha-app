@@ -24,15 +24,37 @@ export const hrEmployeeReviewConfig: CrudModuleConfig<
   orgScoped: true,
 
   views: {
-    list: 'app_hr_employee_reviews',
-    detail: 'app_hr_employee_reviews',
+    list: 'hr_employee_review',
+    detail: 'hr_employee_review',
   },
 
+  // Joined display fields via postgrest embeds. flattenRow turns
+  // `subject.preferred_name` -> `subject_preferred_name`, etc.
+  // `quarter_label` is composed client-side or in the agGrid value getter
+  // since postgrest doesn't expose computed columns; we synthesize it from
+  // review_year + review_quarter at the column-renderer level.
+  select: [
+    '*',
+    'subject:hr_employee!hr_employee_id(preferred_name,profile_photo_url,hr_department_id,start_date)',
+    'lead:hr_employee!lead_id(preferred_name)',
+  ].join(', '),
+
   columns: [
-    { key: 'full_name', label: 'Employee', sortable: true },
-    { key: 'department_name', label: 'Department', sortable: true },
-    { key: 'start_date', label: 'Start Date', type: 'date', priority: 'low' },
-    { key: 'quarter_label', label: 'Quarter', sortable: true },
+    { key: 'subject_preferred_name', label: 'Employee', sortable: true },
+    { key: 'subject_hr_department_id', label: 'Department', sortable: true },
+    {
+      key: 'subject_start_date',
+      label: 'Start Date',
+      type: 'date',
+      priority: 'low',
+    },
+    { key: 'review_year', label: 'Year', type: 'number', sortable: true },
+    {
+      key: 'review_quarter',
+      label: 'Quarter',
+      type: 'number',
+      sortable: true,
+    },
     {
       key: 'productivity',
       label: 'Productivity',
@@ -54,12 +76,17 @@ export const hrEmployeeReviewConfig: CrudModuleConfig<
     },
     { key: 'average', label: 'Average', type: 'number', sortable: true },
     { key: 'notes', label: 'Notes', priority: 'low' },
-    { key: 'lead_name', label: 'Lead', sortable: true, priority: 'low' },
+    {
+      key: 'lead_preferred_name',
+      label: 'Lead',
+      sortable: true,
+      priority: 'low',
+    },
     { key: 'is_locked', label: 'Locked', type: 'boolean', priority: 'low' },
   ],
 
   search: {
-    columns: ['full_name', 'department_name'],
+    columns: ['subject_preferred_name', 'subject_hr_department_id'],
     placeholder: 'Search reviews...',
   },
 

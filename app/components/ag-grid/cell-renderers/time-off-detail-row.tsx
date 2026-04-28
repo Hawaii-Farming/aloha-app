@@ -70,13 +70,21 @@ function DaysPill({
 }
 
 export function TimeOffDetailRow({ data }: TimeOffDetailRowProps) {
-  const fullName = (data['full_name'] as string) ?? '';
-  const photoUrl = data['profile_photo_url'] as string | undefined;
+  // Joined fields come from the postgrest embeds in hr-time-off.config.ts:
+  //   subject:hr_employee!hr_employee_id(...) -> subject_*
+  //   requester:hr_employee!requested_by(...)  -> requester_*
+  //   reviewer:hr_employee!reviewed_by(...)    -> reviewer_*
+  const fullName = (data['subject_preferred_name'] as string) ?? '';
+  const photoUrl = data['subject_profile_photo_url'] as string | undefined;
   const initials = getInitials(fullName);
   const status = (data['status'] as string) ?? 'Pending';
-  const deptName = data['department_name'] as string | undefined;
-  const workAuth = data['work_authorization_name'] as string | undefined;
-  const compManager = data['compensation_manager_id'] as string | undefined;
+  const deptName = data['subject_hr_department_id'] as string | undefined;
+  const workAuth = data['subject_hr_work_authorization_id'] as
+    | string
+    | undefined;
+  const compManager = data['subject_compensation_manager_id'] as
+    | string
+    | undefined;
 
   const startDate = data['start_date'] as string | undefined;
   const returnDate = data['return_date'] as string | undefined;
@@ -88,8 +96,10 @@ export function TimeOffDetailRow({ data }: TimeOffDetailRowProps) {
   const denialReason = data['denial_reason'] as string | undefined;
   const notes = data['notes'] as string | undefined;
 
-  const requestedByName = data['requested_by_name'] as string | undefined;
-  const reviewedByName = data['reviewed_by_name'] as string | undefined;
+  const requestedByName = data['requester_preferred_name'] as
+    | string
+    | undefined;
+  const reviewedByName = data['reviewer_preferred_name'] as string | undefined;
   const requestedAt = data['requested_at'] as string | undefined;
   const reviewedAt = data['reviewed_at'] as string | undefined;
 

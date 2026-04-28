@@ -19,10 +19,14 @@ const hrTimeOffSchema = z.object({
   status: z.string().optional(),
 });
 
+// Column keys reflect the flattened postgrest embeds:
+//   `subject:hr_employee!hr_employee_id(...)`        -> subject_*
+//   `requester:hr_employee!requested_by(...)`        -> requester_*
+//   `reviewer:hr_employee!reviewed_by(...)`          -> reviewer_*
 const timeOffColumns: ColumnConfig[] = [
-  { key: 'full_name', label: 'Employee', sortable: true },
+  { key: 'subject_preferred_name', label: 'Employee', sortable: true },
   {
-    key: 'compensation_manager_id',
+    key: 'subject_compensation_manager_id',
     label: 'Comp Manager',
   },
   {
@@ -60,12 +64,12 @@ const timeOffColumns: ColumnConfig[] = [
   { key: 'request_reason', label: 'Reason', priority: 'low' },
   { key: 'denial_reason', label: 'Denial Reason', priority: 'low' },
   {
-    key: 'requested_by_name',
+    key: 'requester_preferred_name',
     label: 'Requested By',
     priority: 'low',
   },
   {
-    key: 'reviewed_by_name',
+    key: 'reviewer_preferred_name',
     label: 'Reviewed By',
     priority: 'low',
   },
@@ -79,12 +83,14 @@ const timeOffColumns: ColumnConfig[] = [
 const timeOffColDefs = [
   {
     headerName: 'Employee',
-    field: 'full_name',
+    field: 'subject_preferred_name',
     cellRenderer: SchedulerEmployeeRenderer,
     minWidth: 200,
   },
   ...mapColumnsToColDefs(
-    timeOffColumns.filter((c) => c.key !== 'full_name' && c.key !== 'status'),
+    timeOffColumns.filter(
+      (c) => c.key !== 'subject_preferred_name' && c.key !== 'status',
+    ),
   ),
   {
     headerName: 'Status',
@@ -121,9 +127,20 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   },
 
   views: {
-    list: 'app_hr_time_off_requests',
-    detail: 'app_hr_time_off_requests',
+    list: 'hr_time_off_request',
+    detail: 'hr_time_off_request',
   },
+
+  // Read joined display fields directly from hr_employee via postgrest
+  // embeds. flattenRow turns `subject.preferred_name` into
+  // `subject_preferred_name` on the row, which is what the column keys
+  // and the TimeOffDetailRow renderer reference.
+  select: [
+    '*',
+    'subject:hr_employee!hr_employee_id(preferred_name,profile_photo_url,hr_department_id,hr_work_authorization_id,compensation_manager_id)',
+    'requester:hr_employee!requested_by(preferred_name)',
+    'reviewer:hr_employee!reviewed_by(preferred_name)',
+  ].join(', '),
 
   columns: timeOffColumns,
 

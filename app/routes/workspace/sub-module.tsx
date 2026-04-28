@@ -89,7 +89,7 @@ export const loader = async (args: {
     if (subModuleSlug === 'Employee Review') {
       const { data: yearData } = await queryUntypedView(
         client,
-        'app_hr_employee_reviews',
+        'hr_employee_review',
       )
         .select('review_year')
         .eq('org_id', accountSlug);
@@ -104,8 +104,12 @@ export const loader = async (args: {
       }
     }
 
+    // Honour the CRUD config's `select` (postgrest embeds and column
+    // aliases) when specified; otherwise fall back to '*'. This lets
+    // table-backed sub-modules (Time Off, Employee Review, ...) pull
+    // joined display fields without needing a wrapping view.
     let query = queryUntypedView(client, viewName)
-      .select('*')
+      .select(config?.select ?? '*')
       .eq('org_id', accountSlug);
 
     // Slug-specific query params
@@ -192,7 +196,7 @@ export const loader = async (args: {
       const quarter = url.searchParams.get('quarter');
       if (year) query = query.eq('review_year', parseInt(year, 10));
       if (quarter) query = query.eq('review_quarter', parseInt(quarter, 10));
-      query = query.order('full_name');
+      query = query.order('hr_employee_id');
     } else if (subModuleSlug === 'Housing') {
       query = query.order('id');
     } else {
