@@ -11,7 +11,7 @@ export const hrPayrollHoursConfig: CrudModuleConfig<typeof schema> = {
   orgScoped: true,
 
   views: {
-    list: 'app_hr_hours_comparison',
+    list: 'hr_payroll_employee_comparison',
     detail: 'hr_payroll',
   },
 

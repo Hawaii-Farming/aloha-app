@@ -118,7 +118,7 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
   orgScoped: true,
 
   views: {
-    list: 'app_hr_payroll_detail',
+    list: 'hr_payroll',
     detail: 'hr_payroll',
   },
 

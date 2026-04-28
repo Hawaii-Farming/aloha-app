@@ -89,7 +89,7 @@ export const loader = async (args: {
     if (subModuleSlug === 'Employee Review') {
       const { data: yearData } = await queryUntypedView(
         client,
-        'app_hr_employee_reviews',
+        'hr_employee_review',
       )
         .select('review_year')
         .eq('org_id', accountSlug);
@@ -121,18 +121,17 @@ export const loader = async (args: {
       subModuleSlug === 'Payroll Comparison' ||
       subModuleSlug === 'Payroll Comp'
     ) {
-      // Both views use detail data for client-side grouping + inline detail tables
-      query = queryUntypedView(client, 'app_hr_payroll_detail')
+      // Per-(employee, task) detail used for client-side grouping + inline
+      // detail tables. hr_payroll_by_task aggregates one row per
+      // (employee, check_date, task) with all hours/pay fields.
+      query = queryUntypedView(client, 'hr_payroll_by_task')
         .select('*')
         .eq('org_id', accountSlug);
-      const periodStart = url.searchParams.get('period_start');
-      const periodEnd = url.searchParams.get('period_end');
-      if (periodStart && periodEnd) {
-        query = query
-          .eq('pay_period_start', periodStart)
-          .eq('pay_period_end', periodEnd);
+      const checkDate = url.searchParams.get('check_date');
+      if (checkDate) {
+        query = query.eq('check_date', checkDate);
       }
-      query = query.order('employee_name');
+      query = query.order('hr_employee_id');
     } else if (subModuleSlug === 'Payroll Comp Manager') {
       // hr_payroll_employee_comparison auto-anchors to the most recent
       // is_standard=TRUE HRB check_date and exposes deltas vs the prior
