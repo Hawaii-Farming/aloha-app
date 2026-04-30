@@ -92,6 +92,10 @@ const timeOffColDefs = [
     timeOffColumns.filter(
       (c) => c.key !== 'subject_preferred_name' && c.key !== 'status',
     ),
+  ).map((col) =>
+    col.field === 'request_reason'
+      ? { ...col, minWidth: 320, flex: 1 }
+      : col,
   ),
   {
     headerName: 'Status',
@@ -150,7 +154,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   noPagination: true,
 
   search: {
-    columns: ['request_reason', 'notes'],
+    columns: ['request_reason'],
     placeholder: 'Search time-off requests...',
   },
 
@@ -179,20 +183,39 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       required: true,
     },
     { key: 'return_date', label: 'Return Date', type: 'date' },
-    { key: 'pto_days', label: 'PTO Days', type: 'number' },
+    {
+      key: 'pto_allocation',
+      label: 'Time off allocation',
+      type: 'pto-allocation',
+      fullWidth: true,
+    },
+    {
+      key: 'pto_days',
+      label: 'PTO Days',
+      type: 'number',
+      showOnCreate: false,
+      showOnEdit: false,
+    },
     {
       key: 'sick_leave_days',
       label: 'Sick Leave Days',
       type: 'number',
+      showOnCreate: false,
+      showOnEdit: false,
     },
-    { key: 'non_pto_days', label: 'Non-PTO Days', type: 'number' },
+    {
+      key: 'non_pto_days',
+      label: 'Unpaid Days',
+      type: 'number',
+      showOnCreate: false,
+      showOnEdit: false,
+    },
     {
       key: 'request_reason',
       label: 'Reason',
       type: 'textarea',
       required: true,
     },
-    { key: 'notes', label: 'Notes', type: 'textarea' },
   ],
 
   workflow: {

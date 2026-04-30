@@ -62,7 +62,8 @@ type FormFieldType =
   | 'select'
   | 'radio'
   | 'combobox'
-  | 'fk';
+  | 'fk'
+  | 'pto-allocation';
 
 type WorkflowColor =
   | 'default'

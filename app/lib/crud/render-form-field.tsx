@@ -13,6 +13,7 @@ import {
   FormTextareaField,
 } from '@aloha/ui/form-fields';
 
+import { PtoAllocationField } from '~/components/crud/pto-allocation-field';
 import type { FormFieldConfig } from '~/lib/crud/types';
 
 interface RenderFormFieldParams {
@@ -167,6 +168,9 @@ export function renderFormField({
           options={fkOptions?.[field.key] ?? []}
         />
       );
+
+    case 'pto-allocation':
+      return <PtoAllocationField key={field.key} label={field.label} />;
 
     default:
       return null;
