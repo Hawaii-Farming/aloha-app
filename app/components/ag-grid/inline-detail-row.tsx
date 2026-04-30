@@ -27,11 +27,20 @@ function buildFkKeyMap(
 ): Record<string, string> {
   const map: Record<string, string> = {};
   const fkFields = (config.formFields ?? []).filter(
-    (f) => f.type === 'fk' && f.fkLabelColumn,
+    (f) =>
+      f.type === 'fk' &&
+      (f.fkLabelColumn || (f.fkLabelColumns && f.fkLabelColumns.length > 0)),
   );
 
   for (const field of fkFields) {
-    const label = field.fkLabelColumn!;
+    // Multi-column FK labels are resolved separately via resolveFkLabelColumns;
+    // skip them here so the single-key map only handles fkLabelColumn fields.
+    if (field.fkLabelColumns && field.fkLabelColumns.length > 0) {
+      continue;
+    }
+    if (!field.fkLabelColumn) continue;
+
+    const label = field.fkLabelColumn;
     const selfJoinKey = `${field.key}_${label}`;
 
     if (record[selfJoinKey] !== undefined) {
@@ -58,11 +67,39 @@ function buildFkKeyMap(
   return map;
 }
 
+function resolveFkLabelColumns(
+  field: FormFieldConfig,
+  record: Record<string, unknown>,
+): string | null {
+  if (!field.fkLabelColumns || field.fkLabelColumns.length === 0) {
+    return null;
+  }
+  const baseKey = field.key.replace(/_id$/, '');
+  const parts: string[] = [];
+  for (const col of field.fkLabelColumns) {
+    const selfJoinKey = `${field.key}_${col}`;
+    const aliasKey = `${baseKey}_${col}`;
+    const raw =
+      record[selfJoinKey] !== undefined
+        ? record[selfJoinKey]
+        : record[aliasKey];
+    if (raw !== null && raw !== undefined && String(raw).length > 0) {
+      parts.push(String(raw));
+    }
+  }
+  return parts.length > 0 ? parts.join(' ') : null;
+}
+
 function resolveFieldValue(
   field: FormFieldConfig,
   record: Record<string, unknown>,
   fkKeyMap: Record<string, string>,
 ): string {
+  if (field.type === 'fk') {
+    const composed = resolveFkLabelColumns(field, record);
+    if (composed) return composed;
+  }
+
   const fkRecordKey = fkKeyMap[field.key];
 
   if (field.type === 'fk' && fkRecordKey) {
