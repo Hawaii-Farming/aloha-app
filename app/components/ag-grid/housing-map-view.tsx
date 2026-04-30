@@ -46,7 +46,9 @@ interface AccommodationRow {
   baths: number;
   tenantCount: number;
   capacity: number;
+  vacancy: number;
   isActive: boolean;
+  isTotal?: boolean;
 }
 
 function parseHousingSite(row: RowData): HousingSite {
@@ -90,7 +92,9 @@ function buildAccommodations(sites: HousingSite[]): Accommodation[] {
   });
 }
 
-function HomeIconRenderer(_props: CustomCellRendererProps) {
+function HomeIconRenderer(props: CustomCellRendererProps) {
+  const data = props.data as AccommodationRow | undefined;
+  if (data?.isTotal) return null;
   return (
     <div className="flex h-full items-center justify-center">
       <div className="bg-muted text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
@@ -117,7 +121,9 @@ function OccupancyCellRenderer(props: CustomCellRendererProps) {
         aria-valuemax={capacity}
       >
         <div
-          className="bg-foreground/70 h-full rounded-full transition-[width]"
+          className={`h-full rounded-full transition-[width] ${
+            data.isTotal ? 'bg-foreground' : 'bg-foreground/70'
+          }`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -161,6 +167,13 @@ const colDefs: ColDef[] = [
     minWidth: 100,
   },
   {
+    field: 'vacancy',
+    headerName: 'Vacancy',
+    type: 'numericColumn',
+    flex: 1,
+    minWidth: 110,
+  },
+  {
     field: 'tenantCount',
     headerName: 'Occupancy',
     cellRenderer: OccupancyCellRenderer,
@@ -185,24 +198,46 @@ export default function HousingMapView(props: ListViewProps) {
     [rawData],
   );
 
-  const rowData = useMemo<AccommodationRow[]>(
-    () =>
-      accommodations.map((accom) => ({
+  const rowData = useMemo<AccommodationRow[]>(() => {
+    const rows: AccommodationRow[] = accommodations.map((accom) => {
+      const capacity = accom.site.maxBeds ?? accom.bedroomCount;
+      const tenantCount = accom.site.tenantCount;
+      return {
         id: accom.site.id,
         name: accom.site.name,
         beds: accom.bedroomCount,
         baths: accom.bathroomCount,
-        tenantCount: accom.site.tenantCount,
-        capacity: accom.site.maxBeds ?? accom.bedroomCount,
+        tenantCount,
+        capacity,
+        vacancy: Math.max(0, capacity - tenantCount),
         isActive: accom.site.isActive,
-      })),
-    [accommodations],
-  );
+      };
+    });
+
+    if (rows.length === 0) return rows;
+
+    const sum = (k: 'beds' | 'baths' | 'tenantCount' | 'capacity' | 'vacancy') =>
+      rows.reduce((s, r) => s + (r[k] ?? 0), 0);
+
+    rows.push({
+      id: '__total__',
+      name: 'TOTAL',
+      beds: sum('beds'),
+      baths: sum('baths'),
+      tenantCount: sum('tenantCount'),
+      capacity: sum('capacity'),
+      vacancy: sum('vacancy'),
+      isActive: true,
+      isTotal: true,
+    });
+
+    return rows;
+  }, [accommodations]);
 
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
       const row = event.data as AccommodationRow | undefined;
-      if (!account || !row?.id) return;
+      if (!account || !row?.id || row.isTotal) return;
       navigate(`/home/${account}/human_resources/housing/${row.id}`);
     },
     [navigate, account],
@@ -212,13 +247,23 @@ export default function HousingMapView(props: ListViewProps) {
     setTimeout(() => event.api.sizeColumnsToFit(), 20);
   }, []);
 
-  const getRowStyle = useCallback((params: RowClassParams) => {
-    const row = params.data as AccommodationRow | undefined;
-    if (row?.isActive === false) {
-      return { opacity: '0.6' };
-    }
-    return undefined;
-  }, []);
+  const getRowStyle = useCallback(
+    (params: RowClassParams): Record<string, string> | undefined => {
+      const row = params.data as AccommodationRow | undefined;
+      if (row?.isTotal) {
+        return {
+          fontWeight: 'bold',
+          background: 'var(--color-muted)',
+          cursor: 'default',
+        };
+      }
+      if (row?.isActive === false) {
+        return { opacity: '0.6' };
+      }
+      return undefined;
+    },
+    [],
+  );
 
   return (
     <div className="flex min-h-0 flex-1 flex-col" data-test="housing-list-view">
