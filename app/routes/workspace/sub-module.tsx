@@ -12,7 +12,7 @@ import {
   crudBulkDeleteAction,
   crudBulkTransitionAction,
 } from '~/lib/crud/crud-action.server';
-import { loadTableData } from '~/lib/crud/crud-helpers.server';
+import { flattenRow, loadTableData } from '~/lib/crud/crud-helpers.server';
 import { loadFormOptions } from '~/lib/crud/load-form-options.server';
 import { getModuleConfig } from '~/lib/crud/registry';
 import { castRows, queryUntypedView } from '~/lib/crud/typed-query.server';
@@ -210,7 +210,11 @@ export const loader = async (args: {
       throw new Response(error.message, { status: 500 });
     }
 
-    const rows = castRows(data);
+    const rawRows = castRows(data);
+    // Flatten postgrest embeds so list-view configs see flat keys
+    // (subject_preferred_name, subject_hr_department_name, etc.) — mirrors
+    // loadTableData's behaviour for the regular path.
+    const rows = config?.select ? rawRows.map((r) => flattenRow(r)) : rawRows;
 
     // Load distinct managers for payroll_comp_manager
     let managers: Record<string, unknown>[] = [];

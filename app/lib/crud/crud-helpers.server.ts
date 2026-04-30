@@ -6,19 +6,25 @@ import { castRow, castRows } from './typed-query.server';
 
 /** Flattens nested FK objects from Supabase embedded selects.
  *  e.g. { compensation_manager: { preferred_name: 'Joe' } }
- *  becomes { compensation_manager_preferred_name: 'Joe' } */
-function flattenRow(row: Record<string, unknown>): Record<string, unknown> {
+ *  becomes { compensation_manager_preferred_name: 'Joe' }.
+ *  Recurses into nested embeds: { subject: { hr_department: { name: 'X' } } }
+ *  becomes { subject_hr_department_name: 'X' }. Arrays (one-to-many embeds)
+ *  are preserved as-is. */
+export function flattenRow(
+  row: Record<string, unknown>,
+  prefix = '',
+): Record<string, unknown> {
   const flat: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(row)) {
+    const flatKey = prefix ? `${prefix}_${key}` : key;
     if (value && typeof value === 'object' && !Array.isArray(value)) {
-      for (const [nestedKey, nestedValue] of Object.entries(
-        value as Record<string, unknown>,
-      )) {
-        flat[`${key}_${nestedKey}`] = nestedValue;
-      }
+      Object.assign(
+        flat,
+        flattenRow(value as Record<string, unknown>, flatKey),
+      );
     } else {
-      flat[key] = value;
+      flat[flatKey] = value;
     }
   }
 
@@ -169,7 +175,7 @@ export async function loadTableData<T = Record<string, unknown>>(
   }
 
   const rows = castRows(data);
-  let flatRows = params.select ? rows.map(flattenRow) : rows;
+  let flatRows = params.select ? rows.map((r) => flattenRow(r)) : rows;
 
   if (params.selfJoins && flatRows.length > 0) {
     flatRows = await resolveSelfJoins(

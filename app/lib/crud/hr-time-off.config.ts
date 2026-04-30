@@ -24,7 +24,7 @@ const hrTimeOffSchema = z.object({
 //   `requester:hr_employee!requested_by(...)`        -> requester_*
 //   `reviewer:hr_employee!reviewed_by(...)`          -> reviewer_*
 const timeOffColumns: ColumnConfig[] = [
-  { key: 'subject_preferred_name', label: 'Employee', sortable: true },
+  { key: 'subject_preferred_name', label: 'Employee' },
   {
     key: 'subject_compensation_manager_id',
     label: 'Comp Manager',
@@ -33,6 +33,7 @@ const timeOffColumns: ColumnConfig[] = [
     key: 'start_date',
     label: 'Start Date',
     type: 'date',
+    sortable: true,
   },
   {
     key: 'return_date',
@@ -149,7 +150,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   noPagination: true,
 
   search: {
-    columns: ['full_name', 'request_reason', 'notes'],
+    columns: ['request_reason', 'notes'],
     placeholder: 'Search time-off requests...',
   },
 
