@@ -67,11 +67,11 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
 // regular_pay, total_hours, total_cost, scheduled_hours,
 // discretionary_overtime_hours, discretionary_overtime_pay, task,
 // is_manager. Employee display fields (hr_employee_preferred_name /
-// hr_employee_profile_photo_url / hr_employee_hr_department_name) come
+// hr_employee_profile_photo_url / hr_employee_hr_department_id) come
 // from the loader's enrichment step, not the view.
 const byDeptColDefs: ColDef[] = [
   {
-    field: 'hr_employee_hr_department_name',
+    field: 'hr_employee_hr_department_id',
     headerName: 'Department',
     minWidth: 250,
   },
@@ -205,11 +205,11 @@ function groupByDepartment(rows: RowData[]): RowData[] {
   const map = new Map<string, RowData>();
 
   for (const row of rows) {
-    const dept = String(row.hr_employee_hr_department_name ?? 'Unknown');
+    const dept = String(row.hr_employee_hr_department_id ?? 'Unknown');
     const existing = map.get(dept);
     if (!existing) {
       map.set(dept, {
-        hr_employee_hr_department_name: dept,
+        hr_employee_hr_department_id: dept,
         _employees: new Set([String(row.hr_employee_id ?? '')]),
         employee_count: 0,
         regular_hours: Number(row.regular_hours) || 0,
@@ -263,7 +263,7 @@ function groupByEmployee(rows: RowData[]): RowData[] {
         hr_employee_id: empId,
         hr_employee_preferred_name: row.hr_employee_preferred_name,
         hr_employee_profile_photo_url: row.hr_employee_profile_photo_url,
-        hr_employee_hr_department_name: row.hr_employee_hr_department_name,
+        hr_employee_hr_department_id: row.hr_employee_hr_department_id,
         regular_hours: Number(row.regular_hours) || 0,
         discretionary_overtime_hours:
           Number(row.discretionary_overtime_hours) || 0,
@@ -347,7 +347,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     }
     return [
       {
-        hr_employee_hr_department_name: 'TOTAL',
+        hr_employee_hr_department_id: 'TOTAL',
         employee_count: groupedRows.reduce(
           (sum, r) => sum + (Number(r.employee_count) || 0),
           0,
@@ -365,12 +365,12 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     const d = params.data as
       | {
           hr_employee_preferred_name?: string;
-          hr_employee_hr_department_name?: string;
+          hr_employee_hr_department_id?: string;
         }
       | undefined;
     if (
       d?.hr_employee_preferred_name === 'TOTAL' ||
-      d?.hr_employee_hr_department_name === 'TOTAL'
+      d?.hr_employee_hr_department_id === 'TOTAL'
     ) {
       return { fontWeight: 'bold', background: 'var(--color-muted)' };
     }

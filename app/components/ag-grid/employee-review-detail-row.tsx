@@ -39,7 +39,7 @@ export function EmployeeReviewDetailRow({
   data,
 }: EmployeeReviewDetailRowProps) {
   const fullName = String(data.subject_preferred_name ?? '');
-  const deptName = String(data.subject_hr_department_name ?? '');
+  const deptName = String(data.subject_hr_department_id ?? '');
   const year = data.review_year;
   const quarter = data.review_quarter;
   const quarterLabel =

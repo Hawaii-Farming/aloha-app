@@ -19,7 +19,7 @@ export const hrPayrollComparisonConfig: CrudModuleConfig<typeof schema> = {
   // fields are merged onto rows by the loader's enrichment step; the
   // view itself only exposes ids/aggregates.
   columns: [
-    { key: 'hr_employee_hr_department_name', label: 'Department' },
+    { key: 'hr_employee_hr_department_id', label: 'Department' },
     { key: 'employee_count', label: 'Employees', type: 'number' },
     { key: 'regular_hours', label: 'Reg Hours', type: 'number' },
     {

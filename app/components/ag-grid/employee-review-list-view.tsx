@@ -53,7 +53,7 @@ const colDefs: ColDef[] = [
   },
   {
     headerName: 'Dept',
-    field: 'subject_hr_department_name',
+    field: 'subject_hr_department_id',
     minWidth: 100,
   },
   {

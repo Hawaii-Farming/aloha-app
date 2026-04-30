@@ -111,7 +111,7 @@ const colDefs: ColDef[] = [
     pinned: 'left',
   },
   {
-    field: 'hr_employee_hr_department_name',
+    field: 'hr_employee_hr_department_id',
     headerName: 'Department',
     minWidth: 140,
   },

@@ -45,9 +45,9 @@ const agGridColDefs: ColDef[] = [
     minWidth: 200,
     pinned: 'left',
   },
-  { field: 'hr_department_name', headerName: 'Department', minWidth: 140 },
+  { field: 'hr_department_id', headerName: 'Department', minWidth: 140 },
   {
-    field: 'hr_work_authorization_name',
+    field: 'hr_work_authorization_id',
     headerName: 'Work Auth',
     minWidth: 120,
   },
@@ -126,18 +126,13 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
     detail: 'hr_payroll',
   },
 
-  // Pull display names for FK refs via postgrest embeds; flattenRow turns
-  // hr_department.name -> hr_department_name and
-  // hr_work_authorization.name -> hr_work_authorization_name.
-  select: [
-    '*',
-    'hr_department:hr_department(name)',
-    'hr_work_authorization:hr_work_authorization(name)',
-  ].join(', '),
+  // hr_payroll exposes hr_department_id and hr_work_authorization_id
+  // directly; per the 5dfb5f5 slug-indirection drop, those id values
+  // ARE the display strings ('GH', '1099', ...). No embed needed.
 
   columns: [
     { key: 'employee_name', label: 'Employee', sortable: true },
-    { key: 'hr_department_name', label: 'Department' },
+    { key: 'hr_department_id', label: 'Department' },
     { key: 'check_date', label: 'Check Date', type: 'date', sortable: true },
     { key: 'gross_wage', label: 'Gross Wage', type: 'number' },
     { key: 'net_pay', label: 'Net Pay', type: 'number' },

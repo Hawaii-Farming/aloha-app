@@ -29,13 +29,14 @@ export const hrEmployeeReviewConfig: CrudModuleConfig<
   },
 
   // Joined display fields via postgrest embeds. flattenRow turns
-  // `subject.preferred_name` -> `subject_preferred_name`, etc., and
-  // recurses into the nested `subject.hr_department.name` ->
-  // `subject_hr_department_name`. quarter_label is synthesized in the
-  // list-view colDef via valueGetter.
+  // `subject.preferred_name` -> `subject_preferred_name`, etc.
+  // hr_department.id IS the display string ('GH', 'Corp', ...) per the
+  // 5dfb5f5 slug-indirection drop, so no nested embed is needed —
+  // hr_department_id is already human-readable. quarter_label is
+  // synthesized in the list-view colDef via valueGetter.
   select: [
     '*',
-    'subject:hr_employee!hr_employee_id(preferred_name,profile_photo_url,start_date,hr_department:hr_department(name))',
+    'subject:hr_employee!hr_employee_id(preferred_name,profile_photo_url,hr_department_id,start_date)',
     'lead:hr_employee!lead_id(preferred_name)',
   ].join(', '),
 
@@ -43,7 +44,7 @@ export const hrEmployeeReviewConfig: CrudModuleConfig<
     // Sortable flags only on REAL base-table columns. Embed-derived keys
     // can't be sorted via PostgREST without foreignTable order syntax.
     { key: 'subject_preferred_name', label: 'Employee' },
-    { key: 'subject_hr_department_name', label: 'Department' },
+    { key: 'subject_hr_department_id', label: 'Department' },
     {
       key: 'subject_start_date',
       label: 'Start Date',

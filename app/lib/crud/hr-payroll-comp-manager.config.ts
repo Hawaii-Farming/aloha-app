@@ -19,7 +19,7 @@ export const hrPayrollCompManagerConfig: CrudModuleConfig<typeof schema> = {
   // department come from the loader's hr_employee enrichment step.
   columns: [
     { key: 'hr_employee_preferred_name', label: 'Employee' },
-    { key: 'hr_employee_hr_department_name', label: 'Department' },
+    { key: 'hr_employee_hr_department_id', label: 'Department' },
     { key: 'check_date', label: 'Check Date', type: 'date' },
     { key: 'total_hours', label: 'Total Hours', type: 'number' },
     { key: 'hours_delta', label: 'Hours Δ', type: 'number' },

@@ -90,7 +90,7 @@ const colDefs: ColDef[] = [
     pinned: 'left',
   },
   {
-    field: 'hr_employee_hr_department_name',
+    field: 'hr_employee_hr_department_id',
     headerName: 'Department',
     minWidth: 140,
   },
@@ -158,7 +158,7 @@ function groupByEmployee(rows: RowData[]): RowData[] {
         hr_employee_id: empId,
         hr_employee_preferred_name: row.hr_employee_preferred_name,
         hr_employee_profile_photo_url: row.hr_employee_profile_photo_url,
-        hr_employee_hr_department_name: row.hr_employee_hr_department_name,
+        hr_employee_hr_department_id: row.hr_employee_hr_department_id,
         compensation_manager_id: row.compensation_manager_id,
         total_hours: Number(row.total_hours) || 0,
         hours_delta: Number(row.hours_delta) || 0,

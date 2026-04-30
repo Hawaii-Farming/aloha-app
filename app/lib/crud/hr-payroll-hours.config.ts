@@ -20,7 +20,7 @@ export const hrPayrollHoursConfig: CrudModuleConfig<typeof schema> = {
   // total_hours; variance is computed client-side.
   columns: [
     { key: 'hr_employee_preferred_name', label: 'Employee' },
-    { key: 'hr_employee_hr_department_name', label: 'Department' },
+    { key: 'hr_employee_hr_department_id', label: 'Department' },
     { key: 'scheduled_hours', label: 'Scheduled Hrs', type: 'number' },
     { key: 'total_hours', label: 'Payroll Hrs', type: 'number' },
   ],
