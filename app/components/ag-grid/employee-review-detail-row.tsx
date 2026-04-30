@@ -38,12 +38,17 @@ function formatDate(d: unknown): string {
 export function EmployeeReviewDetailRow({
   data,
 }: EmployeeReviewDetailRowProps) {
-  const fullName = String(data.full_name ?? '');
-  const deptName = String(data.department_name ?? '');
-  const quarterLabel = String(data.quarter_label ?? '');
+  const fullName = String(data.subject_preferred_name ?? '');
+  const deptName = String(data.subject_hr_department_name ?? '');
+  const year = data.review_year;
+  const quarter = data.review_quarter;
+  const quarterLabel =
+    year != null && quarter != null ? `${year} Q${quarter}` : '';
   const avg = data.average != null ? Number(data.average).toFixed(1) : '';
   const notes = data.notes ? String(data.notes) : '';
-  const leadName = data.lead_name ? String(data.lead_name) : '';
+  const leadName = data.lead_preferred_name
+    ? String(data.lead_preferred_name)
+    : '';
   const isLocked = data.is_locked === true;
   const createdAt = formatDate(data.created_at);
   const updatedAt = formatDate(data.updated_at);

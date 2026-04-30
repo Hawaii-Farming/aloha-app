@@ -11,6 +11,7 @@ import type {
   GridReadyEvent,
   SortChangedEvent,
   ValueFormatterParams,
+  ValueGetterParams,
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 import { Lock } from 'lucide-react';
@@ -36,21 +37,29 @@ function averageFormatter(params: ValueFormatterParams): string {
   return params.value != null ? Number(params.value).toFixed(1) : '';
 }
 
+function quarterLabelGetter(params: ValueGetterParams): string {
+  const year = params.data?.review_year;
+  const quarter = params.data?.review_quarter;
+  if (year == null || quarter == null) return '';
+  return `${year} Q${quarter}`;
+}
+
 const colDefs: ColDef[] = [
   {
     headerName: 'Employee',
-    field: 'full_name',
+    field: 'subject_preferred_name',
     cellRenderer: SchedulerEmployeeRenderer,
     minWidth: 200,
   },
   {
     headerName: 'Dept',
-    field: 'department_name',
+    field: 'subject_hr_department_name',
     minWidth: 100,
   },
   {
     headerName: 'Quarter',
-    field: 'quarter_label',
+    colId: 'quarter_label',
+    valueGetter: quarterLabelGetter,
     minWidth: 90,
   },
   {
@@ -96,7 +105,7 @@ const colDefs: ColDef[] = [
   },
   {
     headerName: 'Lead',
-    field: 'lead_name',
+    field: 'lead_preferred_name',
     minWidth: 100,
   },
   {

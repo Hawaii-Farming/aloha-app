@@ -29,19 +29,21 @@ export const hrEmployeeReviewConfig: CrudModuleConfig<
   },
 
   // Joined display fields via postgrest embeds. flattenRow turns
-  // `subject.preferred_name` -> `subject_preferred_name`, etc.
-  // `quarter_label` is composed client-side or in the agGrid value getter
-  // since postgrest doesn't expose computed columns; we synthesize it from
-  // review_year + review_quarter at the column-renderer level.
+  // `subject.preferred_name` -> `subject_preferred_name`, etc., and
+  // recurses into the nested `subject.hr_department.name` ->
+  // `subject_hr_department_name`. quarter_label is synthesized in the
+  // list-view colDef via valueGetter.
   select: [
     '*',
-    'subject:hr_employee!hr_employee_id(preferred_name,profile_photo_url,hr_department_id,start_date)',
+    'subject:hr_employee!hr_employee_id(preferred_name,profile_photo_url,start_date,hr_department:hr_department(name))',
     'lead:hr_employee!lead_id(preferred_name)',
   ].join(', '),
 
   columns: [
-    { key: 'subject_preferred_name', label: 'Employee', sortable: true },
-    { key: 'subject_hr_department_id', label: 'Department', sortable: true },
+    // Sortable flags only on REAL base-table columns. Embed-derived keys
+    // can't be sorted via PostgREST without foreignTable order syntax.
+    { key: 'subject_preferred_name', label: 'Employee' },
+    { key: 'subject_hr_department_name', label: 'Department' },
     {
       key: 'subject_start_date',
       label: 'Start Date',
@@ -76,17 +78,13 @@ export const hrEmployeeReviewConfig: CrudModuleConfig<
     },
     { key: 'average', label: 'Average', type: 'number', sortable: true },
     { key: 'notes', label: 'Notes', priority: 'low' },
-    {
-      key: 'lead_preferred_name',
-      label: 'Lead',
-      sortable: true,
-      priority: 'low',
-    },
+    { key: 'lead_preferred_name', label: 'Lead', priority: 'low' },
     { key: 'is_locked', label: 'Locked', type: 'boolean', priority: 'low' },
   ],
 
+  // Only real base-table text columns are searchable via PostgREST .or().
   search: {
-    columns: ['subject_preferred_name', 'subject_hr_department_id'],
+    columns: ['notes'],
     placeholder: 'Search reviews...',
   },
 
