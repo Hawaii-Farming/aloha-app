@@ -15,18 +15,23 @@ export const hrPayrollCompManagerConfig: CrudModuleConfig<typeof schema> = {
     detail: 'hr_payroll',
   },
 
+  // Backing view: hr_payroll_employee_comparison. Employee name +
+  // department come from the loader's hr_employee enrichment step.
   columns: [
-    { key: 'full_name', label: 'Employee', sortable: true },
-    { key: 'department_name', label: 'Department', sortable: true },
+    { key: 'hr_employee_preferred_name', label: 'Employee' },
+    { key: 'hr_employee_hr_department_name', label: 'Department' },
     { key: 'check_date', label: 'Check Date', type: 'date' },
-    { key: 'regular_hours', label: 'Reg Hours', type: 'number' },
-    { key: 'overtime_hours', label: 'OT Hours', type: 'number' },
-    { key: 'gross_wage', label: 'Gross Wage', type: 'number' },
-    { key: 'net_pay', label: 'Net Pay', type: 'number' },
+    { key: 'total_hours', label: 'Total Hours', type: 'number' },
+    { key: 'hours_delta', label: 'Hours Δ', type: 'number' },
+    { key: 'regular_pay', label: 'Regular Pay', type: 'number' },
+    { key: 'regular_pay_delta', label: 'Reg Pay Δ', type: 'number' },
+    { key: 'total_cost', label: 'Total Cost', type: 'number' },
+    { key: 'total_cost_delta', label: 'Cost Δ', type: 'number' },
   ],
 
+  // Search runs client-side via AgGrid quickFilterText.
   search: {
-    columns: ['full_name', 'department_name'],
+    columns: [],
     placeholder: 'Search by employee...',
   },
 

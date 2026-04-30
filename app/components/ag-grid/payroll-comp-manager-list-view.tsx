@@ -44,7 +44,7 @@ function EmployeeDeptRenderer(props: CustomCellRendererProps) {
   const data = props.data as RowData | undefined;
   if (!data) return null;
 
-  const fullName = String(data.full_name ?? '');
+  const fullName = String(data.hr_employee_preferred_name ?? '');
   const pinned = props.node.rowPinned === 'bottom';
 
   return (
@@ -63,7 +63,7 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
 
 const AVATAR_COL: ColDef = {
   headerName: '',
-  field: 'profile_photo_url',
+  field: 'hr_employee_profile_photo_url',
   cellRenderer: PinnedAwareAvatarRenderer,
   maxWidth: 60,
   minWidth: 60,
@@ -75,35 +75,24 @@ const AVATAR_COL: ColDef = {
   lockPosition: true,
 };
 
+// Backing view: hr_payroll_employee_comparison. Real columns:
+// regular_pay, total_hours, total_cost, scheduled_hours,
+// discretionary_overtime_hours, discretionary_overtime_pay, plus deltas
+// (hours_delta, regular_pay_delta, total_cost_delta, ...). Employee
+// display fields come from the loader's hr_employee enrichment step.
 const colDefs: ColDef[] = [
   AVATAR_COL,
   {
-    field: 'full_name',
+    field: 'hr_employee_preferred_name',
     headerName: 'Employee',
     cellRenderer: EmployeeDeptRenderer,
     minWidth: 200,
     pinned: 'left',
   },
   {
-    field: 'department_name',
+    field: 'hr_employee_hr_department_name',
     headerName: 'Department',
     minWidth: 140,
-  },
-  {
-    field: 'regular_hours',
-    headerName: 'Reg Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'overtime_hours',
-    headerName: 'OT Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
   },
   {
     field: 'total_hours',
@@ -114,16 +103,40 @@ const colDefs: ColDef[] = [
     minWidth: 100,
   },
   {
-    field: 'gross_wage',
-    headerName: 'Gross Wage',
+    field: 'hours_delta',
+    headerName: 'Hours Δ',
+    type: 'numericColumn',
+    valueFormatter: hoursFormatter,
+    flex: 1,
+    minWidth: 100,
+  },
+  {
+    field: 'regular_pay',
+    headerName: 'Regular Pay',
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
     flex: 1,
     minWidth: 120,
   },
   {
-    field: 'net_pay',
-    headerName: 'Net Pay',
+    field: 'regular_pay_delta',
+    headerName: 'Reg Pay Δ',
+    cellRenderer: CurrencyRenderer,
+    type: 'numericColumn',
+    flex: 1,
+    minWidth: 120,
+  },
+  {
+    field: 'total_cost',
+    headerName: 'Total Cost',
+    cellRenderer: CurrencyRenderer,
+    type: 'numericColumn',
+    flex: 1,
+    minWidth: 120,
+  },
+  {
+    field: 'total_cost_delta',
+    headerName: 'Cost Δ',
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
     flex: 1,
@@ -143,30 +156,33 @@ function groupByEmployee(rows: RowData[]): RowData[] {
     if (!existing) {
       map.set(empId, {
         hr_employee_id: empId,
-        full_name: row.full_name,
-        profile_photo_url: row.profile_photo_url,
-        department_name: row.department_name,
+        hr_employee_preferred_name: row.hr_employee_preferred_name,
+        hr_employee_profile_photo_url: row.hr_employee_profile_photo_url,
+        hr_employee_hr_department_name: row.hr_employee_hr_department_name,
         compensation_manager_id: row.compensation_manager_id,
-        regular_hours: Number(row.regular_hours) || 0,
-        overtime_hours: Number(row.overtime_hours) || 0,
         total_hours: Number(row.total_hours) || 0,
-        gross_wage: Number(row.gross_wage) || 0,
-        net_pay: Number(row.net_pay) || 0,
+        hours_delta: Number(row.hours_delta) || 0,
+        regular_pay: Number(row.regular_pay) || 0,
+        regular_pay_delta: Number(row.regular_pay_delta) || 0,
+        total_cost: Number(row.total_cost) || 0,
+        total_cost_delta: Number(row.total_cost_delta) || 0,
         _detailRows: [row],
       });
     } else {
-      existing.regular_hours =
-        (Number(existing.regular_hours) || 0) +
-        (Number(row.regular_hours) || 0);
-      existing.overtime_hours =
-        (Number(existing.overtime_hours) || 0) +
-        (Number(row.overtime_hours) || 0);
       existing.total_hours =
         (Number(existing.total_hours) || 0) + (Number(row.total_hours) || 0);
-      existing.gross_wage =
-        (Number(existing.gross_wage) || 0) + (Number(row.gross_wage) || 0);
-      existing.net_pay =
-        (Number(existing.net_pay) || 0) + (Number(row.net_pay) || 0);
+      existing.hours_delta =
+        (Number(existing.hours_delta) || 0) + (Number(row.hours_delta) || 0);
+      existing.regular_pay =
+        (Number(existing.regular_pay) || 0) + (Number(row.regular_pay) || 0);
+      existing.regular_pay_delta =
+        (Number(existing.regular_pay_delta) || 0) +
+        (Number(row.regular_pay_delta) || 0);
+      existing.total_cost =
+        (Number(existing.total_cost) || 0) + (Number(row.total_cost) || 0);
+      existing.total_cost_delta =
+        (Number(existing.total_cost_delta) || 0) +
+        (Number(row.total_cost_delta) || 0);
       (existing._detailRows as RowData[]).push(row);
     }
   }
@@ -241,19 +257,21 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
 
     return [
       {
-        full_name: 'TOTAL',
-        regular_hours: sumField('regular_hours'),
-        overtime_hours: sumField('overtime_hours'),
+        hr_employee_preferred_name: 'TOTAL',
         total_hours: sumField('total_hours'),
-        gross_wage: sumField('gross_wage'),
-        net_pay: sumField('net_pay'),
+        hours_delta: sumField('hours_delta'),
+        regular_pay: sumField('regular_pay'),
+        regular_pay_delta: sumField('regular_pay_delta'),
+        total_cost: sumField('total_cost'),
+        total_cost_delta: sumField('total_cost_delta'),
       },
     ];
   }, [groupedRows]);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
     if (
-      (params.data as { full_name?: string } | undefined)?.full_name === 'TOTAL'
+      (params.data as { hr_employee_preferred_name?: string } | undefined)
+        ?.hr_employee_preferred_name === 'TOTAL'
     ) {
       return {
         fontWeight: 'bold',
