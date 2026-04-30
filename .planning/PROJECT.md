@@ -54,7 +54,7 @@ Every module renders real data from the database and supports full CRUD operatio
 - AG Grid Enterprise features — using Community (free) tier only; all described UX achieved with Community
 - Mobile-specific layouts — web-first; AG Grid responsive column hiding covers basic needs
 - Real-time collaboration / live updates — standard request/response model sufficient
-- Payroll import/processing — hr_payroll is imported externally, this project only displays it
+- ~~Payroll import/processing — hr_payroll is imported externally, this project only displays it~~ **REVERSED 2026-04-29: payroll ingest brought in-scope for AppSheet Scripts Migration milestone (see Key Decisions)**
 - Approval workflow automation — status changes are manual toggles in the row
 - Inline cell editing in grids — side-panel forms are safer and more consistent
 - Chart/graph visualizations — AG Grid Charts is Enterprise-only; tabular data sufficient
@@ -107,6 +107,7 @@ Shipped v2.0 with 4 phases, 22 plans across 166 commits (144 files changed, +21,
 | `renderTrigger` seam on NavbarSearch (v2.0) | Keeps existing search behavior intact while letting the new navbar render its own trigger | ✓ Good — backward compatible, used by navbar + mobile header |
 | Sidebar toggle moved to navbar leftmost position (v2.0) | Matches prototype; retires detached edge toggle | ✓ Good — one affordance, discoverable |
 | Org-derived avatar initials via `getOrgInitials` (v2.0) | Personalizes shell to tenant; sourced from loaded org context | ✓ Good — no extra query, pure helper |
+| Payroll processing brought in-scope (2026-04-29) | AppSheet Scripts Migration milestone replaces legacy Google Apps Script `runPayroll`; HRB ingest pipeline moves into Supabase (staging tables → transformation service → `hr_ee_payroll`). Reverses earlier "displays only" out-of-scope decision. | Pending — drives new milestone roadmap |
 
 ## Evolution
 

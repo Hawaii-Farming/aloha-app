@@ -1,0 +1,27 @@
+{
+  "source_path": "/Users/jmr/GitHub/JJB/HawaiiFarming/aloha-app/APPSHEET_SCRIPTS.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "AppSheet Scripts (Legacy Google Apps Script Automation Dump)",
+  "summary": "Source-of-truth dump of legacy Google Apps Script automations (scheduler emails, payroll, schedule sheets, payroll comparison, quarterly reviews) intended as migration reference.",
+  "scope": [
+    "emailSchedule",
+    "runPayroll",
+    "updateDailySched",
+    "updateWeekSched",
+    "updateWeekSchedSummary",
+    "payrollSchedComparison",
+    "createReviewData",
+    "Google Apps Script",
+    "Google Sheets data flows",
+    "PDF export and email distribution",
+    "payroll processing",
+    "schedule generation",
+    "quarterly employee reviews"
+  ],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": "Prose-light, code-heavy procedural reference with no frontmatter, no decision/consequences sections, no user stories, no API or schema contracts. Functions as descriptive legacy context for migration; not a SPEC because it does not define target system contracts (it documents existing GS behavior). Confidence high based on absence of ADR/PRD/SPEC signals and presence of pure reference content."
+}
