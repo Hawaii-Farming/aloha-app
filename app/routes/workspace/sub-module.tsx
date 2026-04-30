@@ -190,7 +190,7 @@ export const loader = async (args: {
       if (employeeId) {
         query = query.eq('hr_employee_id', employeeId);
       }
-      query = query.order('full_name');
+      query = query.order('employee_name');
     } else if (subModuleSlug === 'Employee Review') {
       const year = url.searchParams.get('year');
       const quarter = url.searchParams.get('quarter');

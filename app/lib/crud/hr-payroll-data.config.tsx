@@ -45,8 +45,12 @@ const agGridColDefs: ColDef[] = [
     minWidth: 200,
     pinned: 'left',
   },
-  { field: 'department_name', headerName: 'Department', minWidth: 140 },
-  { field: 'work_authorization_name', headerName: 'Work Auth', minWidth: 120 },
+  { field: 'hr_department_name', headerName: 'Department', minWidth: 140 },
+  {
+    field: 'hr_work_authorization_name',
+    headerName: 'Work Auth',
+    minWidth: 120,
+  },
   { field: 'pay_structure', headerName: 'Pay Structure' },
   currency('hourly_rate', 'Hourly Rate'),
   hours('overtime_threshold', 'OT Threshold'),
@@ -122,17 +126,27 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
     detail: 'hr_payroll',
   },
 
+  // Pull display names for FK refs via postgrest embeds; flattenRow turns
+  // hr_department.name -> hr_department_name and
+  // hr_work_authorization.name -> hr_work_authorization_name.
+  select: [
+    '*',
+    'hr_department:hr_department(name)',
+    'hr_work_authorization:hr_work_authorization(name)',
+  ].join(', '),
+
   columns: [
     { key: 'employee_name', label: 'Employee', sortable: true },
-    { key: 'department_name', label: 'Department', sortable: true },
+    { key: 'hr_department_name', label: 'Department' },
     { key: 'check_date', label: 'Check Date', type: 'date', sortable: true },
     { key: 'gross_wage', label: 'Gross Wage', type: 'number' },
     { key: 'net_pay', label: 'Net Pay', type: 'number' },
     { key: 'total_cost', label: 'Total Cost', type: 'number' },
   ],
 
+  // Only real base-table text columns are searchable via PostgREST .or().
   search: {
-    columns: ['employee_name', 'department_name'],
+    columns: ['employee_name'],
     placeholder: 'Search payroll data...',
   },
 
