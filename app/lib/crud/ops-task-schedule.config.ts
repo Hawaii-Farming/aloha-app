@@ -56,7 +56,7 @@ export const opsTaskScheduleConfig: CrudModuleConfig<
       type: 'fk',
       required: true,
       fkTable: 'hr_employee',
-      fkLabelColumn: 'preferred_name',
+      fkLabelColumns: ['preferred_name', 'last_name'],
     },
     {
       key: 'ops_task_id',
