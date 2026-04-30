@@ -67,11 +67,36 @@ export function NavbarSearch({
 
   useEffect(() => {
     if (!active) return;
+    let slashArmedAt = 0;
+    const SEQUENCE_WINDOW_MS = 800;
+    const isTypingTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName;
+      return (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        target.isContentEditable
+      );
+    };
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen((prev) => !prev);
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (isTypingTarget(e.target)) return;
+      if (e.key === '/') {
+        slashArmedAt = Date.now();
+        return;
       }
+      if (
+        e.key === 'k' &&
+        slashArmedAt > 0 &&
+        Date.now() - slashArmedAt <= SEQUENCE_WINDOW_MS
+      ) {
+        e.preventDefault();
+        slashArmedAt = 0;
+        setOpen((prev) => !prev);
+        return;
+      }
+      slashArmedAt = 0;
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -147,7 +172,7 @@ export function NavbarSearch({
           >
             <Search className="h-3.5 w-3.5 shrink-0" />
             <span className="flex-1 text-left">Search...</span>
-            <Kbd>{isMac ? '⌘K' : 'Ctrl K'}</Kbd>
+            <Kbd>/ K</Kbd>
           </button>
         )}
       </PopoverAnchor>

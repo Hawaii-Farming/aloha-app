@@ -1,6 +1,6 @@
 import type { JwtPayload } from '@supabase/supabase-js';
 
-import { Command, PanelLeft, PanelLeftClose, Search } from 'lucide-react';
+import { PanelLeft, PanelLeftClose, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { SidebarGroupLabel, useSidebar } from '@aloha/ui/shadcn-sidebar';
@@ -99,8 +99,8 @@ export function WorkspaceNavbar({
                 >
                   <Search size={16} />
                   <span className="text-sm">Search...</span>
-                  <span className="ml-auto flex items-center gap-1 text-xs">
-                    <Command size={12} />
+                  <span className="ml-auto flex items-center gap-1 font-mono text-xs">
+                    <span>/</span>
                     <span>K</span>
                   </span>
                 </button>
