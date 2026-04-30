@@ -213,6 +213,14 @@ export function FormDateField<T extends FieldValues = FieldValues>({
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                captionLayout="dropdown"
+                defaultMonth={
+                  field.value
+                    ? parse(field.value, 'yyyy-MM-dd', new Date())
+                    : new Date(1996, 0, 1)
+                }
+                startMonth={new Date(1920, 0, 1)}
+                endMonth={new Date()}
                 selected={
                   field.value
                     ? parse(field.value, 'yyyy-MM-dd', new Date())

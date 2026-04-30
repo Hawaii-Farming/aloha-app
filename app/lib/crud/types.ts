@@ -130,6 +130,9 @@ export interface FormFieldConfig {
   /** Section heading for grouping fields visually.
    *  Set on the first field of each group. */
   section?: string;
+  /** Default value for this field in create mode. Ignored in edit mode
+   *  (existing record values always win). */
+  defaultValue?: unknown;
 }
 
 export interface WorkflowStateConfig {

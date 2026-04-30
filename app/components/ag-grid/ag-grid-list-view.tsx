@@ -51,16 +51,6 @@ import type { ListViewProps, WorkflowConfig } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
 
-const CHECKBOX_COL: ColDef = {
-  headerCheckboxSelection: true,
-  checkboxSelection: true,
-  maxWidth: 50,
-  sortable: false,
-  filter: false,
-  resizable: false,
-  suppressMovable: true,
-};
-
 const AVATAR_COL: ColDef = {
   headerName: '',
   field: 'profile_photo_url',
@@ -142,7 +132,7 @@ export default function AgGridListView({
     () =>
       hasCustomColDefs
         ? dataColDefs
-        : [CHECKBOX_COL, ...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
+        : [...(hasAvatar ? [AVATAR_COL] : []), ...dataColDefs],
     [dataColDefs, hasAvatar, hasCustomColDefs],
   );
 

@@ -13,12 +13,24 @@ export function buildDefaultValues(
   const defaults: Record<string, unknown> = {};
 
   for (const field of fields) {
+    const recordValue = record?.[field.key];
+    if (recordValue !== undefined && recordValue !== null) {
+      defaults[field.key] = recordValue;
+      continue;
+    }
+
+    // Create mode: honor field-level defaultValue when present.
+    if (record === null && field.defaultValue !== undefined) {
+      defaults[field.key] = field.defaultValue;
+      continue;
+    }
+
     if (field.type === 'boolean') {
-      defaults[field.key] = record?.[field.key] ?? false;
+      defaults[field.key] = false;
     } else if (field.type === 'number') {
-      defaults[field.key] = record?.[field.key] ?? undefined;
+      defaults[field.key] = undefined;
     } else {
-      defaults[field.key] = record?.[field.key] ?? '';
+      defaults[field.key] = '';
     }
   }
 
