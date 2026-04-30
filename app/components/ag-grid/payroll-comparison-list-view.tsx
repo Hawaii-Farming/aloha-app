@@ -39,7 +39,12 @@ function EmployeeDeptRenderer(props: CustomCellRendererProps) {
   const data = props.data as RowData | undefined;
   if (!data) return null;
 
-  const fullName = String(data.full_name ?? data.employee_name ?? '');
+  const fullName = String(
+    data.hr_employee_preferred_name ??
+      data.full_name ??
+      data.employee_name ??
+      '',
+  );
   const pinned = props.node.rowPinned === 'bottom';
 
   return (
@@ -58,9 +63,15 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
 
 // --- Column definitions ---
 
+// Backing view: hr_payroll_by_task. Real columns: regular_hours,
+// regular_pay, total_hours, total_cost, scheduled_hours,
+// discretionary_overtime_hours, discretionary_overtime_pay, task,
+// is_manager. Employee display fields (hr_employee_preferred_name /
+// hr_employee_profile_photo_url / hr_employee_hr_department_name) come
+// from the loader's enrichment step, not the view.
 const byDeptColDefs: ColDef[] = [
   {
-    field: 'department_name',
+    field: 'hr_employee_hr_department_name',
     headerName: 'Department',
     minWidth: 250,
   },
@@ -91,7 +102,7 @@ const byDeptColDefs: ColDef[] = [
     minWidth: 100,
   },
   {
-    field: 'overtime_hours',
+    field: 'discretionary_overtime_hours',
     headerName: 'OT Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
@@ -107,16 +118,16 @@ const byDeptColDefs: ColDef[] = [
     minWidth: 100,
   },
   {
-    field: 'gross_wage',
-    headerName: 'Gross Wage',
+    field: 'regular_pay',
+    headerName: 'Regular Pay',
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
     flex: 1,
     minWidth: 120,
   },
   {
-    field: 'net_pay',
-    headerName: 'Net Pay',
+    field: 'total_cost',
+    headerName: 'Total Cost',
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
     flex: 1,
@@ -126,7 +137,7 @@ const byDeptColDefs: ColDef[] = [
 
 const AVATAR_COL: ColDef = {
   headerName: '',
-  field: 'profile_photo_url',
+  field: 'hr_employee_profile_photo_url',
   cellRenderer: PinnedAwareAvatarRenderer,
   maxWidth: 60,
   minWidth: 60,
@@ -141,7 +152,7 @@ const AVATAR_COL: ColDef = {
 const byEmployeeColDefs: ColDef[] = [
   AVATAR_COL,
   {
-    field: 'full_name',
+    field: 'hr_employee_preferred_name',
     headerName: 'Employee',
     cellRenderer: EmployeeDeptRenderer,
     minWidth: 250,
@@ -156,7 +167,7 @@ const byEmployeeColDefs: ColDef[] = [
     minWidth: 100,
   },
   {
-    field: 'overtime_hours',
+    field: 'discretionary_overtime_hours',
     headerName: 'OT Hours',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
@@ -172,16 +183,16 @@ const byEmployeeColDefs: ColDef[] = [
     minWidth: 100,
   },
   {
-    field: 'gross_wage',
-    headerName: 'Gross Wage',
+    field: 'regular_pay',
+    headerName: 'Regular Pay',
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
     flex: 1,
     minWidth: 120,
   },
   {
-    field: 'net_pay',
-    headerName: 'Net Pay',
+    field: 'total_cost',
+    headerName: 'Total Cost',
     type: 'numericColumn',
     cellRenderer: CurrencyRenderer,
     flex: 1,
@@ -194,18 +205,19 @@ function groupByDepartment(rows: RowData[]): RowData[] {
   const map = new Map<string, RowData>();
 
   for (const row of rows) {
-    const dept = String(row.department_name ?? 'Unknown');
+    const dept = String(row.hr_employee_hr_department_name ?? 'Unknown');
     const existing = map.get(dept);
     if (!existing) {
       map.set(dept, {
-        department_name: dept,
+        hr_employee_hr_department_name: dept,
         _employees: new Set([String(row.hr_employee_id ?? '')]),
         employee_count: 0,
         regular_hours: Number(row.regular_hours) || 0,
-        overtime_hours: Number(row.overtime_hours) || 0,
+        discretionary_overtime_hours:
+          Number(row.discretionary_overtime_hours) || 0,
         total_hours: Number(row.total_hours) || 0,
-        gross_wage: Number(row.gross_wage) || 0,
-        net_pay: Number(row.net_pay) || 0,
+        regular_pay: Number(row.regular_pay) || 0,
+        total_cost: Number(row.total_cost) || 0,
         _detailRows: [row],
       });
     } else {
@@ -215,15 +227,15 @@ function groupByDepartment(rows: RowData[]): RowData[] {
       existing.regular_hours =
         (Number(existing.regular_hours) || 0) +
         (Number(row.regular_hours) || 0);
-      existing.overtime_hours =
-        (Number(existing.overtime_hours) || 0) +
-        (Number(row.overtime_hours) || 0);
+      existing.discretionary_overtime_hours =
+        (Number(existing.discretionary_overtime_hours) || 0) +
+        (Number(row.discretionary_overtime_hours) || 0);
       existing.total_hours =
         (Number(existing.total_hours) || 0) + (Number(row.total_hours) || 0);
-      existing.gross_wage =
-        (Number(existing.gross_wage) || 0) + (Number(row.gross_wage) || 0);
-      existing.net_pay =
-        (Number(existing.net_pay) || 0) + (Number(row.net_pay) || 0);
+      existing.regular_pay =
+        (Number(existing.regular_pay) || 0) + (Number(row.regular_pay) || 0);
+      existing.total_cost =
+        (Number(existing.total_cost) || 0) + (Number(row.total_cost) || 0);
       (existing._detailRows as RowData[]).push(row);
     }
   }
@@ -249,29 +261,30 @@ function groupByEmployee(rows: RowData[]): RowData[] {
     if (!existing) {
       map.set(empId, {
         hr_employee_id: empId,
-        full_name: row.employee_name ?? row.full_name,
-        profile_photo_url: row.profile_photo_url,
-        department_name: row.department_name,
+        hr_employee_preferred_name: row.hr_employee_preferred_name,
+        hr_employee_profile_photo_url: row.hr_employee_profile_photo_url,
+        hr_employee_hr_department_name: row.hr_employee_hr_department_name,
         regular_hours: Number(row.regular_hours) || 0,
-        overtime_hours: Number(row.overtime_hours) || 0,
+        discretionary_overtime_hours:
+          Number(row.discretionary_overtime_hours) || 0,
         total_hours: Number(row.total_hours) || 0,
-        gross_wage: Number(row.gross_wage) || 0,
-        net_pay: Number(row.net_pay) || 0,
+        regular_pay: Number(row.regular_pay) || 0,
+        total_cost: Number(row.total_cost) || 0,
         _detailRows: [row],
       });
     } else {
       existing.regular_hours =
         (Number(existing.regular_hours) || 0) +
         (Number(row.regular_hours) || 0);
-      existing.overtime_hours =
-        (Number(existing.overtime_hours) || 0) +
-        (Number(row.overtime_hours) || 0);
+      existing.discretionary_overtime_hours =
+        (Number(existing.discretionary_overtime_hours) || 0) +
+        (Number(row.discretionary_overtime_hours) || 0);
       existing.total_hours =
         (Number(existing.total_hours) || 0) + (Number(row.total_hours) || 0);
-      existing.gross_wage =
-        (Number(existing.gross_wage) || 0) + (Number(row.gross_wage) || 0);
-      existing.net_pay =
-        (Number(existing.net_pay) || 0) + (Number(row.net_pay) || 0);
+      existing.regular_pay =
+        (Number(existing.regular_pay) || 0) + (Number(row.regular_pay) || 0);
+      existing.total_cost =
+        (Number(existing.total_cost) || 0) + (Number(row.total_cost) || 0);
       (existing._detailRows as RowData[]).push(row);
     }
   }
@@ -321,36 +334,44 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     if (isByEmployee) {
       return [
         {
-          full_name: 'TOTAL',
+          hr_employee_preferred_name: 'TOTAL',
           regular_hours: sumField('regular_hours'),
-          overtime_hours: sumField('overtime_hours'),
+          discretionary_overtime_hours: sumField(
+            'discretionary_overtime_hours',
+          ),
           total_hours: sumField('total_hours'),
-          gross_wage: sumField('gross_wage'),
-          net_pay: sumField('net_pay'),
+          regular_pay: sumField('regular_pay'),
+          total_cost: sumField('total_cost'),
         },
       ];
     }
     return [
       {
-        department_name: 'TOTAL',
+        hr_employee_hr_department_name: 'TOTAL',
         employee_count: groupedRows.reduce(
           (sum, r) => sum + (Number(r.employee_count) || 0),
           0,
         ),
         regular_hours: sumField('regular_hours'),
-        overtime_hours: sumField('overtime_hours'),
+        discretionary_overtime_hours: sumField('discretionary_overtime_hours'),
         total_hours: sumField('total_hours'),
-        gross_wage: sumField('gross_wage'),
-        net_pay: sumField('net_pay'),
+        regular_pay: sumField('regular_pay'),
+        total_cost: sumField('total_cost'),
       },
     ];
   }, [groupedRows, isByEmployee]);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
     const d = params.data as
-      | { full_name?: string; department_name?: string }
+      | {
+          hr_employee_preferred_name?: string;
+          hr_employee_hr_department_name?: string;
+        }
       | undefined;
-    if (d?.full_name === 'TOTAL' || d?.department_name === 'TOTAL') {
+    if (
+      d?.hr_employee_preferred_name === 'TOTAL' ||
+      d?.hr_employee_hr_department_name === 'TOTAL'
+    ) {
       return { fontWeight: 'bold', background: 'var(--color-muted)' };
     }
     return undefined;

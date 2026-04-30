@@ -15,17 +15,28 @@ export const hrPayrollComparisonConfig: CrudModuleConfig<typeof schema> = {
     detail: 'hr_payroll',
   },
 
+  // Backing view: hr_payroll_by_task. Employee + department display
+  // fields are merged onto rows by the loader's enrichment step; the
+  // view itself only exposes ids/aggregates.
   columns: [
-    { key: 'department_name', label: 'Department', sortable: true },
+    { key: 'hr_employee_hr_department_name', label: 'Department' },
     { key: 'employee_count', label: 'Employees', type: 'number' },
-    { key: 'total_regular_hours', label: 'Reg Hours', type: 'number' },
-    { key: 'total_overtime_hours', label: 'OT Hours', type: 'number' },
-    { key: 'total_gross_wage', label: 'Gross Wage', type: 'number' },
-    { key: 'total_net_pay', label: 'Net Pay', type: 'number' },
+    { key: 'regular_hours', label: 'Reg Hours', type: 'number' },
+    {
+      key: 'discretionary_overtime_hours',
+      label: 'OT Hours',
+      type: 'number',
+    },
+    { key: 'total_hours', label: 'Total Hours', type: 'number' },
+    { key: 'regular_pay', label: 'Regular Pay', type: 'number' },
+    { key: 'total_cost', label: 'Total Cost', type: 'number' },
   ],
 
+  // Search runs client-side via AgGrid quickFilterText; no PostgREST
+  // search needed. Drop server-side search.columns since none of the
+  // useful fields (preferred_name, dept name) live on the view.
   search: {
-    columns: ['department_name'],
+    columns: [],
     placeholder: 'Search payroll comparison...',
   },
 

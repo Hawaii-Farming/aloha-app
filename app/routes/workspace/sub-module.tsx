@@ -165,7 +165,7 @@ export const loader = async (args: {
           .eq('pay_period_start', periodStart)
           .eq('pay_period_end', periodEnd);
       }
-      query = query.order('full_name');
+      query = query.order('hr_employee_id');
     } else if (subModuleSlug === 'Payroll Data') {
       let periodStart = url.searchParams.get('period_start');
       let periodEnd = url.searchParams.get('period_end');
@@ -214,7 +214,52 @@ export const loader = async (args: {
     // Flatten postgrest embeds so list-view configs see flat keys
     // (subject_preferred_name, subject_hr_department_name, etc.) — mirrors
     // loadTableData's behaviour for the regular path.
-    const rows = config?.select ? rawRows.map((r) => flattenRow(r)) : rawRows;
+    let rows = config?.select ? rawRows.map((r) => flattenRow(r)) : rawRows;
+
+    // Enrich payroll-summary views with employee display fields. The
+    // hr_payroll_by_task / hr_payroll_employee_comparison views expose
+    // hr_employee_id but not preferred_name / department / photo, and
+    // PostgREST embeds aren't reliable on these views. Fetch a single
+    // batch and merge by id.
+    if (
+      subModuleSlug === 'Payroll Comparison' ||
+      subModuleSlug === 'Payroll Comp' ||
+      subModuleSlug === 'Payroll Comp Manager' ||
+      subModuleSlug === 'Hours Comp'
+    ) {
+      const employeeIds = new Set<string>();
+      for (const r of rows) {
+        const eid = r.hr_employee_id;
+        if (typeof eid === 'string' && eid) employeeIds.add(eid);
+      }
+      if (employeeIds.size > 0) {
+        const { data: empData } = await client
+          .from('hr_employee' as never)
+          .select(
+            'id, preferred_name, profile_photo_url, hr_department:hr_department(name)',
+          )
+          .in('id', Array.from(employeeIds));
+        const empMap = new Map<string, Record<string, unknown>>();
+        for (const e of castRows(empData)) {
+          empMap.set(String(e.id), e);
+        }
+        rows = rows.map((r) => {
+          const eid = String(r.hr_employee_id ?? '');
+          const emp = empMap.get(eid);
+          if (!emp) return r;
+          const dept = emp.hr_department as
+            | Record<string, unknown>
+            | null
+            | undefined;
+          return {
+            ...r,
+            hr_employee_preferred_name: emp.preferred_name,
+            hr_employee_profile_photo_url: emp.profile_photo_url,
+            hr_employee_hr_department_name: dept?.name ?? null,
+          };
+        });
+      }
+    }
 
     // Load distinct managers for payroll_comp_manager
     let managers: Record<string, unknown>[] = [];
