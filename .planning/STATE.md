@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-30 - Completed quick task 260430-jzf: Time off — widen Reason col, drop Notes, add PTO allocator
+Last activity: 2026-04-30 - Completed quick task 260430-k88: Housing list — Vacancy column + TOTAL summary row
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -184,6 +184,7 @@ None.
 | 260420-kd0 | Adopt Kimbie Dark palette app-wide for dark mode (light untouched, emerald brand preserved) | 2026-04-20 | 9ef3d6e | [260420-kd0-adopt-kimbie-dark-app-wide](./quick/260420-kd0-adopt-kimbie-dark-app-wide/) |
 | 260420-mb0 | Mobile navbar + drawer fixes: restore search, fix avatar to org-initials profile menu, drop overlay backdrop-blur, remove redundant mobile brand | 2026-04-20 | fbf529b | [260420-mb0-mobile-navbar-drawer-fixes](./quick/260420-mb0-mobile-navbar-drawer-fixes/) |
 | 260430-jzf | Time off: widen Reason col, drop Notes input, add interactive PTO allocation widget (PTO/sick/unpaid split with sum cap) | 2026-04-30 | 97660be | [260430-jzf-time-off-widen-reason-column-in-ag-grid-](./quick/260430-jzf-time-off-widen-reason-column-in-ag-grid-/) |
+| 260430-k88 | Housing list: add Vacancy column + TOTAL summary row (sum of beds, baths, tenants, capacity, vacancy) | 2026-04-30 | 75b7e8f | [260430-k88-housing-list-grid-add-total-beds-and-tot](./quick/260430-k88-housing-list-grid-add-total-beds-and-tot/) |
 
 ## Session Continuity
 
