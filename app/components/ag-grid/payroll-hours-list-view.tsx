@@ -17,6 +17,7 @@ import type {
   RowClassParams,
   RowClickedEvent,
   SortChangedEvent,
+  ValueGetterParams,
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 
@@ -64,7 +65,7 @@ function EmployeeDeptRenderer(props: CustomCellRendererProps) {
   const data = props.data as RowData | undefined;
   if (!data) return null;
 
-  const fullName = String(data.full_name ?? '');
+  const fullName = String(data.hr_employee_preferred_name ?? '');
   const pinned = props.node.rowPinned === 'bottom';
 
   return (
@@ -78,7 +79,7 @@ function EmployeeDeptRenderer(props: CustomCellRendererProps) {
 
 const AVATAR_COL: ColDef = {
   headerName: '',
-  field: 'profile_photo_url',
+  field: 'hr_employee_profile_photo_url',
   cellRenderer: PinnedAwareAvatarRenderer,
   maxWidth: 60,
   minWidth: 60,
@@ -90,17 +91,27 @@ const AVATAR_COL: ColDef = {
   lockPosition: true,
 };
 
+// Backing view: hr_payroll_employee_comparison. payroll_hours and
+// variance aren't real columns; payroll_hours == total_hours and
+// variance is computed client-side as total_hours - scheduled_hours.
+function varianceGetter(params: ValueGetterParams): number | null {
+  const total = Number(params.data?.total_hours);
+  const sched = Number(params.data?.scheduled_hours);
+  if (Number.isNaN(total) && Number.isNaN(sched)) return null;
+  return (total || 0) - (sched || 0);
+}
+
 const colDefs: ColDef[] = [
   AVATAR_COL,
   {
-    field: 'full_name',
+    field: 'hr_employee_preferred_name',
     headerName: 'Employee',
     cellRenderer: EmployeeDeptRenderer,
     minWidth: 200,
     pinned: 'left',
   },
   {
-    field: 'department_name',
+    field: 'hr_employee_hr_department_name',
     headerName: 'Department',
     minWidth: 140,
   },
@@ -113,7 +124,7 @@ const colDefs: ColDef[] = [
     minWidth: 120,
   },
   {
-    field: 'payroll_hours',
+    field: 'total_hours',
     headerName: 'Payroll Hrs',
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
@@ -121,9 +132,10 @@ const colDefs: ColDef[] = [
     minWidth: 120,
   },
   {
-    field: 'variance',
+    colId: 'variance',
     headerName: 'Variance',
     type: 'numericColumn',
+    valueGetter: varianceGetter,
     cellRenderer: VariancePillRenderer,
     flex: 1,
     minWidth: 120,
@@ -167,21 +179,21 @@ export default function PayrollHoursListView(props: ListViewProps) {
       rawRows.reduce((sum, r) => sum + (Number(r[field]) || 0), 0);
 
     const totalScheduled = sumField('scheduled_hours');
-    const totalPayroll = sumField('payroll_hours');
+    const totalPayroll = sumField('total_hours');
 
     return [
       {
-        full_name: 'TOTAL',
+        hr_employee_preferred_name: 'TOTAL',
         scheduled_hours: totalScheduled,
-        payroll_hours: totalPayroll,
-        variance: totalPayroll - totalScheduled,
+        total_hours: totalPayroll,
       },
     ];
   }, [rawRows]);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
     if (
-      (params.data as { full_name?: string } | undefined)?.full_name === 'TOTAL'
+      (params.data as { hr_employee_preferred_name?: string } | undefined)
+        ?.hr_employee_preferred_name === 'TOTAL'
     ) {
       return {
         fontWeight: 'bold',

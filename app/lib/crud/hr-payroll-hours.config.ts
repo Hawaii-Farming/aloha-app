@@ -15,16 +15,19 @@ export const hrPayrollHoursConfig: CrudModuleConfig<typeof schema> = {
     detail: 'hr_payroll',
   },
 
+  // Backing view: hr_payroll_employee_comparison. Employee + dept come
+  // from the loader's hr_employee enrichment; payroll hours map to
+  // total_hours; variance is computed client-side.
   columns: [
-    { key: 'full_name', label: 'Employee', sortable: true },
-    { key: 'department_name', label: 'Department', sortable: true },
+    { key: 'hr_employee_preferred_name', label: 'Employee' },
+    { key: 'hr_employee_hr_department_name', label: 'Department' },
     { key: 'scheduled_hours', label: 'Scheduled Hrs', type: 'number' },
-    { key: 'payroll_hours', label: 'Payroll Hrs', type: 'number' },
-    { key: 'variance', label: 'Variance', type: 'number' },
+    { key: 'total_hours', label: 'Payroll Hrs', type: 'number' },
   ],
 
+  // Search runs client-side via AgGrid quickFilterText.
   search: {
-    columns: ['full_name', 'department_name'],
+    columns: [],
     placeholder: 'Search employees...',
   },
 
