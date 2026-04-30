@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useFetcher, useRevalidator } from 'react-router';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import type { ZodObject, ZodRawShape } from 'zod';
 import { z } from 'zod';
 
@@ -57,6 +57,28 @@ export function CreatePanel({
     resolver: zodResolver(schema),
     defaultValues: buildDefaultValues(formFields, null),
   });
+
+  // Reactive OT default for HR Register: hr_work_authorization_id drives
+  // overtime_threshold (1099/H1/H3/Local → 80, else → 120) while the user
+  // has not edited the OT field. useEffect is justified per CLAUDE.md as a
+  // cross-field reactive default with no natural event-handler owner — the
+  // FkCombobox onChange isn't routed through this component, so a watcher
+  // is the cleanest path.
+  const workAuthValue = useWatch({
+    control: form.control,
+    name: 'hr_work_authorization_id',
+  });
+
+  useEffect(() => {
+    if (config?.tableName !== 'hr_employee') return;
+    const otState = form.getFieldState('overtime_threshold', form.formState);
+    if (otState.isDirty) return;
+    if (!workAuthValue || typeof workAuthValue !== 'string') return;
+    const next = ['1099', 'H1', 'H3', 'Local'].includes(workAuthValue)
+      ? 80
+      : 120;
+    form.setValue('overtime_threshold', String(next), { shouldDirty: false });
+  }, [workAuthValue, config?.tableName, form]);
 
   const fetcherData = fetcher.data as
     | { success: boolean; error?: string; errors?: unknown }

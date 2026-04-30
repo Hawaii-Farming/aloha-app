@@ -2,31 +2,43 @@ import { z } from 'zod';
 
 import type { CrudModuleConfig } from '~/lib/crud/types';
 
-const hrEmployeeSchema = z.object({
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
-  preferred_name: z.string().optional(),
-  gender: z.string().optional(),
-  date_of_birth: z.string().optional(),
-  is_minority: z.boolean().optional(),
-  phone: z.string().optional(),
-  email: z.string().optional(),
-  company_email: z.string().optional(),
-  hr_department_id: z.string().optional(),
-  sys_access_level_id: z.string().min(1, 'Access level is required'),
-  team_lead_id: z.string().optional(),
-  compensation_manager_id: z.string().optional(),
-  hr_work_authorization_id: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  payroll_id: z.string().optional(),
-  pay_structure: z.string().optional(),
-  overtime_threshold: z.union([z.string(), z.number()]).optional(),
-  wc: z.string().optional(),
-  payroll_processor: z.string().optional(),
-  pay_delivery_method: z.string().optional(),
-  housing_id: z.string().optional(),
-});
+const hrEmployeeSchema = z
+  .object({
+    first_name: z.string().min(1, 'First name is required'),
+    last_name: z.string().min(1, 'Last name is required'),
+    preferred_name: z.string().optional(),
+    gender: z.string().optional(),
+    date_of_birth: z.string().optional(),
+    ethnicity: z.string().optional(),
+    phone: z.string().optional(),
+    email: z.string().optional(),
+    company_email: z.string().optional(),
+    hr_department_id: z.string().optional(),
+    sys_access_level_id: z.string().min(1, 'Access level is required'),
+    team_lead_id: z.string().optional(),
+    compensation_manager_id: z.string().optional(),
+    hr_work_authorization_id: z.string().optional(),
+    start_date: z.string().optional(),
+    end_date: z.string().optional(),
+    payroll_id: z.string().optional(),
+    pay_structure: z.string().optional(),
+    overtime_threshold: z.union([z.string(), z.number()]).optional(),
+    wc: z.string().optional(),
+    payroll_processor: z.string().optional(),
+    pay_delivery_method: z.string().optional(),
+    housing_id: z.string().optional(),
+  })
+  .superRefine((val, ctx) => {
+    const wa = val.hr_work_authorization_id;
+    const requiresHousing = !!wa && wa !== 'Local' && wa !== '1099';
+    if (requiresHousing && !val.housing_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['housing_id'],
+        message: 'Housing is required for this work authorization',
+      });
+    }
+  });
 
 export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
   tableName: 'hr_employee',
@@ -141,7 +153,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     },
     { key: 'last_name', label: 'Last Name', type: 'text', required: true },
     { key: 'preferred_name', label: 'Alias', type: 'text' },
-    { key: 'is_minority', label: 'Minority', type: 'boolean' },
+    { key: 'ethnicity', label: 'Ethnicity', type: 'combobox' },
     {
       key: 'gender',
       label: 'Gender',
@@ -150,6 +162,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
         { value: 'Male', label: 'Male' },
         { value: 'Female', label: 'Female' },
       ],
+      defaultValue: 'Female',
     },
     { key: 'date_of_birth', label: 'Date of Birth', type: 'date' },
 
@@ -224,19 +237,26 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
         { value: 'Salary', label: 'Salary' },
       ],
       section: 'Compensation',
+      defaultValue: 'Hourly',
     },
     {
       key: 'overtime_threshold',
-      label: 'OT Threshold (hrs/week)',
+      label: 'OT Threshold',
       type: 'combobox',
     },
-    { key: 'wc', label: 'WC Code', type: 'combobox' },
+    { key: 'wc', label: 'WC Code', type: 'combobox', defaultValue: '0008' },
     { key: 'payroll_id', label: 'Payroll ID', type: 'text' },
-    { key: 'payroll_processor', label: 'Payroll Processor', type: 'combobox' },
+    {
+      key: 'payroll_processor',
+      label: 'Payroll Processor',
+      type: 'combobox',
+      defaultValue: 'HRB',
+    },
     {
       key: 'pay_delivery_method',
       label: 'Pay Check Delivery',
       type: 'combobox',
+      defaultValue: 'Electronic',
     },
     {
       key: 'housing_id',
