@@ -107,6 +107,10 @@ export interface FormFieldConfig {
   fkTable?: string;
   /** For type='fk': column to use as display label */
   fkLabelColumn?: string;
+  /** For type='fk': multiple columns whose values are joined with a space
+   *  to produce the display label (e.g. ['preferred_name', 'last_name']).
+   *  When set, takes precedence over fkLabelColumn. */
+  fkLabelColumns?: string[];
   /** For type='select' or 'radio': allowed values */
   options?: Array<string | { value: string; label: string }>;
   /** Set to false for system-level FK tables that don't have org_id.

@@ -38,7 +38,10 @@ export async function loadFormOptions(
   }
 
   const fkFields = (config.formFields ?? []).filter(
-    (f) => f.type === 'fk' && f.fkTable && f.fkLabelColumn,
+    (f) =>
+      f.type === 'fk' &&
+      f.fkTable &&
+      (f.fkLabelColumn || (f.fkLabelColumns && f.fkLabelColumns.length > 0)),
   );
 
   const comboboxFields = (config.formFields ?? []).filter(
@@ -48,8 +51,12 @@ export async function loadFormOptions(
   // Load all FK and combobox queries in parallel. allSettled means a single
   // failure does not block the rest — the failed field just gets an empty list.
   const fkPromises = fkFields.map(async (field) => {
-    const orderCol = field.fkOrderColumn ?? field.fkLabelColumn!;
-    const selectCols = new Set(['id', field.fkLabelColumn!, orderCol]);
+    const labelCols =
+      field.fkLabelColumns && field.fkLabelColumns.length > 0
+        ? field.fkLabelColumns
+        : [field.fkLabelColumn!];
+    const orderCol = field.fkOrderColumn ?? labelCols[0]!;
+    const selectCols = new Set(['id', orderCol, ...labelCols]);
     let query = client
       .from(field.fkTable! as never)
       .select([...selectCols].join(', '))
@@ -80,7 +87,11 @@ export async function loadFormOptions(
       key: field.key,
       options: rows.map((row) => ({
         value: String(row['id']),
-        label: String(row[field.fkLabelColumn!]),
+        label: labelCols
+          .map((c) => row[c])
+          .filter((v) => v !== null && v !== undefined && String(v).length > 0)
+          .map((v) => String(v))
+          .join(' '),
       })),
     };
   });
