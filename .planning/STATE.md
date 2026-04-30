@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-04-30 - Completed quick task 260430-nm9: Scheduler form — Employee dropdown shows preferred + last name
+Last activity: 2026-04-30 - Completed quick task 260430-poe: HR Register module — agGrid tweaks, form defaults, conditional housing requirement
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -186,6 +186,7 @@ None.
 | 260430-jzf | Time off: widen Reason col, drop Notes input, add interactive PTO allocation widget (PTO/sick/unpaid split with sum cap) | 2026-04-30 | 97660be | [260430-jzf-time-off-widen-reason-column-in-ag-grid-](./quick/260430-jzf-time-off-widen-reason-column-in-ag-grid-/) |
 | 260430-k88 | Housing list: add Vacancy column + TOTAL summary row (sum of beds, baths, tenants, capacity, vacancy) | 2026-04-30 | 75b7e8f | [260430-k88-housing-list-grid-add-total-beds-and-tot](./quick/260430-k88-housing-list-grid-add-total-beds-and-tot/) |
 | 260430-nm9 | Scheduler form — Employee dropdown shows preferred_name + last_name (multi-column FK label support) | 2026-04-30 | b44f80d | [260430-nm9-scheduler-employee-show-last-name](./quick/260430-nm9-scheduler-employee-show-last-name/) |
+| 260430-poe | HR Register: drop checkbox col, year/month dropdowns, ethnicity rename, form defaults, conditional housing requirement | 2026-04-30 | 1ad04f1 | [260430-poe-hr-register-module-aggrid-tweaks-form-de](./quick/260430-poe-hr-register-module-aggrid-tweaks-form-de/) |
 
 ## Session Continuity
 
