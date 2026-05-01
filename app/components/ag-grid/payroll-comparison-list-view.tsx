@@ -292,12 +292,12 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     gridRef,
   });
 
-  // Detail rows get a fixed height for the embedded grid; everything else
-  // uses the AG Grid theme default. 240 = 40px header + 5 employee rows
-  // (~36px each) + a little padding. Inner grid scrolls if more.
+  // Detail rows get a fixed pixel height so the nested AG Grid inside
+  // the full-width row resolves its h-full chain. 360 leaves room for
+  // ~8 employee rows before the inner grid scrollbar kicks in.
   const getRowHeight = useCallback(
     (params: { data?: Record<string, unknown> }) =>
-      params.data?._isDetailRow ? 240 : undefined,
+      params.data?._isDetailRow ? 360 : undefined,
     [],
   );
 

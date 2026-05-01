@@ -1,5 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+import type { ColDef } from 'ag-grid-community';
+import type { AgGridReact } from 'ag-grid-react';
+
+import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
+import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
+import {
+  CurrencyRenderer,
+  hoursFormatter,
+} from '~/components/ag-grid/payroll-formatters';
 import { useSupabase } from '~/lib/supabase/hooks/use-supabase';
 
 type RowData = Record<string, unknown>;
@@ -10,30 +19,71 @@ interface Props {
   isTeamLead: boolean;
 }
 
-const usdFormat = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
+const HOURS_COLS: ColDef[] = [
+  {
+    headerName: '',
+    field: 'hr_employee_profile_photo_url',
+    cellRenderer: AvatarRenderer,
+    maxWidth: 56,
+    minWidth: 56,
+    sortable: false,
+    filter: false,
+    resizable: false,
+    suppressMovable: true,
+    pinned: 'left',
+  },
+  {
+    field: 'hr_employee_preferred_name',
+    headerName: 'Employee',
+    minWidth: 200,
+    pinned: 'left',
+  },
+  {
+    field: 'total_hours',
+    headerName: 'Total Hours',
+    type: 'numericColumn',
+    minWidth: 110,
+    valueFormatter: hoursFormatter,
+  },
+  {
+    field: 'scheduled_hours',
+    headerName: 'Scheduled',
+    type: 'numericColumn',
+    minWidth: 110,
+    valueFormatter: hoursFormatter,
+  },
+  {
+    field: 'discretionary_overtime_hours',
+    headerName: 'OT Hours',
+    type: 'numericColumn',
+    minWidth: 110,
+    valueFormatter: hoursFormatter,
+  },
+];
 
-function fmtHours(v: unknown): string {
-  if (v == null || v === '') return '';
-  const n = Number(v);
-  if (!Number.isFinite(n)) return '';
-  if (n === 0) return '—';
-  return n.toLocaleString(undefined, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 2,
-  });
-}
-
-function fmtCurrency(v: unknown): string {
-  if (v == null || v === '') return '';
-  const n = Number(v);
-  if (!Number.isFinite(n)) return '';
-  if (n === 0) return '—';
-  return usdFormat.format(n);
-}
+const DOLLAR_COLS: ColDef[] = [
+  {
+    field: 'regular_pay',
+    headerName: 'Regular Pay',
+    type: 'numericColumn',
+    minWidth: 120,
+    cellRenderer: CurrencyRenderer,
+  },
+  {
+    field: 'discretionary_overtime_pay',
+    headerName: 'OT Pay',
+    type: 'numericColumn',
+    minWidth: 120,
+    cellRenderer: CurrencyRenderer,
+  },
+  {
+    field: 'total_cost',
+    headerName: 'Total Cost',
+    type: 'numericColumn',
+    minWidth: 120,
+    cellRenderer: CurrencyRenderer,
+  },
+];
 
 export function PayrollTaskEmployeeDetail({
   data,
@@ -41,6 +91,7 @@ export function PayrollTaskEmployeeDetail({
   isTeamLead,
 }: Props) {
   const supabase = useSupabase();
+  const gridRef = useRef<AgGridReact>(null);
   const [rows, setRows] = useState<RowData[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,6 +161,11 @@ export function PayrollTaskEmployeeDetail({
     };
   }, [supabase, accountSlug, task, status, checkDate]);
 
+  const colDefs = useMemo(
+    () => (isTeamLead ? HOURS_COLS : [...HOURS_COLS, ...DOLLAR_COLS]),
+    [isTeamLead],
+  );
+
   if (error) {
     return (
       <div className="text-destructive px-4 py-3 text-sm">
@@ -132,69 +188,23 @@ export function PayrollTaskEmployeeDetail({
     );
   }
 
+  // Inner grid gets an explicit pixel height so AgGridWrapper's h-full
+  // resolves correctly inside AG Grid's full-width row cell. Cap at 340
+  // so very large breakdowns stay scrollable rather than overflowing.
+  const innerHeight = Math.min(48 + rows.length * 36, 340);
+
   return (
     <div
-      className="bg-muted/30 h-full overflow-auto px-3 py-2"
+      className="bg-muted/30 px-2 py-2"
+      style={{ height: innerHeight }}
       data-test="payroll-task-employee-detail"
     >
-      <table className="w-full text-sm">
-        <thead className="text-muted-foreground border-border border-b text-xs uppercase">
-          <tr>
-            <th className="px-2 py-1.5 text-left font-medium">Employee</th>
-            <th className="px-2 py-1.5 text-right font-medium">Total Hours</th>
-            <th className="px-2 py-1.5 text-right font-medium">Scheduled</th>
-            <th className="px-2 py-1.5 text-right font-medium">OT Hours</th>
-            {!isTeamLead && (
-              <>
-                <th className="px-2 py-1.5 text-right font-medium">
-                  Regular Pay
-                </th>
-                <th className="px-2 py-1.5 text-right font-medium">OT Pay</th>
-                <th className="px-2 py-1.5 text-right font-medium">
-                  Total Cost
-                </th>
-              </>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => {
-            const name = String(
-              r.hr_employee_preferred_name ?? r.hr_employee_id ?? '—',
-            );
-            return (
-              <tr
-                key={String(r.hr_employee_id ?? i)}
-                className="border-border/60 hover:bg-muted/40 border-b last:border-b-0"
-              >
-                <td className="px-2 py-1.5 font-medium">{name}</td>
-                <td className="px-2 py-1.5 text-right tabular-nums">
-                  {fmtHours(r.total_hours)}
-                </td>
-                <td className="px-2 py-1.5 text-right tabular-nums">
-                  {fmtHours(r.scheduled_hours)}
-                </td>
-                <td className="px-2 py-1.5 text-right tabular-nums">
-                  {fmtHours(r.discretionary_overtime_hours)}
-                </td>
-                {!isTeamLead && (
-                  <>
-                    <td className="px-2 py-1.5 text-right tabular-nums">
-                      {fmtCurrency(r.regular_pay)}
-                    </td>
-                    <td className="px-2 py-1.5 text-right tabular-nums">
-                      {fmtCurrency(r.discretionary_overtime_pay)}
-                    </td>
-                    <td className="px-2 py-1.5 text-right tabular-nums">
-                      {fmtCurrency(r.total_cost)}
-                    </td>
-                  </>
-                )}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <AgGridWrapper
+        gridRef={gridRef}
+        colDefs={colDefs}
+        rowData={rows}
+        pagination={false}
+      />
     </div>
   );
 }
