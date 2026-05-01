@@ -9,6 +9,16 @@ interface CrudActionParams {
   employeeId: string;
 }
 
+function coerceEmptyStringsToNull<T extends Record<string, unknown>>(
+  data: T,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    out[key] = typeof value === 'string' && value === '' ? null : value;
+  }
+  return out;
+}
+
 export async function crudCreateAction(
   params: CrudActionParams & {
     data: Record<string, unknown>;
@@ -25,7 +35,7 @@ export async function crudCreateAction(
   }
 
   const insertData: Record<string, unknown> = {
-    ...parsed.data,
+    ...coerceEmptyStringsToNull(parsed.data as Record<string, unknown>),
     org_id: params.orgId,
     created_by: params.employeeId,
     updated_by: params.employeeId,
@@ -73,7 +83,7 @@ export async function crudUpdateAction(
   }
 
   const updateData = {
-    ...parsed.data,
+    ...coerceEmptyStringsToNull(parsed.data as Record<string, unknown>),
     updated_by: params.employeeId,
   };
 
