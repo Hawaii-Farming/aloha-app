@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-10 after v2.0 milestone)
 Phase: —
 Plan: —
 Status: v2.0 milestone SHIPPED — awaiting `/gsd-new-milestone`
-Last activity: 2026-05-01 - Completed quick task 260501-azo: Payroll RBAC — gate views by sys_access_level (Owner/Admin all+$, Manager direct reports+$, Team Lead all hours-only, Employee hidden)
+Last activity: 2026-05-01 - Completed quick task 260501-eus: Scheduler weekly create drawer (7-day form, prefill, sticky total, batch insert)
 
 Progress: v2.0 complete (22/22 plans across 4 phases)
 
@@ -189,6 +189,7 @@ None.
 | 260430-poe | HR Register: drop checkbox col, year/month dropdowns, ethnicity rename, form defaults, conditional housing requirement | 2026-04-30 | 1ad04f1 | [260430-poe-hr-register-module-aggrid-tweaks-form-de](./quick/260430-poe-hr-register-module-aggrid-tweaks-form-de/) |
 | 260430-qk9 | Cross-cutting AG Grid formatting (numbers right-aligned with commas, MM/DD/YY dates, header wrap) + HR module landing → Register submodule | 2026-04-30 | 4061cb2 | [260430-qk9-aggrid-formatting-polish-hr-module-defau](./quick/260430-qk9-aggrid-formatting-polish-hr-module-defau/) |
 | 260501-azo | Payroll RBAC: gate hr_payroll views by sys_access_level (Owner/Admin all+$, Manager direct reports+$, Team Lead all hours-only, Employee hidden) | 2026-05-01 | 4eb7ef2 | [260501-azo-payroll-rbac-gate-hr-payroll-views-by-sy](./quick/260501-azo-payroll-rbac-gate-hr-payroll-views-by-sy/) |
+| 260501-eus | Scheduler weekly create drawer: 7-day form with prefill + sticky total + batch insert | 2026-05-01 | a0cc398 | [260501-eus-scheduler-weekly-form](./quick/260501-eus-scheduler-weekly-form/) |
 
 ## Session Continuity
 
