@@ -70,22 +70,36 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
     [modules],
   );
 
-  // Accordion behavior: at most one module open at a time. Tracks the
-  // user-selected open slug; the module matching the current URL
-  // auto-opens unless the user has explicitly toggled a different one.
-  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  // Accordion behavior: at most one module open at a time. The module
+  // matching the current URL auto-opens by default, but an explicit user
+  // toggle (open *or* close) wins over URL fallback so users can collapse
+  // the active module's submenu.
+  const [override, setOverride] = useState<{
+    slug: string;
+    open: boolean;
+  } | null>(null);
 
-  const effectiveOpenSlug = useMemo(() => {
-    if (openSlug !== null) return openSlug;
-    return (
+  const urlOpenSlug = useMemo(
+    () =>
       sortedModules.find((m) =>
         currentPath.startsWith(`/home/${account}/${m.module_slug}`),
-      )?.module_slug ?? null
-    );
-  }, [openSlug, sortedModules, currentPath, account]);
+      )?.module_slug ?? null,
+    [sortedModules, currentPath, account],
+  );
+
+  const effectiveOpenSlug = useMemo(() => {
+    if (override) {
+      if (override.open) return override.slug;
+      // Explicit close — only suppress that one slug; other modules can
+      // still claim the open slot via URL fallback.
+      return urlOpenSlug === override.slug ? null : urlOpenSlug;
+    }
+    return urlOpenSlug;
+  }, [override, urlOpenSlug]);
 
   function toggleModule(slug: string) {
-    setOpenSlug((prev) => (prev === slug ? null : slug));
+    const isCurrentlyOpen = effectiveOpenSlug === slug;
+    setOverride({ slug, open: !isCurrentlyOpen });
   }
 
   return (
@@ -119,7 +133,9 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                   onClick={() => {
                     onNavigate?.();
                     setOpen(true);
-                    if (hasChildren) setOpenSlug(mod.module_slug);
+                    if (hasChildren) {
+                      setOverride({ slug: mod.module_slug, open: true });
+                    }
                   }}
                   aria-label={mod.display_name}
                   title={mod.display_name}
@@ -157,22 +173,18 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                               : 'text-foreground hover:bg-muted bg-transparent',
                           )}
                         >
-                          <Link
-                            to={modulePath}
-                            onClick={() => {
-                              onNavigate?.();
-                              if (hasChildren) {
-                                toggleModule(mod.module_slug);
-                              }
-                            }}
-                          >
-                            {createElement(IconComponent, {
-                              className: 'h-[18px] w-[18px] shrink-0',
-                            })}
-                            <span className="flex-1 truncate text-left">
-                              {mod.display_name}
-                            </span>
-                            {hasChildren && (
+                          {hasChildren ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleModule(mod.module_slug)}
+                              aria-expanded={isOpen}
+                            >
+                              {createElement(IconComponent, {
+                                className: 'h-[18px] w-[18px] shrink-0',
+                              })}
+                              <span className="flex-1 truncate text-left">
+                                {mod.display_name}
+                              </span>
                               <ChevronDown
                                 className={cn(
                                   'h-3.5 w-3.5 shrink-0 transition-transform duration-200',
@@ -182,8 +194,20 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                                     : 'text-muted-foreground',
                                 )}
                               />
-                            )}
-                          </Link>
+                            </button>
+                          ) : (
+                            <Link
+                              to={modulePath}
+                              onClick={() => onNavigate?.()}
+                            >
+                              {createElement(IconComponent, {
+                                className: 'h-[18px] w-[18px] shrink-0',
+                              })}
+                              <span className="flex-1 truncate text-left">
+                                {mod.display_name}
+                              </span>
+                            </Link>
+                          )}
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     </SidebarMenu>
