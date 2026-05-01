@@ -149,6 +149,8 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
   schema,
   agGridColDefs,
 
+  noRowClickNav: true,
+
   viewType: { list: 'custom' },
   customViews: {
     list: () => import('~/components/ag-grid/ag-grid-list-view'),

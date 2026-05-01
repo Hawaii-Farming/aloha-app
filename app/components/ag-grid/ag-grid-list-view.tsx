@@ -230,7 +230,9 @@ export default function AgGridListView({
             colDefs={allColDefs}
             rowData={tableData.data as RowData[]}
             quickFilterText={query}
-            onRowClicked={handleRowClicked}
+            onRowClicked={
+              freshConfig?.noRowClickNav ? undefined : handleRowClicked
+            }
             pagination={false}
             onGridReady={handleGridReady}
             onSelectionChanged={handleSelectionChanged}

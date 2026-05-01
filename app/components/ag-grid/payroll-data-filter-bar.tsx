@@ -1,63 +1,51 @@
 import { useLoaderData, useSearchParams } from 'react-router';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@aloha/ui/select';
-
-import { PayPeriodFilter } from '~/components/ag-grid/pay-period-filter';
+import { NavbarFilterButton } from '~/components/navbar-filter-button';
+import { formatPayPeriodLabel } from '~/lib/format/pay-period';
 
 export function PayrollDataFilterBar() {
   const loaderData = useLoaderData() as Record<string, unknown>;
   const payPeriods = (loaderData.payPeriods ?? []) as Record<string, unknown>[];
-  const employees = (loaderData.employees ?? []) as Array<{
-    value: string;
-    label: string;
-  }>;
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentEmployee = searchParams.get('employee') ?? '';
-
-  const handleEmployeeChange = (value: string) => {
-    const next = new URLSearchParams(searchParams);
-    if (value === 'all') {
-      next.delete('employee');
-    } else {
-      next.set('employee', value);
-    }
-    setSearchParams(next, { preventScrollReset: true });
-  };
+  const periodStart = searchParams.get('period_start') ?? '';
+  const periodEnd = searchParams.get('period_end') ?? '';
+  const periodValue =
+    periodStart && periodEnd ? `${periodStart}|${periodEnd}` : '';
 
   return (
-    <div
-      className="flex min-w-0 flex-1 items-center gap-2"
-      data-test="payroll-data-filter-bar"
-    >
-      <div className="min-w-0 flex-1">
-        <PayPeriodFilter periods={payPeriods} />
-      </div>
-      <Select
-        value={currentEmployee || 'all'}
-        onValueChange={handleEmployeeChange}
-      >
-        <SelectTrigger
-          className="h-8 min-w-0 flex-1 rounded-md px-3 py-1 text-xs sm:w-[200px] sm:flex-initial"
-          data-test="employee-filter"
-        >
-          <SelectValue placeholder="All employees" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Employees</SelectItem>
-          {employees.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <NavbarFilterButton
+      testKey="payroll-data-filter"
+      filters={[
+        {
+          key: 'period',
+          label: 'Pay Period',
+          allLabel: 'All Pay Periods',
+          value: periodValue,
+          onChange: (v) => {
+            const next = new URLSearchParams(searchParams);
+            if (v === '') {
+              next.delete('period_start');
+              next.delete('period_end');
+            } else {
+              const [start, end] = v.split('|');
+              if (start && end) {
+                next.set('period_start', start);
+                next.set('period_end', end);
+              }
+            }
+            setSearchParams(next, { preventScrollReset: true });
+          },
+          options: payPeriods.map((p) => {
+            const start = String(p.pay_period_start ?? '');
+            const end = String(p.pay_period_end ?? '');
+            return {
+              value: `${start}|${end}`,
+              label: formatPayPeriodLabel(start, end),
+            };
+          }),
+        },
+      ]}
+    />
   );
 }

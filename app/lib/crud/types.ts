@@ -219,6 +219,8 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
   skipDeletedFilter?: boolean;
   /** Disable row-click detail expansion in AgGridListView. */
   noDetailRow?: boolean;
+  /** Disable row-click navigation to the detail page in AgGridListView. */
+  noRowClickNav?: boolean;
 
   /** Additional AG Grid options passed through to AgGridReact. */
   agGridOptions?: Partial<GridOptions>;

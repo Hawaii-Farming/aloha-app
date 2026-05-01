@@ -174,7 +174,6 @@ export const loader = async (args: {
     } else if (subModuleSlug === 'Payroll Data') {
       let periodStart = url.searchParams.get('period_start');
       let periodEnd = url.searchParams.get('period_end');
-      const employeeId = url.searchParams.get('employee');
 
       // Default to most recent pay period when none selected
       if (!periodStart && !periodEnd && payPeriods.length > 0) {
@@ -191,9 +190,6 @@ export const loader = async (args: {
         query = query
           .eq('pay_period_start', periodStart)
           .eq('pay_period_end', periodEnd);
-      }
-      if (employeeId) {
-        query = query.eq('hr_employee_id', employeeId);
       }
       query = query.order('employee_name');
     } else if (subModuleSlug === 'Employee Review') {
@@ -279,21 +275,6 @@ export const loader = async (args: {
       });
     }
 
-    // Load employee options for payroll_data employee filter
-    let employees: Array<{ value: string; label: string }> = [];
-    if (subModuleSlug === 'Payroll Data') {
-      const { data: empData } = await client
-        .from('hr_employee' as never)
-        .select('id, first_name, last_name')
-        .eq('org_id', accountSlug)
-        .eq('is_deleted', false)
-        .order('last_name');
-      employees = castRows(empData).map((r) => ({
-        value: String(r.id),
-        label: `${r.first_name ?? ''} ${r.last_name ?? ''}`.trim(),
-      }));
-    }
-
     const { fkOptions, comboboxOptions } = await loadFormOptions({
       client,
       config,
@@ -317,7 +298,6 @@ export const loader = async (args: {
       comboboxOptions,
       payPeriods,
       managers,
-      employees,
       reviewYears,
     };
   }
@@ -496,10 +476,6 @@ export default function SubModulePage(props: {
     accountSlug,
     filterSlot: typedConfig.workflow ? (
       <StatusFilterTabs workflow={typedConfig.workflow} />
-    ) : subModuleSlug === 'Payroll Data' ? (
-      <Suspense fallback={null}>
-        <LazyPayrollDataFilterBar />
-      </Suspense>
     ) : undefined,
   };
 
@@ -511,7 +487,14 @@ export default function SubModulePage(props: {
         </div>
       }
     >
-      {subModuleSlug === 'Payroll Data' && <PayrollViewToggle />}
+      {subModuleSlug === 'Payroll Data' && (
+        <>
+          <PayrollViewToggle />
+          <Suspense fallback={null}>
+            <LazyPayrollDataFilterBar />
+          </Suspense>
+        </>
+      )}
       <ViewComponent {...viewProps} />
     </Suspense>
   );

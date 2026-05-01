@@ -16,14 +16,8 @@ function isAggregationRow(
 export function CurrencyRenderer(props: CustomCellRendererProps) {
   const value = props.value as number | null;
   if (value == null) return null;
-  const isAgg = isAggregationRow(
-    props.data as Record<string, unknown> | undefined,
-    props.node,
-  );
-  const abs = Math.abs(value);
-  const formatted = abs.toLocaleString('en-US', {
-    minimumFractionDigits: isAgg ? 0 : 2,
-    maximumFractionDigits: isAgg ? 0 : 2,
+  const formatted = Math.abs(value).toLocaleString('en-US', {
+    maximumFractionDigits: 0,
   });
   const isNeg = value < 0;
 
@@ -40,14 +34,8 @@ export function CurrencyRenderer(props: CustomCellRendererProps) {
 export function currencyFormatter(params: ValueFormatterParams): string {
   const value = params.value as number | null;
   if (value == null) return '';
-  const isAgg = isAggregationRow(
-    params.data as Record<string, unknown> | undefined,
-    params.node,
-  );
-  const abs = Math.abs(value);
-  const formatted = abs.toLocaleString('en-US', {
-    minimumFractionDigits: isAgg ? 0 : 2,
-    maximumFractionDigits: isAgg ? 0 : 2,
+  const formatted = Math.abs(value).toLocaleString('en-US', {
+    maximumFractionDigits: 0,
   });
   if (value < 0) return `($${formatted})`;
   return `$${formatted}`;

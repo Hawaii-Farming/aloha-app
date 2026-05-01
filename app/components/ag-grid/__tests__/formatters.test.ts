@@ -28,18 +28,18 @@ describe('dateFormatter', () => {
 });
 
 describe('currencyFormatter', () => {
-  it('formats number as USD currency', () => {
+  it('formats number as whole-dollar USD currency', () => {
     const result = currencyFormatter({
       value: 1234.5,
     } as ValueFormatterParams);
-    expect(result).toBe('$1,234.50');
+    expect(result).toBe('$1,235');
   });
 
-  it('formats zero as $0.00', () => {
+  it('formats zero as $0', () => {
     const result = currencyFormatter({
       value: 0,
     } as ValueFormatterParams);
-    expect(result).toBe('$0.00');
+    expect(result).toBe('$0');
   });
 
   it('returns empty string for null value', () => {

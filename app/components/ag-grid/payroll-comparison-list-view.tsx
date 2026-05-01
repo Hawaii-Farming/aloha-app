@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef } from 'react';
 
-import { useLoaderData, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 import type {
   ColDef,
@@ -29,9 +29,7 @@ import {
   hoursFormatter,
 } from '~/components/ag-grid/payroll-formatters';
 import { PayrollViewToggle } from '~/components/ag-grid/payroll-view-toggle';
-import { NavbarFilterButton } from '~/components/navbar-filter-button';
 import type { ListViewProps } from '~/lib/crud/types';
-import { formatPayPeriodLabel } from '~/lib/format/pay-period';
 
 type RowData = Record<string, unknown>;
 
@@ -60,7 +58,9 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
 }
 
 // Color-coded delta renderer: green positive, red negative, muted zero.
-// Used for *_delta columns from hr_payroll_*_comparison views.
+// Currency deltas defer to CurrencyRenderer for consistent app-wide
+// formatting (whole-dollar, parens for negatives) and only add color +
+// arrow on top. Hours deltas stay inline.
 function DeltaRenderer(
   props: CustomCellRendererProps & { format?: 'currency' | 'hours' },
 ) {
@@ -68,42 +68,37 @@ function DeltaRenderer(
   if (raw == null || raw === '') return null;
   const n = Number(raw);
   if (!Number.isFinite(n)) return null;
-  if (props.node.rowPinned === 'bottom') {
-    return (
-      <span className="text-sm font-bold">
-        {props.format === 'currency'
-          ? formatSignedCurrency(n)
-          : formatSignedHours(n)}
-      </span>
-    );
-  }
-  const cls =
-    n > 0
+  const isPinned = props.node.rowPinned === 'bottom';
+  const cls = isPinned
+    ? ''
+    : n > 0
       ? 'text-emerald-600 dark:text-emerald-400'
       : n < 0
         ? 'text-red-600 dark:text-red-400'
         : 'text-muted-foreground';
-  const arrow = n > 0 ? '▲' : n < 0 ? '▼' : '·';
-  const text =
-    props.format === 'currency'
-      ? formatSignedCurrency(n)
-      : formatSignedHours(n);
-  return (
-    <span className={`inline-flex items-center gap-1 text-sm ${cls}`}>
-      <span aria-hidden>{arrow}</span>
-      <span>{text}</span>
-    </span>
-  );
-}
+  const arrow = isPinned ? '' : n > 0 ? '▲' : n < 0 ? '▼' : '·';
 
-function formatSignedCurrency(n: number) {
-  const abs = Math.abs(n);
-  const formatted = abs.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  const sign = n > 0 ? '+' : n < 0 ? '−' : '';
-  return `${sign}$${formatted}`;
+  if (props.format === 'currency') {
+    return (
+      <div
+        className={`flex h-full w-full items-center ${cls} ${isPinned ? 'font-bold' : ''}`}
+      >
+        <CurrencyRenderer {...props} />
+      </div>
+    );
+  }
+
+  const text = formatSignedHours(n);
+  return (
+    <div
+      className={`flex h-full w-full items-center justify-between text-sm ${cls} ${isPinned ? 'font-bold' : ''}`}
+    >
+      <span aria-hidden className="shrink-0">
+        {arrow}
+      </span>
+      <span>{text}</span>
+    </div>
+  );
 }
 
 function formatSignedHours(n: number) {
@@ -206,16 +201,9 @@ const byEmployeeColDefs: ColDef[] = [
 export default function PayrollComparisonListView(props: ListViewProps) {
   const { tableData } = props;
 
-  const loaderData = useLoaderData() as RowData;
-  const payPeriods = (loaderData.payPeriods ?? []) as RowData[];
-
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const currentView = searchParams.get('view') ?? 'by_task';
   const isByEmployee = currentView === 'by_employee';
-  const periodStart = searchParams.get('period_start') ?? '';
-  const periodEnd = searchParams.get('period_end') ?? '';
-  const periodValue =
-    periodStart && periodEnd ? `${periodStart}|${periodEnd}` : '';
 
   const subModuleSlug = 'Payroll Comp';
   const { query } = useActiveTableSearch();
@@ -308,40 +296,6 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       data-test="payroll-comparison-list-view"
     >
       <PayrollViewToggle />
-
-      <NavbarFilterButton
-        testKey="payroll-comparison-filter"
-        filters={[
-          {
-            key: 'period',
-            label: 'Pay Period',
-            allLabel: 'All Pay Periods',
-            value: periodValue,
-            onChange: (v) => {
-              const next = new URLSearchParams(searchParams);
-              if (v === '') {
-                next.delete('period_start');
-                next.delete('period_end');
-              } else {
-                const [start, end] = v.split('|');
-                if (start && end) {
-                  next.set('period_start', start);
-                  next.set('period_end', end);
-                }
-              }
-              setSearchParams(next, { preventScrollReset: true });
-            },
-            options: payPeriods.map((p) => {
-              const start = String(p.pay_period_start ?? '');
-              const end = String(p.pay_period_end ?? '');
-              return {
-                value: `${start}|${end}`,
-                label: formatPayPeriodLabel(start, end),
-              };
-            }),
-          },
-        ]}
-      />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper
