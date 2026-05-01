@@ -15,7 +15,11 @@ export function ScheduleDayRenderer(props: CustomCellRendererProps) {
     );
   }
 
+  const compact = value.replace(/\s*-\s*/g, '-');
+
   return (
-    <span className="flex h-full items-center font-mono text-sm">{value}</span>
+    <span className="flex h-full items-center font-mono text-sm">
+      {compact}
+    </span>
   );
 }

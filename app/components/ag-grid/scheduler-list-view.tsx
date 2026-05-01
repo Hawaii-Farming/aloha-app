@@ -237,7 +237,7 @@ function ScheduleDetailRowInner({
                   </div>
                   <div className="mt-1">
                     <span className="text-muted-foreground text-[10px]">
-                      {(entry.start_time_formatted as string) ?? ''} -{' '}
+                      {(entry.start_time_formatted as string) ?? ''}-
                       {(entry.end_time_formatted as string) ?? ''}
                     </span>
                     {hours !== null && (
@@ -381,13 +381,6 @@ export default function SchedulerListView(props: ListViewProps) {
         sortable: false,
         filter: false,
         minWidth: 100,
-        cellStyle:
-          i % 2 === 0
-            ? {
-                background:
-                  'repeating-linear-gradient(135deg, rgba(128,128,128,0.06), rgba(128,128,128,0.06) 4px, transparent 4px, transparent 8px)',
-              }
-            : undefined,
       })),
       {
         headerName: 'Total Hrs',
