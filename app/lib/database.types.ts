@@ -10675,6 +10675,7 @@ export type Database = {
       ops_task_weekly_schedule: {
         Row: {
           department_name: string | null
+          farm_name: string | null
           friday: string | null
           full_name: string | null
           hr_department_id: string | null
