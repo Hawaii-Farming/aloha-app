@@ -133,6 +133,9 @@ export interface FormFieldConfig {
   /** Default value for this field in create mode. Ignored in edit mode
    *  (existing record values always win). */
   defaultValue?: unknown;
+  /** For type='date': month the calendar opens to when the field is empty.
+   *  'today' opens to the current month, 'birth' (default) opens to Jan 1996. */
+  pickerDefaultMonth?: 'today' | 'birth';
 }
 
 export interface WorkflowStateConfig {

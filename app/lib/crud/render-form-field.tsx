@@ -92,6 +92,9 @@ export function renderFormField({
           name={name}
           label={field.label}
           required={field.required}
+          defaultMonth={
+            field.pickerDefaultMonth === 'today' ? new Date() : undefined
+          }
         />
       );
 

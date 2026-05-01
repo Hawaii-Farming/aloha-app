@@ -224,8 +224,14 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       label: 'Start Date',
       type: 'date',
       section: 'Employment',
+      pickerDefaultMonth: 'today',
     },
-    { key: 'end_date', label: 'End Date', type: 'date' },
+    {
+      key: 'end_date',
+      label: 'End Date',
+      type: 'date',
+      pickerDefaultMonth: 'today',
+    },
 
     // --- Compensation ---
     {
