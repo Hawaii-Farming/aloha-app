@@ -142,9 +142,9 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   // and the TimeOffDetailRow renderer reference.
   select: [
     '*',
-    'subject:hr_employee!hr_employee_id(preferred_name,profile_photo_url,hr_department_id,hr_work_authorization_id,compensation_manager_id)',
-    'requester:hr_employee!requested_by(preferred_name)',
-    'reviewer:hr_employee!reviewed_by(preferred_name)',
+    'subject:hr_employee!hr_time_off_request_hr_employee_id_emp_fkey(preferred_name,profile_photo_url,hr_department_id,hr_work_authorization_id,compensation_manager_id)',
+    'requester:hr_employee!hr_time_off_request_requested_by_emp_fkey(preferred_name)',
+    'reviewer:hr_employee!hr_time_off_request_reviewed_by_emp_fkey(preferred_name)',
   ].join(', '),
 
   columns: timeOffColumns,
