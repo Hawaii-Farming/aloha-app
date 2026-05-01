@@ -4,6 +4,7 @@ import {
   useLoaderData,
   useNavigate,
   useParams,
+  useRouteLoaderData,
   useSearchParams,
 } from 'react-router';
 
@@ -196,6 +197,24 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
   const loaderData = useLoaderData() as RowData;
   const payPeriods = (loaderData.payPeriods ?? []) as RowData[];
   const managers = (loaderData.managers ?? []) as RowData[];
+
+  // Team Lead sees hours only — DB already NULLs $ columns; hide them
+  // from the grid for a clean UI.
+  const layoutData = useRouteLoaderData('routes/workspace/layout') as
+    | { workspace?: { currentOrg?: { access_level_id?: string } } }
+    | undefined;
+  const isTeamLead =
+    layoutData?.workspace?.currentOrg?.access_level_id === 'Team Lead';
+
+  const DOLLAR_FIELDS = new Set([
+    'regular_pay',
+    'regular_pay_delta',
+    'total_cost',
+    'total_cost_delta',
+  ]);
+  const visibleColDefs = isTeamLead
+    ? colDefs.filter((c) => !c.field || !DOLLAR_FIELDS.has(c.field))
+    : colDefs;
   const [searchParams, setSearchParams] = useSearchParams();
   const checkDateFilter = searchParams.get('check_date') ?? '';
   const managerFilter = searchParams.get('manager') ?? '';
@@ -336,7 +355,7 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper
           gridRef={gridRef}
-          colDefs={colDefs}
+          colDefs={visibleColDefs}
           rowData={[...groupedRows, ...totalsRow]}
           quickFilterText={query}
           pagination={false}

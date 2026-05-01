@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef } from 'react';
 
-import { useSearchParams } from 'react-router';
+import { useRouteLoaderData, useSearchParams } from 'react-router';
 
 import type {
   ColDef,
@@ -216,7 +216,27 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const rows = tableData.data as RowData[];
-  const colDefs = isByEmployee ? byEmployeeColDefs : byTaskColDefs;
+
+  // Team Lead sees hours only — DB already NULLs $ columns; this hides
+  // the empty columns from the grid for a clean UI. Owner/Admin/Manager
+  // see everything.
+  const layoutData = useRouteLoaderData('routes/workspace/layout') as
+    | { workspace?: { currentOrg?: { access_level_id?: string } } }
+    | undefined;
+  const isTeamLead =
+    layoutData?.workspace?.currentOrg?.access_level_id === 'Team Lead';
+
+  const DOLLAR_FIELDS = new Set([
+    'regular_pay',
+    'total_cost',
+    'regular_pay_delta',
+    'discretionary_overtime_pay_delta',
+    'total_cost_delta',
+  ]);
+  const baseColDefs = isByEmployee ? byEmployeeColDefs : byTaskColDefs;
+  const colDefs = isTeamLead
+    ? baseColDefs.filter((c) => !c.field || !DOLLAR_FIELDS.has(c.field))
+    : baseColDefs;
 
   // Pinned bottom TOTAL row — sums every numeric/delta column in view.
   const totalsRow = useMemo(() => {

@@ -121,8 +121,14 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
   pkColumn: 'id',
   orgScoped: true,
 
+  // hr_payroll_data_secure is a SECURITY-DEFINER-helper-gated wrapper
+  // over hr_payroll: row scope per access_level, $ columns NULL for
+  // Team Lead. Defined in aloha-data-migrations migration
+  // 20260501120100_hr_payroll_rbac_views.sql. Not yet in
+  // database.types — the sub-module loader uses queryUntypedView so
+  // this is fine.
   views: {
-    list: 'hr_payroll',
+    list: 'hr_payroll_data_secure',
     detail: 'hr_payroll',
   },
 

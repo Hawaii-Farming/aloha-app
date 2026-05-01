@@ -5,6 +5,7 @@ import {
   useNavigate,
   useParams,
   useRevalidator,
+  useRouteLoaderData,
 } from 'react-router';
 
 import type {
@@ -63,6 +64,47 @@ const AVATAR_COL: ColDef = {
   suppressMovable: true,
 };
 
+// Payroll Data $ columns to hide from the grid when current user is
+// Team Lead. Mirrors the NULL-mask applied by hr_payroll_data_secure;
+// see aloha-data-migrations 20260501120100_hr_payroll_rbac_views.sql.
+const PAYROLL_DOLLAR_FIELDS = new Set([
+  'hourly_rate',
+  'regular_pay',
+  'overtime_pay',
+  'discretionary_overtime_pay',
+  'holiday_pay',
+  'pto_pay',
+  'sick_pay',
+  'funeral_pay',
+  'other_pay',
+  'bonus_pay',
+  'auto_allowance',
+  'per_diem',
+  'salary',
+  'gross_wage',
+  'fit',
+  'sit',
+  'social_security',
+  'medicare',
+  'comp_plus',
+  'hds_dental',
+  'pre_tax_401k',
+  'auto_deduction',
+  'child_support',
+  'program_fees',
+  'net_pay',
+  'labor_tax',
+  'other_tax',
+  'workers_compensation',
+  'health_benefits',
+  'other_health_charges',
+  'admin_fees',
+  'hawaii_get',
+  'other_charges',
+  'tdi',
+  'total_cost',
+]);
+
 export default function AgGridListView({
   config,
   tableData,
@@ -118,10 +160,29 @@ export default function AgGridListView({
 
   const hasCustomColDefs = Boolean(freshConfig?.agGridColDefs);
 
+  // Team Lead RBAC: hide $ columns from the Payroll Data sub-module.
+  // The DB view (hr_payroll_data_secure) already returns NULL for these
+  // fields when access_level_id = 'Team Lead'; this is the cosmetic
+  // mirror so empty columns don't render in the grid. Scoped to
+  // 'Payroll Data' so other sub-modules using this list view are
+  // unaffected.
+  const layoutData = useRouteLoaderData('routes/workspace/layout') as
+    | { workspace?: { currentOrg?: { access_level_id?: string } } }
+    | undefined;
+  const isTeamLead =
+    layoutData?.workspace?.currentOrg?.access_level_id === 'Team Lead';
+  const isPayrollData = subModuleSlug === 'Payroll Data';
+
   const dataColDefs = useMemo(() => {
-    if (freshConfig?.agGridColDefs) return freshConfig.agGridColDefs;
-    return mapColumnsToColDefs(freshConfig?.columns ?? []);
-  }, [freshConfig]);
+    const raw = freshConfig?.agGridColDefs
+      ? freshConfig.agGridColDefs
+      : mapColumnsToColDefs(freshConfig?.columns ?? []);
+    if (!isPayrollData || !isTeamLead) return raw;
+    return raw.filter((c) => {
+      const field = 'field' in c ? c.field : undefined;
+      return !field || !PAYROLL_DOLLAR_FIELDS.has(field);
+    });
+  }, [freshConfig, isPayrollData, isTeamLead]);
 
   // Show avatar column when data has profile_photo_url (skip when custom colDefs manage their own layout)
   const hasAvatar =
