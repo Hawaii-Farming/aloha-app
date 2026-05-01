@@ -38,7 +38,6 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
-import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
 import { SchedulerNavbarTools } from '~/components/ag-grid/scheduler-navbar-tools';
 import { SchedulerCreatePanel } from '~/components/scheduler/scheduler-create-panel';
@@ -80,202 +79,6 @@ interface HistoryRow {
   date: string;
   employee_count: number;
   total_hours: number;
-}
-
-function ScheduleDetailRowInner({
-  data,
-  accountSlug,
-}: {
-  data: Record<string, unknown>;
-  accountSlug: string;
-}) {
-  const [detailData, setDetailData] = useState<RowData[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const employeeId = data.hr_employee_id as string;
-
-  // Justified: fetch on mount when detail row is expanded
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchHistory() {
-      try {
-        const res = await fetch(
-          `/api/schedule-history?mode=detail&employeeId=${encodeURIComponent(employeeId)}&orgId=${encodeURIComponent(accountSlug)}`,
-        );
-        const json = (await res.json()) as { data?: RowData[] };
-
-        if (!cancelled && json.data) {
-          setDetailData(json.data);
-        }
-      } catch {
-        // Silently handle fetch errors
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchHistory();
-    return () => {
-      cancelled = true;
-    };
-  }, [employeeId, accountSlug]);
-
-  if (loading) {
-    return (
-      <div className="text-muted-foreground flex items-center justify-center py-4 text-sm">
-        Loading schedule history...
-      </div>
-    );
-  }
-
-  // Group entries by week (Sunday-anchored), fill missing days
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  // Build a map of date → entry
-  const byDate = new Map<string, RowData>();
-  for (const row of detailData) {
-    const date = (row.date as string) ?? '';
-    if (date) byDate.set(date, row);
-  }
-
-  // Helper to generate a week of day slots from a Sunday start date
-  function buildWeek(weekStart: Date) {
-    const week: { date: string; dayName: string; entry: RowData | null }[] = [];
-    for (let i = 0; i < 7; i++) {
-      const dayDate = new Date(weekStart);
-      dayDate.setDate(weekStart.getDate() + i);
-      const dayStr = dayDate.toISOString().split('T')[0] ?? '';
-      week.push({
-        date: dayStr,
-        dayName: dayNames[i] ?? '',
-        entry: byDate.get(dayStr) ?? null,
-      });
-    }
-    return week;
-  }
-
-  let recentWeeks: { date: string; dayName: string; entry: RowData | null }[][];
-
-  if (detailData.length === 0) {
-    // No data — show current week as all "Off"
-    const now = new Date();
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
-    recentWeeks = [buildWeek(weekStart)];
-  } else {
-    // Find all unique week start dates, then fill 7 days per week
-    const allDates = [...byDate.keys()].sort();
-    const weeks: typeof recentWeeks = [];
-
-    const seen = new Set<string>();
-    for (const date of allDates) {
-      const d = new Date(date + 'T00:00:00');
-      const dow = d.getDay(); // 0=Sun
-      const weekStart = new Date(d);
-      weekStart.setDate(d.getDate() - dow);
-      const weekKey = weekStart.toISOString().split('T')[0] ?? '';
-
-      if (seen.has(weekKey)) continue;
-      seen.add(weekKey);
-
-      weeks.push(buildWeek(weekStart));
-    }
-
-    // Show only the 3 most recent weeks
-    recentWeeks = weeks.slice(-3);
-  }
-
-  return (
-    <div className="@container h-full max-h-[310px] overflow-y-auto px-4 py-2">
-      {recentWeeks.map((week, wi) => (
-        <div key={wi} className={`${wi > 0 ? 'mt-2' : ''}`}>
-          <div className="grid grid-cols-1 gap-2 @xs:grid-cols-2 @sm:grid-cols-3 @md:grid-cols-4 @lg:grid-cols-5 @xl:grid-cols-6 @2xl:grid-cols-7">
-            {week.map(({ date, dayName, entry }) => {
-              const isWeekend = dayName === 'Sun' || dayName === 'Sat';
-              const isOff = !entry;
-
-              if (isOff) {
-                return (
-                  <div
-                    key={date}
-                    className={`overflow-hidden rounded-lg border border-dashed px-2 py-1.5 opacity-40 ${
-                      isWeekend ? 'border-amber-500/30' : 'border-border'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold">{dayName}</span>
-                      <span className="text-muted-foreground text-[10px]">
-                        {date}
-                      </span>
-                    </div>
-                    <div className="text-muted-foreground mt-1 text-[10px]">
-                      Off
-                    </div>
-                  </div>
-                );
-              }
-
-              const hours = entry.hours as number | null;
-
-              return (
-                <div
-                  key={date}
-                  className={`overflow-hidden rounded-lg border px-2 py-1.5 ${
-                    isWeekend
-                      ? 'border-amber-500/30 bg-amber-500/5'
-                      : 'border-border bg-muted/30'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold">{dayName}</span>
-                    <span className="text-muted-foreground text-[10px]">
-                      {date}
-                    </span>
-                  </div>
-                  <div className="mt-1">
-                    <span className="text-muted-foreground text-[10px]">
-                      {(entry.start_time_formatted as string) ?? ''}-
-                      {(entry.end_time_formatted as string) ?? ''}
-                    </span>
-                    {hours !== null && (
-                      <span className="text-primary ml-1 text-[10px] font-semibold">
-                        {hours}h
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {entry.farm_name ? (
-                      <span className="inline-flex items-center rounded border border-emerald-500/30 bg-emerald-500/10 px-1.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                        {String(entry.farm_name)}
-                      </span>
-                    ) : null}
-                    {entry.task_name ? (
-                      <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 text-[10px] font-medium text-emerald-500">
-                        {String(entry.task_name)}
-                      </span>
-                    ) : null}
-                    {entry.department_name ? (
-                      <span className="text-muted-foreground text-[10px]">
-                        {String(entry.department_name)}
-                      </span>
-                    ) : null}
-                    {entry.stat ? (
-                      <span className="text-muted-foreground text-[10px]">
-                        · {String(entry.stat)}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export default function SchedulerListView(props: ListViewProps) {
@@ -470,48 +273,6 @@ export default function SchedulerListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
-  // Create synthetic _rowId for detail row tracking
-  const dataWithIds = useMemo(
-    () =>
-      (tableData.data as RowData[]).map((row, idx) => ({
-        ...row,
-        _rowId: `${row.hr_employee_id}_${row.task}_${row.week_start_date}_${idx}`,
-      })),
-    [tableData.data],
-  );
-
-  // Detail row component that captures accountSlug via closure
-  const detailComponent = useMemo(
-    () =>
-      function DetailRenderer({ data }: { data: Record<string, unknown> }) {
-        return <ScheduleDetailRowInner data={data} accountSlug={accountSlug} />;
-      },
-    [accountSlug],
-  );
-
-  const {
-    rowData: detailRowData,
-    isFullWidthRow,
-    fullWidthCellRenderer,
-    handleRowClicked: handleDetailRowClicked,
-    getRowId,
-    hasExpandedRow: _hasExpandedRow,
-  } = useDetailRow({
-    sourceData: dataWithIds,
-    pkColumn: '_rowId',
-    detailComponent,
-    gridRef,
-  });
-
-  // Only the expanded detail row (timeline) needs a custom height.
-  // Normal rows return undefined so AG Grid uses the theme default
-  // (driven by `rowVerticalPaddingScale` in ag-grid-theme.ts).
-  const getRowHeight = useCallback(
-    (params: { data?: Record<string, unknown> }) =>
-      params.data?._isDetailRow ? 330 : 56,
-    [],
-  );
-
   return (
     <>
       <div
@@ -531,13 +292,8 @@ export default function SchedulerListView(props: ListViewProps) {
           <AgGridWrapper
             gridRef={gridRef}
             colDefs={colDefs}
-            rowData={detailRowData as RowData[]}
+            rowData={tableData.data as RowData[]}
             rowClassRules={otWarningRowClassRules}
-            onRowClicked={handleDetailRowClicked}
-            isFullWidthRow={isFullWidthRow}
-            fullWidthCellRenderer={fullWidthCellRenderer}
-            getRowId={getRowId}
-            getRowHeight={getRowHeight}
             pagination={false}
             quickFilterText={query}
             onGridReady={handleGridReady}
