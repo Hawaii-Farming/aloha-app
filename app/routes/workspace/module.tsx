@@ -4,6 +4,13 @@ import { castRows, queryUntypedView } from '~/lib/crud/typed-query.server';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { requireModuleAccess } from '~/lib/workspace/require-module-access.server';
 
+// Modules whose landing page should pin to a specific sub-module
+// rather than whichever sub-module has display_order=1 in hr_rba_navigation.
+// Slugs are the Proper-Case URL segments — see app/config/module-icons.config.ts.
+const MODULE_DEFAULT_SUB_MODULE: Record<string, string> = {
+  'Human Resources': 'Register',
+};
+
 export const loader = async (args: {
   request: Request;
   params: Record<string, string>;
@@ -31,6 +38,15 @@ export const loader = async (args: {
     .order('sub_module_display_order');
 
   const subModules = castRows<{ sub_module_slug: string }>(data);
+
+  // Module-specific landing override (e.g. HR → Register instead of
+  // whichever sub-module has display_order=1). Falls through to the
+  // standard first-by-display-order redirect if the override sub-module
+  // is not in this user's accessible navigation (RBA blocked).
+  const override = MODULE_DEFAULT_SUB_MODULE[moduleSlug];
+  if (override && subModules.some((s) => s.sub_module_slug === override)) {
+    throw redirect(`/home/${accountSlug}/${moduleSlug}/${override}`);
+  }
 
   if (subModules.length > 0) {
     const first = subModules[0]!;
