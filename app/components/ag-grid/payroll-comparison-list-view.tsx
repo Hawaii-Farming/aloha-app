@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef } from 'react';
 
-import { useRouteLoaderData, useSearchParams } from 'react-router';
+import { useParams, useRouteLoaderData, useSearchParams } from 'react-router';
 
 import type {
   ColDef,
@@ -24,10 +24,12 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
+import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import {
   CurrencyRenderer,
   hoursFormatter,
 } from '~/components/ag-grid/payroll-formatters';
+import { PayrollTaskEmployeeDetail } from '~/components/ag-grid/payroll-task-employee-detail';
 import { PayrollViewToggle } from '~/components/ag-grid/payroll-view-toggle';
 import type { ListViewProps } from '~/lib/crud/types';
 
@@ -204,6 +206,8 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   const [searchParams] = useSearchParams();
   const currentView = searchParams.get('view') ?? 'by_task';
   const isByEmployee = currentView === 'by_employee';
+  const params = useParams();
+  const accountSlug = params.account ?? '';
 
   const subModuleSlug = 'Payroll Comp';
   const { query } = useActiveTableSearch();
@@ -237,6 +241,63 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   const colDefs = isTeamLead
     ? baseColDefs.filter((c) => !c.field || !DOLLAR_FIELDS.has(c.field))
     : baseColDefs;
+
+  // Synthetic PK for by_task rows (task + status). Used by the detail-row
+  // hook to track which row is expanded and to insert the detail node.
+  // by_employee rows already have a unique hr_employee_id.
+  const rowsWithIds = useMemo(() => {
+    if (isByEmployee) {
+      return rows.map((r) => ({
+        ...r,
+        _rowId: String(r.hr_employee_id ?? ''),
+      }));
+    }
+    return rows.map((r) => ({
+      ...r,
+      _rowId: `${String(r.task ?? '')}|${String(r.status ?? '')}`,
+    }));
+  }, [rows, isByEmployee]);
+
+  // Detail component captures accountSlug + isTeamLead via closure so the
+  // hook only re-renders when the column-mask gate flips.
+  const detailComponent = useMemo(
+    () =>
+      function TaskBreakdownRenderer({
+        data,
+      }: {
+        data: Record<string, unknown>;
+      }) {
+        return (
+          <PayrollTaskEmployeeDetail
+            data={data}
+            accountSlug={accountSlug}
+            isTeamLead={isTeamLead}
+          />
+        );
+      },
+    [accountSlug, isTeamLead],
+  );
+
+  const {
+    rowData: rowDataWithDetails,
+    isFullWidthRow,
+    fullWidthCellRenderer,
+    handleRowClicked,
+    getRowId,
+  } = useDetailRow({
+    sourceData: rowsWithIds,
+    pkColumn: '_rowId',
+    detailComponent,
+    gridRef,
+  });
+
+  // Detail rows get a fixed height for the embedded grid; everything else
+  // uses the AG Grid theme default.
+  const getRowHeight = useCallback(
+    (params: { data?: Record<string, unknown> }) =>
+      params.data?._isDetailRow ? 280 : undefined,
+    [],
+  );
 
   // Pinned bottom TOTAL row — sums every numeric/delta column in view.
   const totalsRow = useMemo(() => {
@@ -308,7 +369,12 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
-  const rowData = [...rows, ...totalsRow];
+  // by_task rows go through useDetailRow (which manages its own row inserts
+  // via grid transactions); append the TOTAL pin afterwards. by_employee
+  // keeps the original flat rows + TOTAL.
+  const rowData = isByEmployee
+    ? [...rows, ...totalsRow]
+    : [...rowDataWithDetails, ...totalsRow];
 
   return (
     <div
@@ -330,6 +396,15 @@ export default function PayrollComparisonListView(props: ListViewProps) {
           onColumnResized={handleColumnResized}
           onSortChanged={handleSortChanged}
           onColumnVisible={handleColumnVisible}
+          {...(isByEmployee
+            ? {}
+            : {
+                onRowClicked: handleRowClicked,
+                isFullWidthRow,
+                fullWidthCellRenderer,
+                getRowId,
+                getRowHeight,
+              })}
         />
       </div>
     </div>
