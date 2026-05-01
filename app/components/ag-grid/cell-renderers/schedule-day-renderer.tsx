@@ -2,10 +2,11 @@ import type { CustomCellRendererProps } from 'ag-grid-react';
 
 /**
  * AG Grid cell renderer for day-of-week schedule columns.
- * Plain-text time range, no coloring.
+ * Renders task on the first line and the start-end time range below.
  */
 export function ScheduleDayRenderer(props: CustomCellRendererProps) {
   const value = props.value as string | null | undefined;
+  const task = (props.data?.task as string | null | undefined) ?? '';
 
   if (!value || value.trim() === '') {
     return (
@@ -18,8 +19,9 @@ export function ScheduleDayRenderer(props: CustomCellRendererProps) {
   const compact = value.replace(/\s*-\s*/g, '-');
 
   return (
-    <span className="flex h-full items-center font-mono text-sm">
-      {compact}
-    </span>
+    <div className="flex h-full flex-col justify-center leading-tight">
+      {task ? <span className="text-xs font-medium">{task}</span> : null}
+      <span className="font-mono text-sm">{compact}</span>
+    </div>
   );
 }

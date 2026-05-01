@@ -366,6 +366,11 @@ export default function SchedulerListView(props: ListViewProps) {
         minWidth: 220,
         pinned: 'left' as const,
       },
+      {
+        headerName: 'Work Auth',
+        field: 'work_authorization_name',
+        minWidth: 120,
+      },
       ...['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({
         headerName: day,
         field: [
@@ -509,7 +514,7 @@ export default function SchedulerListView(props: ListViewProps) {
   // (driven by `rowVerticalPaddingScale` in ag-grid-theme.ts).
   const getRowHeight = useCallback(
     (params: { data?: Record<string, unknown> }) =>
-      params.data?._isDetailRow ? 330 : undefined,
+      params.data?._isDetailRow ? 330 : 56,
     [],
   );
 
