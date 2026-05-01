@@ -41,7 +41,7 @@ import {
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import { otWarningRowClassRules } from '~/components/ag-grid/row-class-rules';
 import { SchedulerNavbarTools } from '~/components/ag-grid/scheduler-navbar-tools';
-import { CreatePanel } from '~/components/crud/create-panel';
+import { SchedulerCreatePanel } from '~/components/scheduler/scheduler-create-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -279,13 +279,7 @@ function ScheduleDetailRowInner({
 }
 
 export default function SchedulerListView(props: ListViewProps) {
-  const {
-    tableData,
-    fkOptions,
-    config,
-    comboboxOptions,
-    subModuleDisplayName,
-  } = props;
+  const { tableData, fkOptions, config, subModuleDisplayName } = props;
   const accountSlug = props.accountSlug;
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -585,13 +579,13 @@ export default function SchedulerListView(props: ListViewProps) {
         </Button>
       )}
 
-      <CreatePanel
+      <SchedulerCreatePanel
         open={createOpen}
         onOpenChange={setCreateOpen}
-        config={config}
         fkOptions={fkOptions}
-        comboboxOptions={comboboxOptions}
-        subModuleDisplayName={subModuleDisplayName}
+        subModuleDisplayName={subModuleDisplayName ?? 'Scheduler'}
+        accountSlug={accountSlug}
+        currentWeek={currentWeek}
       />
     </>
   );
