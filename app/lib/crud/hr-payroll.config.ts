@@ -29,7 +29,13 @@ export const hrPayrollConfig: CrudModuleConfig<typeof hrPayrollSchema> = {
 
   columns: [
     { key: 'employee_name', label: 'Employee', sortable: true },
-    { key: 'payroll_id', label: 'Payroll ID', sortable: true, priority: 'low' },
+    {
+      key: 'payroll_id',
+      label: 'Payroll ID',
+      sortable: true,
+      priority: 'low',
+      render: 'code',
+    },
     { key: 'check_date', label: 'Check Date', type: 'date', sortable: true },
     {
       key: 'pay_period_start',

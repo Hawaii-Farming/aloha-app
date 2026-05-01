@@ -93,7 +93,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       sortable: true,
       render: 'badge',
     },
-    { key: 'wc', label: 'WC', sortable: true },
+    { key: 'wc', label: 'WC', sortable: true, render: 'code' },
     { key: 'gender', label: 'Gender', sortable: true },
     { key: 'compensation_manager_id_preferred_name', label: 'Manager' },
     { key: 'team_lead_id_preferred_name', label: 'Team Lead' },

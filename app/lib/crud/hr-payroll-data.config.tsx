@@ -54,7 +54,7 @@ const agGridColDefs: ColDef[] = [
   { field: 'pay_structure', headerName: 'Pay Structure' },
   currency('hourly_rate', 'Hourly Rate'),
   hours('overtime_threshold', 'OT Threshold'),
-  { field: 'payroll_id', headerName: 'Payroll ID' },
+  { field: 'payroll_id', headerName: 'Payroll ID', cellClass: 'font-mono' },
   { field: 'payroll_processor', headerName: 'Processor' },
   {
     field: 'check_date',
@@ -71,7 +71,12 @@ const agGridColDefs: ColDef[] = [
     headerName: 'Period End',
     cellRenderer: DatePillRenderer,
   },
-  { field: 'invoice_number', headerName: 'Invoice #', type: 'numericColumn' },
+  {
+    field: 'invoice_number',
+    headerName: 'Invoice #',
+    type: 'numericColumn',
+    cellClass: 'font-mono',
+  },
   hours('regular_hours', 'Regular Hrs'),
   hours('overtime_hours', 'OT Hrs'),
   hours('holiday_hours', 'Holiday Hrs'),

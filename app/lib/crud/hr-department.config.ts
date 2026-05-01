@@ -20,7 +20,7 @@ export const hrDepartmentConfig: CrudModuleConfig<typeof hrDepartmentSchema> = {
   },
 
   columns: [
-    { key: 'id', label: 'ID', sortable: true },
+    { key: 'id', label: 'ID', sortable: true, render: 'code' },
     { key: 'name', label: 'Name', sortable: true },
     { key: 'description', label: 'Description', priority: 'low' },
     {
