@@ -87,17 +87,22 @@ const DOLLAR_COLS: ColDef[] = [
   },
 ];
 
-// Header (~40) + per-row (~36) + a little padding. Cap the auto-grow so
-// huge breakdowns stay scrollable inside the detail rather than pushing
-// the parent row off-screen.
+// Header (~40) + per-row (~36) + top/bottom padding + breathing room
+// before the next parent row. Cap the auto-grow so huge breakdowns
+// stay scrollable inside the detail rather than pushing the parent
+// row off-screen.
 const HEADER_PX = 48;
 const ROW_PX = 36;
-const MAX_DETAIL_HEIGHT = 360;
-const MIN_DETAIL_HEIGHT = 80; // fits "Loading…" / "No employees…" copy
+const BOTTOM_BUFFER_PX = 28; // visual gap below the detail grid
+const MAX_DETAIL_HEIGHT = 380;
+const MIN_DETAIL_HEIGHT = 96; // fits "Loading…" / "No employees…" copy + buffer
 
 function measureDetailHeight(rowCount: number): number {
   if (rowCount === 0) return MIN_DETAIL_HEIGHT;
-  return Math.min(HEADER_PX + rowCount * ROW_PX + 12, MAX_DETAIL_HEIGHT);
+  return Math.min(
+    HEADER_PX + rowCount * ROW_PX + BOTTOM_BUFFER_PX,
+    MAX_DETAIL_HEIGHT,
+  );
 }
 
 export function PayrollTaskEmployeeDetail({
@@ -217,24 +222,26 @@ export function PayrollTaskEmployeeDetail({
     );
   }
 
-  // Inner div needs an explicit pixel height — the h-full chain doesn't
-  // propagate through AG Grid's full-width row cell wrapper. Same
-  // formula as measureDetailHeight() used to resize the parent row, so
-  // the two stay in sync.
+  // Inner container is the full row height; the inner grid sits inside
+  // a sub-div whose height excludes BOTTOM_BUFFER_PX, leaving an empty
+  // band before the next parent row.
   const innerHeight = measureDetailHeight(rows.length);
+  const gridHeight = Math.max(innerHeight - BOTTOM_BUFFER_PX, 64);
 
   return (
     <div
-      className="bg-muted/30 px-2 py-2"
+      className="bg-muted/30 px-2 pt-2"
       style={{ height: innerHeight }}
       data-test="payroll-task-employee-detail"
     >
-      <AgGridWrapper
-        gridRef={gridRef}
-        colDefs={colDefs}
-        rowData={rows}
-        pagination={false}
-      />
+      <div style={{ height: gridHeight }}>
+        <AgGridWrapper
+          gridRef={gridRef}
+          colDefs={colDefs}
+          rowData={rows}
+          pagination={false}
+        />
+      </div>
     </div>
   );
 }
