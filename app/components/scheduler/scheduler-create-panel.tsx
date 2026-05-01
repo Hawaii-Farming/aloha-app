@@ -3,7 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFetcher, useRevalidator } from 'react-router';
 
 import { addDays, format, parse, parseISO } from 'date-fns';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
+import {
+  Calendar as CalendarIcon,
+  Check,
+  ChevronsUpDown,
+  RotateCcw,
+} from 'lucide-react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@aloha/ui/button';
@@ -574,6 +579,15 @@ export function SchedulerCreatePanel({
     [form, onSubmit],
   );
 
+  const clearDay = useCallback(
+    (i: number) => {
+      form.setValue(`days.${i}.start_time`, '', { shouldDirty: true });
+      form.setValue(`days.${i}.stop_time`, '', { shouldDirty: true });
+      form.setValue(`days.${i}.ops_task_id`, '', { shouldDirty: true });
+    },
+    [form],
+  );
+
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
@@ -641,16 +655,31 @@ export function SchedulerCreatePanel({
                       <span className="text-xs font-semibold tracking-wide uppercase">
                         {DAY_NAMES[i]}
                       </span>
-                      <Controller
-                        control={form.control}
-                        name={`days.${i}.date` as const}
-                        render={({ field }) => (
-                          <CompactDatePicker
-                            value={field.value}
-                            onChange={field.onChange}
-                          />
-                        )}
-                      />
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => clearDay(i)}
+                          disabled={!filled}
+                          aria-label={`Reset ${DAY_NAMES[i]}`}
+                          title="Reset day"
+                          data-test={`scheduler-day-reset-${i}`}
+                          className="text-muted-foreground hover:text-foreground h-7 w-7 p-0"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                        </Button>
+                        <Controller
+                          control={form.control}
+                          name={`days.${i}.date` as const}
+                          render={({ field }) => (
+                            <CompactDatePicker
+                              value={field.value}
+                              onChange={field.onChange}
+                            />
+                          )}
+                        />
+                      </div>
                     </div>
 
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
