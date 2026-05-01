@@ -57,7 +57,7 @@ export function getAgGridTheme() {
       {
         ...shared,
         browserColorScheme: 'dark',
-        backgroundColor: '#1e1710',
+        backgroundColor: '#17120b',
         foregroundColor: '#d3af86',
         headerBackgroundColor: '#15100a',
         headerTextColor: '#a57a4c',
@@ -65,7 +65,7 @@ export function getAgGridTheme() {
         accentColor: '#4ade80',
         rowHoverColor: '#332618',
         selectedRowBackgroundColor: 'rgba(74, 222, 128, 0.12)',
-        oddRowBackgroundColor: '#1e1710',
+        oddRowBackgroundColor: '#17120b',
       },
       'dark',
     );

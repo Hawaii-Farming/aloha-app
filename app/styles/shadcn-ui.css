@@ -87,12 +87,12 @@
     --background: #15100a;
     --foreground: #d3af86;
 
-    --card: #1e1710;
+    --card: #17120b;
     --card-foreground: #d3af86;
 
-    --popover: #2a2015; /* Lifted above --card (#1e1710) so dropdowns,
-                           select menus, modals, and sheets separate
-                           clearly from the page bg and card surfaces */
+    --popover: #17120b; /* Matches --card so popovers/sheets/drawers
+                           share the lifted Kimbie surface with cards
+                           and AG Grid */
     --popover-foreground: #d3af86;
 
     --primary: #4ade80; /* PRESERVED — Aloha brand green-400 */
@@ -152,7 +152,7 @@
     --sidebar-primary-foreground: #052e16; /* PRESERVED */
     --sidebar-accent: #332618; /* Kimbie muted cocoa — cohesive with --secondary / --border */
     --sidebar-accent-foreground: #d3af86;
-    --sidebar-border: #1e1710; /* matches --card — subtle lift edge */
+    --sidebar-border: #17120b; /* matches --card — subtle lift edge */
     --sidebar-ring: #4ade80; /* PRESERVED */
   }
 }

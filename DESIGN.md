@@ -8,7 +8,7 @@ The brand moment is a **green gradient** — `linear-gradient(135deg, #22c55e, #
 
 Typography is **Inter Variable** at a 16px base with weights 400/500/600 for prose. No display-weight drama for headings — hierarchy comes from size, not stroke weight. Table/grid column headers are a single deliberate exception: weight 700 substitutes for the sort/filter UI chrome intentionally stripped from AG Grid (see `UI-RULES.md §Tables`). Geist Mono Variable is retained for the occasional code/numeric label. Corners are soft: `--radius = 1rem` (rounded-2xl) is the base, derived sm/md/lg keep Shadcn primitives proportional. Shadows are a soft **slate-900 alpha scale** — generous around floating surfaces (popovers, the sheet/panel), minimal on flat cards.
 
-Dark mode is **hand-authored** against the Kimbie Dark palette — warm earth tones inspired by the Kimbie Dark VS Code theme (Heiko Cavelier). Backgrounds drop to a deep warm brown (`#15100a`) with slightly lifted card surfaces (`#1e1710`), a deeper recessed muted surface (`#0e0a06` — used for the navbar search trigger and form muted fills), and cocoa borders (`#332618`); foreground text is a warm cream (`#d3af86`) and muted copy a softer tan (`#a57a4c`). The Aloha brand moment is preserved intentionally: `--primary`, `--primary-foreground`, and `--ring` stay at their emerald values (`#4ade80` / green-950) so the focus ring and badges still pop. The **brand gradient darkens in dark mode** to match the light-mode value (`#22c55e → #059669`) — green-400 read too neon on warm cocoa, so we align light + dark on green-500 → emerald-600 for a deeper brand saturation. Every foundation token pair is re-verified against WCAG AA (4.5:1 normal text, 3:1 UI components); any new miss is documented in §9.1.
+Dark mode is **hand-authored** against the Kimbie Dark palette — warm earth tones inspired by the Kimbie Dark VS Code theme (Heiko Cavelier). Backgrounds drop to a deep warm brown (`#15100a`) with slightly lifted card surfaces (`#17120b`), a deeper recessed muted surface (`#0e0a06` — used for the navbar search trigger and form muted fills), and cocoa borders (`#332618`); foreground text is a warm cream (`#d3af86`) and muted copy a softer tan (`#a57a4c`). The Aloha brand moment is preserved intentionally: `--primary`, `--primary-foreground`, and `--ring` stay at their emerald values (`#4ade80` / green-950) so the focus ring and badges still pop. The **brand gradient darkens in dark mode** to match the light-mode value (`#22c55e → #059669`) — green-400 read too neon on warm cocoa, so we align light + dark on green-500 → emerald-600 for a deeper brand saturation. Every foundation token pair is re-verified against WCAG AA (4.5:1 normal text, 3:1 UI components); any new miss is documented in §9.1.
 
 **Key characteristics:**
 - Light-first, slate-100 canvas (`#f1f5f9`), white cards, slate-200 borders
@@ -16,7 +16,7 @@ Dark mode is **hand-authored** against the Kimbie Dark palette — warm earth to
 - Inter Variable 16px body, 400/500/600 weights — no bold display headings
 - `--radius: 1rem` (rounded-2xl) base; derived sm/md/lg via `calc()`
 - Soft slate-900 alpha shadow scale (sm/md/lg/xl/2xl) — not none, not loud
-- Hand-authored Kimbie Dark palette (warm `#15100a` / `#1e1710` / `#332618` earth tones, preserved emerald `#4ade80` brand) with WCAG AA re-verified pairs — see §9
+- Hand-authored Kimbie Dark palette (warm `#15100a` / `#17120b` / `#332618` earth tones, preserved emerald `#4ade80` brand) with WCAG AA re-verified pairs — see §9
 - Geist Mono Variable retained for `--font-mono`
 - Legacy scaffolding tokens (glass surface, slate alpha wash, prior-era brand tokens) are removed wholesale
 
@@ -112,9 +112,9 @@ Adopted from the Kimbie Dark palette (quick-260420-kd0). Rows tagged **PRESERVED
 |-------|-------|-------|
 | `--background` | `#15100a` | Kimbie deep warm brown — canonical page canvas |
 | `--foreground` | `#d3af86` | Kimbie cream body text |
-| `--card` | `#1e1710` | Slightly lifted warm surface |
+| `--card` | `#17120b` | Slightly lifted warm surface |
 | `--card-foreground` | `#d3af86` | Kimbie cream |
-| `--popover` | `#1e1710` | Matches `--card` |
+| `--popover` | `#17120b` | Matches `--card` |
 | `--popover-foreground` | `#d3af86` | Kimbie cream |
 | `--primary` | `#4ade80` | green-400 — **PRESERVED** brand emerald |
 | `--primary-foreground` | `#052e16` | green-950 — **PRESERVED** |
@@ -136,12 +136,12 @@ Adopted from the Kimbie Dark palette (quick-260420-kd0). Rows tagged **PRESERVED
 | `--sidebar-primary-foreground` | `#052e16` | green-950 — **PRESERVED** |
 | `--sidebar-accent` | `#332618` | Kimbie muted cocoa — hover/active wash |
 | `--sidebar-accent-foreground` | `#d3af86` | Kimbie cream |
-| `--sidebar-border` | `#1e1710` | Matches `--card` — subtle lift edge |
+| `--sidebar-border` | `#17120b` | Matches `--card` — subtle lift edge |
 | `--sidebar-ring` | `#4ade80` | green-400 — **PRESERVED** |
 
 > **Chart tokens (dark mode):** `--chart-1: #4ade80` (emerald), `--chart-2: #10b981` (emerald-500, gradient end), `--chart-3: #51bdb2` (Kimbie teal), `--chart-4: #f79a32` (Kimbie yellow-orange), `--chart-5: #d3af86` (Kimbie cream). Repalettized so chart surfaces stay native to the Kimbie canvas instead of snapping back to the slate-cool defaults. Light-mode chart tokens are unchanged.
 
-> **AG Grid dark theme note:** AG Grid v35's `themeQuartz.withParams()` does not resolve CSS vars, so its dark theme hex values are hardcoded in `app/components/ag-grid/ag-grid-theme.ts` and asserted by a Vitest test. quick-260420-kd1 synced those values to the Kimbie palette (`backgroundColor: #1e1710`, `headerBackgroundColor: #15100a`, `borderColor: #332618`, etc.). Keep the hex values and the test in lockstep with the `.dark` block in `app/styles/shadcn-ui.css` when tokens change. See `UI-RULES.md §Tables > Table theme` for the companion note.
+> **AG Grid dark theme note:** AG Grid v35's `themeQuartz.withParams()` does not resolve CSS vars, so its dark theme hex values are hardcoded in `app/components/ag-grid/ag-grid-theme.ts` and asserted by a Vitest test. quick-260420-kd1 synced those values to the Kimbie palette (`backgroundColor: #17120b`, `headerBackgroundColor: #15100a`, `borderColor: #332618`, etc.). Keep the hex values and the test in lockstep with the `.dark` block in `app/styles/shadcn-ui.css` when tokens change. See `UI-RULES.md §Tables > Table theme` for the companion note.
 
 ## 3. Typography
 
@@ -233,7 +233,7 @@ Dark is **hand-authored** against the Kimbie Dark palette, not runtime-derived. 
 
 | `:root` role | `.dark` adaptation |
 |--------------|--------------------|
-| Backgrounds (slate-50/100 canvas, white cards) | Kimbie deep warm brown (`#15100a`) canvas, warm cocoa cards (`#1e1710`) |
+| Backgrounds (slate-50/100 canvas, white cards) | Kimbie deep warm brown (`#15100a`) canvas, warm cocoa cards (`#17120b`) |
 | Body text (slate-900) | Kimbie cream (`#d3af86`) |
 | Muted text (slate-500) | Kimbie tan (`#a57a4c`) |
 | Primary (green-500 solid) | **PRESERVED** green-400 `#4ade80` — brand identity held across palette swap |

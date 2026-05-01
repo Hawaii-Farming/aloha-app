@@ -74,14 +74,14 @@ describe('getAgGridTheme', () => {
     const params = getParams('dark');
 
     it('uses Aloha Kimbie Dark surface hexes', () => {
-      expect(params.backgroundColor).toBe('#1e1710');
+      expect(params.backgroundColor).toBe('#17120b');
       expect(params.foregroundColor).toBe('#d3af86');
       expect(params.headerBackgroundColor).toBe('#15100a');
       expect(params.headerTextColor).toBe('#a57a4c');
       expect(params.borderColor).toBe('#332618');
       expect(params.accentColor).toBe('#4ade80');
       expect(params.rowHoverColor).toBe('#332618');
-      expect(params.oddRowBackgroundColor).toBe('#1e1710');
+      expect(params.oddRowBackgroundColor).toBe('#17120b');
     });
 
     it('uses Inter Variable (not Geist Variable) for dark mode', () => {
