@@ -34,6 +34,7 @@ import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-rende
 import { HoursHeatmapRenderer } from '~/components/ag-grid/cell-renderers/hours-heatmap-renderer';
 import { ScheduleDayRenderer } from '~/components/ag-grid/cell-renderers/schedule-day-renderer';
 import { SchedulerEmployeeRenderer } from '~/components/ag-grid/cell-renderers/scheduler-employee-renderer';
+import { SchedulerTotalHoursRenderer } from '~/components/ag-grid/cell-renderers/scheduler-total-hours-renderer';
 import {
   restoreColumnState,
   saveColumnState,
@@ -202,7 +203,7 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Total Hrs',
         field: 'total_hours',
-        cellRenderer: HoursHeatmapRenderer,
+        cellRenderer: SchedulerTotalHoursRenderer,
         type: 'numericColumn',
         minWidth: 100,
       },
