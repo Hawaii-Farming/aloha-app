@@ -1,3 +1,4 @@
+import type { ValueFormatterParams } from 'ag-grid-community';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ColumnConfig } from '~/lib/crud/types';
@@ -149,6 +150,85 @@ describe('mapColumnsToColDefs', () => {
     ];
     const result = mapColumnsToColDefs(columns);
     expect(result[0]!.cellRenderer).toBe(StatusBadgeRenderer);
+  });
+
+  it('numberFormatter formats integers with thousands separator', async () => {
+    const { numberFormatter } =
+      await import('~/components/ag-grid/cell-renderers/number-formatter');
+    expect(numberFormatter({ value: 1234567 } as ValueFormatterParams)).toBe(
+      '1,234,567',
+    );
+  });
+
+  it('numberFormatter formats decimals with thousands separator and 2 decimals', async () => {
+    const { numberFormatter } =
+      await import('~/components/ag-grid/cell-renderers/number-formatter');
+    expect(numberFormatter({ value: 1234567.89 } as ValueFormatterParams)).toBe(
+      '1,234,567.89',
+    );
+  });
+
+  it('numberFormatter rounds aggregation FP noise to ≤2 decimals', async () => {
+    const { numberFormatter } =
+      await import('~/components/ag-grid/cell-renderers/number-formatter');
+    expect(numberFormatter({ value: 12.456789 } as ValueFormatterParams)).toBe(
+      '12.46',
+    );
+  });
+
+  it('numberFormatter returns empty string for null/undefined/non-finite', async () => {
+    const { numberFormatter } =
+      await import('~/components/ag-grid/cell-renderers/number-formatter');
+    expect(numberFormatter({ value: null } as ValueFormatterParams)).toBe('');
+    expect(numberFormatter({ value: undefined } as ValueFormatterParams)).toBe(
+      '',
+    );
+    expect(numberFormatter({ value: NaN } as ValueFormatterParams)).toBe('');
+  });
+
+  it('maps type=number to right-aligned numeric ColDef preset with comma formatter', async () => {
+    const { mapColumnsToColDefs } =
+      await import('~/components/ag-grid/column-mapper');
+    const columns: ColumnConfig[] = [
+      { key: 'qty', label: 'Qty', type: 'number' },
+    ];
+    const result = mapColumnsToColDefs(columns);
+    const col = result[0]!;
+    expect(col.type).toBe('numericColumn');
+    expect(String(col.cellClass ?? '')).toContain('text-right');
+    expect(String(col.headerClass ?? '')).toContain('text-right');
+    expect(col.valueFormatter).toBeDefined();
+    const formatter = col.valueFormatter as (
+      params: ValueFormatterParams,
+    ) => string;
+    expect(formatter({ value: 1234 } as ValueFormatterParams)).toBe('1,234');
+  });
+
+  it('does not apply numeric preset to text columns (regression guard)', async () => {
+    const { mapColumnsToColDefs } =
+      await import('~/components/ag-grid/column-mapper');
+    const columns: ColumnConfig[] = [{ key: 'name', label: 'Name' }];
+    const result = mapColumnsToColDefs(columns);
+    const col = result[0]!;
+    expect(col.type).toBeUndefined();
+    expect(String(col.cellClass ?? '')).not.toContain('text-right');
+    expect(col.valueFormatter).toBeUndefined();
+  });
+
+  it('maps render=phone to (XXX) XXX-XXXX formatter (regression guard)', async () => {
+    const { mapColumnsToColDefs } =
+      await import('~/components/ag-grid/column-mapper');
+    const columns: ColumnConfig[] = [
+      { key: 'phone', label: 'Phone', render: 'phone' },
+    ];
+    const result = mapColumnsToColDefs(columns);
+    const col = result[0]!;
+    const formatter = col.valueFormatter as (
+      params: ValueFormatterParams,
+    ) => string;
+    expect(formatter({ value: '8085551234' } as ValueFormatterParams)).toBe(
+      '(808) 555-1234',
+    );
   });
 
   it('disables filter always; sortable defaults to true with opt-out support', async () => {
