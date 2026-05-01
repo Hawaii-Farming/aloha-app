@@ -31,7 +31,7 @@ export function SchedulerTotalHoursRenderer(props: CustomCellRendererProps) {
     <div className="flex h-full flex-col justify-center leading-tight">
       {expected !== null ? (
         <span className="text-muted-foreground text-left text-[10px]">
-          exp {expected}
+          OT {expected}
         </span>
       ) : null}
       <span
