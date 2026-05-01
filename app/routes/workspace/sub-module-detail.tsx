@@ -240,9 +240,15 @@ export default function SubModuleDetailPage(props: {
   const subModuleSlug = params.subModule ?? config?.tableName ?? '';
   const ViewComponent = resolveDetailView(subModuleSlug);
 
+  // Loader serialization strips Zod schema methods and other non-JSON fields;
+  // re-resolve from the client registry so EditPanel's zodResolver works.
+  const freshConfig =
+    (getModuleConfig(subModuleSlug) as CrudModuleConfig) ??
+    (config as CrudModuleConfig);
+
   const viewProps: DetailViewProps = {
     record,
-    config: config as CrudModuleConfig,
+    config: freshConfig,
     recordId,
     accountSlug,
     moduleDisplayName: moduleAccess.display_name,
