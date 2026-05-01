@@ -32,7 +32,8 @@ export function PayrollViewToggle() {
   const [searchParams] = useSearchParams();
 
   const account = params.account ?? '';
-  const activeView: PayrollView = location.pathname.endsWith('/payroll_data')
+  const decodedPath = decodeURIComponent(location.pathname);
+  const activeView: PayrollView = decodedPath.endsWith('/Payroll Data')
     ? 'data'
     : searchParams.get('view') === 'by_employee'
       ? 'by_employee'
@@ -40,11 +41,16 @@ export function PayrollViewToggle() {
 
   const go = (view: PayrollView) => {
     if (view === 'data') {
-      navigate(`/home/${account}/human_resources/payroll_data`);
+      navigate(
+        `/home/${account}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Payroll Data')}`,
+      );
     } else {
-      navigate(`/home/${account}/human_resources/payroll_comp?view=${view}`, {
-        preventScrollReset: true,
-      });
+      navigate(
+        `/home/${account}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Payroll Comp')}?view=${view}`,
+        {
+          preventScrollReset: true,
+        },
+      );
     }
   };
 

@@ -11,24 +11,20 @@ export const hrPayrollComparisonConfig: CrudModuleConfig<typeof schema> = {
   orgScoped: true,
 
   views: {
-    list: 'hr_payroll_by_task',
+    // The actual list source is chosen by the loader based on ?view=
+    // (hr_payroll_task_comparison vs hr_payroll_employee_comparison).
+    // This default is used only as a fallback for code paths that read
+    // config.views.list directly.
+    list: 'hr_payroll_task_comparison',
     detail: 'hr_payroll',
   },
 
-  // Backing view: hr_payroll_by_task. Employee + department display
-  // fields are merged onto rows by the loader's enrichment step; the
-  // view itself only exposes ids/aggregates.
+  // The custom list view (payroll-comparison-list-view.tsx) defines its
+  // own ColDefs per ?view= and ignores this columns array. Kept as a
+  // minimal placeholder for the CrudModuleConfig contract.
   columns: [
-    { key: 'hr_employee_hr_department_id', label: 'Department' },
-    { key: 'employee_count', label: 'Employees', type: 'number' },
-    { key: 'regular_hours', label: 'Reg Hours', type: 'number' },
-    {
-      key: 'discretionary_overtime_hours',
-      label: 'OT Hours',
-      type: 'number',
-    },
+    { key: 'task', label: 'Task' },
     { key: 'total_hours', label: 'Total Hours', type: 'number' },
-    { key: 'regular_pay', label: 'Regular Pay', type: 'number' },
     { key: 'total_cost', label: 'Total Cost', type: 'number' },
   ],
 

@@ -12,54 +12,8 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
-      auth_link_log: {
-        Row: {
-          auth_user_id: string
-          employee_id: string
-          id: string
-          linked_at: string
-        }
-        Insert: {
-          auth_user_id: string
-          employee_id: string
-          id?: string
-          linked_at?: string
-        }
-        Update: {
-          auth_user_id?: string
-          employee_id?: string
-          id?: string
-          linked_at?: string
-        }
-        Relationships: []
-      }
       fin_expense: {
         Row: {
           account_name: string | null
@@ -666,6 +620,69 @@ export type Database = {
             columns: ["sales_po_id"]
             isOneToOne: false
             referencedRelation: "sales_po"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_chemistry_result: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          farm_id: string | null
+          id: string
+          is_deleted: boolean
+          notes: string | null
+          nutrient: string
+          org_id: string
+          result: number
+          sample_date: string
+          site_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          nutrient: string
+          org_id: string
+          result: number
+          sample_date: string
+          site_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          nutrient?: string
+          org_id?: string
+          result?: number
+          sample_date?: string
+          site_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_chemistry_result_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_chemistry_result_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
             referencedColumns: ["id"]
           },
         ]
@@ -2251,7 +2268,7 @@ export type Database = {
           effective_date: string | null
           epa_registration: string | null
           expiration_date: string | null
-          external_label_url: string
+          external_label_url: string | null
           farm_id: string | null
           id: string
           invnt_item_id: string | null
@@ -2275,7 +2292,7 @@ export type Database = {
           effective_date?: string | null
           epa_registration?: string | null
           expiration_date?: string | null
-          external_label_url: string
+          external_label_url?: string | null
           farm_id?: string | null
           id?: string
           invnt_item_id?: string | null
@@ -2299,7 +2316,7 @@ export type Database = {
           effective_date?: string | null
           epa_registration?: string | null
           expiration_date?: string | null
-          external_label_url?: string
+          external_label_url?: string | null
           farm_id?: string | null
           id?: string
           invnt_item_id?: string | null
@@ -2790,6 +2807,96 @@ export type Database = {
           },
           {
             foreignKeyName: "grow_variety_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grow_weather_reading: {
+        Row: {
+          atmospheric_pressure: number | null
+          created_at: string
+          created_by: string | null
+          farm_id: string | null
+          id: string
+          inside_humidity: number | null
+          inside_par: number | null
+          inside_temperature: number | null
+          is_deleted: boolean
+          org_id: string
+          outside_dew_point_temperature: number | null
+          outside_humidity: number | null
+          outside_rain: number | null
+          outside_temperature: number | null
+          outside_wet_bulb_temperature: number | null
+          outside_wind_average_max_speed: number | null
+          outside_wind_average_speed: number | null
+          outside_wind_direction: string | null
+          power_supply: string | null
+          reading_at: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          atmospheric_pressure?: number | null
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string | null
+          id?: string
+          inside_humidity?: number | null
+          inside_par?: number | null
+          inside_temperature?: number | null
+          is_deleted?: boolean
+          org_id: string
+          outside_dew_point_temperature?: number | null
+          outside_humidity?: number | null
+          outside_rain?: number | null
+          outside_temperature?: number | null
+          outside_wet_bulb_temperature?: number | null
+          outside_wind_average_max_speed?: number | null
+          outside_wind_average_speed?: number | null
+          outside_wind_direction?: string | null
+          power_supply?: string | null
+          reading_at: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          atmospheric_pressure?: number | null
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string | null
+          id?: string
+          inside_humidity?: number | null
+          inside_par?: number | null
+          inside_temperature?: number | null
+          is_deleted?: boolean
+          org_id?: string
+          outside_dew_point_temperature?: number | null
+          outside_humidity?: number | null
+          outside_rain?: number | null
+          outside_temperature?: number | null
+          outside_wet_bulb_temperature?: number | null
+          outside_wind_average_max_speed?: number | null
+          outside_wind_average_speed?: number | null
+          outside_wind_direction?: string | null
+          power_supply?: string | null
+          reading_at?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_weather_reading_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_weather_reading_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
@@ -8230,6 +8337,85 @@ export type Database = {
           },
         ]
       }
+      sales_edi_inbound_message: {
+        Row: {
+          acknowledgement_sent_at: string | null
+          acknowledgement_status: string | null
+          created_at: string
+          document_type: string
+          id: string
+          is_deleted: boolean
+          org_id: string
+          parse_error: string | null
+          parsed_at: string | null
+          raw_body: string
+          received_at: string
+          sales_po_id: string | null
+          sales_trading_partner_id: string | null
+          source_filename: string | null
+          sps_message_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          acknowledgement_sent_at?: string | null
+          acknowledgement_status?: string | null
+          created_at?: string
+          document_type: string
+          id?: string
+          is_deleted?: boolean
+          org_id: string
+          parse_error?: string | null
+          parsed_at?: string | null
+          raw_body: string
+          received_at?: string
+          sales_po_id?: string | null
+          sales_trading_partner_id?: string | null
+          source_filename?: string | null
+          sps_message_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          acknowledgement_sent_at?: string | null
+          acknowledgement_status?: string | null
+          created_at?: string
+          document_type?: string
+          id?: string
+          is_deleted?: boolean
+          org_id?: string
+          parse_error?: string | null
+          parsed_at?: string | null
+          raw_body?: string
+          received_at?: string
+          sales_po_id?: string | null
+          sales_trading_partner_id?: string | null
+          source_filename?: string | null
+          sps_message_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_edi_inbound_message_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_edi_inbound_message_sales_po_id_fkey"
+            columns: ["sales_po_id"]
+            isOneToOne: false
+            referencedRelation: "sales_po"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_edi_inbound_message_sales_trading_partner_id_fkey"
+            columns: ["sales_trading_partner_id"]
+            isOneToOne: false
+            referencedRelation: "sales_trading_partner"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_fob: {
         Row: {
           created_at: string
@@ -8349,10 +8535,167 @@ export type Database = {
           },
         ]
       }
+      sales_pallet: {
+        Row: {
+          capacity_utilization: number
+          container_space_number: number | null
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          id: string
+          is_deleted: boolean
+          is_locked: boolean
+          is_spillover: boolean
+          notes: string | null
+          org_id: string
+          pallet_number: string
+          pallet_type: string
+          sales_shipment_container_id: string | null
+          target_invoice_date: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          capacity_utilization?: number
+          container_space_number?: number | null
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          id?: string
+          is_deleted?: boolean
+          is_locked?: boolean
+          is_spillover?: boolean
+          notes?: string | null
+          org_id: string
+          pallet_number: string
+          pallet_type: string
+          sales_shipment_container_id?: string | null
+          target_invoice_date: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          capacity_utilization?: number
+          container_space_number?: number | null
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          id?: string
+          is_deleted?: boolean
+          is_locked?: boolean
+          is_spillover?: boolean
+          notes?: string | null
+          org_id?: string
+          pallet_number?: string
+          pallet_type?: string
+          sales_shipment_container_id?: string | null
+          target_invoice_date?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_pallet_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_pallet_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_pallet_sales_shipment_container_id_fkey"
+            columns: ["sales_shipment_container_id"]
+            isOneToOne: false
+            referencedRelation: "sales_shipment_container"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_pallet_allocation: {
+        Row: {
+          allocated_quantity: number
+          created_at: string
+          created_by: string | null
+          id: string
+          is_deleted: boolean
+          org_id: string
+          sales_pallet_id: string
+          sales_po_fulfillment_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allocated_quantity: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id: string
+          sales_pallet_id: string
+          sales_po_fulfillment_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allocated_quantity?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id?: string
+          sales_pallet_id?: string
+          sales_po_fulfillment_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_pallet_allocation_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_pallet_allocation_sales_pallet_id_fkey"
+            columns: ["sales_pallet_id"]
+            isOneToOne: false
+            referencedRelation: "sales_pallet"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_pallet_allocation_sales_po_fulfillment_id_fkey"
+            columns: ["sales_po_fulfillment_id"]
+            isOneToOne: false
+            referencedRelation: "sales_po_fulfillment"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_po: {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          bill_to_address1: string | null
+          bill_to_address2: string | null
+          bill_to_city: string | null
+          bill_to_country: string | null
+          bill_to_name: string | null
+          bill_to_state: string | null
+          bill_to_zip: string | null
+          buyer_contact_email: string | null
+          buyer_contact_name: string | null
+          buyer_contact_phone: string | null
+          buyer_department: string | null
+          buyer_division: string | null
+          carrier_routing: string | null
+          carrier_scac: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -8361,13 +8704,24 @@ export type Database = {
           notes: string | null
           order_date: string
           org_id: string
+          payment_terms_net_days: number | null
           po_number: string | null
           qb_uploaded_at: string | null
           qb_uploaded_by: string | null
           recurring_frequency: string | null
+          requested_delivery_date: string | null
+          requested_ship_date: string | null
           sales_customer_group_id: string | null
           sales_customer_id: string
           sales_fob_id: string | null
+          sales_trading_partner_id: string | null
+          ship_to_address1: string | null
+          ship_to_address2: string | null
+          ship_to_city: string | null
+          ship_to_country: string | null
+          ship_to_name: string | null
+          ship_to_state: string | null
+          ship_to_zip: string | null
           status: string
           updated_at: string
           updated_by: string | null
@@ -8375,6 +8729,20 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          bill_to_address1?: string | null
+          bill_to_address2?: string | null
+          bill_to_city?: string | null
+          bill_to_country?: string | null
+          bill_to_name?: string | null
+          bill_to_state?: string | null
+          bill_to_zip?: string | null
+          buyer_contact_email?: string | null
+          buyer_contact_name?: string | null
+          buyer_contact_phone?: string | null
+          buyer_department?: string | null
+          buyer_division?: string | null
+          carrier_routing?: string | null
+          carrier_scac?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -8383,13 +8751,24 @@ export type Database = {
           notes?: string | null
           order_date: string
           org_id: string
+          payment_terms_net_days?: number | null
           po_number?: string | null
           qb_uploaded_at?: string | null
           qb_uploaded_by?: string | null
           recurring_frequency?: string | null
+          requested_delivery_date?: string | null
+          requested_ship_date?: string | null
           sales_customer_group_id?: string | null
           sales_customer_id: string
           sales_fob_id?: string | null
+          sales_trading_partner_id?: string | null
+          ship_to_address1?: string | null
+          ship_to_address2?: string | null
+          ship_to_city?: string | null
+          ship_to_country?: string | null
+          ship_to_name?: string | null
+          ship_to_state?: string | null
+          ship_to_zip?: string | null
           status?: string
           updated_at?: string
           updated_by?: string | null
@@ -8397,6 +8776,20 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          bill_to_address1?: string | null
+          bill_to_address2?: string | null
+          bill_to_city?: string | null
+          bill_to_country?: string | null
+          bill_to_name?: string | null
+          bill_to_state?: string | null
+          bill_to_zip?: string | null
+          buyer_contact_email?: string | null
+          buyer_contact_name?: string | null
+          buyer_contact_phone?: string | null
+          buyer_department?: string | null
+          buyer_division?: string | null
+          carrier_routing?: string | null
+          carrier_scac?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -8405,13 +8798,24 @@ export type Database = {
           notes?: string | null
           order_date?: string
           org_id?: string
+          payment_terms_net_days?: number | null
           po_number?: string | null
           qb_uploaded_at?: string | null
           qb_uploaded_by?: string | null
           recurring_frequency?: string | null
+          requested_delivery_date?: string | null
+          requested_ship_date?: string | null
           sales_customer_group_id?: string | null
           sales_customer_id?: string
           sales_fob_id?: string | null
+          sales_trading_partner_id?: string | null
+          ship_to_address1?: string | null
+          ship_to_address2?: string | null
+          ship_to_city?: string | null
+          ship_to_country?: string | null
+          ship_to_name?: string | null
+          ship_to_state?: string | null
+          ship_to_zip?: string | null
           status?: string
           updated_at?: string
           updated_by?: string | null
@@ -8473,13 +8877,206 @@ export type Database = {
             referencedRelation: "sales_fob"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "sales_po_sales_trading_partner_id_fkey"
+            columns: ["sales_trading_partner_id"]
+            isOneToOne: false
+            referencedRelation: "sales_trading_partner"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_po_asn: {
+        Row: {
+          acknowledged_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_deleted: boolean
+          org_id: string
+          raw_outbound: string | null
+          sales_po_id: string
+          sales_shipment_container_id: string
+          sent_at: string | null
+          sps_message_id: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id: string
+          raw_outbound?: string | null
+          sales_po_id: string
+          sales_shipment_container_id: string
+          sent_at?: string | null
+          sps_message_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id?: string
+          raw_outbound?: string | null
+          sales_po_id?: string
+          sales_shipment_container_id?: string
+          sent_at?: string | null
+          sps_message_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_po_asn_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_sales_po_id_fkey"
+            columns: ["sales_po_id"]
+            isOneToOne: false
+            referencedRelation: "sales_po"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_sales_shipment_container_id_fkey"
+            columns: ["sales_shipment_container_id"]
+            isOneToOne: false
+            referencedRelation: "sales_shipment_container"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_po_asn_carton: {
+        Row: {
+          actual_net_weight: number | null
+          best_by_date: string | null
+          carton_type: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_deleted: boolean
+          org_id: string
+          pack_date: string | null
+          pack_lot_id: string | null
+          parent_carton_id: string | null
+          quantity: number
+          sales_po_asn_id: string
+          sales_po_fulfillment_id: string | null
+          sales_po_line_id: string
+          sscc: string
+          updated_at: string
+          updated_by: string | null
+          weight_uom: string | null
+        }
+        Insert: {
+          actual_net_weight?: number | null
+          best_by_date?: string | null
+          carton_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id: string
+          pack_date?: string | null
+          pack_lot_id?: string | null
+          parent_carton_id?: string | null
+          quantity: number
+          sales_po_asn_id: string
+          sales_po_fulfillment_id?: string | null
+          sales_po_line_id: string
+          sscc: string
+          updated_at?: string
+          updated_by?: string | null
+          weight_uom?: string | null
+        }
+        Update: {
+          actual_net_weight?: number | null
+          best_by_date?: string | null
+          carton_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id?: string
+          pack_date?: string | null
+          pack_lot_id?: string | null
+          parent_carton_id?: string | null
+          quantity?: number
+          sales_po_asn_id?: string
+          sales_po_fulfillment_id?: string | null
+          sales_po_line_id?: string
+          sscc?: string
+          updated_at?: string
+          updated_by?: string | null
+          weight_uom?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_po_asn_carton_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_carton_pack_lot_id_fkey"
+            columns: ["pack_lot_id"]
+            isOneToOne: false
+            referencedRelation: "pack_lot"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_carton_parent_carton_id_fkey"
+            columns: ["parent_carton_id"]
+            isOneToOne: false
+            referencedRelation: "sales_po_asn_carton"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_carton_sales_po_asn_id_fkey"
+            columns: ["sales_po_asn_id"]
+            isOneToOne: false
+            referencedRelation: "sales_po_asn"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_carton_sales_po_fulfillment_id_fkey"
+            columns: ["sales_po_fulfillment_id"]
+            isOneToOne: false
+            referencedRelation: "sales_po_fulfillment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_carton_sales_po_line_id_fkey"
+            columns: ["sales_po_line_id"]
+            isOneToOne: false
+            referencedRelation: "sales_po_line"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_po_asn_carton_weight_uom_fkey"
+            columns: ["weight_uom"]
+            isOneToOne: false
+            referencedRelation: "sys_uom"
+            referencedColumns: ["id"]
+          },
         ]
       }
       sales_po_fulfillment: {
         Row: {
-          booking_id: string | null
-          container_id: string | null
-          container_space: string | null
           created_at: string
           created_by: string | null
           farm_id: string
@@ -8489,17 +9086,12 @@ export type Database = {
           notes: string | null
           org_id: string
           pack_lot_id: string | null
-          pallet_number: string | null
-          sales_container_type_id: string | null
           sales_po_id: string
           sales_po_line_id: string
           updated_at: string
           updated_by: string | null
         }
         Insert: {
-          booking_id?: string | null
-          container_id?: string | null
-          container_space?: string | null
           created_at?: string
           created_by?: string | null
           farm_id: string
@@ -8509,17 +9101,12 @@ export type Database = {
           notes?: string | null
           org_id: string
           pack_lot_id?: string | null
-          pallet_number?: string | null
-          sales_container_type_id?: string | null
           sales_po_id: string
           sales_po_line_id: string
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
-          booking_id?: string | null
-          container_id?: string | null
-          container_space?: string | null
           created_at?: string
           created_by?: string | null
           farm_id?: string
@@ -8529,8 +9116,6 @@ export type Database = {
           notes?: string | null
           org_id?: string
           pack_lot_id?: string | null
-          pallet_number?: string | null
-          sales_container_type_id?: string | null
           sales_po_id?: string
           sales_po_line_id?: string
           updated_at?: string
@@ -8559,13 +9144,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "sales_po_fulfillment_sales_container_type_id_fkey"
-            columns: ["sales_container_type_id"]
-            isOneToOne: false
-            referencedRelation: "sales_container_type"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "sales_po_fulfillment_sales_po_id_fkey"
             columns: ["sales_po_id"]
             isOneToOne: false
@@ -8583,9 +9161,14 @@ export type Database = {
       }
       sales_po_line: {
         Row: {
+          buyer_description: string | null
+          buyer_line_sequence: number | null
+          buyer_part_number: string | null
+          buyer_uom: string | null
           created_at: string
           created_by: string | null
           farm_id: string
+          gtin_case: string | null
           id: string
           is_deleted: boolean
           notes: string | null
@@ -8598,9 +9181,14 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          buyer_description?: string | null
+          buyer_line_sequence?: number | null
+          buyer_part_number?: string | null
+          buyer_uom?: string | null
           created_at?: string
           created_by?: string | null
           farm_id: string
+          gtin_case?: string | null
           id?: string
           is_deleted?: boolean
           notes?: string | null
@@ -8613,9 +9201,14 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          buyer_description?: string | null
+          buyer_line_sequence?: number | null
+          buyer_part_number?: string | null
+          buyer_uom?: string | null
           created_at?: string
           created_by?: string | null
           farm_id?: string
+          gtin_case?: string | null
           id?: string
           is_deleted?: boolean
           notes?: string | null
@@ -8861,6 +9454,76 @@ export type Database = {
           },
         ]
       }
+      sales_product_buyer_part: {
+        Row: {
+          buyer_description: string | null
+          buyer_part_number: string
+          buyer_uom: string | null
+          created_at: string
+          created_by: string | null
+          gtin_case: string | null
+          id: string
+          is_deleted: boolean
+          org_id: string
+          sales_customer_id: string
+          sales_product_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          buyer_description?: string | null
+          buyer_part_number: string
+          buyer_uom?: string | null
+          created_at?: string
+          created_by?: string | null
+          gtin_case?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id: string
+          sales_customer_id: string
+          sales_product_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          buyer_description?: string | null
+          buyer_part_number?: string
+          buyer_uom?: string | null
+          created_at?: string
+          created_by?: string | null
+          gtin_case?: string | null
+          id?: string
+          is_deleted?: boolean
+          org_id?: string
+          sales_customer_id?: string
+          sales_product_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_product_buyer_part_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_product_buyer_part_sales_customer_id_fkey"
+            columns: ["sales_customer_id"]
+            isOneToOne: false
+            referencedRelation: "sales_customer"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_product_buyer_part_sales_product_id_fkey"
+            columns: ["sales_product_id"]
+            isOneToOne: false
+            referencedRelation: "sales_product"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_product_price: {
         Row: {
           created_at: string
@@ -8954,6 +9617,217 @@ export type Database = {
             columns: ["sales_product_id"]
             isOneToOne: false
             referencedRelation: "sales_product"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_shipment: {
+        Row: {
+          bol_number: string
+          booking_number: string | null
+          carrier_pro_number: string | null
+          carrier_scac: string | null
+          created_at: string
+          created_by: string | null
+          estimated_delivery_date: string | null
+          id: string
+          is_deleted: boolean
+          notes: string | null
+          org_id: string
+          ship_date: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          bol_number: string
+          booking_number?: string | null
+          carrier_pro_number?: string | null
+          carrier_scac?: string | null
+          created_at?: string
+          created_by?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id: string
+          ship_date: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          bol_number?: string
+          booking_number?: string | null
+          carrier_pro_number?: string | null
+          carrier_scac?: string | null
+          created_at?: string
+          created_by?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id?: string
+          ship_date?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_shipment_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_shipment_container: {
+        Row: {
+          container_number: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_deleted: boolean
+          notes: string | null
+          org_id: string
+          sales_container_type_id: string | null
+          sales_shipment_id: string
+          seal_number: string | null
+          temperature_setpoint: number | null
+          temperature_uom: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          container_number: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id: string
+          sales_container_type_id?: string | null
+          sales_shipment_id: string
+          seal_number?: string | null
+          temperature_setpoint?: number | null
+          temperature_uom?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          container_number?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          notes?: string | null
+          org_id?: string
+          sales_container_type_id?: string | null
+          sales_shipment_id?: string
+          seal_number?: string | null
+          temperature_setpoint?: number | null
+          temperature_uom?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_shipment_container_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_shipment_container_sales_container_type_id_fkey"
+            columns: ["sales_container_type_id"]
+            isOneToOne: false
+            referencedRelation: "sales_container_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_shipment_container_sales_shipment_id_fkey"
+            columns: ["sales_shipment_id"]
+            isOneToOne: false
+            referencedRelation: "sales_shipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_shipment_container_temperature_uom_fkey"
+            columns: ["temperature_uom"]
+            isOneToOne: false
+            referencedRelation: "sys_uom"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_trading_partner: {
+        Row: {
+          acknowledgement_required: boolean
+          asn_required: boolean
+          created_at: string
+          created_by: string | null
+          default_carrier_scac: string | null
+          default_payment_terms_net_days: number | null
+          id: string
+          invoice_required: boolean
+          is_active: boolean
+          is_deleted: boolean
+          org_id: string
+          sales_customer_id: string
+          sps_partner_id: string
+          sps_vendor_number: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          acknowledgement_required?: boolean
+          asn_required?: boolean
+          created_at?: string
+          created_by?: string | null
+          default_carrier_scac?: string | null
+          default_payment_terms_net_days?: number | null
+          id: string
+          invoice_required?: boolean
+          is_active?: boolean
+          is_deleted?: boolean
+          org_id: string
+          sales_customer_id: string
+          sps_partner_id: string
+          sps_vendor_number?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          acknowledgement_required?: boolean
+          asn_required?: boolean
+          created_at?: string
+          created_by?: string | null
+          default_carrier_scac?: string | null
+          default_payment_terms_net_days?: number | null
+          id?: string
+          invoice_required?: boolean
+          is_active?: boolean
+          is_deleted?: boolean
+          org_id?: string
+          sales_customer_id?: string
+          sps_partner_id?: string
+          sps_vendor_number?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_trading_partner_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_trading_partner_sales_customer_id_fkey"
+            columns: ["sales_customer_id"]
+            isOneToOne: false
+            referencedRelation: "sales_customer"
             referencedColumns: ["id"]
           },
         ]
@@ -9113,6 +9987,16 @@ export type Database = {
       }
     }
     Views: {
+      audit_pre_check: {
+        Row: {
+          check_id: number | null
+          row_count: number | null
+          source: string | null
+          target: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
       fin_expense_v: {
         Row: {
           account_name: string | null
@@ -9317,6 +10201,49 @@ export type Database = {
         }
         Relationships: []
       }
+      grow_weather_reading_dli: {
+        Row: {
+          atmospheric_pressure: number | null
+          created_at: string | null
+          created_by: string | null
+          dli: number | null
+          farm_id: string | null
+          id: string | null
+          inside_humidity: number | null
+          inside_par: number | null
+          inside_temperature: number | null
+          is_deleted: boolean | null
+          org_id: string | null
+          outside_dew_point_temperature: number | null
+          outside_humidity: number | null
+          outside_rain: number | null
+          outside_temperature: number | null
+          outside_wet_bulb_temperature: number | null
+          outside_wind_average_max_speed: number | null
+          outside_wind_average_speed: number | null
+          outside_wind_direction: string | null
+          power_supply: string | null
+          reading_at: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_weather_reading_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "org_farm"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grow_weather_reading_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_payroll_by_task: {
         Row: {
           check_date: string | null
@@ -9372,6 +10299,27 @@ export type Database = {
           total_cost_delta: number | null
           total_hours: number | null
           workers_compensation_code: string | null
+        }
+        Relationships: []
+      }
+      hr_payroll_task_comparison: {
+        Row: {
+          check_date: string | null
+          compensation_manager_id: string | null
+          discretionary_overtime_hours: number | null
+          discretionary_overtime_pay: number | null
+          discretionary_overtime_pay_delta: number | null
+          hours_delta: number | null
+          org_id: string | null
+          other_pay_delta: number | null
+          regular_pay: number | null
+          regular_pay_delta: number | null
+          scheduled_hours: number | null
+          status: string | null
+          task: string | null
+          total_cost: number | null
+          total_cost_delta: number | null
+          total_hours: number | null
         }
         Relationships: []
       }
@@ -9510,28 +10458,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "hr_employee_hr_department_id_fkey"
-            columns: ["department_name"]
-            isOneToOne: false
-            referencedRelation: "hr_department"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_employee_hr_department_id_fkey"
             columns: ["hr_department_id"]
             isOneToOne: false
             referencedRelation: "hr_department"
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "hr_employee_hr_department_id_fkey"
+            columns: ["department_name"]
+            isOneToOne: false
+            referencedRelation: "hr_department"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "hr_employee_hr_work_authorization_id_fkey"
-            columns: ["hr_work_authorization_id"]
+            columns: ["work_authorization_name"]
             isOneToOne: false
             referencedRelation: "hr_work_authorization"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "hr_employee_hr_work_authorization_id_fkey"
-            columns: ["work_authorization_name"]
+            columns: ["hr_work_authorization_id"]
             isOneToOne: false
             referencedRelation: "hr_work_authorization"
             referencedColumns: ["id"]
@@ -9668,460 +10616,12 @@ export type Database = {
       }
     }
     Functions: {
+      chat_query: { Args: { q: string }; Returns: Json }
+      chat_schema: { Args: never; Returns: Json }
       get_user_org_ids: { Args: never; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      buckets_analytics: {
-        Row: {
-          created_at: string
-          deleted_at: string | null
-          format: string
-          id: string
-          name: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      buckets_vectors: {
-        Row: {
-          created_at: string
-          id: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          user_metadata: Json | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          metadata: Json | null
-          owner_id: string | null
-          upload_signature: string
-          user_metadata: Json | null
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          metadata?: Json | null
-          owner_id?: string | null
-          upload_signature: string
-          user_metadata?: Json | null
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          metadata?: Json | null
-          owner_id?: string | null
-          upload_signature?: string
-          user_metadata?: Json | null
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vector_indexes: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id: string
-          metadata_configuration: Json | null
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id?: string
-          metadata_configuration?: Json | null
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          data_type?: string
-          dimension?: number
-          distance_metric?: string
-          id?: string
-          metadata_configuration?: Json | null
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vector_indexes_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_vectors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      allow_any_operation: {
-        Args: { expected_operations: string[] }
-        Returns: boolean
-      }
-      allow_only_operation: {
-        Args: { expected_operation: string }
-        Returns: boolean
-      }
-      can_insert_object: {
-        Args: { bucketid: string; metadata: Json; name: string; owner: string }
-        Returns: undefined
-      }
-      extension: { Args: { name: string }; Returns: string }
-      filename: { Args: { name: string }; Returns: string }
-      foldername: { Args: { name: string }; Returns: string[] }
-      get_common_prefix: {
-        Args: { p_delimiter: string; p_key: string; p_prefix: string }
-        Returns: string
-      }
-      get_size_by_bucket: {
-        Args: never
-        Returns: {
-          bucket_id: string
-          size: number
-        }[]
-      }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-          prefix_param: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-        }[]
-      }
-      list_objects_with_delimiter: {
-        Args: {
-          _bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_token?: string
-          prefix_param: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      operation: { Args: never; Returns: string }
-      search: {
-        Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
-          prefix: string
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_by_timestamp: {
-        Args: {
-          p_bucket_id: string
-          p_level: number
-          p_limit: number
-          p_prefix: string
-          p_sort_column: string
-          p_sort_column_after: string
-          p_sort_order: string
-          p_start_after: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_v2: {
-        Args: {
-          bucket_name: string
-          levels?: number
-          limits?: number
-          prefix: string
-          sort_column?: string
-          sort_column_after?: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-    }
-    Enums: {
-      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -10247,15 +10747,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
-  },
-  storage: {
-    Enums: {
-      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
-    },
   },
 } as const

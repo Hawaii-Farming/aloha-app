@@ -35,10 +35,9 @@ import { formatPayPeriodLabel } from '~/lib/format/pay-period';
 
 type RowData = Record<string, unknown>;
 
-function EmployeeDeptRenderer(props: CustomCellRendererProps) {
+function EmployeeNameRenderer(props: CustomCellRendererProps) {
   const data = props.data as RowData | undefined;
   if (!data) return null;
-
   const fullName = String(
     data.hr_employee_preferred_name ??
       data.full_name ??
@@ -46,7 +45,6 @@ function EmployeeDeptRenderer(props: CustomCellRendererProps) {
       '',
   );
   const pinned = props.node.rowPinned === 'bottom';
-
   return (
     <span
       className={`flex h-full items-center truncate text-sm ${pinned ? 'font-bold' : 'font-medium'}`}
@@ -61,78 +59,109 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
   return <AvatarRenderer {...props} />;
 }
 
-// --- Column definitions ---
+// Color-coded delta renderer: green positive, red negative, muted zero.
+// Used for *_delta columns from hr_payroll_*_comparison views.
+function DeltaRenderer(
+  props: CustomCellRendererProps & { format?: 'currency' | 'hours' },
+) {
+  const raw = props.value;
+  if (raw == null || raw === '') return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return null;
+  if (props.node.rowPinned === 'bottom') {
+    return (
+      <span className="text-sm font-bold">
+        {props.format === 'currency'
+          ? formatSignedCurrency(n)
+          : formatSignedHours(n)}
+      </span>
+    );
+  }
+  const cls =
+    n > 0
+      ? 'text-emerald-600 dark:text-emerald-400'
+      : n < 0
+        ? 'text-red-600 dark:text-red-400'
+        : 'text-muted-foreground';
+  const arrow = n > 0 ? '▲' : n < 0 ? '▼' : '·';
+  const text =
+    props.format === 'currency'
+      ? formatSignedCurrency(n)
+      : formatSignedHours(n);
+  return (
+    <span className={`inline-flex items-center gap-1 text-sm ${cls}`}>
+      <span aria-hidden>{arrow}</span>
+      <span>{text}</span>
+    </span>
+  );
+}
 
-// Backing view: hr_payroll_by_task. Real columns: regular_hours,
-// regular_pay, total_hours, total_cost, scheduled_hours,
-// discretionary_overtime_hours, discretionary_overtime_pay, task,
-// is_manager. Employee display fields (hr_employee_preferred_name /
-// hr_employee_profile_photo_url / hr_employee_hr_department_id) come
-// from the loader's enrichment step, not the view.
-const byDeptColDefs: ColDef[] = [
-  {
-    field: 'hr_employee_hr_department_id',
-    headerName: 'Department',
-    minWidth: 250,
+function formatSignedCurrency(n: number) {
+  const abs = Math.abs(n);
+  const formatted = abs.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const sign = n > 0 ? '+' : n < 0 ? '−' : '';
+  return `${sign}$${formatted}`;
+}
+
+function formatSignedHours(n: number) {
+  const abs = Math.abs(n);
+  const formatted = abs.toLocaleString(undefined, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 2,
+  });
+  const sign = n > 0 ? '+' : n < 0 ? '−' : '';
+  return `${sign}${formatted}`;
+}
+
+const numericCol = (
+  field: string,
+  headerName: string,
+  opts?: {
+    width?: number;
+    formatter?: typeof hoursFormatter;
+    currency?: boolean;
   },
-  {
-    field: 'employee_count',
-    headerName: 'Employees',
-    type: 'numericColumn',
-    flex: 1,
-    minWidth: 100,
-    cellRenderer: (props: CustomCellRendererProps) => {
-      const value = props.value as number | null;
-      if (value == null) return null;
-      return (
-        <div className="flex h-full items-center justify-center">
-          <span className="inline-flex items-center rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-            {value}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    field: 'regular_hours',
-    headerName: 'Reg Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'discretionary_overtime_hours',
-    headerName: 'OT Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'total_hours',
-    headerName: 'Total Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'regular_pay',
-    headerName: 'Regular Pay',
-    type: 'numericColumn',
-    cellRenderer: CurrencyRenderer,
-    flex: 1,
-    minWidth: 120,
-  },
-  {
-    field: 'total_cost',
-    headerName: 'Total Cost',
-    type: 'numericColumn',
-    cellRenderer: CurrencyRenderer,
-    flex: 1,
-    minWidth: 120,
-  },
+): ColDef => ({
+  field,
+  headerName,
+  type: 'numericColumn',
+  flex: 1,
+  minWidth: opts?.width ?? 100,
+  valueFormatter: opts?.currency ? undefined : opts?.formatter,
+  cellRenderer: opts?.currency ? CurrencyRenderer : undefined,
+});
+
+const deltaCol = (
+  field: string,
+  headerName: string,
+  format: 'currency' | 'hours',
+): ColDef => ({
+  field,
+  headerName,
+  type: 'numericColumn',
+  flex: 1,
+  minWidth: 110,
+  cellRenderer: (p: CustomCellRendererProps) => DeltaRenderer({ ...p, format }),
+});
+
+// Source view: hr_payroll_task_comparison (one row per task with deltas
+// vs prior period). No employee/department dimension.
+const byTaskColDefs: ColDef[] = [
+  { field: 'task', headerName: 'Task', minWidth: 220, pinned: 'left' },
+  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
+  numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
+  numericCol('discretionary_overtime_hours', 'OT Hours', {
+    formatter: hoursFormatter,
+  }),
+  numericCol('regular_pay', 'Regular Pay', { currency: true, width: 130 }),
+  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
+  deltaCol('hours_delta', 'Δ Hours', 'hours'),
+  deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
+  deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
+  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
 ];
 
 const AVATAR_COL: ColDef = {
@@ -149,148 +178,30 @@ const AVATAR_COL: ColDef = {
   lockPosition: true,
 };
 
+// Source view: hr_payroll_employee_comparison (one row per employee
+// with deltas vs prior period). hr_employee_id present; loader enriches
+// preferred_name + photo + department via hr_employee join.
 const byEmployeeColDefs: ColDef[] = [
   AVATAR_COL,
   {
     field: 'hr_employee_preferred_name',
     headerName: 'Employee',
-    cellRenderer: EmployeeDeptRenderer,
-    minWidth: 250,
+    cellRenderer: EmployeeNameRenderer,
+    minWidth: 220,
     pinned: 'left',
   },
-  {
-    field: 'regular_hours',
-    headerName: 'Reg Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'discretionary_overtime_hours',
-    headerName: 'OT Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'total_hours',
-    headerName: 'Total Hours',
-    type: 'numericColumn',
-    valueFormatter: hoursFormatter,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'regular_pay',
-    headerName: 'Regular Pay',
-    type: 'numericColumn',
-    cellRenderer: CurrencyRenderer,
-    flex: 1,
-    minWidth: 120,
-  },
-  {
-    field: 'total_cost',
-    headerName: 'Total Cost',
-    type: 'numericColumn',
-    cellRenderer: CurrencyRenderer,
-    flex: 1,
-    minWidth: 120,
-  },
+  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
+  numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
+  numericCol('discretionary_overtime_hours', 'OT Hours', {
+    formatter: hoursFormatter,
+  }),
+  numericCol('regular_pay', 'Regular Pay', { currency: true, width: 130 }),
+  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
+  deltaCol('hours_delta', 'Δ Hours', 'hours'),
+  deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
+  deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
+  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
 ];
-
-/** Group raw payroll rows by department, sum numeric fields, count unique employees, stash detail rows */
-function groupByDepartment(rows: RowData[]): RowData[] {
-  const map = new Map<string, RowData>();
-
-  for (const row of rows) {
-    const dept = String(row.hr_employee_hr_department_id ?? 'Unknown');
-    const existing = map.get(dept);
-    if (!existing) {
-      map.set(dept, {
-        hr_employee_hr_department_id: dept,
-        _employees: new Set([String(row.hr_employee_id ?? '')]),
-        employee_count: 0,
-        regular_hours: Number(row.regular_hours) || 0,
-        discretionary_overtime_hours:
-          Number(row.discretionary_overtime_hours) || 0,
-        total_hours: Number(row.total_hours) || 0,
-        regular_pay: Number(row.regular_pay) || 0,
-        total_cost: Number(row.total_cost) || 0,
-        _detailRows: [row],
-      });
-    } else {
-      (existing._employees as Set<string>).add(
-        String(row.hr_employee_id ?? ''),
-      );
-      existing.regular_hours =
-        (Number(existing.regular_hours) || 0) +
-        (Number(row.regular_hours) || 0);
-      existing.discretionary_overtime_hours =
-        (Number(existing.discretionary_overtime_hours) || 0) +
-        (Number(row.discretionary_overtime_hours) || 0);
-      existing.total_hours =
-        (Number(existing.total_hours) || 0) + (Number(row.total_hours) || 0);
-      existing.regular_pay =
-        (Number(existing.regular_pay) || 0) + (Number(row.regular_pay) || 0);
-      existing.total_cost =
-        (Number(existing.total_cost) || 0) + (Number(row.total_cost) || 0);
-      (existing._detailRows as RowData[]).push(row);
-    }
-  }
-
-  // Resolve employee count from Set
-  for (const entry of map.values()) {
-    entry.employee_count = (entry._employees as Set<string>).size;
-    delete entry._employees;
-  }
-
-  return [...map.values()];
-}
-
-/** Group raw payroll rows by employee, sum numeric fields, stash detail rows */
-function groupByEmployee(rows: RowData[]): RowData[] {
-  const map = new Map<string, RowData>();
-
-  for (const row of rows) {
-    const empId = String(row.hr_employee_id ?? '');
-    if (!empId) continue;
-
-    const existing = map.get(empId);
-    if (!existing) {
-      map.set(empId, {
-        hr_employee_id: empId,
-        hr_employee_preferred_name: row.hr_employee_preferred_name,
-        hr_employee_profile_photo_url: row.hr_employee_profile_photo_url,
-        hr_employee_hr_department_id: row.hr_employee_hr_department_id,
-        regular_hours: Number(row.regular_hours) || 0,
-        discretionary_overtime_hours:
-          Number(row.discretionary_overtime_hours) || 0,
-        total_hours: Number(row.total_hours) || 0,
-        regular_pay: Number(row.regular_pay) || 0,
-        total_cost: Number(row.total_cost) || 0,
-        _detailRows: [row],
-      });
-    } else {
-      existing.regular_hours =
-        (Number(existing.regular_hours) || 0) +
-        (Number(row.regular_hours) || 0);
-      existing.discretionary_overtime_hours =
-        (Number(existing.discretionary_overtime_hours) || 0) +
-        (Number(row.discretionary_overtime_hours) || 0);
-      existing.total_hours =
-        (Number(existing.total_hours) || 0) + (Number(row.total_hours) || 0);
-      existing.regular_pay =
-        (Number(existing.regular_pay) || 0) + (Number(row.regular_pay) || 0);
-      existing.total_cost =
-        (Number(existing.total_cost) || 0) + (Number(row.total_cost) || 0);
-      (existing._detailRows as RowData[]).push(row);
-    }
-  }
-
-  return [...map.values()];
-}
 
 export default function PayrollComparisonListView(props: ListViewProps) {
   const { tableData } = props;
@@ -316,62 +227,37 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   const gridRef = useRef<AgGridReact>(null);
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const rawRows = tableData.data as RowData[];
+  const rows = tableData.data as RowData[];
+  const colDefs = isByEmployee ? byEmployeeColDefs : byTaskColDefs;
 
-  // Group by employee or department depending on view
-  const groupedRows = useMemo(() => {
-    if (isByEmployee) return groupByEmployee(rawRows);
-    return groupByDepartment(rawRows);
-  }, [rawRows, isByEmployee]);
-
-  const colDefs = isByEmployee ? byEmployeeColDefs : byDeptColDefs;
-
+  // Pinned bottom TOTAL row — sums every numeric/delta column in view.
   const totalsRow = useMemo(() => {
-    if (!groupedRows.length) return [];
-    const sumField = (field: string) =>
-      groupedRows.reduce((sum, r) => sum + (Number(r[field]) || 0), 0);
-
-    if (isByEmployee) {
-      return [
-        {
-          hr_employee_preferred_name: 'TOTAL',
-          regular_hours: sumField('regular_hours'),
-          discretionary_overtime_hours: sumField(
-            'discretionary_overtime_hours',
-          ),
-          total_hours: sumField('total_hours'),
-          regular_pay: sumField('regular_pay'),
-          total_cost: sumField('total_cost'),
-        },
-      ];
-    }
-    return [
-      {
-        hr_employee_hr_department_id: 'TOTAL',
-        employee_count: groupedRows.reduce(
-          (sum, r) => sum + (Number(r.employee_count) || 0),
-          0,
-        ),
-        regular_hours: sumField('regular_hours'),
-        discretionary_overtime_hours: sumField('discretionary_overtime_hours'),
-        total_hours: sumField('total_hours'),
-        regular_pay: sumField('regular_pay'),
-        total_cost: sumField('total_cost'),
-      },
+    if (!rows.length) return [];
+    const numericFields = [
+      'total_hours',
+      'scheduled_hours',
+      'discretionary_overtime_hours',
+      'regular_pay',
+      'total_cost',
+      'hours_delta',
+      'regular_pay_delta',
+      'discretionary_overtime_pay_delta',
+      'total_cost_delta',
     ];
-  }, [groupedRows, isByEmployee]);
+    const totals: RowData = isByEmployee
+      ? { hr_employee_preferred_name: 'TOTAL' }
+      : { task: 'TOTAL' };
+    for (const f of numericFields) {
+      totals[f] = rows.reduce((sum, r) => sum + (Number(r[f]) || 0), 0);
+    }
+    return [totals];
+  }, [rows, isByEmployee]);
 
   const getRowStyle = useCallback((params: RowClassParams) => {
     const d = params.data as
-      | {
-          hr_employee_preferred_name?: string;
-          hr_employee_hr_department_id?: string;
-        }
+      | { hr_employee_preferred_name?: string; task?: string }
       | undefined;
-    if (
-      d?.hr_employee_preferred_name === 'TOTAL' ||
-      d?.hr_employee_hr_department_id === 'TOTAL'
-    ) {
+    if (d?.hr_employee_preferred_name === 'TOTAL' || d?.task === 'TOTAL') {
       return { fontWeight: 'bold', background: 'var(--color-muted)' };
     }
     return undefined;
@@ -414,7 +300,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     [debouncedSaveState],
   );
 
-  const rowData = [...groupedRows, ...totalsRow];
+  const rowData = [...rows, ...totalsRow];
 
   return (
     <div
@@ -457,7 +343,6 @@ export default function PayrollComparisonListView(props: ListViewProps) {
         ]}
       />
 
-      {/* Grid */}
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper
           gridRef={gridRef}

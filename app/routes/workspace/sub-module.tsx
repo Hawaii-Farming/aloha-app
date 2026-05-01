@@ -125,17 +125,22 @@ export const loader = async (args: {
       subModuleSlug === 'Payroll Comparison' ||
       subModuleSlug === 'Payroll Comp'
     ) {
-      // Per-(employee, task) detail used for client-side grouping + inline
-      // detail tables. hr_payroll_by_task aggregates one row per
-      // (employee, check_date, task) with all hours/pay fields.
-      query = queryUntypedView(client, 'hr_payroll_by_task')
+      // Server-aggregated comparison views with period-over-period deltas.
+      // by_task   -> hr_payroll_task_comparison      (one row per task)
+      // by_employee -> hr_payroll_employee_comparison (one row per employee)
+      const view = url.searchParams.get('view') ?? 'by_task';
+      const sourceView =
+        view === 'by_employee'
+          ? 'hr_payroll_employee_comparison'
+          : 'hr_payroll_task_comparison';
+      query = queryUntypedView(client, sourceView)
         .select('*')
         .eq('org_id', accountSlug);
       const checkDate = url.searchParams.get('check_date');
       if (checkDate) {
         query = query.eq('check_date', checkDate);
       }
-      query = query.order('hr_employee_id');
+      query = query.order(view === 'by_employee' ? 'hr_employee_id' : 'task');
     } else if (subModuleSlug === 'Payroll Comp Manager') {
       // hr_payroll_employee_comparison auto-anchors to the most recent
       // is_standard=TRUE HRB check_date and exposes deltas vs the prior
@@ -217,10 +222,11 @@ export const loader = async (args: {
     let rows = config?.select ? rawRows.map((r) => flattenRow(r)) : rawRows;
 
     // Enrich payroll-summary views with employee display fields. The
-    // hr_payroll_by_task / hr_payroll_employee_comparison views expose
-    // hr_employee_id but not preferred_name / department / photo, and
-    // PostgREST embeds aren't reliable on these views. Fetch a single
-    // batch and merge by id.
+    // hr_payroll_employee_comparison view exposes hr_employee_id but not
+    // preferred_name / department / photo, and PostgREST embeds aren't
+    // reliable on these views. Fetch a single batch and merge by id.
+    // (hr_payroll_task_comparison has no employee dimension; the loop
+    // is a no-op there since employeeIds will be empty.)
     if (
       subModuleSlug === 'Payroll Comparison' ||
       subModuleSlug === 'Payroll Comp' ||
