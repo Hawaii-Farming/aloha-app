@@ -64,7 +64,7 @@ export function DatePillRenderer(props: CustomCellRendererProps) {
   if (!value) return null;
 
   try {
-    return renderText(format(parseISO(value), 'MM/dd/yyyy'));
+    return renderText(format(parseISO(value), 'MM/dd/yy'));
   } catch {
     return null;
   }

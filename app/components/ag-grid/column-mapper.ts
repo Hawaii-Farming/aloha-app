@@ -6,6 +6,7 @@ import type {
 
 import { CodeCellRenderer } from '~/components/ag-grid/cell-renderers/code-cell-renderer';
 import { EmployeeCellRenderer } from '~/components/ag-grid/cell-renderers/employee-cell-renderer';
+import { numericColDef } from '~/components/ag-grid/cell-renderers/number-formatter';
 import {
   DatePillRenderer,
   EmailPillRenderer,
@@ -27,6 +28,12 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
       filter: false,
       hide: false,
     };
+
+    // Numeric columns: right-align header + cell, thousands separator,
+    // ≤2 decimals (rounds aggregation FP noise).
+    if (col.type === 'number') {
+      Object.assign(colDef, numericColDef);
+    }
 
     // Date columns get pill renderer
     if (col.type === 'date' || col.type === 'datetime') {

@@ -167,6 +167,9 @@ function AgGridInner({
       filter: false,
       minWidth: 100,
       autoHeaderHeight: true,
+      // Wrap header text onto two lines instead of clipping ("Start Date"
+      // becomes "Start" / "Date" rather than "Start Da…").
+      wrapHeaderText: true,
     }),
     [],
   );
