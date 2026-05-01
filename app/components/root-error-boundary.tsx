@@ -45,10 +45,10 @@ export function RootErrorBoundary() {
               className="pointer-events-none absolute inset-0 -z-10"
             >
               <div
-                className="absolute inset-0 opacity-40 dark:opacity-20"
+                className="absolute inset-0 opacity-40 dark:opacity-30"
                 style={{
                   backgroundImage:
-                    'radial-gradient(circle, rgb(100 116 139 / 0.5) 1px, transparent 1px)',
+                    'radial-gradient(circle, rgb(165 122 76 / 0.5) 1px, transparent 1px)',
                   backgroundSize: '24px 24px',
                   maskImage:
                     'radial-gradient(ellipse at center, black 20%, transparent 70%)',
@@ -57,11 +57,11 @@ export function RootErrorBoundary() {
                 }}
               />
 
-              <div className="animate-error-orb-slow absolute top-1/2 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/50 blur-3xl dark:bg-amber-500/30" />
-              <div className="animate-error-orb-fast absolute top-[8%] left-[8%] h-96 w-96 rounded-full bg-sky-400/40 blur-3xl dark:bg-rose-500/25" />
-              <div className="animate-error-orb-medium absolute right-[8%] bottom-[5%] h-[28rem] w-[28rem] rounded-full bg-teal-400/45 blur-3xl dark:bg-orange-500/30" />
-              <div className="absolute top-[15%] right-[25%] h-72 w-72 rounded-full bg-lime-300/40 blur-3xl dark:bg-yellow-500/20" />
-              <div className="absolute bottom-[15%] left-[12%] h-80 w-80 rounded-full bg-cyan-300/35 blur-3xl dark:bg-red-500/20" />
+              <div className="animate-error-orb-slow absolute top-1/2 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/50 blur-3xl dark:bg-amber-600/55" />
+              <div className="animate-error-orb-fast absolute top-[8%] left-[8%] h-96 w-96 rounded-full bg-sky-400/40 blur-3xl dark:bg-rose-600/45" />
+              <div className="animate-error-orb-medium absolute right-[8%] bottom-[5%] h-[28rem] w-[28rem] rounded-full bg-teal-400/45 blur-3xl dark:bg-orange-500/55" />
+              <div className="absolute top-[15%] right-[25%] h-72 w-72 rounded-full bg-lime-300/40 blur-3xl dark:bg-yellow-600/40" />
+              <div className="absolute bottom-[15%] left-[12%] h-80 w-80 rounded-full bg-cyan-300/35 blur-3xl dark:bg-teal-700/45" />
             </div>
 
             <style>{`
