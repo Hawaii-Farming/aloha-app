@@ -63,9 +63,9 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
 
   select: [
     '*',
-    'hr_department:hr_department!hr_department_id(name:id)',
-    'hr_work_authorization:hr_work_authorization!hr_work_authorization_id(name:id)',
-    'housing:org_site_housing!housing_id(name:id)',
+    'hr_department:hr_department!hr_employee_hr_department_fkey(name:id)',
+    'hr_work_authorization:hr_work_authorization!hr_employee_hr_work_authorization_fkey(name:id)',
+    'housing:org_site_housing!hr_employee_housing_id_fkey(name:id)',
   ].join(', '),
 
   selfJoins: {
