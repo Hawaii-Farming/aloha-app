@@ -15,10 +15,14 @@ export type PillColor =
 /**
  * Plain text cell — neutral formatting, no color.
  */
-function renderText(value: string, options?: { truncate?: boolean }) {
+function renderText(
+  value: string,
+  options?: { truncate?: boolean; align?: 'left' | 'right' },
+) {
+  const justify = options?.align === 'right' ? 'justify-end' : '';
   return (
     <span
-      className={`flex h-full items-center text-sm ${options?.truncate ? 'truncate' : ''}`}
+      className={`flex h-full items-center text-sm ${justify} ${options?.truncate ? 'truncate' : ''}`}
       title={options?.truncate ? value : undefined}
     >
       {value}
@@ -49,11 +53,11 @@ export function HashPillRenderer(props: CustomCellRendererProps) {
   if (raw == null || raw === '') return null;
 
   const value = String(raw);
-  const display =
-    typeof raw === 'number'
-      ? value
-      : value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-  return renderText(display);
+  const isNumeric = typeof raw === 'number';
+  const display = isNumeric
+    ? value
+    : value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+  return renderText(display, isNumeric ? { align: 'right' } : undefined);
 }
 
 /**

@@ -71,7 +71,7 @@ const agGridColDefs: ColDef[] = [
     headerName: 'Period End',
     cellRenderer: DatePillRenderer,
   },
-  { field: 'invoice_number', headerName: 'Invoice #' },
+  { field: 'invoice_number', headerName: 'Invoice #', type: 'numericColumn' },
   hours('regular_hours', 'Regular Hrs'),
   hours('overtime_hours', 'OT Hrs'),
   hours('holiday_hours', 'Holiday Hrs'),

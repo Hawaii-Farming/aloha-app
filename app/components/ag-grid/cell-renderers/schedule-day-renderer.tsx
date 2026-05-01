@@ -24,7 +24,7 @@ export function ScheduleDayRenderer(props: CustomCellRendererProps) {
       {farm ? (
         <span className="text-muted-foreground text-xs">{farm}</span>
       ) : null}
-      <span className="font-mono text-sm">{compact}</span>
+      <span className="font-mono text-xs">{compact}</span>
     </div>
   );
 }
