@@ -425,21 +425,7 @@ export function SchedulerCreatePanel({
             </div>
 
             <div className="flex shrink-0 items-center justify-between border-t px-4 py-3 sm:px-6">
-              <span
-                className="text-sm font-medium"
-                data-test="scheduler-weekly-total"
-              >
-                Total: {totalHours.toFixed(2)}h
-              </span>
               <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleOpenChange(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
                 <Button
                   type="submit"
                   variant="brand"
@@ -448,7 +434,21 @@ export function SchedulerCreatePanel({
                 >
                   {submitLabel}
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleOpenChange(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
               </div>
+              <span
+                className="text-sm font-medium"
+                data-test="scheduler-weekly-total"
+              >
+                Total: {totalHours.toFixed(2)}h
+              </span>
             </div>
           </form>
         </Form>
