@@ -217,12 +217,16 @@ export function PayrollTaskEmployeeDetail({
     );
   }
 
-  // Inner grid takes the full row height (parent useEffect above keeps
-  // the parent row sized to fit). Padding stays small so the inner grid
-  // edges align with the parent grid columns above and below.
+  // Inner div needs an explicit pixel height — the h-full chain doesn't
+  // propagate through AG Grid's full-width row cell wrapper. Same
+  // formula as measureDetailHeight() used to resize the parent row, so
+  // the two stay in sync.
+  const innerHeight = measureDetailHeight(rows.length);
+
   return (
     <div
-      className="bg-muted/30 h-full px-2 py-2"
+      className="bg-muted/30 px-2 py-2"
+      style={{ height: innerHeight }}
       data-test="payroll-task-employee-detail"
     >
       <AgGridWrapper
