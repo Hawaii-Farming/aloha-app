@@ -55,7 +55,6 @@ const agGridColDefs: ColDef[] = [
   currency('hourly_rate', 'Hourly Rate'),
   hours('overtime_threshold', 'OT Threshold'),
   { field: 'payroll_id', headerName: 'Payroll ID', cellClass: 'font-mono' },
-  { field: 'payroll_processor', headerName: 'Processor' },
   {
     field: 'check_date',
     headerName: 'Check Date',
