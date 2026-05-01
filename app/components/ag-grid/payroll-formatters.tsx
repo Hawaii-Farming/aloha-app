@@ -1,13 +1,29 @@
 import type { ValueFormatterParams } from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
 
+// Detect TOTAL/aggregation rows so they render whole numbers (no decimals)
+// while body rows keep their natural precision. Pinned-bottom rows OR rows
+// whose first text field literally equals "TOTAL".
+function isAggregationRow(
+  data: Record<string, unknown> | undefined,
+  node?: { rowPinned?: string | null } | null,
+): boolean {
+  if (node?.rowPinned) return true;
+  if (!data) return false;
+  return Object.values(data).some((v) => v === 'TOTAL');
+}
+
 export function CurrencyRenderer(props: CustomCellRendererProps) {
   const value = props.value as number | null;
   if (value == null) return null;
+  const isAgg = isAggregationRow(
+    props.data as Record<string, unknown> | undefined,
+    props.node,
+  );
   const abs = Math.abs(value);
   const formatted = abs.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: isAgg ? 0 : 2,
+    maximumFractionDigits: isAgg ? 0 : 2,
   });
   const isNeg = value < 0;
 
@@ -24,10 +40,14 @@ export function CurrencyRenderer(props: CustomCellRendererProps) {
 export function currencyFormatter(params: ValueFormatterParams): string {
   const value = params.value as number | null;
   if (value == null) return '';
+  const isAgg = isAggregationRow(
+    params.data as Record<string, unknown> | undefined,
+    params.node,
+  );
   const abs = Math.abs(value);
   const formatted = abs.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: isAgg ? 0 : 2,
+    maximumFractionDigits: isAgg ? 0 : 2,
   });
   if (value < 0) return `($${formatted})`;
   return `$${formatted}`;
@@ -36,5 +56,12 @@ export function currencyFormatter(params: ValueFormatterParams): string {
 export function hoursFormatter(params: ValueFormatterParams): string {
   const value = params.value as number | null;
   if (value == null) return '';
+  const isAgg = isAggregationRow(
+    params.data as Record<string, unknown> | undefined,
+    params.node,
+  );
+  if (isAgg) {
+    return Math.round(value).toLocaleString('en-US');
+  }
   return value.toFixed(1);
 }

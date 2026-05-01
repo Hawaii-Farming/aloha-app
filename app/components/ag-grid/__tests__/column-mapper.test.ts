@@ -160,19 +160,31 @@ describe('mapColumnsToColDefs', () => {
     );
   });
 
-  it('numberFormatter formats decimals with thousands separator and 2 decimals', async () => {
+  it('numberFormatter rounds decimals to whole number with thousands separator', async () => {
     const { numberFormatter } =
       await import('~/components/ag-grid/cell-renderers/number-formatter');
     expect(numberFormatter({ value: 1234567.89 } as ValueFormatterParams)).toBe(
-      '1,234,567.89',
+      '1,234,568',
     );
   });
 
-  it('numberFormatter rounds aggregation FP noise to ≤2 decimals', async () => {
+  it('numberFormatter rounds aggregation FP noise to integer (no decimals)', async () => {
     const { numberFormatter } =
       await import('~/components/ag-grid/cell-renderers/number-formatter');
     expect(numberFormatter({ value: 12.456789 } as ValueFormatterParams)).toBe(
-      '12.46',
+      '12',
+    );
+    // Half-up rounding boundary
+    expect(numberFormatter({ value: 12.5 } as ValueFormatterParams)).toBe('13');
+  });
+
+  it('numberFormatter omits commas for values below 1,000', async () => {
+    const { numberFormatter } =
+      await import('~/components/ag-grid/cell-renderers/number-formatter');
+    expect(numberFormatter({ value: 8 } as ValueFormatterParams)).toBe('8');
+    expect(numberFormatter({ value: 999 } as ValueFormatterParams)).toBe('999');
+    expect(numberFormatter({ value: 1000 } as ValueFormatterParams)).toBe(
+      '1,000',
     );
   });
 

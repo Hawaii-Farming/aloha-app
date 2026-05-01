@@ -43,7 +43,16 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
     forceExpanded = false,
   } = props;
   const location = useLocation();
-  const currentPath = location.pathname;
+  // Decode so paths with spaces (e.g. "Human Resources") match raw module
+  // ids used in the comparison targets. useLocation().pathname returns
+  // the URL-encoded form.
+  const currentPath = (() => {
+    try {
+      return decodeURIComponent(location.pathname);
+    } catch {
+      return location.pathname;
+    }
+  })();
   const { setOpen } = useSidebar();
 
   const subModulesByModule = useMemo(() => {

@@ -2,6 +2,7 @@ import type { ComponentType, RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
+  CellClassParams,
   ColDef,
   ColGroupDef,
   ColumnMovedEvent,
@@ -174,6 +175,16 @@ function AgGridInner({
       // the `.ag-header-cell-text` CSS override in kit.css, single words
       // never break mid-character.
       wrapHeaderText: true,
+      // Right-align any cell whose value is a finite number — covers
+      // integer/decimal columns that aren't explicitly tagged
+      // type:'number' in their CrudModuleConfig. tabular-nums keeps
+      // digits in stable columns. Skips columns that already carry a
+      // custom cellClass (e.g. numericColDef adds 'text-right' itself).
+      cellClass: (params: CellClassParams) => {
+        const v = params.value;
+        if (typeof v !== 'number' || !Number.isFinite(v)) return '';
+        return 'text-right tabular-nums';
+      },
     }),
     [],
   );

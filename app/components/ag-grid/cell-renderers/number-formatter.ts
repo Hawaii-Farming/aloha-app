@@ -5,21 +5,18 @@ const intFormat = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 
-const decFormat = new Intl.NumberFormat('en-US', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
-
 /**
- * Shared number valueFormatter: thousands separators, up to 2 decimals,
- * rounds aggregation FP noise. Returns '' for null/undefined/non-finite.
+ * Shared number valueFormatter for grid columns and aggregations.
+ * Rounds to integer (no decimals), thousands separator only when the value
+ * crosses 1,000 — small integers like "8" or "40" render as-is, large ones
+ * like "12,345" get commas. Returns '' for null/undefined/non-finite.
  */
 export function numberFormatter(params: ValueFormatterParams): string {
   const v = params.value;
   if (v == null || v === '') return '';
   const n = typeof v === 'number' ? v : Number(v);
   if (!Number.isFinite(n)) return '';
-  return Number.isInteger(n) ? intFormat.format(n) : decFormat.format(n);
+  return intFormat.format(Math.round(n));
 }
 
 /**
