@@ -124,32 +124,52 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
           <div key={mod.module_id}>
             {/* Collapsed (icon-only) mode — just the module icon.
              * Prototype parity: submenus are NEVER rendered when the
-             * sidebar is collapsed. Clicking the icon navigates to the
-             * module root; tooltip shows the full label on hover. */}
+             * sidebar is collapsed. Modules with children expand the
+             * sidebar and open their submenu (no navigation); leaf
+             * modules navigate to the module root. */}
             {!forceExpanded && (
               <div className="hidden items-center justify-center px-2 py-1 group-data-[collapsible=icon]:flex">
-                <Link
-                  to={modulePath}
-                  onClick={() => {
-                    onNavigate?.();
-                    setOpen(true);
-                    if (hasChildren) {
+                {hasChildren ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(true);
                       setOverride({ slug: mod.module_slug, open: true });
-                    }
-                  }}
-                  aria-label={mod.display_name}
-                  title={mod.display_name}
-                  className={cn(
-                    'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
-                    isRouteActive
-                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 dark:from-green-400 dark:to-emerald-500 dark:text-green-950'
-                      : 'text-foreground hover:bg-muted bg-transparent',
-                  )}
-                >
-                  {createElement(IconComponent, {
-                    className: 'h-[18px] w-[18px] shrink-0',
-                  })}
-                </Link>
+                    }}
+                    aria-label={mod.display_name}
+                    title={mod.display_name}
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
+                      isRouteActive
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 dark:from-green-400 dark:to-emerald-500 dark:text-green-950'
+                        : 'text-foreground hover:bg-muted bg-transparent',
+                    )}
+                  >
+                    {createElement(IconComponent, {
+                      className: 'h-[18px] w-[18px] shrink-0',
+                    })}
+                  </button>
+                ) : (
+                  <Link
+                    to={modulePath}
+                    onClick={() => {
+                      onNavigate?.();
+                      setOpen(true);
+                    }}
+                    aria-label={mod.display_name}
+                    title={mod.display_name}
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
+                      isRouteActive
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 dark:from-green-400 dark:to-emerald-500 dark:text-green-950'
+                        : 'text-foreground hover:bg-muted bg-transparent',
+                    )}
+                  >
+                    {createElement(IconComponent, {
+                      className: 'h-[18px] w-[18px] shrink-0',
+                    })}
+                  </Link>
+                )}
               </div>
             )}
 
