@@ -87,12 +87,12 @@ function CompactTimePicker({
     onChange(`${nextH || '00'}:${nextM || '00'}`);
   };
   return (
-    <div className="flex items-center gap-1" aria-label={placeholder}>
+    <div className="flex items-center gap-0.5" aria-label={placeholder}>
       <Select
         value={h ?? ''}
         onValueChange={(next) => commit(next, m ?? '')}
       >
-        <SelectTrigger className="h-9 w-[68px] text-xs">
+        <SelectTrigger className="h-8 w-[58px] px-2 text-xs">
           <SelectValue placeholder="HH" />
         </SelectTrigger>
         <SelectContent>
@@ -103,12 +103,12 @@ function CompactTimePicker({
           ))}
         </SelectContent>
       </Select>
-      <span className="text-muted-foreground text-xs">:</span>
+      <span className="text-muted-foreground px-0.5 text-xs">:</span>
       <Select
         value={m ?? ''}
         onValueChange={(next) => commit(h ?? '', next)}
       >
-        <SelectTrigger className="h-9 w-[68px] text-xs">
+        <SelectTrigger className="h-8 w-[58px] px-2 text-xs">
           <SelectValue placeholder="MM" />
         </SelectTrigger>
         <SelectContent>
@@ -147,7 +147,7 @@ function CompactCombobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'h-9 w-full justify-between px-2 text-xs font-normal',
+            'h-8 w-full justify-between px-2 text-xs font-normal',
             !value && 'text-muted-foreground',
           )}
         >
@@ -503,7 +503,7 @@ export function SchedulerCreatePanel({
               />
             </div>
 
-            <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3 sm:px-6">
+            <div className="flex-1 space-y-1.5 overflow-y-auto px-3 py-2 sm:px-6">
               {days.map((day, i) => {
                 const filled = isRowFilled(day);
                 const err = rowErrors.get(i);
@@ -512,13 +512,13 @@ export function SchedulerCreatePanel({
                     key={i}
                     data-test={`scheduler-day-card-${i}`}
                     className={cn(
-                      'rounded-md border p-3',
+                      'rounded-md border px-2.5 py-2',
                       filled && 'border-primary/30 bg-muted/30',
                       err && 'border-destructive',
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium">
+                      <span className="text-xs font-semibold uppercase tracking-wide">
                         {DAY_NAMES[i]}
                       </span>
                       <Controller
@@ -533,7 +533,7 @@ export function SchedulerCreatePanel({
                       />
                     </div>
 
-                    <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       <Controller
                         control={form.control}
                         name={`days.${i}.start_time` as const}
@@ -545,9 +545,7 @@ export function SchedulerCreatePanel({
                           />
                         )}
                       />
-                      <span className="text-muted-foreground hidden text-xs sm:inline">
-                        →
-                      </span>
+                      <span className="text-muted-foreground text-xs">→</span>
                       <Controller
                         control={form.control}
                         name={`days.${i}.stop_time` as const}
@@ -559,7 +557,7 @@ export function SchedulerCreatePanel({
                           />
                         )}
                       />
-                      <div className="flex-1 sm:ml-1">
+                      <div className="min-w-[140px] flex-1">
                         <Controller
                           control={form.control}
                           name={`days.${i}.ops_task_id` as const}
