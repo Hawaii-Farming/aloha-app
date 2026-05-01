@@ -7,6 +7,7 @@ export const loader = async ({ request }: { request: Request }) => {
   const mode = url.searchParams.get('mode') ?? 'detail';
   const employeeId = url.searchParams.get('employeeId');
   const orgId = url.searchParams.get('orgId');
+  const weekStart = url.searchParams.get('weekStart');
 
   if (!orgId) {
     return new Response('orgId required', { status: 400 });
@@ -19,14 +20,25 @@ export const loader = async ({ request }: { request: Request }) => {
       });
     }
 
-    const { data, error } = await client
+    let query = client
       .from('ops_task_schedule' as never)
       .select(
         'id, start_time, stop_time, ops_task_id, hr_employee_id, org_id, farm_id, is_deleted, created_at, hr_employee!inner(hr_department(name:id), hr_work_authorization(name:id)), ops_task!inner(name:id), org_farm(name:id)',
       )
       .eq('org_id', orgId)
       .eq('hr_employee_id', employeeId)
-      .eq('is_deleted', false)
+      .eq('is_deleted', false);
+
+    if (weekStart && /^\d{4}-\d{2}-\d{2}$/.test(weekStart)) {
+      const endDate = new Date(`${weekStart}T00:00:00`);
+      endDate.setDate(endDate.getDate() + 7);
+      const end = endDate.toISOString().split('T')[0];
+      query = query
+        .gte('start_time', `${weekStart}T00:00:00`)
+        .lt('start_time', `${end}T00:00:00`);
+    }
+
+    const { data, error } = await query
       .order('start_time', { ascending: false })
       .limit(50);
 

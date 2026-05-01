@@ -22,6 +22,12 @@ export const opsTaskScheduleEntrySchema = z
 export const opsTaskScheduleWeeklySchema = z.object({
   hr_employee_id: z.string().min(1, 'Employee is required'),
   entries: z.array(opsTaskScheduleEntrySchema).min(1, 'Add at least one day'),
+  /** Sunday yyyy-MM-dd. When set, the action replaces the employee's
+   * rows in [weekStart, weekStart+7d) instead of plain insert. */
+  weekStart: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 export type OpsTaskScheduleEntry = z.infer<typeof opsTaskScheduleEntrySchema>;

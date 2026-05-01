@@ -50,6 +50,33 @@ export const action = async ({ request }: { request: Request }) => {
     updated_by: employeeId,
   }));
 
+  // Replace-week semantics when `weekStart` is provided: soft-delete any
+  // existing rows for this employee in [weekStart, weekStart+7d) before
+  // inserting the new set. Without `weekStart` the action is a plain
+  // insert (legacy create flow).
+  if (parsed.data.weekStart) {
+    const start = parsed.data.weekStart;
+    const endDate = new Date(`${start}T00:00:00`);
+    endDate.setDate(endDate.getDate() + 7);
+    const end = endDate.toISOString().split('T')[0];
+
+    const { error: clearError } = await client
+      .from('ops_task_schedule')
+      .update({ is_deleted: true, updated_by: employeeId })
+      .eq('org_id', orgId)
+      .eq('hr_employee_id', parsed.data.hr_employee_id)
+      .eq('is_deleted', false)
+      .gte('start_time', `${start}T00:00:00`)
+      .lt('start_time', `${end}T00:00:00`);
+
+    if (clearError) {
+      return Response.json(
+        { success: false, error: clearError.message },
+        { status: 500 },
+      );
+    }
+  }
+
   const { data, error } = await client
     .from('ops_task_schedule')
     .insert(rows)

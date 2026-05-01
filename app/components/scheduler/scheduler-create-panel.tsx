@@ -209,6 +209,10 @@ interface SchedulerCreatePanelProps {
   accountSlug: string;
   /** yyyy-MM-dd Sunday — the currently-viewed week from `?week`. */
   currentWeek: string;
+  /** When set, drawer opens in edit mode for this employee + currentWeek.
+   * The employee selector is locked, prefill loads only that week's rows,
+   * and submit replaces the week (delete+insert) instead of plain insert. */
+  editEmployeeId?: string | null;
 }
 
 interface ScheduleHistoryRow {
@@ -271,11 +275,13 @@ export function SchedulerCreatePanel({
   subModuleDisplayName,
   accountSlug,
   currentWeek,
+  editEmployeeId,
 }: SchedulerCreatePanelProps) {
   const fetcher = useFetcher();
   const revalidator = useRevalidator();
   const hasHandledSuccess = useRef(false);
 
+  const isEdit = !!editEmployeeId;
   const employeeOptions = fkOptions['hr_employee_id'] ?? [];
   const taskOptions = fkOptions['ops_task_id'] ?? [];
 
@@ -320,9 +326,18 @@ export function SchedulerCreatePanel({
     }, 0);
   }, [days]);
 
+  // Lock employee to editEmployeeId when drawer opens in edit mode.
+  useEffect(() => {
+    if (!open) return;
+    if (isEdit && editEmployeeId) {
+      form.setValue('hr_employee_id', editEmployeeId, { shouldDirty: false });
+    }
+  }, [open, isEdit, editEmployeeId, form]);
+
   // Justified useEffect #1: cross-system fetch on drawer open + employee change.
-  // The /api/schedule-history endpoint lives outside the form state machine,
-  // so a watcher-driven effect is the cleanest path. Cancel via AbortController.
+  // - Create mode: pull employee history (any week), use most-recent week
+  //   as a "pattern" template, anchor each day's date to currentWeek.
+  // - Edit mode: pull only the currentWeek rows for this employee.
   useEffect(() => {
     if (!open) return;
     if (!employeeId) return;
@@ -331,26 +346,46 @@ export function SchedulerCreatePanel({
 
     async function loadPrefill() {
       try {
-        const res = await fetch(
-          `/api/schedule-history?mode=detail&employeeId=${encodeURIComponent(
-            employeeId,
-          )}&orgId=${encodeURIComponent(accountSlug)}`,
-          { signal: controller.signal },
-        );
+        const params = new URLSearchParams({
+          mode: 'detail',
+          employeeId,
+          orgId: accountSlug,
+        });
+        if (isEdit) params.set('weekStart', currentWeek);
+
+        const res = await fetch(`/api/schedule-history?${params.toString()}`, {
+          signal: controller.signal,
+        });
         if (!res.ok) return;
         const json = (await res.json()) as { data?: ScheduleHistoryRow[] };
         const rows = json.data ?? [];
+
+        const seeded = buildDefaultDays(currentWeek);
+
+        if (isEdit) {
+          // In edit mode the API already restricted rows to currentWeek.
+          for (const row of rows) {
+            if (!row.date) continue;
+            const dow = new Date(`${row.date}T00:00:00`).getDay();
+            if (dow < 0 || dow > 6) continue;
+            const day = seeded[dow];
+            if (!day) continue;
+            if (day.start_time || day.stop_time || day.ops_task_id) continue;
+            day.start_time = extractHHmm(row.start_time);
+            day.stop_time = extractHHmm(row.stop_time);
+            day.ops_task_id = row.ops_task_id ?? '';
+          }
+          form.setValue('days', seeded, { shouldDirty: false });
+          return;
+        }
+
         if (rows.length === 0) return;
 
-        // Rows are sorted desc by start_time. Pick the most recent week start.
+        // Create mode: rows are sorted desc by start_time. Use the most
+        // recent week as the pattern, and project it onto currentWeek's dates.
         const firstWithDate = rows.find((r) => r.date);
         if (!firstWithDate?.date) return;
         const targetWeekStart = getWeekStartFromDate(firstWithDate.date);
-
-        // Reset day cards to blank for current week (date stays anchored to
-        // currentWeek) before applying prefill so re-selecting employee
-        // doesn't accumulate stale rows.
-        const seeded = buildDefaultDays(currentWeek);
 
         for (const row of rows) {
           if (!row.date) continue;
@@ -359,7 +394,6 @@ export function SchedulerCreatePanel({
           if (dow < 0 || dow > 6) continue;
           const day = seeded[dow];
           if (!day) continue;
-          // Don't overwrite if already prefilled by an earlier (more recent) row.
           if (day.start_time || day.stop_time || day.ops_task_id) continue;
           day.start_time = extractHHmm(row.start_time);
           day.stop_time = extractHHmm(row.stop_time);
@@ -374,7 +408,7 @@ export function SchedulerCreatePanel({
 
     loadPrefill();
     return () => controller.abort();
-  }, [open, employeeId, accountSlug, currentWeek, form]);
+  }, [open, employeeId, accountSlug, currentWeek, isEdit, form]);
 
   // Justified useEffect #2: handle fetcher response. Refs must be read in
   // useEffect; mirrors the generic CreatePanel pattern.
@@ -390,7 +424,8 @@ export function SchedulerCreatePanel({
     if (fetcherData.success) {
       hasHandledSuccess.current = true;
       const count = fetcherData.count ?? 0;
-      toast.success(`Created ${count} ${count === 1 ? 'entry' : 'entries'}`);
+      const verb = isEdit ? 'Updated' : 'Created';
+      toast.success(`${verb} ${count} ${count === 1 ? 'entry' : 'entries'}`);
       revalidator.revalidate();
       onOpenChange(false);
       form.reset(buildDefaults(currentWeek));
@@ -405,6 +440,7 @@ export function SchedulerCreatePanel({
     onOpenChange,
     form,
     currentWeek,
+    isEdit,
   ]);
 
   // Justified useEffect #3: reset success-tracking ref when drawer reopens.
@@ -444,6 +480,7 @@ export function SchedulerCreatePanel({
             stop_time: d.stop_time,
             ops_task_id: d.ops_task_id,
           })),
+          ...(isEdit ? { weekStart: currentWeek } : {}),
         },
         {
           method: 'POST',
@@ -452,7 +489,7 @@ export function SchedulerCreatePanel({
         },
       );
     },
-    [fetcher, accountSlug],
+    [fetcher, accountSlug, isEdit, currentWeek],
   );
 
   const handleOpenChange = useCallback(
@@ -465,9 +502,10 @@ export function SchedulerCreatePanel({
     [form, currentWeek, onOpenChange],
   );
 
+  const submitVerb = isEdit ? 'Update' : 'Create';
   const submitLabel = isSubmitting
     ? 'Saving…'
-    : `Create ${filledCount} ${filledCount === 1 ? 'entry' : 'entries'}`;
+    : `${submitVerb} ${filledCount} ${filledCount === 1 ? 'entry' : 'entries'}`;
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -484,7 +522,9 @@ export function SchedulerCreatePanel({
         data-test="scheduler-create-panel"
       >
         <SheetHeader className="border-b px-6 pt-6 pb-4">
-          <SheetTitle>Create {subModuleDisplayName}</SheetTitle>
+          <SheetTitle>
+            {isEdit ? 'Edit' : 'Create'} {subModuleDisplayName}
+          </SheetTitle>
         </SheetHeader>
 
         <Form {...form}>
@@ -500,6 +540,7 @@ export function SchedulerCreatePanel({
                 required
                 options={employeeOptions}
                 placeholder="Select employee…"
+                disabled={isEdit}
               />
             </div>
 

@@ -20,7 +20,7 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { Plus } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
@@ -92,6 +92,7 @@ export default function SchedulerListView(props: ListViewProps) {
   const { query } = useActiveTableSearch();
   const gridRef = useRef<AgGridReact>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
@@ -153,6 +154,11 @@ export default function SchedulerListView(props: ListViewProps) {
     };
   }, [accountSlug]);
 
+  const handleEditRow = useCallback((employeeId: string) => {
+    setEditEmployeeId(employeeId);
+    setCreateOpen(true);
+  }, []);
+
   // Data columns (after checkbox + avatar) for column visibility dropdown
   const dataColDefs: ColDef[] = useMemo(
     () => [
@@ -191,8 +197,40 @@ export default function SchedulerListView(props: ListViewProps) {
         type: 'numericColumn',
         minWidth: 100,
       },
+      {
+        headerName: '',
+        colId: 'edit',
+        cellRenderer: (p: { data?: RowData }) => {
+          const empId = p.data?.hr_employee_id as string | undefined;
+          if (!empId) return null;
+          return (
+            <div className="flex h-full items-center justify-center">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7"
+                aria-label="Edit week"
+                data-test="scheduler-edit-row"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditRow(empId);
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          );
+        },
+        sortable: false,
+        filter: false,
+        resizable: false,
+        suppressMovable: true,
+        pinned: 'right',
+        maxWidth: 56,
+        minWidth: 56,
+      },
     ],
-    [],
+    [handleEditRow],
   );
 
   // Full column defs including checkbox and avatar
@@ -326,7 +364,10 @@ export default function SchedulerListView(props: ListViewProps) {
       {(config?.formFields?.length ?? 0) > 0 && (
         <Button
           variant="brand"
-          onClick={() => setCreateOpen(true)}
+          onClick={() => {
+            setEditEmployeeId(null);
+            setCreateOpen(true);
+          }}
           data-test="sub-module-create-button"
           aria-label="Create"
           className="fixed right-10 bottom-10 z-30 h-14 w-14 rounded-full p-0 shadow-lg"
@@ -337,11 +378,15 @@ export default function SchedulerListView(props: ListViewProps) {
 
       <SchedulerCreatePanel
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(next) => {
+          setCreateOpen(next);
+          if (!next) setEditEmployeeId(null);
+        }}
         fkOptions={fkOptions}
         subModuleDisplayName={subModuleDisplayName ?? 'Scheduler'}
         accountSlug={accountSlug}
         currentWeek={currentWeek}
+        editEmployeeId={editEmployeeId}
       />
     </>
   );
