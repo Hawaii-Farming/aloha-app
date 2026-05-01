@@ -14,6 +14,7 @@ const apiRoutes = [
   route('api/ai/form-assist', 'routes/api/ai/form-assist.ts'),
   route('api/schedule-history', 'routes/api/schedule-history.ts'),
   route('api/schedule-by-period', 'routes/api/schedule-by-period.ts'),
+  route('api/scheduler/create-weekly', 'routes/api/scheduler/create-weekly.ts'),
   route('api/housing-tenants', 'routes/api/housing-tenants.ts'),
   route('api/housing-rooms', 'routes/api/housing-rooms.ts'),
 ];
