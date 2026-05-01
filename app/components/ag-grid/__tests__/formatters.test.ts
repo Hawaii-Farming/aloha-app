@@ -35,11 +35,11 @@ describe('currencyFormatter', () => {
     expect(result).toBe('$1,235');
   });
 
-  it('formats zero as $0', () => {
+  it('formats zero as em-dash', () => {
     const result = currencyFormatter({
       value: 0,
     } as ValueFormatterParams);
-    expect(result).toBe('$0');
+    expect(result).toBe('—');
   });
 
   it('returns empty string for null value', () => {

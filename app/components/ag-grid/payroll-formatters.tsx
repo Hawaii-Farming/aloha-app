@@ -16,6 +16,13 @@ function isAggregationRow(
 export function CurrencyRenderer(props: CustomCellRendererProps) {
   const value = props.value as number | null;
   if (value == null) return null;
+  if (value === 0) {
+    return (
+      <div className="text-muted-foreground flex h-full w-full items-center justify-end font-mono">
+        —
+      </div>
+    );
+  }
   const formatted = Math.abs(value).toLocaleString('en-US', {
     maximumFractionDigits: 0,
   });
@@ -34,6 +41,7 @@ export function CurrencyRenderer(props: CustomCellRendererProps) {
 export function currencyFormatter(params: ValueFormatterParams): string {
   const value = params.value as number | null;
   if (value == null) return '';
+  if (value === 0) return '—';
   const formatted = Math.abs(value).toLocaleString('en-US', {
     maximumFractionDigits: 0,
   });
