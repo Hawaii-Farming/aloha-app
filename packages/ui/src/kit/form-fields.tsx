@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { format, formatISO, parse, parseISO } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import type { Control, FieldValues, Path } from 'react-hook-form';
@@ -180,6 +182,7 @@ export function FormDateField<T extends FieldValues = FieldValues>({
   required,
   defaultMonth,
 }: FormFieldProps<T> & { defaultMonth?: Date }) {
+  const [open, setOpen] = useState(false);
   const fallbackMonth = defaultMonth ?? new Date(1996, 0, 1);
   return (
     <FormField
@@ -191,7 +194,7 @@ export function FormDateField<T extends FieldValues = FieldValues>({
             {label}
             <RequiredMark required={required} />
           </FormLabel>
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
@@ -228,9 +231,10 @@ export function FormDateField<T extends FieldValues = FieldValues>({
                     ? parse(field.value, 'yyyy-MM-dd', new Date())
                     : undefined
                 }
-                onSelect={(date) =>
-                  field.onChange(date ? format(date, 'yyyy-MM-dd') : '')
-                }
+                onSelect={(date) => {
+                  field.onChange(date ? format(date, 'yyyy-MM-dd') : '');
+                  setOpen(false);
+                }}
                 disabled={disabled}
               />
             </PopoverContent>
@@ -257,6 +261,7 @@ export function FormDateTimeField<T extends FieldValues = FieldValues>({
   disabled,
   required,
 }: FormFieldProps<T>) {
+  const [open, setOpen] = useState(false);
   return (
     <FormField
       control={control}
@@ -282,7 +287,7 @@ export function FormDateTimeField<T extends FieldValues = FieldValues>({
               <RequiredMark required={required} />
             </FormLabel>
             <div className="flex gap-2">
-              <Popover>
+              <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -303,8 +308,12 @@ export function FormDateTimeField<T extends FieldValues = FieldValues>({
                     mode="single"
                     selected={currentDate}
                     onSelect={(date) => {
-                      if (!date) return field.onChange('');
-                      commit(date, hourValue, minuteValue);
+                      if (!date) {
+                        field.onChange('');
+                      } else {
+                        commit(date, hourValue, minuteValue);
+                      }
+                      setOpen(false);
                     }}
                     disabled={disabled}
                   />

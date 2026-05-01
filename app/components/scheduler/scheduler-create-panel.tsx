@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFetcher, useRevalidator } from 'react-router';
 
 import { addDays, format, parse, parseISO } from 'date-fns';
-import { Check, ChevronsUpDown, Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@aloha/ui/button';
@@ -38,24 +38,43 @@ const MINUTE_OPTIONS = ['00', '15', '30', '45'];
 interface CompactDatePickerProps {
   value: string;
   onChange: (next: string) => void;
+  sundayOnly?: boolean;
+  placeholder?: string;
+  disabled?: boolean;
+  label?: string;
+  className?: string;
 }
 
-function CompactDatePicker({ value, onChange }: CompactDatePickerProps) {
+function CompactDatePicker({
+  value,
+  onChange,
+  sundayOnly,
+  placeholder = 'Pick date',
+  disabled,
+  label,
+  className,
+}: CompactDatePickerProps) {
+  const [open, setOpen] = useState(false);
   const selected = value ? parse(value, 'yyyy-MM-dd', new Date()) : undefined;
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           type="button"
           variant="outline"
           size="sm"
+          disabled={disabled}
           className={cn(
-            'h-8 max-w-[170px] justify-start gap-2 px-2 text-xs font-normal',
+            'h-8 max-w-[220px] justify-start gap-2 px-2 text-xs font-normal',
             !value && 'text-muted-foreground',
+            className,
           )}
         >
           <CalendarIcon className="h-3.5 w-3.5 shrink-0 opacity-70" />
-          {selected ? format(selected, 'EEE, MMM d') : 'Pick date'}
+          {label ? (
+            <span className="text-muted-foreground mr-1">{label}</span>
+          ) : null}
+          {selected ? format(selected, 'EEE, MMM d') : placeholder}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="end">
@@ -63,7 +82,13 @@ function CompactDatePicker({ value, onChange }: CompactDatePickerProps) {
           mode="single"
           selected={selected}
           defaultMonth={selected}
-          onSelect={(date) => onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+          disabled={
+            sundayOnly ? (date: Date) => date.getDay() !== 0 : undefined
+          }
+          onSelect={(date) => {
+            onChange(date ? format(date, 'yyyy-MM-dd') : '');
+            setOpen(false);
+          }}
         />
       </PopoverContent>
     </Popover>
@@ -88,10 +113,7 @@ function CompactTimePicker({
   };
   return (
     <div className="flex items-center gap-0.5" aria-label={placeholder}>
-      <Select
-        value={h ?? ''}
-        onValueChange={(next) => commit(next, m ?? '')}
-      >
+      <Select value={h ?? ''} onValueChange={(next) => commit(next, m ?? '')}>
         <SelectTrigger className="h-8 w-[58px] px-2 text-xs">
           <SelectValue placeholder="HH" />
         </SelectTrigger>
@@ -104,10 +126,7 @@ function CompactTimePicker({
         </SelectContent>
       </Select>
       <span className="text-muted-foreground px-0.5 text-xs">:</span>
-      <Select
-        value={m ?? ''}
-        onValueChange={(next) => commit(h ?? '', next)}
-      >
+      <Select value={m ?? ''} onValueChange={(next) => commit(h ?? '', next)}>
         <SelectTrigger className="h-8 w-[58px] px-2 text-xs">
           <SelectValue placeholder="MM" />
         </SelectTrigger>
@@ -198,6 +217,7 @@ type DayEntry = {
 
 type WeeklyFormValues = {
   hr_employee_id: string;
+  week_start: string; // 'yyyy-MM-dd' Sunday — anchors all day dates
   days: DayEntry[];
 };
 
@@ -233,7 +253,11 @@ function buildDefaultDays(currentWeek: string): DayEntry[] {
 }
 
 function buildDefaults(currentWeek: string): WeeklyFormValues {
-  return { hr_employee_id: '', days: buildDefaultDays(currentWeek) };
+  return {
+    hr_employee_id: '',
+    week_start: currentWeek,
+    days: buildDefaultDays(currentWeek),
+  };
 }
 
 function extractHHmm(iso: string | null | undefined): string {
@@ -253,6 +277,19 @@ function getWeekStartFromDate(dateStr: string): string {
   return format(start, 'yyyy-MM-dd');
 }
 
+// Inline (live) row error — only shown while user is editing the row.
+// Soft: surfaces only logical conflicts (bad time order). "Required field"
+// errors are deferred to submit so picking a single time doesn't immediately
+// complain about the other one.
+function computeInlineRowError(d: DayEntry): string | null {
+  if (d.start_time && d.stop_time && d.start_time >= d.stop_time) {
+    return 'End must be after start';
+  }
+  return null;
+}
+
+// Strict row check — used at submit time to block save and surface required
+// fields once the user has tried to save.
 function computeRowError(d: DayEntry): string | null {
   const hasAny = !!(d.start_time || d.stop_time || d.ops_task_id);
   if (!hasAny) return null;
@@ -293,20 +330,27 @@ export function SchedulerCreatePanel({
     control: form.control,
     name: 'hr_employee_id',
   });
+  const weekStart = useWatch({
+    control: form.control,
+    name: 'week_start',
+  });
   const watchedDays = useWatch({ control: form.control, name: 'days' });
   const days: DayEntry[] = useMemo(
     () => (watchedDays as DayEntry[] | undefined) ?? [],
     [watchedDays],
   );
 
+  // After the user attempts to save once, escalate to strict checks
+  // (required fields). Resets automatically when form.reset() is called.
+  const isSubmitted = form.formState.isSubmitted;
   const rowErrors = useMemo(() => {
     const errs = new Map<number, string>();
     days.forEach((d, i) => {
-      const err = computeRowError(d);
+      const err = isSubmitted ? computeRowError(d) : computeInlineRowError(d);
       if (err) errs.set(i, err);
     });
     return errs;
-  }, [days]);
+  }, [days, isSubmitted]);
 
   const filledCount = useMemo(() => days.filter(isRowFilled).length, [days]);
 
@@ -334,6 +378,30 @@ export function SchedulerCreatePanel({
     }
   }, [open, isEdit, editEmployeeId, form]);
 
+  // Re-anchor week_start to currentWeek whenever the drawer opens, so the
+  // picker reflects the page's currently-viewed week.
+  useEffect(() => {
+    if (!open) return;
+    form.setValue('week_start', currentWeek, { shouldDirty: false });
+  }, [open, currentWeek, form]);
+
+  const handleWeekStartChange = useCallback(
+    (next: string) => {
+      if (!next) return;
+      form.setValue('week_start', next, { shouldDirty: true });
+      const anchor = parseISO(next);
+      const current = (form.getValues('days') ?? []) as DayEntry[];
+      const updated: DayEntry[] = Array.from({ length: 7 }, (_, i) => ({
+        date: format(addDays(anchor, i), 'yyyy-MM-dd'),
+        start_time: current[i]?.start_time ?? '',
+        stop_time: current[i]?.stop_time ?? '',
+        ops_task_id: current[i]?.ops_task_id ?? '',
+      }));
+      form.setValue('days', updated, { shouldDirty: true });
+    },
+    [form],
+  );
+
   // Justified useEffect #1: cross-system fetch on drawer open + employee change.
   // - Create mode: pull employee history (any week), use most-recent week
   //   as a "pattern" template, anchor each day's date to currentWeek.
@@ -341,6 +409,7 @@ export function SchedulerCreatePanel({
   useEffect(() => {
     if (!open) return;
     if (!employeeId) return;
+    const anchor = weekStart || currentWeek;
 
     const controller = new AbortController();
 
@@ -360,7 +429,7 @@ export function SchedulerCreatePanel({
         const json = (await res.json()) as { data?: ScheduleHistoryRow[] };
         const rows = json.data ?? [];
 
-        const seeded = buildDefaultDays(currentWeek);
+        const seeded = buildDefaultDays(anchor);
 
         if (isEdit) {
           // In edit mode the API already restricted rows to currentWeek.
@@ -408,7 +477,17 @@ export function SchedulerCreatePanel({
 
     loadPrefill();
     return () => controller.abort();
-  }, [open, employeeId, accountSlug, currentWeek, isEdit, form]);
+  }, [open, employeeId, accountSlug, currentWeek, weekStart, isEdit, form]);
+
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      if (!nextOpen) {
+        form.reset(buildDefaults(currentWeek));
+      }
+      onOpenChange(nextOpen);
+    },
+    [form, currentWeek, onOpenChange],
+  );
 
   // Justified useEffect #2: handle fetcher response. Refs must be read in
   // useEffect; mirrors the generic CreatePanel pattern.
@@ -427,21 +506,12 @@ export function SchedulerCreatePanel({
       const verb = isEdit ? 'Updated' : 'Created';
       toast.success(`${verb} ${count} ${count === 1 ? 'entry' : 'entries'}`);
       revalidator.revalidate();
-      onOpenChange(false);
-      form.reset(buildDefaults(currentWeek));
+      handleOpenChange(false);
     } else {
       hasHandledSuccess.current = true;
       toast.error(fetcherData.error ?? 'Failed to save schedule');
     }
-  }, [
-    fetcher.state,
-    fetcherData,
-    revalidator,
-    onOpenChange,
-    form,
-    currentWeek,
-    isEdit,
-  ]);
+  }, [fetcher.state, fetcherData, revalidator, handleOpenChange, isEdit]);
 
   // Justified useEffect #3: reset success-tracking ref when drawer reopens.
   useEffect(() => {
@@ -492,16 +562,6 @@ export function SchedulerCreatePanel({
     [fetcher, accountSlug, isEdit, currentWeek],
   );
 
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      if (!nextOpen) {
-        form.reset(buildDefaults(currentWeek));
-      }
-      onOpenChange(nextOpen);
-    },
-    [form, currentWeek, onOpenChange],
-  );
-
   const submitVerb = isEdit ? 'Update' : 'Create';
   const submitLabel = isSubmitting
     ? 'Saving…'
@@ -532,16 +592,35 @@ export function SchedulerCreatePanel({
             onSubmit={handleFormSubmit}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <div className="border-b px-4 py-3 sm:px-6">
-              <FkCombobox
-                control={form.control}
-                name="hr_employee_id"
-                label="Employee"
-                required
-                options={employeeOptions}
-                placeholder="Select employee…"
-                disabled={isEdit}
-              />
+            <div className="flex items-end gap-3 border-b px-4 py-3 sm:px-6">
+              <div className="min-w-0 flex-1">
+                <FkCombobox
+                  control={form.control}
+                  name="hr_employee_id"
+                  label="Employee"
+                  required
+                  options={employeeOptions}
+                  placeholder="Select employee…"
+                  disabled={isEdit}
+                />
+              </div>
+              <div className="shrink-0">
+                <Controller
+                  control={form.control}
+                  name="week_start"
+                  render={({ field }) => (
+                    <CompactDatePicker
+                      value={field.value}
+                      onChange={handleWeekStartChange}
+                      sundayOnly
+                      placeholder="Pick week"
+                      label="Week of"
+                      disabled={isEdit}
+                      className="text-muted-foreground bg-muted/40 hover:bg-muted/60 h-auto max-w-none border-dashed px-5 py-3 text-sm font-normal"
+                    />
+                  )}
+                />
+              </div>
             </div>
 
             <div className="flex-1 space-y-1.5 overflow-y-auto px-3 py-2 sm:px-6">
@@ -559,7 +638,7 @@ export function SchedulerCreatePanel({
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold uppercase tracking-wide">
+                      <span className="text-xs font-semibold tracking-wide uppercase">
                         {DAY_NAMES[i]}
                       </span>
                       <Controller
@@ -645,7 +724,7 @@ export function SchedulerCreatePanel({
                 className="bg-muted/50 flex items-baseline gap-1.5 rounded-md border px-3 py-1.5"
                 data-test="scheduler-weekly-total"
               >
-                <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">
+                <span className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase">
                   Total
                 </span>
                 <span className="text-foreground text-base font-semibold tabular-nums">
