@@ -242,8 +242,9 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     ? baseColDefs.filter((c) => !c.field || !DOLLAR_FIELDS.has(c.field))
     : baseColDefs;
 
-  // Synthetic PK for by_task rows (task + status). Used by the detail-row
-  // hook to track which row is expanded and to insert the detail node.
+  // Synthetic PK for by_task rows. The view groups by (org_id,
+  // compensation_manager_id, task, status), so the same task name can
+  // appear under multiple managers — task+status alone would collide.
   // by_employee rows already have a unique hr_employee_id.
   const rowsWithIds = useMemo(() => {
     if (isByEmployee) {
@@ -252,9 +253,9 @@ export default function PayrollComparisonListView(props: ListViewProps) {
         _rowId: String(r.hr_employee_id ?? ''),
       }));
     }
-    return rows.map((r) => ({
+    return rows.map((r, idx) => ({
       ...r,
-      _rowId: `${String(r.task ?? '')}|${String(r.status ?? '')}`,
+      _rowId: `${String(r.compensation_manager_id ?? '')}|${String(r.task ?? '')}|${String(r.status ?? '')}|${idx}`,
     }));
   }, [rows, isByEmployee]);
 
@@ -292,10 +293,11 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   });
 
   // Detail rows get a fixed height for the embedded grid; everything else
-  // uses the AG Grid theme default.
+  // uses the AG Grid theme default. 240 = 40px header + 5 employee rows
+  // (~36px each) + a little padding. Inner grid scrolls if more.
   const getRowHeight = useCallback(
     (params: { data?: Record<string, unknown> }) =>
-      params.data?._isDetailRow ? 280 : undefined,
+      params.data?._isDetailRow ? 240 : undefined,
     [],
   );
 

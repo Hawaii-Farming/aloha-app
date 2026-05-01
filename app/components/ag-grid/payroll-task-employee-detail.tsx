@@ -190,8 +190,7 @@ export function PayrollTaskEmployeeDetail({
 
   return (
     <div
-      className="bg-muted/30 px-2 py-2"
-      style={{ height: Math.min(40 + rows.length * 36, 320) }}
+      className="bg-muted/30 flex h-full min-h-0 flex-col px-2 py-2"
       data-test="payroll-task-employee-detail"
     >
       <AgGridWrapper
