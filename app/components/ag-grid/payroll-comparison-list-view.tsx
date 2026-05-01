@@ -259,8 +259,11 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     }));
   }, [rows, isByEmployee]);
 
-  // Detail component captures accountSlug + isTeamLead via closure so the
-  // hook only re-renders when the column-mask gate flips.
+  // Detail component captures accountSlug + isTeamLead via closure so
+  // the hook only re-renders when the column-mask gate flips. The
+  // detail uses gridRef + the synthetic detail row id (parent _rowId +
+  // '_detail', matching useDetailRow's convention) to resize its parent
+  // row once the breakdown query resolves.
   const detailComponent = useMemo(
     () =>
       function TaskBreakdownRenderer({
@@ -268,11 +271,14 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       }: {
         data: Record<string, unknown>;
       }) {
+        const parentRowId = String(data._rowId ?? '');
         return (
           <PayrollTaskEmployeeDetail
             data={data}
             accountSlug={accountSlug}
             isTeamLead={isTeamLead}
+            parentGridRef={gridRef}
+            detailRowId={`${parentRowId}_detail`}
           />
         );
       },
@@ -292,12 +298,12 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     gridRef,
   });
 
-  // Detail rows get a fixed pixel height so the nested AG Grid inside
-  // the full-width row resolves its h-full chain. 360 leaves room for
-  // ~8 employee rows before the inner grid scrollbar kicks in.
+  // Initial detail-row placeholder height. The PayrollTaskEmployeeDetail
+  // component calls node.setRowHeight() + api.onRowHeightChanged() after
+  // its data loads, so this is only used during the brief loading state.
   const getRowHeight = useCallback(
     (params: { data?: Record<string, unknown> }) =>
-      params.data?._isDetailRow ? 360 : undefined,
+      params.data?._isDetailRow ? 120 : undefined,
     [],
   );
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, GridApi } from 'ag-grid-community';
 import type { AgGridReact } from 'ag-grid-react';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
@@ -17,6 +17,8 @@ interface Props {
   data: RowData; // parent task_comparison row
   accountSlug: string;
   isTeamLead: boolean;
+  parentGridRef: React.RefObject<AgGridReact | null>;
+  detailRowId: string; // AG Grid row id of the full-width detail row
 }
 
 const HOURS_COLS: ColDef[] = [
@@ -85,15 +87,42 @@ const DOLLAR_COLS: ColDef[] = [
   },
 ];
 
+// Header (~40) + per-row (~36) + a little padding. Cap the auto-grow so
+// huge breakdowns stay scrollable inside the detail rather than pushing
+// the parent row off-screen.
+const HEADER_PX = 48;
+const ROW_PX = 36;
+const MAX_DETAIL_HEIGHT = 360;
+const MIN_DETAIL_HEIGHT = 80; // fits "Loading…" / "No employees…" copy
+
+function measureDetailHeight(rowCount: number): number {
+  if (rowCount === 0) return MIN_DETAIL_HEIGHT;
+  return Math.min(HEADER_PX + rowCount * ROW_PX + 12, MAX_DETAIL_HEIGHT);
+}
+
 export function PayrollTaskEmployeeDetail({
   data,
   accountSlug,
   isTeamLead,
+  parentGridRef,
+  detailRowId,
 }: Props) {
   const supabase = useSupabase();
   const gridRef = useRef<AgGridReact>(null);
   const [rows, setRows] = useState<RowData[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Resize the parent's full-width row to fit the detail content. Runs
+  // whenever the row count changes (initial load, RBAC re-fetch, etc.).
+  useEffect(() => {
+    if (rows === null) return;
+    const api = parentGridRef.current?.api as GridApi | undefined;
+    if (!api) return;
+    const node = api.getRowNode(detailRowId);
+    if (!node) return;
+    node.setRowHeight(measureDetailHeight(rows.length));
+    api.onRowHeightChanged();
+  }, [rows, parentGridRef, detailRowId]);
 
   const task = data.task as string | undefined;
   const status = data.status as string | undefined;
@@ -188,15 +217,12 @@ export function PayrollTaskEmployeeDetail({
     );
   }
 
-  // Inner grid gets an explicit pixel height so AgGridWrapper's h-full
-  // resolves correctly inside AG Grid's full-width row cell. Cap at 340
-  // so very large breakdowns stay scrollable rather than overflowing.
-  const innerHeight = Math.min(48 + rows.length * 36, 340);
-
+  // Inner grid takes the full row height (parent useEffect above keeps
+  // the parent row sized to fit). Padding stays small so the inner grid
+  // edges align with the parent grid columns above and below.
   return (
     <div
-      className="bg-muted/30 px-2 py-2"
-      style={{ height: innerHeight }}
+      className="bg-muted/30 h-full px-2 py-2"
       data-test="payroll-task-employee-detail"
     >
       <AgGridWrapper
