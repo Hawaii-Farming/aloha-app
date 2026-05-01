@@ -600,12 +600,20 @@ export function SchedulerCreatePanel({
                   Cancel
                 </Button>
               </div>
-              <span
-                className="text-sm font-medium"
+              <div
+                className="bg-muted/50 flex items-baseline gap-1.5 rounded-md border px-3 py-1.5"
                 data-test="scheduler-weekly-total"
               >
-                Total: {totalHours.toFixed(2)}h
-              </span>
+                <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">
+                  Total
+                </span>
+                <span className="text-foreground text-base font-semibold tabular-nums">
+                  {totalHours.toFixed(2)}
+                </span>
+                <span className="text-muted-foreground text-xs font-medium">
+                  h
+                </span>
+              </div>
             </div>
           </form>
         </Form>
