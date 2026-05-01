@@ -6,10 +6,9 @@ import {
   useRouteError,
 } from 'react-router';
 
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Home, RefreshCw } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
-import { Heading } from '@aloha/ui/heading';
 import { Trans } from '@aloha/ui/trans';
 
 import { RootHead } from '~/components/root-head';
@@ -24,8 +23,9 @@ export function RootErrorBoundary() {
       : new Error(`Unknown error: ${JSON.stringify(routeError)}"`);
 
   const status = isRouteErrorResponse(error) ? error.status : 500;
+  const isNotFound = status === 404;
 
-  if (status !== 404) {
+  if (!isNotFound) {
     console.error(error);
   }
 
@@ -39,55 +39,103 @@ export function RootErrorBoundary() {
         </head>
 
         <body data-test={'root-error-boundary'}>
-          <div className={'flex h-screen flex-1 flex-col'}>
+          <div className="bg-background relative isolate flex min-h-screen items-center justify-center overflow-hidden px-6 py-16">
             <div
-              className={
-                'container m-auto flex w-full flex-1 flex-col items-center justify-center'
-              }
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -z-10"
             >
-              <div className={'flex flex-col items-center space-y-16'}>
-                <div>
-                  <h1 className={'font-heading text-9xl font-extrabold'}>
-                    {status === 404 ? (
-                      <Trans i18nKey={'common:pageNotFoundHeading'} />
-                    ) : (
-                      <Trans i18nKey={'common:errorPageHeading'} />
-                    )}
-                  </h1>
-                </div>
+              <div
+                className="absolute inset-0 opacity-40 dark:opacity-20"
+                style={{
+                  backgroundImage:
+                    'radial-gradient(circle, rgb(100 116 139 / 0.5) 1px, transparent 1px)',
+                  backgroundSize: '24px 24px',
+                  maskImage:
+                    'radial-gradient(ellipse at center, black 20%, transparent 70%)',
+                  WebkitMaskImage:
+                    'radial-gradient(ellipse at center, black 20%, transparent 70%)',
+                }}
+              />
 
-                <div className={'flex flex-col items-center space-y-8'}>
-                  <div className={'flex flex-col items-center space-y-2.5'}>
-                    <div>
-                      <Heading level={1}>
-                        {status === 404 ? (
-                          <Trans i18nKey={'common:pageNotFound'} />
-                        ) : (
-                          <Trans i18nKey={'common:genericError'} />
-                        )}
-                      </Heading>
-                    </div>
+              <div className="animate-error-orb-slow absolute top-1/2 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/50 blur-3xl dark:bg-amber-500/30" />
+              <div className="animate-error-orb-fast absolute top-[8%] left-[8%] h-96 w-96 rounded-full bg-sky-400/40 blur-3xl dark:bg-rose-500/25" />
+              <div className="animate-error-orb-medium absolute right-[8%] bottom-[5%] h-[28rem] w-[28rem] rounded-full bg-teal-400/45 blur-3xl dark:bg-orange-500/30" />
+              <div className="absolute top-[15%] right-[25%] h-72 w-72 rounded-full bg-lime-300/40 blur-3xl dark:bg-yellow-500/20" />
+              <div className="absolute bottom-[15%] left-[12%] h-80 w-80 rounded-full bg-cyan-300/35 blur-3xl dark:bg-red-500/20" />
+            </div>
 
-                    <p className={'text-muted-foreground'}>
-                      {status === 404 ? (
-                        <Trans i18nKey={'common:pageNotFoundSubHeading'} />
-                      ) : (
-                        <Trans i18nKey={'common:genericErrorSubHeading'} />
-                      )}
-                    </p>
-                  </div>
+            <style>{`
+              @keyframes error-drift-slow {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); }
+                50% { transform: translate(-46%, -54%) scale(1.08); }
+              }
+              @keyframes error-drift-medium {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                50% { transform: translate(-30px, 20px) scale(1.1); }
+              }
+              @keyframes error-drift-fast {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                50% { transform: translate(25px, -15px) scale(1.12); }
+              }
+              .animate-error-orb-slow { animation: error-drift-slow 14s ease-in-out infinite; }
+              .animate-error-orb-medium { animation: error-drift-medium 11s ease-in-out infinite; }
+              .animate-error-orb-fast { animation: error-drift-fast 8s ease-in-out infinite; }
+              @media (prefers-reduced-motion: reduce) {
+                .animate-error-orb-slow,
+                .animate-error-orb-medium,
+                .animate-error-orb-fast { animation: none; }
+              }
+            `}</style>
 
-                  <div>
-                    <Button variant={'outline'} asChild>
-                      <Link to={'/'}>
-                        <ArrowLeft className={'mr-2 h-4'} />
+            <div className="relative flex w-full max-w-2xl flex-col items-center text-center">
+              <h1 className="font-heading from-foreground via-foreground to-foreground/40 bg-gradient-to-br bg-clip-text px-4 text-[8rem] leading-none font-black tracking-tight text-transparent sm:text-[11rem]">
+                {status}
+              </h1>
 
-                        <Trans i18nKey={'common:goBack'} />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
+              <p className="text-muted-foreground mt-6 max-w-md text-sm sm:text-base">
+                {isNotFound ? (
+                  <Trans i18nKey={'common:pageNotFoundSubHeading'} />
+                ) : (
+                  <Trans i18nKey={'common:genericErrorSubHeading'} />
+                )}
+              </p>
+
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+                {!isNotFound && (
+                  <Button
+                    variant="default"
+                    onClick={() => window.location.reload()}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    <Trans i18nKey={'common:tryAgain'} />
+                  </Button>
+                )}
+
+                <Button variant={isNotFound ? 'default' : 'outline'} asChild>
+                  <Link to={'/'}>
+                    <Home className="mr-2 h-4 w-4" />
+                    <Trans i18nKey={'common:backToHomePage'} />
+                  </Link>
+                </Button>
+
+                <Button variant="ghost" asChild>
+                  <Link to={'..'} relative="path">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    <Trans i18nKey={'common:goBack'} />
+                  </Link>
+                </Button>
               </div>
+
+              {import.meta.env.DEV && error.message && (
+                <details className="mt-12 w-full max-w-lg text-left">
+                  <summary className="text-muted-foreground hover:text-foreground cursor-pointer font-mono text-xs tracking-wider uppercase select-none">
+                    Error details (dev only)
+                  </summary>
+                  <pre className="border-border bg-muted/50 text-muted-foreground mt-3 overflow-x-auto rounded-md border p-4 text-xs">
+                    {error.message}
+                  </pre>
+                </details>
+              )}
             </div>
           </div>
         </body>
