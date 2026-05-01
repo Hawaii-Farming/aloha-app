@@ -165,10 +165,14 @@ function AgGridInner({
       resizable: true,
       sortable: true,
       filter: false,
-      minWidth: 100,
+      // Wide enough for ~11 chars at 13px/700 ("Department", "Start Date")
+      // so single-word headers don't break mid-character.
+      minWidth: 130,
       autoHeaderHeight: true,
       // Wrap header text onto two lines instead of clipping ("Start Date"
-      // becomes "Start" / "Date" rather than "Start Da…").
+      // becomes "Start" / "Date" rather than "Start Da…"). Combined with
+      // the `.ag-header-cell-text` CSS override in kit.css, single words
+      // never break mid-character.
       wrapHeaderText: true,
     }),
     [],

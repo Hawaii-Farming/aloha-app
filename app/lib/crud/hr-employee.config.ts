@@ -97,7 +97,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
     { key: 'gender', label: 'Gender', sortable: true },
     { key: 'compensation_manager_id_preferred_name', label: 'Manager' },
     { key: 'team_lead_id_preferred_name', label: 'Team Lead' },
-    { key: 'overtime_threshold', label: 'OT Threshold' },
+    { key: 'overtime_threshold', label: 'OT Threshold', type: 'number' },
     {
       key: 'pay_structure',
       label: 'Pay Structure',

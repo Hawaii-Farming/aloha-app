@@ -27,31 +27,30 @@ export const loader = async (args: {
   });
 
   // Get sub-modules for this module, ordered by display_order.
-  // Uses the `hr_rba_navigation` view (one row per accessible sub-module) —
-  // the previous query targeted `app_nav_sub_modules`, which doesn't exist
-  // in the database and silently returned empty → false redirect to
-  // `/home/{account}`.
+  // The `hr_rba_navigation` view exposes display-name IDs as URL segments —
+  // there are no separate slug columns. `module_id` = "Human Resources",
+  // `sub_module_id` = "Register", etc.
   const { data } = await queryUntypedView(client, 'hr_rba_navigation')
-    .select('sub_module_slug, sub_module_display_order')
+    .select('sub_module_id, sub_module_display_order')
     .eq('org_id', accountSlug)
-    .eq('module_slug', moduleSlug)
+    .eq('module_id', moduleSlug)
     .order('sub_module_display_order');
 
-  const subModules = castRows<{ sub_module_slug: string }>(data);
+  const subModules = castRows<{ sub_module_id: string }>(data);
 
   // Module-specific landing override (e.g. HR → Register instead of
   // whichever sub-module has display_order=1). Falls through to the
   // standard first-by-display-order redirect if the override sub-module
   // is not in this user's accessible navigation (RBA blocked).
   const override = MODULE_DEFAULT_SUB_MODULE[moduleSlug];
-  if (override && subModules.some((s) => s.sub_module_slug === override)) {
+  if (override && subModules.some((s) => s.sub_module_id === override)) {
     throw redirect(`/home/${accountSlug}/${moduleSlug}/${override}`);
   }
 
   if (subModules.length > 0) {
     const first = subModules[0]!;
     throw redirect(
-      `/home/${accountSlug}/${moduleSlug}/${first.sub_module_slug}`,
+      `/home/${accountSlug}/${moduleSlug}/${first.sub_module_id}`,
     );
   }
 

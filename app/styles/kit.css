@@ -52,3 +52,15 @@ Optimize dropdowns for mobile
 .ag-grid-cell-borders .ag-cell {
   border-right: 1px solid var(--ag-border-color);
 }
+
+/* AG Grid header: wrap multi-word headers at whitespace, never break inside
+ * a single word. Default `overflow-wrap: break-word` would split "Department"
+ * into "Departmen / t" when the column is narrower than the word — combined
+ * with a sane `minWidth` on defaultColDef this keeps single words intact and
+ * "Start Date" breaks cleanly into "Start" / "Date". */
+.ag-grid-cell-borders .ag-header-cell-text {
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: normal;
+  line-height: 1.2;
+}
