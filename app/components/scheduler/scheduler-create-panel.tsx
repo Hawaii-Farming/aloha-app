@@ -1,17 +1,191 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useFetcher, useRevalidator } from 'react-router';
 
-import { addDays, format, parseISO } from 'date-fns';
+import { addDays, format, parse, parseISO } from 'date-fns';
+import { Check, ChevronsUpDown, Calendar as CalendarIcon } from 'lucide-react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@aloha/ui/button';
+import { Calendar } from '@aloha/ui/calendar';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@aloha/ui/command';
 import { FkCombobox } from '@aloha/ui/fk-combobox';
 import { Form } from '@aloha/ui/form';
-import { Input } from '@aloha/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@aloha/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@aloha/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 import { toast } from '@aloha/ui/sonner';
 import { cn } from '@aloha/ui/utils';
+
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) =>
+  i.toString().padStart(2, '0'),
+);
+const MINUTE_OPTIONS = ['00', '15', '30', '45'];
+
+interface CompactDatePickerProps {
+  value: string;
+  onChange: (next: string) => void;
+}
+
+function CompactDatePicker({ value, onChange }: CompactDatePickerProps) {
+  const selected = value ? parse(value, 'yyyy-MM-dd', new Date()) : undefined;
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className={cn(
+            'h-8 max-w-[170px] justify-start gap-2 px-2 text-xs font-normal',
+            !value && 'text-muted-foreground',
+          )}
+        >
+          <CalendarIcon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+          {selected ? format(selected, 'EEE, MMM d') : 'Pick date'}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="end">
+        <Calendar
+          mode="single"
+          selected={selected}
+          defaultMonth={selected}
+          onSelect={(date) => onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+interface CompactTimePickerProps {
+  value: string;
+  onChange: (next: string) => void;
+  placeholder: string;
+}
+
+function CompactTimePicker({
+  value,
+  onChange,
+  placeholder,
+}: CompactTimePickerProps) {
+  const [h, m] = value ? value.split(':') : ['', ''];
+  const commit = (nextH: string, nextM: string) => {
+    if (!nextH && !nextM) return onChange('');
+    onChange(`${nextH || '00'}:${nextM || '00'}`);
+  };
+  return (
+    <div className="flex items-center gap-1" aria-label={placeholder}>
+      <Select
+        value={h ?? ''}
+        onValueChange={(next) => commit(next, m ?? '')}
+      >
+        <SelectTrigger className="h-9 w-[68px] text-xs">
+          <SelectValue placeholder="HH" />
+        </SelectTrigger>
+        <SelectContent>
+          {HOUR_OPTIONS.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <span className="text-muted-foreground text-xs">:</span>
+      <Select
+        value={m ?? ''}
+        onValueChange={(next) => commit(h ?? '', next)}
+      >
+        <SelectTrigger className="h-9 w-[68px] text-xs">
+          <SelectValue placeholder="MM" />
+        </SelectTrigger>
+        <SelectContent>
+          {MINUTE_OPTIONS.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+interface CompactComboboxProps {
+  value: string;
+  onChange: (next: string) => void;
+  options: Array<{ value: string; label: string }>;
+  placeholder: string;
+}
+
+function CompactCombobox({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: CompactComboboxProps) {
+  const [open, setOpen] = useState(false);
+  const selectedLabel = options.find((o) => o.value === value)?.label;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn(
+            'h-9 w-full justify-between px-2 text-xs font-normal',
+            !value && 'text-muted-foreground',
+          )}
+        >
+          <span className="truncate">{selectedLabel ?? placeholder}</span>
+          <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[260px] p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Search task…" className="h-9" />
+          <CommandList>
+            <CommandEmpty>No task found.</CommandEmpty>
+            <CommandGroup>
+              {options.map((opt) => (
+                <CommandItem
+                  key={opt.value}
+                  value={opt.label}
+                  onSelect={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      value === opt.value ? 'opacity-100' : 'opacity-0',
+                    )}
+                  />
+                  {opt.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
@@ -351,69 +525,54 @@ export function SchedulerCreatePanel({
                         control={form.control}
                         name={`days.${i}.date` as const}
                         render={({ field }) => (
-                          <Input
-                            type="date"
+                          <CompactDatePicker
                             value={field.value}
                             onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            className="h-8 max-w-[160px] text-sm"
                           />
                         )}
                       />
                     </div>
 
-                    <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_2fr]">
+                    <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
                       <Controller
                         control={form.control}
                         name={`days.${i}.start_time` as const}
                         render={({ field }) => (
-                          <Input
-                            type="time"
-                            placeholder="Start"
+                          <CompactTimePicker
                             value={field.value}
                             onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            className="h-9 text-sm"
+                            placeholder="Start time"
                           />
                         )}
                       />
+                      <span className="text-muted-foreground hidden text-xs sm:inline">
+                        →
+                      </span>
                       <Controller
                         control={form.control}
                         name={`days.${i}.stop_time` as const}
                         render={({ field }) => (
-                          <Input
-                            type="time"
-                            placeholder="End"
+                          <CompactTimePicker
                             value={field.value}
                             onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            className="h-9 text-sm"
+                            placeholder="End time"
                           />
                         )}
                       />
-                      <Controller
-                        control={form.control}
-                        name={`days.${i}.ops_task_id` as const}
-                        render={({ field }) => (
-                          <select
-                            value={field.value}
-                            onChange={(e) => field.onChange(e.target.value)}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
-                          >
-                            <option value="">Select task…</option>
-                            {taskOptions.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      />
+                      <div className="flex-1 sm:ml-1">
+                        <Controller
+                          control={form.control}
+                          name={`days.${i}.ops_task_id` as const}
+                          render={({ field }) => (
+                            <CompactCombobox
+                              value={field.value}
+                              onChange={field.onChange}
+                              options={taskOptions}
+                              placeholder="Select task…"
+                            />
+                          )}
+                        />
+                      </div>
                     </div>
 
                     {err && (
