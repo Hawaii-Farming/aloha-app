@@ -10279,6 +10279,246 @@ export type Database = {
           },
         ]
       }
+      hr_payroll_data_secure: {
+        Row: {
+          admin_fees: number | null
+          auto_allowance: number | null
+          auto_deduction: number | null
+          bonus_pay: number | null
+          check_date: string | null
+          child_support: number | null
+          comp_plus: number | null
+          created_at: string | null
+          created_by: string | null
+          discretionary_overtime_hours: number | null
+          discretionary_overtime_pay: number | null
+          employee_name: string | null
+          fit: number | null
+          funeral_hours: number | null
+          funeral_pay: number | null
+          gross_wage: number | null
+          hawaii_get: number | null
+          hds_dental: number | null
+          health_benefits: number | null
+          holiday_hours: number | null
+          holiday_pay: number | null
+          hourly_rate: number | null
+          hr_department_id: string | null
+          hr_employee_id: string | null
+          hr_work_authorization_id: string | null
+          id: string | null
+          invoice_number: string | null
+          is_deleted: boolean | null
+          is_standard: boolean | null
+          labor_tax: number | null
+          medicare: number | null
+          net_pay: number | null
+          org_id: string | null
+          other_charges: number | null
+          other_health_charges: number | null
+          other_pay: number | null
+          other_tax: number | null
+          overtime_hours: number | null
+          overtime_pay: number | null
+          overtime_threshold: number | null
+          pay_period_end: string | null
+          pay_period_start: string | null
+          pay_structure: string | null
+          payroll_id: string | null
+          payroll_processor: string | null
+          per_diem: number | null
+          pre_tax_401k: number | null
+          program_fees: number | null
+          pto_hours: number | null
+          pto_hours_accrued: number | null
+          pto_pay: number | null
+          regular_hours: number | null
+          regular_pay: number | null
+          salary: number | null
+          sick_hours: number | null
+          sick_pay: number | null
+          sit: number | null
+          social_security: number | null
+          tdi: number | null
+          total_cost: number | null
+          total_hours: number | null
+          updated_at: string | null
+          updated_by: string | null
+          wc: string | null
+          workers_compensation: number | null
+        }
+        Insert: {
+          admin_fees?: never
+          auto_allowance?: never
+          auto_deduction?: never
+          bonus_pay?: never
+          check_date?: string | null
+          child_support?: never
+          comp_plus?: never
+          created_at?: string | null
+          created_by?: string | null
+          discretionary_overtime_hours?: number | null
+          discretionary_overtime_pay?: never
+          employee_name?: string | null
+          fit?: never
+          funeral_hours?: number | null
+          funeral_pay?: never
+          gross_wage?: never
+          hawaii_get?: never
+          hds_dental?: never
+          health_benefits?: never
+          holiday_hours?: number | null
+          holiday_pay?: never
+          hourly_rate?: never
+          hr_department_id?: string | null
+          hr_employee_id?: string | null
+          hr_work_authorization_id?: string | null
+          id?: string | null
+          invoice_number?: string | null
+          is_deleted?: boolean | null
+          is_standard?: boolean | null
+          labor_tax?: never
+          medicare?: never
+          net_pay?: never
+          org_id?: string | null
+          other_charges?: never
+          other_health_charges?: never
+          other_pay?: never
+          other_tax?: never
+          overtime_hours?: number | null
+          overtime_pay?: never
+          overtime_threshold?: number | null
+          pay_period_end?: string | null
+          pay_period_start?: string | null
+          pay_structure?: string | null
+          payroll_id?: string | null
+          payroll_processor?: string | null
+          per_diem?: never
+          pre_tax_401k?: never
+          program_fees?: never
+          pto_hours?: number | null
+          pto_hours_accrued?: number | null
+          pto_pay?: never
+          regular_hours?: number | null
+          regular_pay?: never
+          salary?: never
+          sick_hours?: number | null
+          sick_pay?: never
+          sit?: never
+          social_security?: never
+          tdi?: never
+          total_cost?: never
+          total_hours?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          wc?: string | null
+          workers_compensation?: never
+        }
+        Update: {
+          admin_fees?: never
+          auto_allowance?: never
+          auto_deduction?: never
+          bonus_pay?: never
+          check_date?: string | null
+          child_support?: never
+          comp_plus?: never
+          created_at?: string | null
+          created_by?: string | null
+          discretionary_overtime_hours?: number | null
+          discretionary_overtime_pay?: never
+          employee_name?: string | null
+          fit?: never
+          funeral_hours?: number | null
+          funeral_pay?: never
+          gross_wage?: never
+          hawaii_get?: never
+          hds_dental?: never
+          health_benefits?: never
+          holiday_hours?: number | null
+          holiday_pay?: never
+          hourly_rate?: never
+          hr_department_id?: string | null
+          hr_employee_id?: string | null
+          hr_work_authorization_id?: string | null
+          id?: string | null
+          invoice_number?: string | null
+          is_deleted?: boolean | null
+          is_standard?: boolean | null
+          labor_tax?: never
+          medicare?: never
+          net_pay?: never
+          org_id?: string | null
+          other_charges?: never
+          other_health_charges?: never
+          other_pay?: never
+          other_tax?: never
+          overtime_hours?: number | null
+          overtime_pay?: never
+          overtime_threshold?: number | null
+          pay_period_end?: string | null
+          pay_period_start?: string | null
+          pay_structure?: string | null
+          payroll_id?: string | null
+          payroll_processor?: string | null
+          per_diem?: never
+          pre_tax_401k?: never
+          program_fees?: never
+          pto_hours?: number | null
+          pto_hours_accrued?: number | null
+          pto_pay?: never
+          regular_hours?: number | null
+          regular_pay?: never
+          salary?: never
+          sick_hours?: number | null
+          sick_pay?: never
+          sit?: never
+          social_security?: never
+          tdi?: never
+          total_cost?: never
+          total_hours?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+          wc?: string | null
+          workers_compensation?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_payroll_hr_department_id_fkey"
+            columns: ["hr_department_id"]
+            isOneToOne: false
+            referencedRelation: "hr_department"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "hr_employee"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_employee_id_fkey"
+            columns: ["hr_employee_id"]
+            isOneToOne: false
+            referencedRelation: "ops_task_weekly_schedule"
+            referencedColumns: ["hr_employee_id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_hr_work_authorization_id_fkey"
+            columns: ["hr_work_authorization_id"]
+            isOneToOne: false
+            referencedRelation: "hr_work_authorization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_payroll_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_payroll_employee_comparison: {
         Row: {
           check_date: string | null
@@ -10458,28 +10698,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "hr_employee_hr_department_id_fkey"
-            columns: ["hr_department_id"]
-            isOneToOne: false
-            referencedRelation: "hr_department"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "hr_employee_hr_department_id_fkey"
             columns: ["department_name"]
             isOneToOne: false
             referencedRelation: "hr_department"
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "hr_employee_hr_department_id_fkey"
+            columns: ["hr_department_id"]
+            isOneToOne: false
+            referencedRelation: "hr_department"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "hr_employee_hr_work_authorization_id_fkey"
-            columns: ["work_authorization_name"]
+            columns: ["hr_work_authorization_id"]
             isOneToOne: false
             referencedRelation: "hr_work_authorization"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "hr_employee_hr_work_authorization_id_fkey"
-            columns: ["hr_work_authorization_id"]
+            columns: ["work_authorization_name"]
             isOneToOne: false
             referencedRelation: "hr_work_authorization"
             referencedColumns: ["id"]
@@ -10616,6 +10856,8 @@ export type Database = {
       }
     }
     Functions: {
+      auth_access_level: { Args: { target_org: string }; Returns: string }
+      auth_employee_id: { Args: { target_org: string }; Returns: string }
       chat_query: { Args: { q: string }; Returns: Json }
       chat_schema: { Args: never; Returns: Json }
       get_user_org_ids: { Args: never; Returns: string[] }
