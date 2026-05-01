@@ -20,7 +20,7 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { Pencil, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
@@ -159,6 +159,15 @@ export default function SchedulerListView(props: ListViewProps) {
     setCreateOpen(true);
   }, []);
 
+  const handleRowClicked = useCallback(
+    (event: { data?: RowData }) => {
+      const empId = event.data?.hr_employee_id as string | undefined;
+      if (!empId) return;
+      handleEditRow(empId);
+    },
+    [handleEditRow],
+  );
+
   // Data columns (after checkbox + avatar) for column visibility dropdown
   const dataColDefs: ColDef[] = useMemo(
     () => [
@@ -197,40 +206,8 @@ export default function SchedulerListView(props: ListViewProps) {
         type: 'numericColumn',
         minWidth: 100,
       },
-      {
-        headerName: '',
-        colId: 'edit',
-        cellRenderer: (p: { data?: RowData }) => {
-          const empId = p.data?.hr_employee_id as string | undefined;
-          if (!empId) return null;
-          return (
-            <div className="flex h-full items-center justify-center">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7"
-                aria-label="Edit week"
-                data-test="scheduler-edit-row"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditRow(empId);
-                }}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          );
-        },
-        sortable: false,
-        filter: false,
-        resizable: false,
-        suppressMovable: true,
-        pinned: 'right',
-        maxWidth: 56,
-        minWidth: 56,
-      },
     ],
-    [handleEditRow],
+    [],
   );
 
   // Full column defs including checkbox and avatar
@@ -334,6 +311,7 @@ export default function SchedulerListView(props: ListViewProps) {
             rowClassRules={otWarningRowClassRules}
             pagination={false}
             quickFilterText={query}
+            onRowClicked={handleRowClicked}
             onGridReady={handleGridReady}
             onColumnMoved={handleColumnMoved}
             onColumnResized={handleColumnResized}
