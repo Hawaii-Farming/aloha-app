@@ -165,7 +165,9 @@ export default function PayrollHoursListView(props: ListViewProps) {
       if (event.node.rowPinned) return;
       const employeeId = event.data?.hr_employee_id as string | undefined;
       if (!employeeId || !account) return;
-      navigate(`/home/${account}/human_resources/register/${employeeId}`);
+      navigate(
+        `/home/${account}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Register')}/${encodeURIComponent(employeeId)}`,
+      );
     },
     [navigate, account],
   );

@@ -20,80 +20,30 @@ import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
 
-interface HousingSite {
+interface HousingRow {
   id: string;
   name: string;
-  maxBeds: number | null;
+  maximumBeds: number;
   tenantCount: number;
   availableBeds: number;
-  notes: string | null;
-  isActive: boolean;
-  parentId: string | null;
-  parentName: string | null;
-}
-
-interface Accommodation {
-  site: HousingSite;
-  rooms: HousingSite[];
-  bedroomCount: number;
-  bathroomCount: number;
-}
-
-interface AccommodationRow {
-  id: string;
-  name: string;
-  beds: number;
-  baths: number;
-  tenantCount: number;
-  capacity: number;
-  vacancy: number;
   isActive: boolean;
   isTotal?: boolean;
 }
 
-function parseHousingSite(row: RowData): HousingSite {
-  // org_site_housing's id IS the display name. The base row has no
-  // tenant_count / available_beds; those are derived elsewhere or via
-  // a future view wrapping this table.
+function parseHousingRow(row: RowData): HousingRow {
   const id = String(row.id ?? '');
   return {
     id,
     name: id,
-    maxBeds: row.maximum_beds != null ? Number(row.maximum_beds) : null,
+    maximumBeds: Number(row.maximum_beds ?? 0),
     tenantCount: Number(row.tenant_count ?? 0),
     availableBeds: Number(row.available_beds ?? 0),
-    notes: row.notes ? String(row.notes) : null,
     isActive: row.is_deleted === false || row.is_deleted == null,
-    parentId: null,
-    parentName: null,
   };
 }
 
-function buildAccommodations(sites: HousingSite[]): Accommodation[] {
-  const parents = sites.filter((s) => !s.parentId);
-  const childMap = new Map<string, HousingSite[]>();
-  for (const site of sites) {
-    if (site.parentId) {
-      const arr = childMap.get(site.parentId) ?? [];
-      arr.push(site);
-      childMap.set(site.parentId, arr);
-    }
-  }
-
-  return parents.map((parent) => {
-    const rooms = childMap.get(parent.id) ?? [];
-    const bedroomCount = rooms.filter((r) =>
-      r.name.toLowerCase().includes('bedroom'),
-    ).length;
-    const bathroomCount = rooms.filter((r) =>
-      r.name.toLowerCase().includes('bathroom'),
-    ).length;
-    return { site: parent, rooms, bedroomCount, bathroomCount };
-  });
-}
-
 function HomeIconRenderer(props: CustomCellRendererProps) {
-  const data = props.data as AccommodationRow | undefined;
+  const data = props.data as HousingRow | undefined;
   if (data?.isTotal) return null;
   return (
     <div className="flex h-full items-center justify-center">
@@ -105,10 +55,10 @@ function HomeIconRenderer(props: CustomCellRendererProps) {
 }
 
 function OccupancyCellRenderer(props: CustomCellRendererProps) {
-  const data = props.data as AccommodationRow | undefined;
+  const data = props.data as HousingRow | undefined;
   if (!data) return null;
   const tenants = data.tenantCount;
-  const capacity = data.capacity;
+  const capacity = data.maximumBeds;
   const ratio = capacity > 0 ? Math.min(tenants / capacity, 1) : 0;
   const pct = Math.round(ratio * 100);
 
@@ -153,25 +103,18 @@ const colDefs: ColDef[] = [
     minWidth: 180,
   },
   {
-    field: 'beds',
-    headerName: 'Beds',
-    type: 'numericColumn',
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'baths',
-    headerName: 'Baths',
-    type: 'numericColumn',
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'vacancy',
-    headerName: 'Vacancy',
+    field: 'maximumBeds',
+    headerName: 'Max Beds',
     type: 'numericColumn',
     flex: 1,
     minWidth: 110,
+  },
+  {
+    field: 'availableBeds',
+    headerName: 'Available Beds',
+    type: 'numericColumn',
+    flex: 1,
+    minWidth: 130,
   },
   {
     field: 'tenantCount',
@@ -193,52 +136,35 @@ export default function HousingMapView(props: ListViewProps) {
   const gridRef = useRef<AgGridReact>(null);
 
   const rawData = tableData.data as RowData[];
-  const accommodations = useMemo(
-    () => buildAccommodations(rawData.map(parseHousingSite)),
-    [rawData],
-  );
 
-  const rowData = useMemo<AccommodationRow[]>(() => {
-    const rows: AccommodationRow[] = accommodations.map((accom) => {
-      const capacity = accom.site.maxBeds ?? accom.bedroomCount;
-      const tenantCount = accom.site.tenantCount;
-      return {
-        id: accom.site.id,
-        name: accom.site.name,
-        beds: accom.bedroomCount,
-        baths: accom.bathroomCount,
-        tenantCount,
-        capacity,
-        vacancy: Math.max(0, capacity - tenantCount),
-        isActive: accom.site.isActive,
-      };
-    });
+  const rowData = useMemo<HousingRow[]>(() => {
+    const rows: HousingRow[] = rawData.map(parseHousingRow);
 
     if (rows.length === 0) return rows;
 
-    const sum = (k: 'beds' | 'baths' | 'tenantCount' | 'capacity' | 'vacancy') =>
+    const sum = (k: 'maximumBeds' | 'tenantCount' | 'availableBeds') =>
       rows.reduce((s, r) => s + (r[k] ?? 0), 0);
 
     rows.push({
       id: '__total__',
       name: 'TOTAL',
-      beds: sum('beds'),
-      baths: sum('baths'),
+      maximumBeds: sum('maximumBeds'),
       tenantCount: sum('tenantCount'),
-      capacity: sum('capacity'),
-      vacancy: sum('vacancy'),
+      availableBeds: sum('availableBeds'),
       isActive: true,
       isTotal: true,
     });
 
     return rows;
-  }, [accommodations]);
+  }, [rawData]);
 
   const handleRowClicked = useCallback(
     (event: RowClickedEvent) => {
-      const row = event.data as AccommodationRow | undefined;
+      const row = event.data as HousingRow | undefined;
       if (!account || !row?.id || row.isTotal) return;
-      navigate(`/home/${account}/human_resources/housing/${row.id}`);
+      navigate(
+        `/home/${account}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Housing')}/${encodeURIComponent(row.id)}`,
+      );
     },
     [navigate, account],
   );
@@ -249,7 +175,7 @@ export default function HousingMapView(props: ListViewProps) {
 
   const getRowStyle = useCallback(
     (params: RowClassParams): Record<string, string> | undefined => {
-      const row = params.data as AccommodationRow | undefined;
+      const row = params.data as HousingRow | undefined;
       if (row?.isTotal) {
         return {
           fontWeight: 'bold',

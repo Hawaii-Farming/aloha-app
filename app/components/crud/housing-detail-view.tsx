@@ -115,7 +115,9 @@ function TenantsGrid({
     (event: RowClickedEvent) => {
       const tenantId = (event.data as TenantRow | undefined)?.id;
       if (!tenantId || !accountSlug) return;
-      navigate(`/home/${accountSlug}/human_resources/employees/${tenantId}`);
+      navigate(
+        `/home/${accountSlug}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Register')}/${encodeURIComponent(tenantId)}`,
+      );
     },
     [navigate, accountSlug],
   );

@@ -1,4 +1,4 @@
-import { castRows } from '~/lib/crud/typed-query.server';
+import { castRows, queryUntypedView } from '~/lib/crud/typed-query.server';
 import { requireUserLoader } from '~/lib/require-user-loader';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
@@ -13,36 +13,60 @@ export const loader = async ({ request }: { request: Request }) => {
     return new Response('siteId and orgId are required', { status: 400 });
   }
 
-  const { data, error } = await client
-    .from('hr_employee' as never)
-    .select(
-      'id, first_name, last_name, profile_photo_url, start_date, hr_department(name:id), hr_work_authorization(name:id)',
-    )
+  // org_site_housing_tenants already filters to active assignments
+  // (matches the active-tenant logic used by org_site_housing_tenant_count,
+  // so detail-page counts agree with the list view).
+  const { data: tenantRows, error: tenantError } = await queryUntypedView(
+    client,
+    'org_site_housing_tenants',
+  )
+    .select('hr_employee_id, first_name, last_name, start_date')
     .eq('org_id', orgId)
     .eq('housing_id', siteId)
-    .eq('is_deleted', false)
     .order('last_name');
 
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+  if (tenantError) {
+    return Response.json({ error: tenantError.message }, { status: 500 });
   }
 
-  const rows = castRows(data);
-  const tenants = rows.map((row) => {
-    const dept = row.hr_department as Record<string, unknown> | null;
-    const workAuth = row.hr_work_authorization as Record<
+  const tenants = castRows(tenantRows);
+  const employeeIds = tenants
+    .map((t) => t.hr_employee_id as string | undefined)
+    .filter((id): id is string => !!id);
+
+  // Enrich with display fields the view doesn't expose: photo, department
+  // display name, work authorization name.
+  const employeeDetails = new Map<string, Record<string, unknown>>();
+  if (employeeIds.length > 0) {
+    const { data: empData } = await client
+      .from('hr_employee' as never)
+      .select(
+        'id, profile_photo_url, hr_department(name:id), hr_work_authorization(name:id)',
+      )
+      .in('id', employeeIds);
+
+    for (const row of castRows(empData)) {
+      employeeDetails.set(String(row.id), row);
+    }
+  }
+
+  const result = tenants.map((row) => {
+    const id = String(row.hr_employee_id ?? '');
+    const detail = employeeDetails.get(id);
+    const dept = detail?.hr_department as Record<string, unknown> | null;
+    const workAuth = detail?.hr_work_authorization as Record<
       string,
       unknown
     > | null;
     return {
-      id: row.id,
+      id,
       full_name: `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim(),
-      profile_photo_url: row.profile_photo_url ?? null,
+      profile_photo_url: (detail?.profile_photo_url as string | null) ?? null,
       department_name: (dept?.name as string) ?? '',
-      start_date: row.start_date ?? null,
+      start_date: (row.start_date as string | null) ?? null,
       work_authorization_name: (workAuth?.name as string) ?? '',
     };
   });
 
-  return Response.json({ data: tenants });
+  return Response.json({ data: result });
 };
