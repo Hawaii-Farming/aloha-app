@@ -358,7 +358,8 @@ export default function PayrollCompManagerListView(props: ListViewProps) {
         <AgGridWrapper
           gridRef={gridRef}
           colDefs={visibleColDefs}
-          rowData={[...groupedRows, ...totalsRow]}
+          rowData={groupedRows}
+          pinnedBottomRowData={totalsRow}
           quickFilterText={query}
           pagination={false}
           getRowStyle={getRowStyle}

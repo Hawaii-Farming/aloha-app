@@ -28,11 +28,18 @@ describe('dateFormatter', () => {
 });
 
 describe('currencyFormatter', () => {
-  it('formats number as whole-dollar USD currency', () => {
+  it('formats number as whole number with thousands separators', () => {
     const result = currencyFormatter({
       value: 1234.5,
     } as ValueFormatterParams);
-    expect(result).toBe('$1,235');
+    expect(result).toBe('1,235');
+  });
+
+  it('formats negative number with leading minus sign', () => {
+    const result = currencyFormatter({
+      value: -1234.5,
+    } as ValueFormatterParams);
+    expect(result).toBe('-1,235');
   });
 
   it('formats zero as em-dash', () => {

@@ -301,7 +301,8 @@ export default function PayrollHoursListView(props: ListViewProps) {
         <AgGridWrapper
           gridRef={gridRef}
           colDefs={colDefs}
-          rowData={[...rawRows, ...totalsRow]}
+          rowData={rawRows}
+          pinnedBottomRowData={totalsRow}
           quickFilterText={query}
           pagination={false}
           getRowStyle={getRowStyle}

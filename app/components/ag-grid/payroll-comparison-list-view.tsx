@@ -59,10 +59,9 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
   return <AvatarRenderer {...props} />;
 }
 
-// Color-coded delta renderer: green positive, red negative, muted zero.
+// Delta renderer: signed value with arrow, no color coding.
 // Currency deltas defer to CurrencyRenderer for consistent app-wide
-// formatting (whole-dollar, parens for negatives) and only add color +
-// arrow on top. Hours deltas stay inline.
+// formatting. Hours deltas stay inline.
 function DeltaRenderer(
   props: CustomCellRendererProps & { format?: 'currency' | 'hours' },
 ) {
@@ -71,19 +70,12 @@ function DeltaRenderer(
   const n = Number(raw);
   if (!Number.isFinite(n)) return null;
   const isPinned = props.node.rowPinned === 'bottom';
-  const cls = isPinned
-    ? ''
-    : n > 0
-      ? 'text-emerald-600 dark:text-emerald-400'
-      : n < 0
-        ? 'text-red-600 dark:text-red-400'
-        : 'text-muted-foreground';
   const arrow = isPinned ? '' : n > 0 ? '▲' : n < 0 ? '▼' : '·';
 
   if (props.format === 'currency') {
     return (
       <div
-        className={`flex h-full w-full items-center ${cls} ${isPinned ? 'font-bold' : ''}`}
+        className={`flex h-full w-full items-center ${isPinned ? 'font-bold' : ''}`}
       >
         <CurrencyRenderer {...props} />
       </div>
@@ -93,7 +85,7 @@ function DeltaRenderer(
   const text = formatSignedHours(n);
   return (
     <div
-      className={`flex h-full w-full items-center justify-between text-sm ${cls} ${isPinned ? 'font-bold' : ''}`}
+      className={`flex h-full w-full items-center justify-between text-sm ${isPinned ? 'font-bold' : ''}`}
     >
       <span aria-hidden className="shrink-0">
         {arrow}
@@ -148,17 +140,17 @@ const deltaCol = (
 // vs prior period). No employee/department dimension.
 const byTaskColDefs: ColDef[] = [
   { field: 'task', headerName: 'Task', minWidth: 220, pinned: 'left' },
-  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
   numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
+  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
+  deltaCol('hours_delta', 'Δ Hours', 'hours'),
+  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
+  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
   numericCol('discretionary_overtime_hours', 'OT Hours', {
     formatter: hoursFormatter,
   }),
   numericCol('regular_pay', 'Regular Pay', { currency: true, width: 130 }),
-  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
-  deltaCol('hours_delta', 'Δ Hours', 'hours'),
   deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
   deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
-  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
 ];
 
 const AVATAR_COL: ColDef = {
@@ -187,17 +179,17 @@ const byEmployeeColDefs: ColDef[] = [
     minWidth: 220,
     pinned: 'left',
   },
-  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
   numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
+  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
+  deltaCol('hours_delta', 'Δ Hours', 'hours'),
+  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
+  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
   numericCol('discretionary_overtime_hours', 'OT Hours', {
     formatter: hoursFormatter,
   }),
   numericCol('regular_pay', 'Regular Pay', { currency: true, width: 130 }),
-  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
-  deltaCol('hours_delta', 'Δ Hours', 'hours'),
   deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
   deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
-  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
 ];
 
 export default function PayrollComparisonListView(props: ListViewProps) {
@@ -378,11 +370,9 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   );
 
   // by_task rows go through useDetailRow (which manages its own row inserts
-  // via grid transactions); append the TOTAL pin afterwards. by_employee
-  // keeps the original flat rows + TOTAL.
-  const rowData = isByEmployee
-    ? [...rows, ...totalsRow]
-    : [...rowDataWithDetails, ...totalsRow];
+  // via grid transactions); TOTAL is wired via pinnedBottomRowData so it
+  // stays anchored regardless of sort.
+  const rowData = isByEmployee ? rows : rowDataWithDetails;
 
   return (
     <div
@@ -396,6 +386,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
           gridRef={gridRef}
           colDefs={colDefs}
           rowData={rowData}
+          pinnedBottomRowData={totalsRow}
           quickFilterText={query}
           pagination={false}
           getRowStyle={getRowStyle}

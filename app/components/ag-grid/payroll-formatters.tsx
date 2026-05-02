@@ -29,11 +29,8 @@ export function CurrencyRenderer(props: CustomCellRendererProps) {
   const isNeg = value < 0;
 
   return (
-    <div className="flex h-full w-full items-center font-mono">
-      <span className="text-muted-foreground shrink-0">$</span>
-      <span className="flex-1 text-right">
-        {isNeg ? `(${formatted})` : formatted}
-      </span>
+    <div className="flex h-full w-full items-center justify-end font-mono">
+      {isNeg ? `-${formatted}` : formatted}
     </div>
   );
 }
@@ -45,8 +42,8 @@ export function currencyFormatter(params: ValueFormatterParams): string {
   const formatted = Math.abs(value).toLocaleString('en-US', {
     maximumFractionDigits: 0,
   });
-  if (value < 0) return `($${formatted})`;
-  return `$${formatted}`;
+  if (value < 0) return `-${formatted}`;
+  return formatted;
 }
 
 export function hoursFormatter(params: ValueFormatterParams): string {

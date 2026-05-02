@@ -1,14 +1,13 @@
 import type { ValueFormatterParams } from 'ag-grid-community';
 
-const usdFormat = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
+const numberFormat = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
+  signDisplay: 'negative',
 });
 
 /**
  * AG Grid valueFormatter for currency columns.
- * Formats numeric values as whole-dollar USD (e.g. 1234.5 -> '$1,235').
+ * Formats numeric values as whole numbers with thousands separators (e.g. 1234.5 -> '1,235', -50 -> '-50').
  * Returns empty string for null/undefined values, em-dash for zero.
  */
 export function currencyFormatter(params: ValueFormatterParams): string {
@@ -16,5 +15,5 @@ export function currencyFormatter(params: ValueFormatterParams): string {
   if (value == null) return '';
   const n = Number(value);
   if (n === 0) return '—';
-  return usdFormat.format(n);
+  return numberFormat.format(n);
 }

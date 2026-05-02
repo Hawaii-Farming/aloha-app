@@ -1,4 +1,4 @@
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, ValueFormatterParams } from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
 import { z } from 'zod';
 
@@ -37,6 +37,23 @@ const hours = (field: string, headerName: string): ColDef => ({
   valueFormatter: hoursFormatter,
 });
 
+const rateFormatter = (params: ValueFormatterParams): string => {
+  const value = params.value as number | null;
+  if (value == null) return '';
+  const n = Number(value);
+  if (n === 0) return '—';
+  return n.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+const wholeNumberFormatter = (params: ValueFormatterParams): string => {
+  const value = params.value as number | null;
+  if (value == null) return '';
+  return Math.round(Number(value)).toLocaleString('en-US');
+};
+
 const agGridColDefs: ColDef[] = [
   {
     field: 'employee_name',
@@ -52,8 +69,18 @@ const agGridColDefs: ColDef[] = [
     minWidth: 120,
   },
   { field: 'pay_structure', headerName: 'Pay Structure' },
-  currency('hourly_rate', 'Hourly Rate'),
-  hours('overtime_threshold', 'OT Threshold'),
+  {
+    field: 'hourly_rate',
+    headerName: 'Hourly Rate',
+    type: 'numericColumn',
+    valueFormatter: rateFormatter,
+  },
+  {
+    field: 'overtime_threshold',
+    headerName: 'OT Threshold',
+    type: 'numericColumn',
+    valueFormatter: wholeNumberFormatter,
+  },
   { field: 'payroll_id', headerName: 'Payroll ID', cellClass: 'font-mono' },
   {
     field: 'check_date',
