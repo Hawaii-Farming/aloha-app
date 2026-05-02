@@ -170,7 +170,17 @@ export default function HousingMapView(props: ListViewProps) {
   );
 
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    setTimeout(() => event.api.sizeColumnsToFit(), 20);
+    setTimeout(() => {
+      event.api.autoSizeAllColumns(false);
+      const cols = event.api.getColumns();
+      if (!cols) return;
+      const total = cols.reduce((sum, c) => sum + c.getActualWidth(), 0);
+      const viewport = document.querySelector(
+        '.ag-center-cols-viewport',
+      ) as HTMLElement | null;
+      const width = viewport?.clientWidth ?? 0;
+      if (width > 0 && total < width) event.api.sizeColumnsToFit();
+    }, 20);
   }, []);
 
   const getRowStyle = useCallback(

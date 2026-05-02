@@ -48,6 +48,26 @@ function useIsMobile() {
 const AG_GRID_MODULES: Module[] = [AllCommunityModule];
 const PAGE_SIZE_SELECTOR = [10, 25, 50, 100];
 
+// Auto-size columns to their content; if the total fits inside the grid,
+// flex-fill the remaining space so columns don't leave a blank gutter.
+function autoSizeThenFill(api: {
+  autoSizeAllColumns: (skipHeader?: boolean) => void;
+  sizeColumnsToFit: () => void;
+  getColumns: () => { getActualWidth: () => number }[] | null;
+}) {
+  api.autoSizeAllColumns(false);
+  const cols = api.getColumns();
+  if (!cols) return;
+  const total = cols.reduce((sum, c) => sum + c.getActualWidth(), 0);
+  // Read grid body width via DOM — AG Grid doesn't expose viewport width
+  // through the API. Falls back to no-op if not yet rendered.
+  const viewport = document.querySelector(
+    '.ag-center-cols-viewport',
+  ) as HTMLElement | null;
+  const width = viewport?.clientWidth ?? 0;
+  if (width > 0 && total < width) api.sizeColumnsToFit();
+}
+
 interface AgGridWrapperProps {
   colDefs: (ColDef | ColGroupDef)[];
   rowData: Record<string, unknown>[];
@@ -145,9 +165,11 @@ function AgGridInner({
           defaultState: { pinned: null },
         });
       }
-      // Fit columns to the grid width on mount
+      // Auto-size columns to fit their content (header + cell values).
+      // If the resulting total is narrower than the grid, expand the
+      // remainder proportionally so the table fills the viewport.
       setTimeout(() => {
-        event.api.sizeColumnsToFit();
+        autoSizeThenFill(event.api);
       }, 0);
     },
     [onGridReady, isMobile],
@@ -155,8 +177,15 @@ function AgGridInner({
 
   // Re-fit columns when the grid container resizes (e.g. sidebar toggle)
   const handleGridSizeChanged = useCallback(
-    (event: { api: { sizeColumnsToFit: () => void } }) => {
-      event.api.sizeColumnsToFit();
+    (event: {
+      api: {
+        autoSizeAllColumns: (skipHeader?: boolean) => void;
+        sizeColumnsToFit: () => void;
+        getColumns: () => { getActualWidth: () => number }[] | null;
+      };
+      clientWidth?: number;
+    }) => {
+      autoSizeThenFill(event.api);
     },
     [],
   );
@@ -166,9 +195,10 @@ function AgGridInner({
       resizable: true,
       sortable: true,
       filter: false,
-      // Wide enough for ~11 chars at 13px/700 ("Department", "Start Date")
-      // so single-word headers don't break mid-character.
-      minWidth: 130,
+      // Tight floor — autoSizeAllColumns sets actual widths from content;
+      // this is just a safety floor so unusually short columns don't
+      // collapse to nothing.
+      minWidth: 70,
       autoHeaderHeight: true,
       // Wrap header text onto two lines instead of clipping ("Start Date"
       // becomes "Start" / "Date" rather than "Start Da…"). Combined with
