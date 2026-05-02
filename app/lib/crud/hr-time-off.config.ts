@@ -93,9 +93,7 @@ const timeOffColDefs = [
       (c) => c.key !== 'subject_preferred_name' && c.key !== 'status',
     ),
   ).map((col) =>
-    col.field === 'request_reason'
-      ? { ...col, minWidth: 320, flex: 1 }
-      : col,
+    col.field === 'request_reason' ? { ...col, minWidth: 320, flex: 1 } : col,
   ),
   {
     headerName: 'Status',
@@ -181,8 +179,18 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       label: 'Start Date',
       type: 'date',
       required: true,
+      allowFutureDates: true,
+      pickerDefaultMonth: 'today',
+      defaultValue: 'today',
     },
-    { key: 'return_date', label: 'Return Date', type: 'date' },
+    {
+      key: 'return_date',
+      label: 'Return Date',
+      type: 'date',
+      allowFutureDates: true,
+      pickerDefaultMonth: 'today',
+      defaultValue: 'today',
+    },
     {
       key: 'pto_allocation',
       label: 'Time off allocation',

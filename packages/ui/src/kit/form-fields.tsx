@@ -181,9 +181,17 @@ export function FormDateField<T extends FieldValues = FieldValues>({
   disabled,
   required,
   defaultMonth,
-}: FormFieldProps<T> & { defaultMonth?: Date }) {
+  startMonth,
+  endMonth,
+}: FormFieldProps<T> & {
+  defaultMonth?: Date;
+  startMonth?: Date;
+  endMonth?: Date;
+}) {
   const [open, setOpen] = useState(false);
   const fallbackMonth = defaultMonth ?? new Date(1996, 0, 1);
+  const resolvedStartMonth = startMonth ?? new Date(1920, 0, 1);
+  const resolvedEndMonth = endMonth ?? new Date();
   return (
     <FormField
       control={control}
@@ -224,8 +232,8 @@ export function FormDateField<T extends FieldValues = FieldValues>({
                     ? parse(field.value, 'yyyy-MM-dd', new Date())
                     : fallbackMonth
                 }
-                startMonth={new Date(1920, 0, 1)}
-                endMonth={new Date()}
+                startMonth={resolvedStartMonth}
+                endMonth={resolvedEndMonth}
                 selected={
                   field.value
                     ? parse(field.value, 'yyyy-MM-dd', new Date())

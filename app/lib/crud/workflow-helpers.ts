@@ -21,7 +21,16 @@ export function buildDefaultValues(
 
     // Create mode: honor field-level defaultValue when present.
     if (record === null && field.defaultValue !== undefined) {
-      defaults[field.key] = field.defaultValue;
+      // Sentinel: 'today' resolves to current ISO date for date fields.
+      if (field.type === 'date' && field.defaultValue === 'today') {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        defaults[field.key] = `${yyyy}-${mm}-${dd}`;
+      } else {
+        defaults[field.key] = field.defaultValue;
+      }
       continue;
     }
 

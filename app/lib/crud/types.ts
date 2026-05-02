@@ -138,6 +138,9 @@ export interface FormFieldConfig {
   /** For type='date': month the calendar opens to when the field is empty.
    *  'today' opens to the current month, 'birth' (default) opens to Jan 1996. */
   pickerDefaultMonth?: 'today' | 'birth';
+  /** For type='date': allow selecting future dates. Defaults to false
+   *  (calendar caps at today, suitable for birthdates / past events). */
+  allowFutureDates?: boolean;
 }
 
 export interface WorkflowStateConfig {

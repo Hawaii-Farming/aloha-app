@@ -95,6 +95,11 @@ export function renderFormField({
           defaultMonth={
             field.pickerDefaultMonth === 'today' ? new Date() : undefined
           }
+          endMonth={
+            field.allowFutureDates
+              ? new Date(new Date().getFullYear() + 10, 11, 31)
+              : undefined
+          }
         />
       );
 
