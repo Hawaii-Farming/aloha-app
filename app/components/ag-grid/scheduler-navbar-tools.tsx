@@ -12,13 +12,12 @@ interface SchedulerNavbarToolsProps {
   onHistoryOpen: () => void;
 }
 
-// The slot is rendered by WorkspaceNavbar ahead of the Outlet, so it's
-// already in the DOM when the scheduler renders on the client. SSR returns
-// null (no document), which is fine since createPortal is client-only.
-function getNavbarFilterSlot(): HTMLElement | null {
-  return typeof document === 'undefined'
-    ? null
-    : document.getElementById('workspace-navbar-filter-slot');
+// Slots rendered by WorkspaceNavbar (desktop) and WorkspaceMobileHeader (mobile).
+// Both exist in the DOM at all viewports — their parent headers toggle
+// visibility via `hidden md:flex` / `md:hidden`. We portal into both so the
+// tools follow whichever header is visible.
+function getSlot(id: string): HTMLElement | null {
+  return typeof document === 'undefined' ? null : document.getElementById(id);
 }
 
 export function SchedulerNavbarTools({
@@ -28,10 +27,10 @@ export function SchedulerNavbarTools({
   onToday,
   onHistoryOpen,
 }: SchedulerNavbarToolsProps) {
-  const slot = getNavbarFilterSlot();
-  if (!slot) return null;
+  const desktopSlot = getSlot('workspace-navbar-filter-slot');
+  const mobileSlot = getSlot('workspace-mobile-header-filter-slot');
 
-  return createPortal(
+  const content = (
     <div className="flex items-center gap-2">
       {/* History button — FIRST (leftmost) */}
       <Button
@@ -77,7 +76,13 @@ export function SchedulerNavbarTools({
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
-    </div>,
-    slot,
+    </div>
+  );
+
+  return (
+    <>
+      {desktopSlot ? createPortal(content, desktopSlot) : null}
+      {mobileSlot ? createPortal(content, mobileSlot) : null}
+    </>
   );
 }
