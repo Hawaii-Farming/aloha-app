@@ -185,6 +185,7 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       fkLabelColumn: 'id',
       fkOrgScoped: false,
       fkOrderColumn: 'level',
+      fkExcludeValues: ['Admin', 'Owner'],
       required: true,
     },
     {

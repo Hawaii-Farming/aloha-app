@@ -72,6 +72,14 @@ export async function loadFormOptions(
       }
     }
 
+    if (field.fkExcludeValues && field.fkExcludeValues.length > 0) {
+      query = query.not(
+        'id',
+        'in',
+        `(${field.fkExcludeValues.map((v) => `"${v}"`).join(',')})`,
+      );
+    }
+
     const { data, error } = await query.order(orderCol).limit(200);
 
     if (error) {

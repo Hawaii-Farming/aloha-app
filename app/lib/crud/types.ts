@@ -121,6 +121,8 @@ export interface FormFieldConfig {
   /** Additional eq filters when loading FK options.
    *  e.g. { sys_access_level_id: 'manager' } */
   fkFilter?: Record<string, string>;
+  /** Exclude FK options whose id matches any value in this list. */
+  fkExcludeValues?: string[];
   /** For type='combobox': source table and column to pull distinct values from.
    *  Defaults to the config's own tableName and this field's key. */
   comboboxSource?: { table: string; column: string };
