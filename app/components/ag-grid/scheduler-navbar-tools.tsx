@@ -1,6 +1,12 @@
 import { createPortal } from 'react-dom';
 
-import { ChevronLeft, ChevronRight, History } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  History,
+  Loader2,
+} from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 
@@ -10,6 +16,8 @@ interface SchedulerNavbarToolsProps {
   onNext: () => void;
   onToday: () => void;
   onHistoryOpen: () => void;
+  onCopyFromPrev: () => void;
+  copyPending: boolean;
 }
 
 // Slots rendered by WorkspaceNavbar (desktop) and WorkspaceMobileHeader (mobile).
@@ -26,6 +34,8 @@ export function SchedulerNavbarTools({
   onNext,
   onToday,
   onHistoryOpen,
+  onCopyFromPrev,
+  copyPending,
 }: SchedulerNavbarToolsProps) {
   const desktopSlot = getSlot('workspace-navbar-filter-slot');
   const mobileSlot = getSlot('workspace-mobile-header-filter-slot');
@@ -76,6 +86,23 @@ export function SchedulerNavbarTools({
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
+
+      {/* Copy-from-prev-week button — THIRD (rightmost) */}
+      <Button
+        variant="outline"
+        onClick={onCopyFromPrev}
+        disabled={copyPending}
+        data-test="copy-from-prev-week"
+        aria-label="Copy previous week"
+        title="Copy previous week (only when current week is empty)"
+        className="h-9 w-9 rounded-full p-0"
+      >
+        {copyPending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
+      </Button>
     </div>
   );
 

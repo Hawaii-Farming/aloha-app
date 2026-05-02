@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useParams, useSearchParams } from 'react-router';
+import { useParams, useRevalidator, useSearchParams } from 'react-router';
 
 import type {
   ColDef,
@@ -24,6 +24,7 @@ import { Plus } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
+import { toast } from '@aloha/ui/sonner';
 
 import {
   useActiveTableSearch,
@@ -97,6 +98,8 @@ export default function SchedulerListView(props: ListViewProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [copyPending, setCopyPending] = useState(false);
+  const revalidator = useRevalidator();
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentWeek = searchParams.get('week') ?? getCurrentWeekStart();
@@ -124,6 +127,32 @@ export default function SchedulerListView(props: ListViewProps) {
   const handlePrev = useCallback(() => navigateWeek('prev'), [navigateWeek]);
   const handleNext = useCallback(() => navigateWeek('next'), [navigateWeek]);
   const handleToday = useCallback(() => navigateWeek('today'), [navigateWeek]);
+
+  const handleCopyFromPrev = useCallback(async () => {
+    setCopyPending(true);
+    try {
+      const res = await fetch('/api/scheduler/copy-from-prev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountSlug, weekStart: currentWeek }),
+      });
+      const json = (await res.json()) as {
+        success?: boolean;
+        copied?: number;
+        error?: string;
+      };
+      if (json.success) {
+        toast.success(`Copied ${json.copied ?? 0} entries from previous week`);
+        revalidator.revalidate();
+      } else {
+        toast.error(json.error ?? 'Failed to copy previous week');
+      }
+    } catch {
+      toast.error('Failed to copy previous week');
+    } finally {
+      setCopyPending(false);
+    }
+  }, [accountSlug, currentWeek, revalidator]);
 
   // Fetch history summary on mount
   // Justified: both tables render simultaneously, history needs its own data
@@ -301,6 +330,8 @@ export default function SchedulerListView(props: ListViewProps) {
           onNext={handleNext}
           onToday={handleToday}
           onHistoryOpen={() => setHistoryOpen(true)}
+          onCopyFromPrev={handleCopyFromPrev}
+          copyPending={copyPending}
         />
 
         {/* Weekly Schedule — full width */}
