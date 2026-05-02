@@ -17,6 +17,10 @@ const apiRoutes = [
   route('api/scheduler/create-weekly', 'routes/api/scheduler/create-weekly.ts'),
   route('api/housing-tenants', 'routes/api/housing-tenants.ts'),
   route('api/housing-rooms', 'routes/api/housing-rooms.ts'),
+  route('api/quickbooks/connect', 'routes/api/quickbooks/connect.ts'),
+  route('api/quickbooks/callback', 'routes/api/quickbooks/callback.ts'),
+  route('api/quickbooks/disconnect', 'routes/api/quickbooks/disconnect.ts'),
+  route('api/quickbooks/invoices', 'routes/api/quickbooks/invoices.ts'),
 ];
 
 const authRoutes = [route('auth/sign-out', 'routes/auth/sign-out.ts')];
