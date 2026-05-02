@@ -1,4 +1,5 @@
 import { opsTaskScheduleWeeklySchema } from '~/lib/crud/ops-task-schedule.schema';
+import { addDaysToDate } from '~/lib/scheduler/wallclock-time';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 
@@ -41,9 +42,8 @@ export const action = async ({ request }: { request: Request }) => {
     org_id: orgId,
     hr_employee_id: parsed.data.hr_employee_id,
     ops_task_id: entry.ops_task_id,
-    // Combine date + time into a local-time ISO string. The DB column is
-    // timestamptz; the existing single-entry path already submits the
-    // browser-local datetime-local string, so we follow that contract.
+    // DB columns are plain TIMESTAMP (wall-clock, no time zone). The
+    // value is stored verbatim as the user picked it.
     start_time: `${entry.date}T${entry.start_time}:00`,
     stop_time: `${entry.date}T${entry.stop_time}:00`,
     created_by: employeeId,
@@ -56,9 +56,7 @@ export const action = async ({ request }: { request: Request }) => {
   // insert (legacy create flow).
   if (parsed.data.weekStart) {
     const start = parsed.data.weekStart;
-    const endDate = new Date(`${start}T00:00:00`);
-    endDate.setDate(endDate.getDate() + 7);
-    const end = endDate.toISOString().split('T')[0];
+    const end = addDaysToDate(start, 7);
 
     const { error: clearError } = await client
       .from('ops_task_schedule')

@@ -1,4 +1,11 @@
 import { castRows } from '~/lib/crud/typed-query.server';
+import {
+  addDaysToDate,
+  dayOfWeekName,
+  diffHours,
+  extractDate,
+  extractHHmm,
+} from '~/lib/scheduler/wallclock-time';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
 export const loader = async ({ request }: { request: Request }) => {
@@ -30,9 +37,7 @@ export const loader = async ({ request }: { request: Request }) => {
       .eq('is_deleted', false);
 
     if (weekStart && /^\d{4}-\d{2}-\d{2}$/.test(weekStart)) {
-      const endDate = new Date(`${weekStart}T00:00:00`);
-      endDate.setDate(endDate.getDate() + 7);
-      const end = endDate.toISOString().split('T')[0];
+      const end = addDaysToDate(weekStart, 7);
       query = query
         .gte('start_time', `${weekStart}T00:00:00`)
         .lt('start_time', `${end}T00:00:00`);
@@ -51,40 +56,11 @@ export const loader = async ({ request }: { request: Request }) => {
     const enriched = rows.map((row) => {
       const start = row.start_time as string | null;
       const stop = row.stop_time as string | null;
-      let hours: number | null = null;
-      let dayOfWeek = '';
-      let dateStr = '';
-
-      if (start) {
-        const startDate = new Date(start);
-        dayOfWeek = startDate.toLocaleDateString('en-US', {
-          weekday: 'short',
-        });
-        dateStr = startDate.toISOString().split('T')[0] ?? '';
-
-        if (stop) {
-          const stopDate = new Date(stop);
-          hours =
-            Math.round(
-              ((stopDate.getTime() - startDate.getTime()) / 3600000) * 100,
-            ) / 100;
-        }
-      }
-
-      const startTime = start
-        ? new Date(start).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          })
-        : '';
-      const endTime = stop
-        ? new Date(stop).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          })
-        : '';
+      const dateStr = extractDate(start);
+      const dayOfWeek = dateStr ? dayOfWeekName(dateStr) : '';
+      const hours = diffHours(start, stop);
+      const startTime = extractHHmm(start);
+      const endTime = extractHHmm(stop);
 
       const emp = row.hr_employee as Record<string, unknown> | null | undefined;
       const dept = emp?.hr_department as
@@ -142,9 +118,9 @@ export const loader = async ({ request }: { request: Request }) => {
       const stop = row.stop_time as string | null;
       const empId = row.hr_employee_id as string;
 
-      if (!start) continue;
+      const dateKey = extractDate(start);
+      if (!dateKey) continue;
 
-      const dateKey = new Date(start).toISOString().split('T')[0] ?? '';
       const entry = byDate.get(dateKey) ?? {
         employees: new Set<string>(),
         totalHours: 0,
@@ -152,9 +128,8 @@ export const loader = async ({ request }: { request: Request }) => {
 
       entry.employees.add(empId);
 
-      if (stop) {
-        const hours =
-          (new Date(stop).getTime() - new Date(start).getTime()) / 3600000;
+      const hours = diffHours(start, stop);
+      if (hours !== null) {
         entry.totalHours += hours;
       }
 

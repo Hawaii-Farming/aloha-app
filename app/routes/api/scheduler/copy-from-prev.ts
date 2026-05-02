@@ -1,3 +1,7 @@
+import {
+  addDaysToDate,
+  addDaysWallclock,
+} from '~/lib/scheduler/wallclock-time';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 
@@ -37,13 +41,9 @@ export const action = async ({ request }: { request: Request }) => {
   const employeeId = workspace.currentOrg.employee_id;
   const orgId = workspace.currentOrg.org_id;
 
-  const currentStart = new Date(`${weekStart}T00:00:00`);
-  const currentEnd = new Date(currentStart);
-  currentEnd.setDate(currentEnd.getDate() + 7);
-  const prevStart = new Date(currentStart);
-  prevStart.setDate(prevStart.getDate() - 7);
-
-  const isoDate = (d: Date) => d.toISOString().split('T')[0];
+  const currentStartDate = weekStart;
+  const currentEndDate = addDaysToDate(weekStart, 7);
+  const prevStartDate = addDaysToDate(weekStart, -7);
 
   // Guard: current week must be empty (RLS-scoped — only sees what user can see).
   const { count: currentCount, error: currentErr } = await client
@@ -51,8 +51,8 @@ export const action = async ({ request }: { request: Request }) => {
     .select('id', { count: 'exact', head: true })
     .eq('org_id', orgId)
     .eq('is_deleted', false)
-    .gte('start_time', `${isoDate(currentStart)}T00:00:00`)
-    .lt('start_time', `${isoDate(currentEnd)}T00:00:00`);
+    .gte('start_time', `${currentStartDate}T00:00:00`)
+    .lt('start_time', `${currentEndDate}T00:00:00`);
 
   if (currentErr) {
     return Response.json(
@@ -76,8 +76,8 @@ export const action = async ({ request }: { request: Request }) => {
     )
     .eq('org_id', orgId)
     .eq('is_deleted', false)
-    .gte('start_time', `${isoDate(prevStart)}T00:00:00`)
-    .lt('start_time', `${isoDate(currentStart)}T00:00:00`);
+    .gte('start_time', `${prevStartDate}T00:00:00`)
+    .lt('start_time', `${currentStartDate}T00:00:00`);
 
   if (prevErr) {
     return Response.json(
@@ -93,12 +93,7 @@ export const action = async ({ request }: { request: Request }) => {
     );
   }
 
-  const shift = (ts: string | null) => {
-    if (!ts) return null;
-    const d = new Date(ts);
-    d.setDate(d.getDate() + 7);
-    return d.toISOString();
-  };
+  const shift = (ts: string | null) => (ts ? addDaysWallclock(ts, 7) : null);
 
   const rows = prevRows.map((r) => ({
     org_id: orgId,

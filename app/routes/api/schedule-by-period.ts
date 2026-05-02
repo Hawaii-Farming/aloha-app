@@ -1,4 +1,10 @@
 import { castRows } from '~/lib/crud/typed-query.server';
+import {
+  dayOfWeekName,
+  diffHours,
+  extractDate,
+  extractHHmm,
+} from '~/lib/scheduler/wallclock-time';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 
 export const loader = async ({ request }: { request: Request }) => {
@@ -38,35 +44,11 @@ export const loader = async ({ request }: { request: Request }) => {
   const enriched = rows.map((row) => {
     const start = row.start_time as string | null;
     const stop = row.stop_time as string | null;
-    let hours: number | null = null;
-    let dayOfWeek = '';
-    let dateStr = '';
-    let startTimeFormatted = '';
-    let endTimeFormatted = '';
-
-    if (start) {
-      const startDate = new Date(start);
-      dayOfWeek = startDate.toLocaleDateString('en-US', { weekday: 'short' });
-      dateStr = startDate.toISOString().split('T')[0] ?? '';
-      startTimeFormatted = startDate.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-
-      if (stop) {
-        const stopDate = new Date(stop);
-        hours =
-          Math.round(
-            ((stopDate.getTime() - startDate.getTime()) / 3600000) * 100,
-          ) / 100;
-        endTimeFormatted = stopDate.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        });
-      }
-    }
+    const dateStr = extractDate(start);
+    const dayOfWeek = dateStr ? dayOfWeekName(dateStr) : '';
+    const startTimeFormatted = extractHHmm(start);
+    const endTimeFormatted = extractHHmm(stop);
+    const hours = diffHours(start, stop);
 
     const emp = row.hr_employee as Record<string, unknown> | null | undefined;
     const dept = emp?.hr_department as

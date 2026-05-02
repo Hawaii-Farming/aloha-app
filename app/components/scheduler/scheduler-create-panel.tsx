@@ -29,6 +29,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 import { toast } from '@aloha/ui/sonner';
 import { cn } from '@aloha/ui/utils';
 
+import { dayOfWeekIndex, extractHHmm } from '~/lib/scheduler/wallclock-time';
+
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, '0'),
 );
@@ -199,21 +201,10 @@ function buildDefaults(currentWeek: string): WeeklyFormValues {
   };
 }
 
-function extractHHmm(iso: string | null | undefined): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mm = String(d.getMinutes()).padStart(2, '0');
-  return `${hh}:${mm}`;
-}
-
 function getWeekStartFromDate(dateStr: string): string {
-  const d = new Date(`${dateStr}T00:00:00`);
-  const dow = d.getDay();
-  const start = new Date(d);
-  start.setDate(d.getDate() - dow);
-  return format(start, 'yyyy-MM-dd');
+  const dow = dayOfWeekIndex(dateStr);
+  if (dow < 0) return dateStr;
+  return format(addDays(parseISO(dateStr), -dow), 'yyyy-MM-dd');
 }
 
 // Inline (live) row error — only shown while user is editing the row.
@@ -356,7 +347,7 @@ export function SchedulerCreatePanel({
           // In edit mode the API already restricted rows to currentWeek.
           for (const row of rows) {
             if (!row.date) continue;
-            const dow = new Date(`${row.date}T00:00:00`).getDay();
+            const dow = dayOfWeekIndex(row.date);
             if (dow < 0 || dow > 6) continue;
             const day = seeded[dow];
             if (!day) continue;
