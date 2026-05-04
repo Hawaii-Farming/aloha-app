@@ -3115,7 +3115,6 @@ export type Database = {
           hr_work_authorization_id: string | null
           id: string
           is_deleted: boolean
-          is_manager: boolean
           is_primary_org: boolean
           last_name: string
           org_id: string
@@ -3151,7 +3150,6 @@ export type Database = {
           hr_work_authorization_id?: string | null
           id: string
           is_deleted?: boolean
-          is_manager?: boolean
           is_primary_org?: boolean
           last_name: string
           org_id: string
@@ -3187,7 +3185,6 @@ export type Database = {
           hr_work_authorization_id?: string | null
           id?: string
           is_deleted?: boolean
-          is_manager?: boolean
           is_primary_org?: boolean
           last_name?: string
           org_id?: string
@@ -10331,7 +10328,6 @@ export type Database = {
           discretionary_overtime_hours: number | null
           discretionary_overtime_pay: number | null
           hr_employee_id: string | null
-          is_manager: boolean | null
           org_id: string | null
           regular_hours: number | null
           regular_pay: number | null
