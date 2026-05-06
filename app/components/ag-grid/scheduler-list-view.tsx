@@ -75,6 +75,16 @@ function getCurrentWeekStart(): string {
   return format(startOfWeek(new Date(), { weekStartsOn: 0 }), 'yyyy-MM-dd');
 }
 
+function lastNameKey(value: unknown): string {
+  const name = String(value ?? '')
+    .trim()
+    .toLowerCase();
+  if (!name) return '';
+  const parts = name.split(/\s+/);
+  // Sort key: "lastname firstname…" so ties on last name fall back to first.
+  return [parts[parts.length - 1], ...parts.slice(0, -1)].join(' ');
+}
+
 function formatWeekLabel(weekStartStr: string): string {
   const weekStart = parseISO(weekStartStr);
   const weekEnd = addDays(weekStart, 6);
@@ -311,9 +321,7 @@ export default function SchedulerListView(props: ListViewProps) {
         sortable: true,
         sort: 'asc' as const,
         comparator: (a: unknown, b: unknown) =>
-          String(a ?? '')
-            .toLowerCase()
-            .localeCompare(String(b ?? '').toLowerCase()),
+          lastNameKey(a).localeCompare(lastNameKey(b)),
       },
       {
         headerName: 'Task',
