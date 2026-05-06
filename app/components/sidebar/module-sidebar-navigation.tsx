@@ -243,9 +243,20 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                       >
                         {children.map((sm, subIndex) => {
                           const subModulePath = `/home/${account}/${sm.module_slug}/${sm.sub_module_slug}`;
+                          // "Payroll Data" is hidden from the sidebar and
+                          // merged under "Payroll Comp"'s 3-way toggle —
+                          // treat its route as belonging to the Payroll
+                          // entry so the sidebar still highlights.
+                          const aliasPath =
+                            sm.sub_module_slug === 'Payroll Comp'
+                              ? `/home/${account}/${sm.module_slug}/Payroll Data`
+                              : null;
                           const isActive =
                             currentPath === subModulePath ||
-                            currentPath.startsWith(subModulePath + '/');
+                            currentPath.startsWith(subModulePath + '/') ||
+                            (aliasPath != null &&
+                              (currentPath === aliasPath ||
+                                currentPath.startsWith(aliasPath + '/')));
 
                           return (
                             <Link
