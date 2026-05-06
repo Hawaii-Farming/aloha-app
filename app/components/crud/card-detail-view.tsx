@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { useFetcher, useNavigate } from 'react-router';
 
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, X } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -405,9 +405,13 @@ export function CardDetailView({
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label="Edit"
+                  title="Edit"
+                  className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:w-auto sm:rounded-md sm:px-3"
                   onClick={() => setEditOpen(true)}
                 >
-                  Edit
+                  <Pencil className="h-4 w-4 sm:mr-1.5" />
+                  <span className="hidden sm:inline">Edit</span>
                 </Button>
               </AccessGate>
             )}
@@ -423,8 +427,12 @@ export function CardDetailView({
                       size="sm"
                       disabled={isDeleting}
                       data-test="cancel-request"
+                      aria-label="Cancel Request"
+                      title="Cancel Request"
+                      className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:w-auto sm:rounded-md sm:px-3"
                     >
-                      Cancel Request
+                      <X className="h-4 w-4 sm:mr-1.5" />
+                      <span className="hidden sm:inline">Cancel Request</span>
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -453,9 +461,16 @@ export function CardDetailView({
             <AccessGate permission="can_delete">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm" disabled={isDeleting}>
-                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                    Delete
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={isDeleting}
+                    aria-label="Delete"
+                    title="Delete"
+                    className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:w-auto sm:rounded-md sm:px-3"
+                  >
+                    <Trash2 className="h-4 w-4 sm:mr-1.5 sm:h-3.5 sm:w-3.5" />
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

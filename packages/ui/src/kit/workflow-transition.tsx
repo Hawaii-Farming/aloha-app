@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { Check, Circle, X } from 'lucide-react';
+
 import { Button } from '../shadcn/button';
 import {
   Dialog,
@@ -63,23 +65,32 @@ export function WorkflowTransitionButtons({
 
   return (
     <div className="flex gap-2" data-test="workflow-transitions">
-      {validNextStates.map((nextState) => (
-        <Button
-          key={nextState}
-          variant="outline"
-          size="sm"
-          disabled={disabled}
-          onClick={() => {
-            setPromptValue('');
-            setConfirmStatus(nextState);
-          }}
-        >
-          <Trans
-            i18nKey={states[nextState]?.label ?? nextState}
-            defaults={states[nextState]?.label ?? nextState}
-          />
-        </Button>
-      ))}
+      {validNextStates.map((nextState) => {
+        const color = states[nextState]?.color;
+        const Icon =
+          color === 'success' ? Check : color === 'destructive' ? X : Circle;
+        const label = states[nextState]?.label ?? nextState;
+        return (
+          <Button
+            key={nextState}
+            variant="outline"
+            size="sm"
+            disabled={disabled}
+            aria-label={label}
+            title={label}
+            className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:h-9 sm:w-auto sm:rounded-md sm:px-3"
+            onClick={() => {
+              setPromptValue('');
+              setConfirmStatus(nextState);
+            }}
+          >
+            <Icon className="h-4 w-4 sm:mr-1.5" />
+            <span className="hidden sm:inline">
+              <Trans i18nKey={label} defaults={label} />
+            </span>
+          </Button>
+        );
+      })}
 
       <Dialog
         open={!!confirmStatus}
