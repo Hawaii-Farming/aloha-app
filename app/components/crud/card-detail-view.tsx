@@ -396,15 +396,17 @@ export function CardDetailView({
               </AccessGate>
             )}
 
-            <AccessGate permission="can_edit">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setEditOpen(true)}
-              >
-                Edit
-              </Button>
-            </AccessGate>
+            {formFields.some((f) => f.showOnEdit !== false) && (
+              <AccessGate permission="can_edit">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditOpen(true)}
+                >
+                  Edit
+                </Button>
+              </AccessGate>
+            )}
 
             <AccessGate permission="can_delete">
               <AlertDialog>
