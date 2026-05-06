@@ -46,14 +46,20 @@ export async function action({ request }: Route.ActionArgs) {
       sourceFilename: request.headers.get('x-sps-filename'),
     });
 
+    let status: 'applied' | 'queued_unmapped' | 'parse_error';
+    if (result.salesPoId) status = 'applied';
+    else if (!result.salesTradingPartnerId) status = 'queued_unmapped';
+    else status = 'parse_error';
+
     return Response.json(
       {
         inboundMessageId: result.inboundMessageId,
         salesTradingPartnerId: result.salesTradingPartnerId,
         tradingPartnerId: result.tradingPartnerId,
         documentType: result.documentType,
-        // The parser runs separately; this row is queued via parsed_at IS NULL.
-        status: result.salesTradingPartnerId ? 'queued' : 'queued_unmapped',
+        salesPoId: result.salesPoId ?? null,
+        parseError: result.parseError ?? null,
+        status,
       },
       { status: 202 },
     );

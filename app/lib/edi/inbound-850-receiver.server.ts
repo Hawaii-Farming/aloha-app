@@ -12,6 +12,8 @@
  */
 import { XMLParser } from 'fast-xml-parser';
 
+import { EdiApplyError, apply850 } from '~/lib/edi/apply-850.server';
+import { parse850 } from '~/lib/edi/parse-850.server';
 import { getSupabaseServerAdminClient } from '~/lib/supabase/clients/server-admin-client.server';
 
 const ALLOWED_DOC_TYPES = new Set(['850', '860']); // 850=PO, 860=PO change
@@ -108,6 +110,11 @@ export type ArchiveResult = {
   tradingPartnerId: string;
   salesTradingPartnerId: string | null;
   documentType: string;
+  /** Set when the parser ran successfully and a sales_po was upserted. */
+  salesPoId?: string;
+  /** Set when the parser ran but failed; the inbound row's parse_error
+   *  is populated for replay. */
+  parseError?: string;
 };
 
 /**
@@ -190,11 +197,44 @@ export async function archiveInbound850(
     .single();
   if (error) throw new Error(`Insert failed: ${error.message}`);
 
+  // Archive succeeded; now run the field-level parser + applier in the
+  // same request so the sales_po lands immediately. Wrapped in try/catch
+  // so a parser failure doesn't bubble up as a 5xx -- we record
+  // parse_error on the inbound row and the operator replays via
+  // /api/edi/process-pending after fixing master data.
+  let salesPoId: string | undefined;
+  let parseError: string | undefined;
+  try {
+    const parsed = parse850(rawBody);
+    const applied = await apply850(parsed);
+    await supabase
+      .from('sales_edi_inbound_message')
+      .update({
+        parsed_at: new Date().toISOString(),
+        sales_po_id: applied.sales_po_id,
+        parse_error: null,
+      })
+      .eq('id', data.id);
+    salesPoId = applied.sales_po_id;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    parseError = msg;
+    if (!(err instanceof EdiApplyError)) {
+      console.error('[edi/inbound-850] unexpected parse failure:', err);
+    }
+    await supabase
+      .from('sales_edi_inbound_message')
+      .update({ parse_error: msg })
+      .eq('id', data.id);
+  }
+
   return {
     inboundMessageId: data.id,
     orgId: data.org_id,
     tradingPartnerId,
     salesTradingPartnerId: partner.id,
     documentType,
+    salesPoId,
+    parseError,
   };
 }
