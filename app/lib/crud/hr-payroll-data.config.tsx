@@ -1,5 +1,6 @@
 import type { ColDef, ValueFormatterParams } from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
+import { Check, X } from 'lucide-react';
 import { z } from 'zod';
 
 import { DatePillRenderer } from '~/components/ag-grid/cell-renderers/pill-renderer';
@@ -29,6 +30,20 @@ function HoursRenderer(props: CustomCellRendererProps) {
   return (
     <div className="flex h-full w-full items-center justify-end font-mono">
       {isNeg ? `-${formatted}` : formatted}
+    </div>
+  );
+}
+
+function BoolRenderer(props: CustomCellRendererProps) {
+  const value = props.value as boolean | null;
+  if (value == null) return null;
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      {value ? (
+        <Check className="text-primary h-4 w-4" aria-label="Yes" />
+      ) : (
+        <X className="text-muted-foreground h-4 w-4" aria-label="No" />
+      )}
     </div>
   );
 }
@@ -122,6 +137,12 @@ const agGridColDefs: ColDef[] = [
     valueFormatter: wholeNumberFormatter,
   },
   { field: 'payroll_id', headerName: 'Payroll ID', cellClass: 'font-mono' },
+  {
+    field: 'is_standard',
+    headerName: 'Standard',
+    cellRenderer: BoolRenderer,
+    maxWidth: 110,
+  },
   {
     field: 'check_date',
     headerName: 'Check Date',
