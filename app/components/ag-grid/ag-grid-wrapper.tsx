@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   CellClassParams,
+  CellClickedEvent,
   ColDef,
   ColGroupDef,
   ColumnMovedEvent,
@@ -74,6 +75,7 @@ interface AgGridWrapperProps {
   pinnedBottomRowData?: Record<string, unknown>[];
   quickFilterText?: string;
   onRowClicked?: (event: RowClickedEvent) => void;
+  onCellClicked?: (event: CellClickedEvent) => void;
   isFullWidthRow?: (params: IsFullWidthRowParams) => boolean;
   fullWidthCellRenderer?: ComponentType<ICellRendererParams>;
   getRowId?: (params: GetRowIdParams) => string;
@@ -114,6 +116,7 @@ function AgGridInner({
   pinnedBottomRowData,
   quickFilterText,
   onRowClicked,
+  onCellClicked,
   isFullWidthRow,
   fullWidthCellRenderer,
   getRowId,
@@ -288,6 +291,7 @@ function AgGridInner({
           animateRows={false}
           suppressRowClickSelection={suppressRowClickSelection ?? true}
           onRowClicked={onRowClicked}
+          onCellClicked={onCellClicked}
           isFullWidthRow={isFullWidthRow}
           fullWidthCellRenderer={fullWidthCellRenderer}
           getRowId={getRowId}

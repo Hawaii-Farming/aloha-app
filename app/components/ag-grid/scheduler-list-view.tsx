@@ -179,14 +179,7 @@ export default function SchedulerListView(props: ListViewProps) {
   }, [fetchHistorySummary]);
 
   const handleDeleteEmployeeWeek = useCallback(
-    async (employeeId: string, employeeName: string) => {
-      const confirmed = window.confirm(
-        `Delete ${employeeName}'s schedule for the week of ${format(
-          parseISO(currentWeek),
-          'MMM d, yyyy',
-        )}?`,
-      );
-      if (!confirmed) return;
+    async (employeeId: string, _employeeName: string) => {
       try {
         const res = await fetch('/api/scheduler/delete-week', {
           method: 'POST',
@@ -238,8 +231,9 @@ export default function SchedulerListView(props: ListViewProps) {
     setCreateOpen(true);
   }, []);
 
-  const handleRowClicked = useCallback(
-    (event: { data?: RowData }) => {
+  const handleCellClicked = useCallback(
+    (event: { data?: RowData; column?: { getColId: () => string } }) => {
+      if (event.column?.getColId() === 'delete') return;
       const empId = event.data?.hr_employee_id as string | undefined;
       if (!empId) return;
       handleEditRow(empId);
@@ -434,7 +428,7 @@ export default function SchedulerListView(props: ListViewProps) {
             rowClassRules={otWarningRowClassRules}
             pagination={false}
             quickFilterText={query}
-            onRowClicked={handleRowClicked}
+            onCellClicked={handleCellClicked}
             onGridReady={handleGridReady}
             onColumnMoved={handleColumnMoved}
             onColumnResized={handleColumnResized}
