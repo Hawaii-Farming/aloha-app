@@ -30,6 +30,14 @@ const colorVariantMap: Record<
   secondary: 'secondary',
 };
 
+const dotColorMap: Record<WorkflowColor, string> = {
+  default: 'bg-stone-400',
+  success: 'bg-emerald-500',
+  warning: 'bg-amber-500',
+  destructive: 'bg-red-500',
+  secondary: 'bg-stone-400',
+};
+
 interface StatusConfig {
   label: string;
   color: WorkflowColor;
@@ -51,12 +59,25 @@ export function WorkflowStatusBadge({
   }
 
   return (
-    <Badge
-      variant={colorVariantMap[config.color]}
-      className={cn(colorClassMap[config.color])}
-      data-test={`status-badge-${status}`}
-    >
-      <Trans i18nKey={config.label} defaults={config.label} />
-    </Badge>
+    <>
+      {/* Mobile: just the colored dot (with aria/title for context) */}
+      <span
+        className={cn(
+          'inline-block h-2.5 w-2.5 shrink-0 rounded-full sm:hidden',
+          dotColorMap[config.color],
+        )}
+        aria-label={config.label}
+        title={config.label}
+        data-test={`status-badge-${status}`}
+      />
+      {/* sm+: full text pill */}
+      <Badge
+        variant={colorVariantMap[config.color]}
+        className={cn('hidden sm:inline-flex', colorClassMap[config.color])}
+        data-test={`status-badge-${status}-text`}
+      >
+        <Trans i18nKey={config.label} defaults={config.label} />
+      </Badge>
+    </>
   );
 }

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { useFetcher, useNavigate } from 'react-router';
 
-import { ArrowLeft, Pencil, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Ban, Pencil, Trash2 } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -431,7 +431,7 @@ export function CardDetailView({
                       title="Cancel Request"
                       className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:w-auto sm:rounded-md sm:px-3"
                     >
-                      <X className="h-4 w-4 sm:mr-1.5" />
+                      <Ban className="h-4 w-4 sm:mr-1.5" />
                       <span className="hidden sm:inline">Cancel Request</span>
                     </Button>
                   </AlertDialogTrigger>
