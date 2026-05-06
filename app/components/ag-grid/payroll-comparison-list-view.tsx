@@ -137,6 +137,16 @@ const deltaCol = (
 // vs prior period). No employee/department dimension.
 const byTaskColDefs: ColDef[] = [
   { field: 'task', headerName: 'Task', minWidth: 220, pinned: 'left' },
+  {
+    field: 'hr_work_authorization_id',
+    headerName: 'Work Auth',
+    minWidth: 120,
+  },
+  {
+    field: 'compensation_manager_name',
+    headerName: 'Comp Manager',
+    minWidth: 160,
+  },
   numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
   numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
   deltaCol('hours_delta', 'Δ Hours', 'hours'),
