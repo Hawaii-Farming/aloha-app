@@ -45,13 +45,13 @@ export function SchedulerNavbarTools({
 
   const content = (
     <div className="flex items-center gap-2">
-      {/* History button — FIRST (leftmost) — desktop only */}
+      {/* History button — FIRST (leftmost) */}
       <Button
         variant="outline"
         onClick={onHistoryOpen}
         data-test="history-toggle"
         aria-label="History"
-        className="hidden h-9 w-9 rounded-full p-0 md:inline-flex"
+        className="h-9 w-9 rounded-full p-0"
       >
         <History className="h-4 w-4" />
       </Button>
@@ -107,14 +107,14 @@ export function SchedulerNavbarTools({
         )}
       </Button>
 
-      {/* Print button — FOURTH (rightmost) — desktop only */}
+      {/* Print button — FOURTH (rightmost) */}
       <Button
         variant="outline"
         onClick={onPrint}
         data-test="print-schedule"
         aria-label="Print schedule"
         title="Print schedule"
-        className="hidden h-9 w-9 rounded-full p-0 md:inline-flex"
+        className="h-9 w-9 rounded-full p-0"
       >
         <Printer className="h-4 w-4" />
       </Button>
