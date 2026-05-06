@@ -569,9 +569,24 @@ export default function HousingDetailView({
           )}
 
           {tenants.length === 0 ? (
-            <p className="text-muted-foreground px-6 py-4 text-sm">
-              No tenants currently assigned.
-            </p>
+            <div className="flex flex-col items-start gap-3 px-6 py-4">
+              <p className="text-muted-foreground text-sm">
+                No tenants currently assigned.
+              </p>
+              <AccessGate permission="can_edit">
+                {availableBeds > 0 && (
+                  <Button
+                    variant="brand"
+                    size="sm"
+                    onClick={() => setAssignOpen(true)}
+                    data-test="housing-assign-empty-state"
+                  >
+                    <Plus className="mr-1.5 h-4 w-4" />
+                    Assign tenant
+                  </Button>
+                )}
+              </AccessGate>
+            </div>
           ) : (
             <div className="bg-card flex min-h-0 flex-1 flex-col">
               <TenantsGrid
@@ -583,21 +598,6 @@ export default function HousingDetailView({
           )}
         </div>
       </div>
-
-      {/* Floating "Assign tenant" FAB — hidden when no beds available */}
-      <AccessGate permission="can_edit">
-        {availableBeds > 0 && (
-          <Button
-            variant="brand"
-            aria-label="Assign tenant"
-            data-test="housing-assign-fab"
-            onClick={() => setAssignOpen(true)}
-            className="fixed right-10 bottom-10 z-30 h-14 w-14 rounded-full p-0 shadow-lg"
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
-        )}
-      </AccessGate>
 
       {/*
         Keying on assignOpen forces the panel to remount each time it
