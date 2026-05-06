@@ -44,21 +44,21 @@ export function SchedulerNavbarTools({
   const mobileSlot = getSlot('workspace-mobile-header-filter-slot');
 
   const content = (
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 items-center gap-1.5 lg:gap-2">
       {/* History button — FIRST (leftmost) */}
       <Button
         variant="outline"
         onClick={onHistoryOpen}
         data-test="history-toggle"
         aria-label="History"
-        className="h-9 w-9 rounded-full p-0"
+        className="h-9 w-9 shrink-0 rounded-full p-0"
       >
         <History className="h-4 w-4" />
       </Button>
 
       {/* Week navigator pill — SECOND */}
       <div
-        className="border-border bg-background inline-flex items-center overflow-hidden rounded-full border"
+        className="border-border bg-background inline-flex shrink-0 items-center overflow-hidden rounded-full border"
         data-test="week-navigator"
       >
         <button
@@ -74,10 +74,11 @@ export function SchedulerNavbarTools({
           type="button"
           onClick={onToday}
           title="Jump to current week"
-          className="text-foreground hover:bg-muted border-border border-x px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
+          className="text-foreground hover:bg-muted border-border border-x px-2 py-1.5 text-xs font-medium whitespace-nowrap transition-colors lg:px-3"
           data-test="week-nav-today"
         >
-          {weekLabel}
+          <span className="lg:hidden">Today</span>
+          <span className="hidden lg:inline">{weekLabel}</span>
         </button>
         <button
           type="button"
@@ -98,7 +99,7 @@ export function SchedulerNavbarTools({
         data-test="copy-from-prev-week"
         aria-label="Copy previous week"
         title="Copy previous week (only when current week is empty)"
-        className="h-9 w-9 rounded-full p-0"
+        className="h-9 w-9 shrink-0 rounded-full p-0"
       >
         {copyPending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -114,7 +115,7 @@ export function SchedulerNavbarTools({
         data-test="print-schedule"
         aria-label="Print schedule"
         title="Print schedule"
-        className="h-9 w-9 rounded-full p-0"
+        className="h-9 w-9 shrink-0 rounded-full p-0"
       >
         <Printer className="h-4 w-4" />
       </Button>

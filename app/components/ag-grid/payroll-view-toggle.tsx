@@ -15,17 +15,26 @@ import { cn } from '@aloha/ui/utils';
 
 type PayrollView = 'data' | 'by_task' | 'by_employee';
 
-function useNavbarFilterSlot(): HTMLElement | null {
-  const [el, setEl] = useState<HTMLElement | null>(null);
+function useNavbarFilterSlots(): {
+  desktop: HTMLElement | null;
+  mobile: HTMLElement | null;
+} {
+  const [slots, setSlots] = useState<{
+    desktop: HTMLElement | null;
+    mobile: HTMLElement | null;
+  }>({ desktop: null, mobile: null });
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot portal target lookup on mount
-    setEl(document.getElementById('workspace-navbar-filter-slot'));
+    setSlots({
+      desktop: document.getElementById('workspace-navbar-filter-slot'),
+      mobile: document.getElementById('workspace-mobile-header-filter-slot'),
+    });
   }, []);
-  return el;
+  return slots;
 }
 
 export function PayrollViewToggle() {
-  const slot = useNavbarFilterSlot();
+  const { desktop: desktopSlot, mobile: mobileSlot } = useNavbarFilterSlots();
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
@@ -54,8 +63,6 @@ export function PayrollViewToggle() {
     }
   };
 
-  if (!slot) return null;
-
   const segmentClass = (active: boolean) =>
     cn(
       'flex h-9 w-9 items-center justify-center rounded-full transition-colors',
@@ -64,9 +71,9 @@ export function PayrollViewToggle() {
         : 'text-muted-foreground hover:text-foreground hover:bg-muted',
     );
 
-  return createPortal(
+  const content = (
     <div
-      className="border-border bg-background inline-flex h-10 items-center rounded-full border p-0.5"
+      className="border-border bg-background inline-flex h-10 shrink-0 items-center rounded-full border p-0.5"
       data-test="payroll-view-toggle"
       role="group"
       aria-label="Payroll view"
@@ -101,7 +108,13 @@ export function PayrollViewToggle() {
       >
         <User className="h-4 w-4" />
       </button>
-    </div>,
-    slot,
+    </div>
+  );
+
+  return (
+    <>
+      {desktopSlot ? createPortal(content, desktopSlot) : null}
+      {mobileSlot ? createPortal(content, mobileSlot) : null}
+    </>
   );
 }

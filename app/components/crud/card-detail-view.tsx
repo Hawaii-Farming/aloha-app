@@ -343,7 +343,7 @@ export function CardDetailView({
               className="text-muted-foreground hover:text-foreground flex shrink-0 items-center gap-2 text-sm transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden lg:inline">Back</span>
+              <span className="hidden sm:inline">Back</span>
             </button>
 
             <div className="bg-border h-5 w-px" />
@@ -411,11 +411,11 @@ export function CardDetailView({
                   size="sm"
                   aria-label="Edit"
                   title="Edit"
-                  className="aspect-square h-9 w-9 rounded-full p-0 lg:aspect-auto lg:w-auto lg:rounded-md lg:px-3"
+                  className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:w-auto sm:rounded-md sm:px-3"
                   onClick={() => setEditOpen(true)}
                 >
-                  <Pencil className="h-4 w-4 lg:mr-1.5" />
-                  <span className="hidden lg:inline">Edit</span>
+                  <Pencil className="h-4 w-4 sm:mr-1.5" />
+                  <span className="hidden sm:inline">Edit</span>
                 </Button>
               </AccessGate>
             )}
@@ -433,10 +433,10 @@ export function CardDetailView({
                       data-test="cancel-request"
                       aria-label="Cancel Request"
                       title="Cancel Request"
-                      className="aspect-square h-9 w-9 rounded-full p-0 lg:aspect-auto lg:w-auto lg:rounded-md lg:px-3"
+                      className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:w-auto sm:rounded-md sm:px-3"
                     >
-                      <Ban className="h-4 w-4 lg:mr-1.5" />
-                      <span className="hidden lg:inline">Cancel Request</span>
+                      <Ban className="h-4 w-4 sm:mr-1.5" />
+                      <span className="hidden sm:inline">Cancel Request</span>
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -471,10 +471,10 @@ export function CardDetailView({
                     disabled={isDeleting}
                     aria-label="Delete"
                     title="Delete"
-                    className="aspect-square h-9 w-9 rounded-full p-0 lg:aspect-auto lg:w-auto lg:rounded-md lg:px-3"
+                    className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:w-auto sm:rounded-md sm:px-3"
                   >
-                    <Trash2 className="h-4 w-4 lg:mr-1.5 lg:h-3.5 lg:w-3.5" />
-                    <span className="hidden lg:inline">Delete</span>
+                    <Trash2 className="h-4 w-4 sm:mr-1.5 sm:h-3.5 sm:w-3.5" />
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

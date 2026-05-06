@@ -41,22 +41,32 @@ interface NavbarFilterButtonProps {
   testKey?: string;
 }
 
-// Resolve the navbar slot once on mount. The slot is rendered by
-// WorkspaceNavbar and is stable for the lifetime of the shell.
-function useNavbarFilterSlot(): HTMLElement | null {
-  const [el, setEl] = useState<HTMLElement | null>(null);
+// Resolve both navbar slots (desktop + mobile) once on mount. The slots are
+// rendered by WorkspaceNavbar / WorkspaceMobileHeader and toggle visibility via
+// CSS — portaling into both keeps filters visible at every viewport.
+function useNavbarFilterSlots(): {
+  desktop: HTMLElement | null;
+  mobile: HTMLElement | null;
+} {
+  const [slots, setSlots] = useState<{
+    desktop: HTMLElement | null;
+    mobile: HTMLElement | null;
+  }>({ desktop: null, mobile: null });
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot portal target lookup on mount
-    setEl(document.getElementById('workspace-navbar-filter-slot'));
+    setSlots({
+      desktop: document.getElementById('workspace-navbar-filter-slot'),
+      mobile: document.getElementById('workspace-mobile-header-filter-slot'),
+    });
   }, []);
-  return el;
+  return slots;
 }
 
 export function NavbarFilterButton({
   filters,
   testKey = 'navbar-filter',
 }: NavbarFilterButtonProps) {
-  const slot = useNavbarFilterSlot();
+  const { desktop: desktopSlot, mobile: mobileSlot } = useNavbarFilterSlots();
 
   const activeFilters = filters.filter((f) => f.value !== '');
   const activeCount = activeFilters.length;
@@ -76,25 +86,26 @@ export function NavbarFilterButton({
     }
   };
 
-  if (!slot) return null;
-
   // Single-filter case: render the Select directly in the navbar slot
   // instead of nesting it inside a "Filters" popover. Matches the
   // 3-way toggle visual rhythm and removes a wasted click.
   if (filters.length === 1) {
     const f = filters[0]!;
-    return createPortal(
+    const single = (
       <Select
         value={f.value || 'all'}
         onValueChange={(v) => f.onChange(v === 'all' ? '' : v)}
       >
         <SelectTrigger
-          className="h-10 min-w-[12rem] gap-2 rounded-full px-4 text-sm font-medium tabular-nums"
+          className="h-10 shrink-0 gap-2 rounded-full px-3 text-sm font-medium tabular-nums lg:min-w-[12rem] lg:px-4"
           data-test={`${testKey}-${f.key}`}
           aria-label={f.label}
+          title={f.label}
         >
           <SlidersHorizontal className="h-4 w-4 shrink-0" />
-          <SelectValue placeholder={f.allLabel ?? `All ${f.label}`} />
+          <span className="hidden truncate lg:inline">
+            <SelectValue placeholder={f.allLabel ?? `All ${f.label}`} />
+          </span>
         </SelectTrigger>
         <SelectContent className="tabular-nums">
           <SelectItem value="all">{f.allLabel ?? `All ${f.label}`}</SelectItem>
@@ -104,12 +115,17 @@ export function NavbarFilterButton({
             </SelectItem>
           ))}
         </SelectContent>
-      </Select>,
-      slot,
+      </Select>
+    );
+    return (
+      <>
+        {desktopSlot ? createPortal(single, desktopSlot) : null}
+        {mobileSlot ? createPortal(single, mobileSlot) : null}
+      </>
     );
   }
 
-  return createPortal(
+  const multi = (
     <Popover>
       <PopoverTrigger asChild>
         <Button
@@ -180,7 +196,13 @@ export function NavbarFilterButton({
           ))}
         </div>
       </PopoverContent>
-    </Popover>,
-    slot,
+    </Popover>
+  );
+
+  return (
+    <>
+      {desktopSlot ? createPortal(multi, desktopSlot) : null}
+      {mobileSlot ? createPortal(multi, mobileSlot) : null}
+    </>
   );
 }
