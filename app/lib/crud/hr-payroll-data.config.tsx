@@ -130,7 +130,7 @@ const agGridColDefs: ColDef[] = [
   { field: 'payroll_id', headerName: 'Payroll ID', cellClass: 'font-mono' },
   {
     field: 'is_standard',
-    headerName: 'Standard',
+    headerName: 'Is Standard',
     valueFormatter: boolFormatter,
     maxWidth: 110,
   },
