@@ -251,13 +251,31 @@ export default function SchedulerListView(props: ListViewProps) {
 
   const handlePrint = useCallback(() => {
     const api = gridRef.current?.api;
+
+    // Snapshot the user's current sort so we can restore after print.
+    const previousSort = api?.getColumnState().map((c) => ({
+      colId: c.colId,
+      sort: c.sort ?? null,
+      sortIndex: c.sortIndex ?? null,
+    }));
+
     document.body.classList.add('print-schedule');
     api?.setColumnsVisible(['profile_photo_url', 'delete'], false);
+    api?.applyColumnState({
+      state: [{ colId: 'full_name', sort: 'asc', sortIndex: 0 }],
+      defaultState: { sort: null },
+    });
     api?.setGridOption('domLayout', 'print');
 
     const cleanup = () => {
       api?.setGridOption('domLayout', 'normal');
       api?.setColumnsVisible(['profile_photo_url', 'delete'], true);
+      if (previousSort) {
+        api?.applyColumnState({
+          state: previousSort,
+          defaultState: { sort: null },
+        });
+      }
       document.body.classList.remove('print-schedule');
       window.removeEventListener('afterprint', cleanup);
     };
