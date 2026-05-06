@@ -12,6 +12,8 @@ import {
 import { Badge } from '@aloha/ui/badge';
 import { Separator } from '@aloha/ui/separator';
 
+import { formatDate } from '~/lib/format/date';
+
 interface TimeOffDetailRowProps {
   data: Record<string, unknown>;
 }
@@ -22,15 +24,6 @@ function getInitials(fullName: string): string {
     return `${parts[0]![0]!.toUpperCase()}${parts[parts.length - 1]![0]!.toUpperCase()}`;
   }
   return fullName.slice(0, 2).toUpperCase();
-}
-
-function formatDate(value: string): string {
-  const d = new Date(value);
-  return d.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
 }
 
 function StatusIcon({ status }: { status: string }) {

@@ -28,27 +28,9 @@ import type {
 } from '~/lib/crud/types';
 import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
 import type { WorkflowHistoryEntry } from '~/lib/crud/workflow-helpers';
+import { stateDotClass } from '~/lib/crud/workflow-state-color';
+import { formatDate, formatDateTime } from '~/lib/format/date';
 import { AccessGate } from '~/lib/workspace/access-gate';
-
-function formatDate(value: string): string {
-  const d = new Date(value);
-  return d.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
-function formatDateTime(value: string): string {
-  const d = new Date(value);
-  return d.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-}
 
 function getInitials(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
@@ -223,14 +205,6 @@ function getRecordSubtitle(
   return null;
 }
 
-const STATE_DOT_CLASS: Record<string, string> = {
-  default: 'bg-stone-400',
-  success: 'bg-emerald-500',
-  warning: 'bg-amber-500',
-  destructive: 'bg-red-500',
-  secondary: 'bg-stone-400',
-};
-
 function WorkflowInline({ entries }: { entries: WorkflowHistoryEntry[] }) {
   if (entries.length === 0) return null;
   return (
@@ -241,9 +215,7 @@ function WorkflowInline({ entries }: { entries: WorkflowHistoryEntry[] }) {
           className="flex items-start gap-2 last:after:hidden"
         >
           <span
-            className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-              STATE_DOT_CLASS[entry.color ?? 'default']
-            }`}
+            className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${stateDotClass(entry.color)}`}
           />
           <div>
             <div className="text-foreground text-sm font-medium">
@@ -541,9 +513,7 @@ export function CardDetailView({
                     </h2>
                     <div className="flex items-start gap-2">
                       <span
-                        className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
-                          STATE_DOT_CLASS[currentStateColor]
-                        }`}
+                        className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${stateDotClass(currentStateColor)}`}
                       />
                       <div>
                         <div className="text-foreground text-sm font-medium">

@@ -16,7 +16,12 @@ export type DetailViewType = 'card' | 'workspace' | 'custom';
 /** Same-table self-join (string) or cross-table lookup (object).
  *  String form looks up the FK in the config's own tableName.
  *  Object form looks up in a different table; each displayField is
- *  written back as `{fkColumn}_{displayField}`. */
+ *  written back as `{fkColumn}_{displayField}`.
+ *
+ *  ⚠️ Both forms assume the lookup table's primary key is named `id`.
+ *  resolveSelfJoins selects `id, ...displayFields` and filters with
+ *  `.in('id', refIds)`. If a lookup table uses a different PK column,
+ *  this won't work. */
 export type SelfJoinSpec = string | { table: string; displayFields: string[] };
 
 export interface ListViewProps {
@@ -71,7 +76,7 @@ type FormFieldType =
   | 'fk'
   | 'pto-allocation';
 
-type WorkflowColor =
+export type WorkflowColor =
   | 'default'
   | 'success'
   | 'warning'

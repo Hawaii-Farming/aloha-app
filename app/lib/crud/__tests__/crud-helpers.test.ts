@@ -167,3 +167,202 @@ describe('loadTableData filter validation', () => {
     expect(nameCall).toBeDefined();
   });
 });
+
+// ============================================================
+// resolveSelfJoins (via loadTableData) — cross-table lookup behavior
+// ============================================================
+
+interface SelfJoinFixture {
+  /** Rows the main `viewName` query returns. */
+  mainRows: Record<string, unknown>[];
+  /** Lookup table → rows returned for the .in('id', ...) call against it. */
+  lookups: Record<string, Record<string, unknown>[]>;
+}
+
+/** Mock that routes `from(table)` to either the main result or a per-table
+ *  lookup based on the simple-call sequence resolveSelfJoins makes:
+ *    .from(table).select('id, ...').in('id', [...])
+ *  ...resolving with the rows configured for that table. */
+function createSelfJoinMock(fixture: SelfJoinFixture) {
+  const calls: { method: string; args: unknown[]; table?: string }[] = [];
+  const fromSeen: string[] = [];
+
+  function makeChain(table: string) {
+    const chain: Record<string, (...args: unknown[]) => unknown> = {};
+    const passthrough = ['select', 'eq', 'is', 'not', 'or', 'ilike', 'order'];
+
+    for (const method of passthrough) {
+      chain[method] = (...args: unknown[]) => {
+        calls.push({ method, args, table });
+        return chain;
+      };
+    }
+
+    chain.in = (...args: unknown[]) => {
+      calls.push({ method: 'in', args, table });
+      // The lookup queries terminate in `.in('id', [...])` and are awaited
+      // directly. Resolve with the configured fixture rows for that table.
+      return Promise.resolve({
+        data: fixture.lookups[table] ?? [],
+        error: null,
+      });
+    };
+
+    chain.range = (...args: unknown[]) => {
+      // The main viewName query terminates in `.range(from, to)`.
+      calls.push({ method: 'range', args, table });
+      return Promise.resolve({
+        data: fixture.mainRows,
+        count: fixture.mainRows.length,
+        error: null,
+      });
+    };
+
+    return chain;
+  }
+
+  const client = {
+    from: (table: string) => {
+      fromSeen.push(table);
+      calls.push({ method: 'from', args: [table], table });
+      return makeChain(table);
+    },
+  };
+
+  return {
+    client: client as unknown as SupabaseClient<Database>,
+    calls,
+    fromSeen,
+  };
+}
+
+describe('resolveSelfJoins (via loadTableData)', () => {
+  it('enriches rows with cross-table display fields', async () => {
+    const { client } = createSelfJoinMock({
+      mainRows: [
+        { id: 'r1', subject_compensation_manager_id: 'pavao_peter' },
+        { id: 'r2', subject_compensation_manager_id: null },
+      ],
+      lookups: {
+        hr_employee: [
+          { id: 'pavao_peter', first_name: 'Peter', last_name: 'Pavao' },
+        ],
+      },
+    });
+
+    const loadTableData = await getLoadTableData();
+    const result = await loadTableData<Record<string, unknown>>({
+      client,
+      viewName: 'hr_time_off_request',
+      orgId: 'acme',
+      searchParams: new URLSearchParams(),
+      selfJoins: {
+        subject_compensation_manager_id: {
+          table: 'hr_employee',
+          displayFields: ['first_name', 'last_name'],
+        },
+      },
+    });
+
+    expect(result.data[0]!.subject_compensation_manager_id_first_name).toBe(
+      'Peter',
+    );
+    expect(result.data[0]!.subject_compensation_manager_id_last_name).toBe(
+      'Pavao',
+    );
+    // Null FK -> null enrichment
+    expect(result.data[1]!.subject_compensation_manager_id_first_name).toBe(
+      null,
+    );
+  });
+
+  it('batches multiple selfJoins targeting the same table into one query', async () => {
+    const { client, fromSeen } = createSelfJoinMock({
+      mainRows: [
+        {
+          id: 'r1',
+          requested_by: 'karen',
+          reviewed_by: 'pavao_peter',
+          subject_compensation_manager_id: 'pavao_peter',
+        },
+      ],
+      lookups: {
+        hr_employee: [
+          { id: 'karen', first_name: 'Karen', last_name: 'Martins' },
+          { id: 'pavao_peter', first_name: 'Peter', last_name: 'Pavao' },
+        ],
+      },
+    });
+
+    const loadTableData = await getLoadTableData();
+    await loadTableData<Record<string, unknown>>({
+      client,
+      viewName: 'hr_time_off_request',
+      orgId: 'acme',
+      searchParams: new URLSearchParams(),
+      selfJoins: {
+        requested_by: {
+          table: 'hr_employee',
+          displayFields: ['first_name', 'last_name'],
+        },
+        reviewed_by: {
+          table: 'hr_employee',
+          displayFields: ['first_name', 'last_name'],
+        },
+        subject_compensation_manager_id: {
+          table: 'hr_employee',
+          displayFields: ['first_name', 'last_name'],
+        },
+      },
+    });
+
+    // One call to from('hr_time_off_request') for the main query, and
+    // exactly ONE call to from('hr_employee') for the bundled lookup.
+    const employeeQueries = fromSeen.filter((t) => t === 'hr_employee');
+    expect(employeeQueries).toHaveLength(1);
+  });
+
+  it('writes null for unmatched FK ids', async () => {
+    const { client } = createSelfJoinMock({
+      mainRows: [{ id: 'r1', requested_by: 'unknown_id' }],
+      lookups: { hr_employee: [] },
+    });
+
+    const loadTableData = await getLoadTableData();
+    const result = await loadTableData<Record<string, unknown>>({
+      client,
+      viewName: 'hr_time_off_request',
+      orgId: 'acme',
+      searchParams: new URLSearchParams(),
+      selfJoins: {
+        requested_by: {
+          table: 'hr_employee',
+          displayFields: ['first_name', 'last_name'],
+        },
+      },
+    });
+
+    expect(result.data[0]!.requested_by_first_name).toBe(null);
+    expect(result.data[0]!.requested_by_last_name).toBe(null);
+  });
+
+  it('still supports the legacy string spec (same-table self-join)', async () => {
+    const { client } = createSelfJoinMock({
+      mainRows: [{ id: 'a', compensation_manager_id: 'b' }],
+      lookups: {
+        hr_employee: [{ id: 'b', preferred_name: 'Pete' }],
+      },
+    });
+
+    const loadTableData = await getLoadTableData();
+    const result = await loadTableData<Record<string, unknown>>({
+      client,
+      viewName: 'hr_employee',
+      orgId: 'acme',
+      searchParams: new URLSearchParams(),
+      selfJoins: { compensation_manager_id: 'preferred_name' },
+    });
+
+    expect(result.data[0]!.compensation_manager_id_preferred_name).toBe('Pete');
+  });
+});

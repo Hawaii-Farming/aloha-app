@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import type { CrudModuleConfig } from '~/lib/crud/types';
+import type { CrudModuleConfig, FormFieldConfig } from '~/lib/crud/types';
 import type { Database } from '~/lib/database.types';
 
 import { castRows } from './typed-query.server';
@@ -37,15 +37,22 @@ export async function loadFormOptions(
     return { fkOptions, comboboxOptions };
   }
 
+  // Display-only fields (e.g. cross-table selfJoin lookups carried in
+  // formFields purely for the detail view) never appear in forms. Skip
+  // their FK/combobox lookups so we don't burn a roundtrip per page load.
+  const isDisplayOnly = (f: FormFieldConfig) =>
+    f.showOnCreate === false && f.showOnEdit === false;
+
   const fkFields = (config.formFields ?? []).filter(
     (f) =>
+      !isDisplayOnly(f) &&
       f.type === 'fk' &&
       f.fkTable &&
       (f.fkLabelColumn || (f.fkLabelColumns && f.fkLabelColumns.length > 0)),
   );
 
   const comboboxFields = (config.formFields ?? []).filter(
-    (f) => f.type === 'combobox',
+    (f) => !isDisplayOnly(f) && f.type === 'combobox',
   );
 
   // Load all FK and combobox queries in parallel. allSettled means a single

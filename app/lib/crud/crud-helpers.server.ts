@@ -32,6 +32,12 @@ export function flattenRow(
   return flat;
 }
 
+// `selfJoins` and the table/field names it carries are developer config,
+// not user input — never feed user-supplied strings into a SelfJoinSpec.
+// The lookup queries below interpolate `group.table` and the display
+// field names directly into PostgREST `from()` and `select()` calls.
+//
+// Assumes every lookup target uses `id` as its primary key.
 async function resolveSelfJoins(
   client: SupabaseClient<Database>,
   tableName: string,
