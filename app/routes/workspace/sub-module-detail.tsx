@@ -159,6 +159,37 @@ export const action = async (args: {
     return result;
   }
 
+  if (body.intent === 'assign_tenant' || body.intent === 'unassign_tenant') {
+    const ids: string[] = Array.isArray(body.tenantIds)
+      ? body.tenantIds.filter(
+          (v: unknown): v is string => typeof v === 'string' && v.length > 0,
+        )
+      : typeof body.tenantId === 'string' && body.tenantId.length > 0
+        ? [body.tenantId]
+        : [];
+
+    if (ids.length === 0) {
+      return { success: false, error: 'tenantId(s) required' };
+    }
+
+    const housingId = body.intent === 'assign_tenant' ? recordId : null;
+
+    const { error } = await client
+      .from('hr_employee')
+      .update({
+        housing_id: housingId,
+        updated_by: workspace.currentOrg.employee_id,
+      })
+      .eq('org_id', accountSlug)
+      .in('id', ids);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, count: ids.length };
+  }
+
   if (body.intent === 'transition') {
     const result = await crudTransitionAction({
       client,

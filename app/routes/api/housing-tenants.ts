@@ -8,9 +8,45 @@ export const loader = async ({ request }: { request: Request }) => {
   const url = new URL(request.url);
   const siteId = url.searchParams.get('siteId');
   const orgId = url.searchParams.get('orgId');
+  const available = url.searchParams.get('available');
 
-  if (!siteId || !orgId) {
-    return new Response('siteId and orgId are required', { status: 400 });
+  if (!orgId) {
+    return new Response('orgId is required', { status: 400 });
+  }
+
+  // Eligible-employee picker for the "Assign tenant" drawer:
+  //   - Currently employed (end_date NULL or in the future)
+  //   - Not currently housed anywhere (housing_id IS NULL — strict, no
+  //     double-counting across houses)
+  // Stricter than the inverse of org_site_housing_tenants on purpose:
+  // we don't want to assign housing to former employees that still carry
+  // a stale housing_id (would be a data-cleanup artefact, not a free bed).
+  if (available === 'true') {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await client
+      .from('hr_employee')
+      .select('id, first_name, last_name, preferred_name')
+      .eq('org_id', orgId)
+      .eq('is_deleted', false)
+      .is('housing_id', null)
+      .or(`end_date.is.null,end_date.gt.${today}`)
+      .order('last_name');
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    const result = (data ?? []).map((e) => {
+      const display =
+        (e.preferred_name && e.preferred_name.trim()) ||
+        `${e.first_name ?? ''} ${e.last_name ?? ''}`.trim();
+      return { id: e.id, full_name: display };
+    });
+    return Response.json({ data: result });
+  }
+
+  if (!siteId) {
+    return new Response('siteId is required', { status: 400 });
   }
 
   // org_site_housing_tenants already filters to active assignments
