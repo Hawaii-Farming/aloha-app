@@ -338,7 +338,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   }, []);
 
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    restoreColumnState('payroll_comparison_v2', event.api);
+    restoreColumnState('payroll_comparison_v3', event.api);
   }, []);
 
   const debouncedSaveState = useCallback((api: GridApi) => {
@@ -346,7 +346,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       clearTimeout(saveDebounceRef.current);
     }
     saveDebounceRef.current = setTimeout(() => {
-      saveColumnState('payroll_comparison_v2', api);
+      saveColumnState('payroll_comparison_v3', api);
     }, 300);
   }, []);
 
