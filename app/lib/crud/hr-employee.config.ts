@@ -27,6 +27,7 @@ const hrEmployeeSchema = z
     payroll_processor: z.string().optional(),
     pay_delivery_method: z.string().optional(),
     housing_id: z.string().optional(),
+    is_deleted: z.boolean().optional(),
   })
   .superRefine((val, ctx) => {
     const wa = val.hr_work_authorization_id;
@@ -38,6 +39,17 @@ const hrEmployeeSchema = z
         message: 'Housing is required for this work authorization',
       });
     }
+  })
+  .transform((val) => {
+    // Auto-mark inactive when the end date is in the past. Form-supplied
+    // value still wins when end_date is empty or in the future.
+    if (val.end_date) {
+      const today = new Date().toISOString().slice(0, 10);
+      if (val.end_date < today) {
+        return { ...val, is_deleted: true };
+      }
+    }
+    return val;
   });
 
 export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
@@ -266,6 +278,14 @@ export const hrEmployeeConfig: CrudModuleConfig<typeof hrEmployeeSchema> = {
       type: 'fk',
       fkTable: 'org_site_housing',
       fkLabelColumn: 'id',
+    },
+
+    // --- Status ---
+    {
+      key: 'is_deleted',
+      label: 'Inactive',
+      type: 'boolean',
+      section: 'Status',
     },
   ],
 
