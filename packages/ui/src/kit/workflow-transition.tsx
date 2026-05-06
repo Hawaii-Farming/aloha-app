@@ -41,6 +41,7 @@ export function WorkflowTransitionButtons({
         <Button
           key={nextState}
           variant="outline"
+          size="sm"
           disabled={disabled}
           onClick={() => setConfirmStatus(nextState)}
         >

@@ -55,6 +55,23 @@ export function buildHistoryEntries(
     return [];
   }
 
+  const currentStatus = record[workflow.statusColumn] as string | undefined;
+
+  // Group statuses by their `at` field. When multiple statuses share the
+  // same column (e.g. Approved + Denied both write `reviewed_at`), only
+  // the current status reflects what actually happened — emitting both
+  // would duplicate the same timestamp under two different actions.
+  const statusesByAtField = new Map<string, string[]>();
+  for (const [status, fields] of Object.entries(workflow.transitionFields)) {
+    const atField = Object.entries(fields).find(
+      ([_key, value]) => value === 'now',
+    )?.[0];
+    if (!atField) continue;
+    const list = statusesByAtField.get(atField) ?? [];
+    list.push(status);
+    statusesByAtField.set(atField, list);
+  }
+
   const entries: WorkflowHistoryEntry[] = [];
 
   for (const [status, fields] of Object.entries(workflow.transitionFields)) {
@@ -65,14 +82,17 @@ export function buildHistoryEntries(
       ([_key, value]) => value === 'currentEmployee',
     )?.[0];
 
-    if (atField && record[atField]) {
-      entries.push({
-        action: workflow.states[status]?.label ?? status,
-        at: record[atField] as string,
-        by: byField ? (record[byField] as string | null) : null,
-        color: workflow.states[status]?.color,
-      });
-    }
+    if (!atField || !record[atField]) continue;
+
+    const sharedWith = statusesByAtField.get(atField) ?? [];
+    if (sharedWith.length > 1 && status !== currentStatus) continue;
+
+    entries.push({
+      action: workflow.states[status]?.label ?? status,
+      at: record[atField] as string,
+      by: byField ? (record[byField] as string | null) : null,
+      color: workflow.states[status]?.color,
+    });
   }
 
   entries.sort((a, b) => new Date(a.at!).getTime() - new Date(b.at!).getTime());
