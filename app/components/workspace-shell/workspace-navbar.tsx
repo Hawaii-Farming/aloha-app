@@ -88,7 +88,7 @@ export function WorkspaceNavbar({
           className="flex min-w-0 items-center gap-2 justify-self-start"
         />
 
-        <div className="hidden w-[clamp(12rem,40vw,28rem)] justify-self-center md:flex">
+        <div className="hidden w-[clamp(10rem,28vw,28rem)] min-w-0 justify-self-center xl:flex">
           <NavbarSearch
             items={searchItems}
             variant="desktop"
