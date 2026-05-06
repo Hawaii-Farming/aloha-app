@@ -51,8 +51,22 @@ export function buildHistoryEntries(
   record: Record<string, unknown>,
   workflow: WorkflowConfig,
 ): WorkflowHistoryEntry[] {
+  const entries: WorkflowHistoryEntry[] = [];
+
+  if (workflow.initialEntry) {
+    const { state, atField, byField } = workflow.initialEntry;
+    if (record[atField]) {
+      entries.push({
+        action: workflow.states[state]?.label ?? state,
+        at: record[atField] as string,
+        by: byField ? (record[byField] as string | null) : null,
+        color: workflow.states[state]?.color,
+      });
+    }
+  }
+
   if (!workflow.transitionFields) {
-    return [];
+    return entries;
   }
 
   const currentStatus = record[workflow.statusColumn] as string | undefined;
@@ -71,8 +85,6 @@ export function buildHistoryEntries(
     list.push(status);
     statusesByAtField.set(atField, list);
   }
-
-  const entries: WorkflowHistoryEntry[] = [];
 
   for (const [status, fields] of Object.entries(workflow.transitionFields)) {
     const atField = Object.entries(fields).find(

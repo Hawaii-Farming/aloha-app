@@ -161,6 +161,13 @@ export interface WorkflowConfig {
   states: Record<string, WorkflowStateConfig>;
   transitions: Record<string, string[]>;
   transitionFields?: Record<string, WorkflowTransitionFields>;
+  /** Synthetic history entry for the initial state (e.g. Pending) sourced
+   *  from creation columns like requested_at/requested_by. */
+  initialEntry?: {
+    state: string;
+    atField: string;
+    byField?: string;
+  };
 }
 
 export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {

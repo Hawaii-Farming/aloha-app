@@ -256,6 +256,11 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
         reviewed_at: 'now',
       },
     },
+    initialEntry: {
+      state: 'Pending',
+      atField: 'requested_at',
+      byField: 'requested_by',
+    },
   },
 
   additionalCreateFields: {
