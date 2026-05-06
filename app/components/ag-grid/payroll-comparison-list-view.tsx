@@ -195,11 +195,11 @@ const byEmployeeColDefs: ColDef[] = [
   deltaCol('hours_delta', 'Δ Hours', 'hours'),
   numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
   deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
-  numericCol('discretionary_overtime_hours', 'OT Hours', {
+  numericCol('discretionary_overtime_hours', 'Disc OT Hours', {
     formatter: hoursFormatter,
   }),
   deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
-  deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
+  deltaCol('discretionary_overtime_pay_delta', 'Δ Disc OT Pay', 'currency'),
 ];
 
 export default function PayrollComparisonListView(props: ListViewProps) {
