@@ -167,11 +167,26 @@ export interface WorkflowTransitionFields {
   [field: string]: 'now' | 'currentEmployee';
 }
 
+export interface WorkflowTransitionPrompt {
+  /** Column on the underlying table that receives the entered value. */
+  field: string;
+  /** Label shown above the textarea in the confirm dialog. */
+  label: string;
+  placeholder?: string;
+  /** When true, the dialog's Confirm button stays disabled until the
+   *  user enters a non-empty trimmed value. Defaults to true. */
+  required?: boolean;
+}
+
 export interface WorkflowConfig {
   statusColumn: string;
   states: Record<string, WorkflowStateConfig>;
   transitions: Record<string, string[]>;
   transitionFields?: Record<string, WorkflowTransitionFields>;
+  /** Per-target-state prompts that collect a free-form value (e.g. denial
+   *  reason) inside the workflow confirm dialog. The value is sent as
+   *  extraFields[field] alongside the transition. */
+  transitionPrompts?: Record<string, WorkflowTransitionPrompt>;
   /** Synthetic history entry for the initial state (e.g. Pending) sourced
    *  from creation columns like requested_at/requested_by. */
   initialEntry?: {

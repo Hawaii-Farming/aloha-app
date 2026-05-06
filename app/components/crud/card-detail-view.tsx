@@ -266,15 +266,18 @@ export function CardDetailView({
   }, [fetcher]);
 
   const handleTransition = useCallback(
-    (newStatus: string) => {
+    (newStatus: string, extraFields?: Record<string, unknown>) => {
       if (!workflowConfig) return;
-      const payload: Record<string, string | Record<string, string> | null> = {
+      const payload: Record<string, unknown> = {
         intent: 'transition',
         statusColumn: workflowConfig.statusColumn,
         newStatus,
         transitionFields: workflowConfig.transitionFields?.[newStatus] ?? null,
       };
-      fetcher.submit(payload, {
+      if (extraFields && Object.keys(extraFields).length > 0) {
+        payload.extraFields = extraFields;
+      }
+      fetcher.submit(JSON.stringify(payload), {
         method: 'POST',
         encType: 'application/json',
       });
@@ -390,6 +393,7 @@ export function CardDetailView({
                   currentStatus={record[workflowConfig.statusColumn] as string}
                   transitions={workflowConfig.transitions}
                   states={workflowConfig.states}
+                  transitionPrompts={workflowConfig.transitionPrompts}
                   onTransition={handleTransition}
                   disabled={fetcher.state !== 'idle'}
                 />

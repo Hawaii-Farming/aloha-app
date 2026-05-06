@@ -323,6 +323,14 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
         reviewed_at: 'now',
       },
     },
+    transitionPrompts: {
+      Denied: {
+        field: 'denial_reason',
+        label: 'Denial Reason',
+        placeholder: 'Enter reason for denial...',
+        required: true,
+      },
+    },
     initialEntry: {
       state: 'Pending',
       atField: 'requested_at',
