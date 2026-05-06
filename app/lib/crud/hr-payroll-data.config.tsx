@@ -3,11 +3,54 @@ import type { CustomCellRendererProps } from 'ag-grid-react';
 import { z } from 'zod';
 
 import { DatePillRenderer } from '~/components/ag-grid/cell-renderers/pill-renderer';
-import {
-  CurrencyRenderer,
-  hoursFormatter,
-} from '~/components/ag-grid/payroll-formatters';
 import type { CrudModuleConfig } from '~/lib/crud/types';
+
+// Show decimals only when the value actually has them: 8 → "8",
+// 8.5 → "8.5", 8.25 → "8.25". Two-decimal cap matches payroll rounding.
+function smartDecimal(value: number): string {
+  return Math.abs(value).toLocaleString('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+}
+
+function HoursRenderer(props: CustomCellRendererProps) {
+  const value = props.value as number | null;
+  if (value == null) return null;
+  if (value === 0) {
+    return (
+      <div className="text-muted-foreground flex h-full w-full items-center justify-end font-mono">
+        —
+      </div>
+    );
+  }
+  const formatted = smartDecimal(value);
+  const isNeg = value < 0;
+  return (
+    <div className="flex h-full w-full items-center justify-end font-mono">
+      {isNeg ? `-${formatted}` : formatted}
+    </div>
+  );
+}
+
+function CurrencyRenderer(props: CustomCellRendererProps) {
+  const value = props.value as number | null;
+  if (value == null) return null;
+  if (value === 0) {
+    return (
+      <div className="text-muted-foreground flex h-full w-full items-center justify-end font-mono">
+        —
+      </div>
+    );
+  }
+  const formatted = smartDecimal(value);
+  const isNeg = value < 0;
+  return (
+    <div className="flex h-full w-full items-center justify-end font-mono">
+      {isNeg ? `-${formatted}` : formatted}
+    </div>
+  );
+}
 
 function EmployeeInfoRenderer(props: CustomCellRendererProps) {
   const data = props.data as Record<string, unknown> | undefined;
@@ -34,7 +77,7 @@ const hours = (field: string, headerName: string): ColDef => ({
   field,
   headerName,
   type: 'numericColumn',
-  valueFormatter: hoursFormatter,
+  cellRenderer: HoursRenderer,
 });
 
 const rateFormatter = (params: ValueFormatterParams): string => {
@@ -42,13 +85,13 @@ const rateFormatter = (params: ValueFormatterParams): string => {
   if (value == null) return '';
   const n = Number(value);
   if (n === 0) return '—';
-  return Math.round(n).toLocaleString('en-US');
+  return smartDecimal(n);
 };
 
 const wholeNumberFormatter = (params: ValueFormatterParams): string => {
   const value = params.value as number | null;
   if (value == null) return '';
-  return Math.round(Number(value)).toLocaleString('en-US');
+  return smartDecimal(Number(value));
 };
 
 const agGridColDefs: ColDef[] = [
