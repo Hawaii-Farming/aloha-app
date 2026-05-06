@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { useFetcher, useNavigate } from 'react-router';
 
-import { ArrowLeft, Calendar, Clock, Trash2, User } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Trash2 } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -31,7 +31,6 @@ import type {
 } from '~/lib/crud/types';
 import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
 import { AccessGate } from '~/lib/workspace/access-gate';
-import { useHasPermission } from '~/lib/workspace/use-module-access';
 
 function formatDate(value: string): string {
   const d = new Date(value);
@@ -40,6 +39,24 @@ function formatDate(value: string): string {
     day: 'numeric',
     year: 'numeric',
   });
+}
+
+function getInitials(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return `${parts[0]![0]!.toUpperCase()}${parts[parts.length - 1]![0]!.toUpperCase()}`;
+  }
+  return fullName.slice(0, 2).toUpperCase();
+}
+
+function getRecordPhotoUrl(
+  record: Record<string, unknown>,
+): string | undefined {
+  const direct = record['profile_photo_url'];
+  if (typeof direct === 'string' && direct.length > 0) return direct;
+  const subject = record['subject_profile_photo_url'];
+  if (typeof subject === 'string' && subject.length > 0) return subject;
+  return undefined;
 }
 
 function buildFkKeyMap(
@@ -233,7 +250,6 @@ export function CardDetailView({
   const fetcher = useFetcher();
   const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
-  const canEdit = useHasPermission('can_edit');
 
   const handleDelete = useCallback(() => {
     fetcher.submit(
@@ -262,6 +278,8 @@ export function CardDetailView({
   const isDeleting = fetcher.state !== 'idle';
   const title = getRecordTitle(record, config);
   const subtitle = getRecordSubtitle(record, config);
+  const photoUrl = getRecordPhotoUrl(record);
+  const initials = getInitials(title);
   const formFields = config?.formFields ?? [];
   const sections = buildSections(formFields);
   const fkKeyMap = buildFkKeyMap(config, record);
@@ -287,9 +305,28 @@ export function CardDetailView({
             <div className="bg-border h-5 w-px" />
 
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-                <User className="text-primary h-4.5 w-4.5" />
-              </div>
+              {photoUrl ? (
+                <img
+                  src={photoUrl}
+                  alt={title}
+                  className="ring-border h-9 w-9 shrink-0 rounded-full object-cover ring-2"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const parent = target.parentElement;
+                    if (parent) {
+                      const fallback = document.createElement('div');
+                      fallback.className =
+                        'bg-primary/10 text-primary ring-border flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ring-2';
+                      fallback.textContent = initials;
+                      parent.replaceChild(fallback, target);
+                    }
+                  }}
+                />
+              ) : (
+                <div className="bg-primary/10 text-primary ring-border flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ring-2">
+                  {initials}
+                </div>
+              )}
               <div className="min-w-0">
                 <span className="text-foreground text-sm font-semibold">
                   {title}
@@ -414,7 +451,7 @@ export function CardDetailView({
                               rawValue={record[field.key]}
                               fkOptions={fkOptionsForField}
                               comboboxOptions={comboboxOptionsForField}
-                              canEdit={canEdit}
+                              canEdit={false}
                             />
                           </dd>
                         </div>

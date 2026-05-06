@@ -177,6 +177,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       fkLabelColumns: ['first_name', 'last_name'],
       fkEmbedAlias: 'subject',
       required: true,
+      section: 'Employee',
     },
     {
       key: 'start_date',
@@ -186,6 +187,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       allowFutureDates: true,
       pickerDefaultMonth: 'today',
       defaultValue: 'today',
+      section: 'Dates',
     },
     {
       key: 'return_date',
@@ -200,6 +202,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       label: 'Time off allocation',
       type: 'pto-allocation',
       fullWidth: true,
+      section: 'Allocation',
     },
     {
       key: 'pto_days',
@@ -227,6 +230,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       label: 'Reason',
       type: 'textarea',
       required: true,
+      section: 'Request',
     },
   ],
 
