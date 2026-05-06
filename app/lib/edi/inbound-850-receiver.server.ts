@@ -6,13 +6,14 @@
  * in-line, return the inbound message id (and the resulting sales_po
  * id when the parse succeeds).
  *
- * Authentication lives at the route boundary (Supabase user session
- * via require-edi-admin.server.ts). This module trusts its caller
- * has already done that check.
+ * Called by the SPS SFTP poller worker, which on each tick
+ *   (a) downloads new files from the SPS SFTP mailbox, and
+ *   (b) sweeps sales_edi_inbound_message rows where parsed_at IS NULL
+ *       and retries them (so master-data fixes get picked up
+ *       automatically without an HTTP replay flow).
  *
- * The same `archiveInbound850` function will eventually be called by
- * the SFTP poller worker -- it bypasses the route entirely and
- * passes the user-equivalent orgId directly.
+ * The poller passes the org_id it's polling on behalf of directly.
+ * There is no public HTTP route in front of this module.
  */
 import { XMLParser } from 'fast-xml-parser';
 

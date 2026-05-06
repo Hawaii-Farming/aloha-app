@@ -27,8 +27,6 @@ const apiRoutes = [
   route('api/quickbooks/callback', 'routes/api/quickbooks/callback.ts'),
   route('api/quickbooks/disconnect', 'routes/api/quickbooks/disconnect.ts'),
   route('api/quickbooks/invoices', 'routes/api/quickbooks/invoices.ts'),
-  route('api/edi/inbound', 'routes/api/edi/inbound.ts'),
-  route('api/edi/process-pending', 'routes/api/edi/process-pending.ts'),
 ];
 
 const authRoutes = [route('auth/sign-out', 'routes/auth/sign-out.ts')];
