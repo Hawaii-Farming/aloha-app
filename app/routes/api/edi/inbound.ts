@@ -1,34 +1,34 @@
 /**
  * POST /api/edi/inbound
  *
- * Receives an SPS Commerce 850 (Purchase Order) XML payload, archives
- * it to sales_edi_inbound_message, and returns 202 with the inbound
- * message id. The full field-by-field parse + sales_po creation happens
- * in a downstream step (next iteration); this route's only job is to
- * accept fast and never lose a delivery.
+ * Manual / admin upload path for an SPS Commerce 850 (Purchase Order)
+ * XML payload. Archives to sales_edi_inbound_message, runs parse +
+ * apply in-line, returns 202 with the inbound message id and the
+ * resulting sales_po id when the parse succeeds.
  *
- * Auth: shared secret in the X-EDI-Secret header, compared against
- * EDI_INBOUND_SECRET env.
+ * Auth: Supabase user session. Caller must be signed in with Owner or
+ * Admin in at least one org. The bulk-delivery path will eventually
+ * be the SFTP poller worker, which calls the same archive helper
+ * directly without going through this HTTP route.
  *
  * Body: raw XML. Content-Type can be application/xml, text/xml, or
- * even text/plain -- we just read the request as text.
+ * text/plain -- we just read the request as text.
  *
- * Headers honoured (optional, used for traceability):
+ * Optional headers (used for traceability if present):
  *   X-SPS-Message-Id   -- SPS-side message identifier
  *   X-SPS-Filename     -- original SFTP filename
  *
  * Responses:
- *   202 { inboundMessageId, salesTradingPartnerId }   on success
- *   400                                               malformed XML / missing TradingPartnerId / unknown partner archived but flagged
- *   401                                               missing or wrong X-EDI-Secret
- *   500                                               server / DB error
+ *   202 { inboundMessageId, salesPoId, status, parseError } on success
+ *   400                                  malformed XML / missing required fields
+ *   403                                  not Owner/Admin (via require-edi-admin)
+ *   500                                  unexpected server / DB error
  */
 import {
-  EdiAuthError,
   EdiBadRequestError,
   archiveInbound850,
-  verifySecret,
 } from '~/lib/edi/inbound-850-receiver.server';
+import { requireEdiAdmin } from '~/lib/edi/require-edi-admin.server';
 import type { Route } from '~/types/app/routes/api/edi/+types/inbound';
 
 export async function action({ request }: Route.ActionArgs) {
@@ -36,12 +36,15 @@ export async function action({ request }: Route.ActionArgs) {
     return new Response('Method not allowed', { status: 405 });
   }
 
-  try {
-    verifySecret(request.headers.get('x-edi-secret'));
+  // requireEdiAdmin throws a redirect if not signed in, or a 403 Response
+  // if signed in but not Owner/Admin. Both bubble up as the route response.
+  const ctx = await requireEdiAdmin(request);
 
+  try {
     const rawBody = await request.text();
     const result = await archiveInbound850({
       rawBody,
+      orgId: ctx.orgId,
       spsMessageId: request.headers.get('x-sps-message-id'),
       sourceFilename: request.headers.get('x-sps-filename'),
     });
@@ -64,9 +67,6 @@ export async function action({ request }: Route.ActionArgs) {
       { status: 202 },
     );
   } catch (err) {
-    if (err instanceof EdiAuthError) {
-      return new Response('Unauthorized', { status: 401 });
-    }
     if (err instanceof EdiBadRequestError) {
       return new Response(err.message, { status: 400 });
     }

@@ -1,14 +1,18 @@
 /**
  * SPS Commerce 850 (Purchase Order) inbound receiver.
  *
- * v1 scope: archive the raw XML payload to sales_edi_inbound_message,
- * resolve the trading partner so the row links back, return the inbound
- * message id. Full field-by-field parsing into sales_po + sales_po_line
- * lives in a sibling parser module (next iteration).
+ * Archive the raw XML payload to sales_edi_inbound_message, resolve
+ * the trading partner so the row links back, run parse + apply
+ * in-line, return the inbound message id (and the resulting sales_po
+ * id when the parse succeeds).
  *
- * Authentication is a shared secret in EDI_INBOUND_SECRET. The caller
- * (SPS push, an SFTP polling worker, manual curl) sets X-EDI-Secret to
- * that value. We compare in constant time.
+ * Authentication lives at the route boundary (Supabase user session
+ * via require-edi-admin.server.ts). This module trusts its caller
+ * has already done that check.
+ *
+ * The same `archiveInbound850` function will eventually be called by
+ * the SFTP poller worker -- it bypasses the route entirely and
+ * passes the user-equivalent orgId directly.
  */
 import { XMLParser } from 'fast-xml-parser';
 
@@ -18,34 +22,10 @@ import { getSupabaseServerAdminClient } from '~/lib/supabase/clients/server-admi
 
 const ALLOWED_DOC_TYPES = new Set(['850', '860']); // 850=PO, 860=PO change
 
-export class EdiAuthError extends Error {
-  constructor() {
-    super('EDI_INBOUND_SECRET mismatch');
-    this.name = 'EdiAuthError';
-  }
-}
 export class EdiBadRequestError extends Error {
   constructor(reason: string) {
     super(reason);
     this.name = 'EdiBadRequestError';
-  }
-}
-
-function constantTimeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++)
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return mismatch === 0;
-}
-
-export function verifySecret(headerValue: string | null): void {
-  const expected = process.env.EDI_INBOUND_SECRET;
-  if (!expected) {
-    throw new Error('EDI_INBOUND_SECRET is not configured on the server');
-  }
-  if (!headerValue || !constantTimeEqual(headerValue, expected)) {
-    throw new EdiAuthError();
   }
 }
 
@@ -98,6 +78,10 @@ function preflight(rawBody: string): {
 
 export type ArchiveOptions = {
   rawBody: string;
+  /** Org the caller belongs to. Used as the org_id when no
+   *  trading partner row matches the inbound TradingPartnerId, so
+   *  unmapped messages still land somewhere queryable. */
+  orgId: string;
   /** SPS-side message id, if delivered in HTTP headers / a wrapper. */
   spsMessageId?: string | null;
   /** Original SFTP filename if applicable. */
@@ -126,9 +110,12 @@ export type ArchiveResult = {
 export async function archiveInbound850(
   opts: ArchiveOptions,
 ): Promise<ArchiveResult> {
-  const { rawBody, spsMessageId = null, sourceFilename = null } = opts;
+  const { rawBody, orgId, spsMessageId = null, sourceFilename = null } = opts;
   if (!rawBody || rawBody.trim().length === 0) {
     throw new EdiBadRequestError('Empty body');
+  }
+  if (!orgId) {
+    throw new EdiBadRequestError('Missing orgId');
   }
 
   const { tradingPartnerId, documentType } = preflight(rawBody);
@@ -163,7 +150,7 @@ export async function archiveInbound850(
     const { data, error } = await supabase
       .from('sales_edi_inbound_message')
       .insert({
-        org_id: process.env.EDI_DEFAULT_ORG_ID ?? 'hawaii_farming',
+        org_id: orgId,
         sales_trading_partner_id: null,
         document_type: documentType,
         sps_message_id: spsMessageId,

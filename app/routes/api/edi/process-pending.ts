@@ -2,24 +2,21 @@
  * POST /api/edi/process-pending
  *
  * Replay handler for inbound 850 messages where the in-line apply step
- * during the inbound webhook hit a master-data gap. Walks every
- * sales_edi_inbound_message row where parsed_at IS NULL (regardless of
- * parse_error), re-runs parse + apply against the stored raw_body, and
- * updates parsed_at / parse_error / sales_po_id accordingly.
+ * during initial receipt hit a master-data gap. Walks every
+ * sales_edi_inbound_message row in the caller's org where parsed_at IS
+ * NULL, re-runs parse + apply against the stored raw_body, and updates
+ * parsed_at / parse_error / sales_po_id accordingly.
  *
  * Trigger this manually after adding sales_trading_partner or
  * sales_product_buyer_part rows that were missing on first delivery.
  * Safe to fire repeatedly -- the applier is idempotent on
  * (org_id, sales_trading_partner_id, po_number).
  *
- * Auth: same X-EDI-Secret shared header as POST /api/edi/inbound.
+ * Auth: Supabase user session, Owner or Admin level.
  */
 import { EdiApplyError, apply850 } from '~/lib/edi/apply-850.server';
-import {
-  EdiAuthError,
-  verifySecret,
-} from '~/lib/edi/inbound-850-receiver.server';
 import { parse850 } from '~/lib/edi/parse-850.server';
+import { requireEdiAdmin } from '~/lib/edi/require-edi-admin.server';
 import { getSupabaseServerAdminClient } from '~/lib/supabase/clients/server-admin-client.server';
 import type { Route } from '~/types/app/routes/api/edi/+types/process-pending';
 
@@ -30,19 +27,13 @@ export async function action({ request }: Route.ActionArgs) {
     return new Response('Method not allowed', { status: 405 });
   }
 
-  try {
-    verifySecret(request.headers.get('x-edi-secret'));
-  } catch (err) {
-    if (err instanceof EdiAuthError) {
-      return new Response('Unauthorized', { status: 401 });
-    }
-    throw err;
-  }
+  const ctx = await requireEdiAdmin(request);
 
   const supabase = getSupabaseServerAdminClient();
   const { data: pending, error: fetchErr } = await supabase
     .from('sales_edi_inbound_message')
     .select('id, raw_body, document_type')
+    .eq('org_id', ctx.orgId)
     .is('parsed_at', null)
     .eq('is_deleted', false)
     .order('received_at', { ascending: true })
@@ -98,6 +89,7 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   return Response.json({
+    orgId: ctx.orgId,
     processed: results.length,
     applied: results.filter((r) => r.status === 'applied').length,
     failed: results.filter((r) => r.status === 'parse_error').length,
