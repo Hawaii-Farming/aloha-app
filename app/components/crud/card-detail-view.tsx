@@ -330,18 +330,20 @@ export function CardDetailView({
         className="bg-card flex min-h-0 flex-1 flex-col"
         data-test="crud-detail-page"
       >
-        {/* Top bar: back + actions. Stacks on mobile so the action
-            cluster sits on its own row (no overflow / icon collisions
-            with the status dot). */}
-        <div className="border-border flex flex-col gap-2 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+        {/* Top bar: back + actions. One row at every width — title
+            truncates instead of wrapping so the action cluster keeps
+            its space on the right. */}
+        <div className="border-border flex items-center justify-between gap-3 border-b px-4 py-3 sm:gap-4 sm:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
+              aria-label="Back"
+              title="Back"
+              className="text-muted-foreground hover:text-foreground flex shrink-0 items-center gap-2 text-sm transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Back</span>
+              <span className="hidden sm:inline">Back</span>
             </button>
 
             <div className="bg-border h-5 w-px" />
@@ -369,12 +371,12 @@ export function CardDetailView({
                   {initials}
                 </div>
               )}
-              <div className="min-w-0 flex-1">
-                <span className="text-foreground truncate text-sm font-semibold">
+              <div className="min-w-0 flex-1 truncate">
+                <span className="text-foreground text-sm font-semibold">
                   {title}
                 </span>
                 {subtitle && (
-                  <span className="text-muted-foreground ml-1.5 truncate text-sm">
+                  <span className="text-muted-foreground ml-1.5 text-sm">
                     {subtitle}
                   </span>
                 )}
@@ -388,7 +390,7 @@ export function CardDetailView({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 sm:justify-start">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {hasWorkflow && workflowConfig && (
               <AccessGate permission="can_edit">
                 <WorkflowTransitionButtons
