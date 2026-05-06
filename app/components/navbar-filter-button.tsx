@@ -78,6 +78,37 @@ export function NavbarFilterButton({
 
   if (!slot) return null;
 
+  // Single-filter case: render the Select directly in the navbar slot
+  // instead of nesting it inside a "Filters" popover. Matches the
+  // 3-way toggle visual rhythm and removes a wasted click.
+  if (filters.length === 1) {
+    const f = filters[0]!;
+    return createPortal(
+      <Select
+        value={f.value || 'all'}
+        onValueChange={(v) => f.onChange(v === 'all' ? '' : v)}
+      >
+        <SelectTrigger
+          className="h-10 min-w-[12rem] gap-2 rounded-full px-4 text-sm font-medium tabular-nums"
+          data-test={`${testKey}-${f.key}`}
+          aria-label={f.label}
+        >
+          <SlidersHorizontal className="h-4 w-4 shrink-0" />
+          <SelectValue placeholder={f.allLabel ?? `All ${f.label}`} />
+        </SelectTrigger>
+        <SelectContent className="tabular-nums">
+          <SelectItem value="all">{f.allLabel ?? `All ${f.label}`}</SelectItem>
+          {f.options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>,
+      slot,
+    );
+  }
+
   return createPortal(
     <Popover>
       <PopoverTrigger asChild>
