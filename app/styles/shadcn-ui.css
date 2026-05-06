@@ -84,13 +84,13 @@
      * (--primary, --primary-foreground, --ring, --gradient-primary) are
      * intentionally preserved so the Aloha green CTA still reads as brand on
      * the Kimbie canvas. See DESIGN.md §2 Dark mode foundation tokens. */
-    --background: #15100a;
+    --background: #0f0b06;
     --foreground: #d3af86;
 
-    --card: #17120b;
+    --card: #110d07;
     --card-foreground: #d3af86;
 
-    --popover: #17120b; /* Matches --card so popovers/sheets/drawers
+    --popover: #110d07; /* Matches --card so popovers/sheets/drawers
                            share the lifted Kimbie surface with cards
                            and AG Grid */
     --popover-foreground: #d3af86;
@@ -98,21 +98,21 @@
     --primary: #4ade80; /* PRESERVED — Aloha brand green-400 */
     --primary-foreground: #052e16; /* PRESERVED — green-950 */
 
-    --secondary: #332618;
+    --secondary: #261b10;
     --secondary-foreground: #d3af86;
 
-    --muted: #0e0a06; /* Kimbie surface-muted — recessed below page bg so
+    --muted: #080503; /* Kimbie surface-muted — recessed below page bg so
                          search triggers and muted surfaces separate from the
-                         #15100a canvas */
+                         #0f0b06 canvas */
     --muted-foreground: #a57a4c;
 
-    --accent: #332618;
+    --accent: #261b10;
     --accent-foreground: #d3af86;
 
     --destructive: #dc3958;
     --destructive-foreground: #ffffff;
 
-    --border: #332618;
+    --border: #261b10;
     --input: #4a3620;
     --ring: #4ade80; /* PRESERVED — focus ring stays emerald */
 
@@ -146,13 +146,13 @@
     --semantic-blue-fg: #51bdb2;
     --semantic-blue-border: rgb(81 189 178 / 0.3);
 
-    --sidebar-background: #15100a; /* matches --background — cohesive Kimbie canvas */
+    --sidebar-background: #0f0b06; /* matches --background — cohesive Kimbie canvas */
     --sidebar-foreground: #a57a4c;
     --sidebar-primary: #4ade80; /* PRESERVED */
     --sidebar-primary-foreground: #052e16; /* PRESERVED */
-    --sidebar-accent: #332618; /* Kimbie muted cocoa — cohesive with --secondary / --border */
+    --sidebar-accent: #261b10; /* Kimbie muted cocoa — cohesive with --secondary / --border */
     --sidebar-accent-foreground: #d3af86;
-    --sidebar-border: #17120b; /* matches --card — subtle lift edge */
+    --sidebar-border: #110d07; /* matches --card — subtle lift edge */
     --sidebar-ring: #4ade80; /* PRESERVED */
   }
 }
