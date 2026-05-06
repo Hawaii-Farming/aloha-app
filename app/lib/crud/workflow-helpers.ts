@@ -66,46 +66,61 @@ export function buildHistoryEntries(
   record: Record<string, unknown>,
   workflow: WorkflowConfig,
 ): WorkflowHistoryEntry[] {
-  const currentStatus = record[workflow.statusColumn] as string | undefined;
-  if (!currentStatus) return [];
+  const entries: WorkflowHistoryEntry[] = [];
 
-  // If the current status matches the configured initial state (e.g. Pending),
-  // source the entry from the creation columns (requested_at / requested_by).
-  if (
-    workflow.initialEntry &&
-    workflow.initialEntry.state === currentStatus &&
-    record[workflow.initialEntry.atField]
-  ) {
+  // Initial entry (e.g. Pending) sourced from creation columns.
+  if (workflow.initialEntry && record[workflow.initialEntry.atField]) {
     const { state, atField, byField } = workflow.initialEntry;
-    return [
-      {
-        action: workflow.states[state]?.label ?? state,
-        at: record[atField] as string,
-        by: resolveByDisplay(record, byField),
-        color: workflow.states[state]?.color,
-      },
-    ];
-  }
-
-  // Otherwise, emit the entry for the current transitioned-to state.
-  const fields = workflow.transitionFields?.[currentStatus];
-  if (!fields) return [];
-
-  const atField = Object.entries(fields).find(
-    ([_key, value]) => value === 'now',
-  )?.[0];
-  const byField = Object.entries(fields).find(
-    ([_key, value]) => value === 'currentEmployee',
-  )?.[0];
-
-  if (!atField || !record[atField]) return [];
-
-  return [
-    {
-      action: workflow.states[currentStatus]?.label ?? currentStatus,
+    entries.push({
+      action: workflow.states[state]?.label ?? state,
       at: record[atField] as string,
       by: resolveByDisplay(record, byField),
-      color: workflow.states[currentStatus]?.color,
-    },
-  ];
+      color: workflow.states[state]?.color,
+    });
+  }
+
+  if (!workflow.transitionFields) {
+    return entries;
+  }
+
+  const currentStatus = record[workflow.statusColumn] as string | undefined;
+
+  // When multiple states share the same `at` column (e.g. Approved + Denied
+  // both write reviewed_at), only the entry matching the current status
+  // reflects what actually happened.
+  const statusesByAtField = new Map<string, string[]>();
+  for (const [status, fields] of Object.entries(workflow.transitionFields)) {
+    const atField = Object.entries(fields).find(
+      ([_key, value]) => value === 'now',
+    )?.[0];
+    if (!atField) continue;
+    const list = statusesByAtField.get(atField) ?? [];
+    list.push(status);
+    statusesByAtField.set(atField, list);
+  }
+
+  for (const [status, fields] of Object.entries(workflow.transitionFields)) {
+    const atField = Object.entries(fields).find(
+      ([_key, value]) => value === 'now',
+    )?.[0];
+    const byField = Object.entries(fields).find(
+      ([_key, value]) => value === 'currentEmployee',
+    )?.[0];
+
+    if (!atField || !record[atField]) continue;
+
+    const sharedWith = statusesByAtField.get(atField) ?? [];
+    if (sharedWith.length > 1 && status !== currentStatus) continue;
+
+    entries.push({
+      action: workflow.states[status]?.label ?? status,
+      at: record[atField] as string,
+      by: resolveByDisplay(record, byField),
+      color: workflow.states[status]?.color,
+    });
+  }
+
+  entries.sort((a, b) => new Date(a.at!).getTime() - new Date(b.at!).getTime());
+
+  return entries;
 }

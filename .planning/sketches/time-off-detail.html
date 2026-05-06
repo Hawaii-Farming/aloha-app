@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Time-Off detail — design variants</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background: #f5f5f4;
+      }
+      .variant {
+        max-width: 1200px;
+        margin: 32px auto;
+        background: white;
+        border: 1px solid #e7e5e4;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+      .variant-header {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #78716c;
+        padding: 12px 24px;
+        background: #fafaf9;
+        border-bottom: 1px solid #e7e5e4;
+      }
+      .dot-amber {
+        background: #f59e0b;
+      }
+      .dot-emerald {
+        background: #10b981;
+      }
+      .dot-red {
+        background: #ef4444;
+      }
+    </style>
+  </head>
+  <body class="text-stone-900">
+    <div class="mx-auto max-w-[1200px] px-6 pt-8 pb-2">
+      <h1 class="text-2xl font-semibold">Time-Off detail — design variants</h1>
+      <p class="mt-1 text-sm text-stone-500">
+        Same record (Elvie Nobriga, Approved). Pick the one you like — I'll
+        port the winner into <code>CardDetailView</code>.
+      </p>
+    </div>
+
+    <!-- =============== VARIANT A: Horizontal step timeline + sticky toolbar -->
+    <section class="variant">
+      <div class="variant-header">
+        Variant A — horizontal step timeline + definition-list rows
+      </div>
+
+      <!-- Top bar -->
+      <div
+        class="flex items-center justify-between border-b border-stone-200 px-6 py-3"
+      >
+        <div class="flex items-center gap-4">
+          <button class="flex items-center gap-2 text-sm text-stone-500">
+            ← Back
+          </button>
+          <div class="h-5 w-px bg-stone-200"></div>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700 ring-2 ring-stone-200"
+            >
+              EN
+            </div>
+            <div>
+              <span class="text-sm font-semibold">Elvie Nobriga</span>
+              <span class="ml-1.5 text-sm text-stone-400">"Elvie"</span>
+            </div>
+            <span
+              class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700"
+            >
+              Approved
+            </span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            class="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50"
+          >
+            Edit
+          </button>
+          <button
+            class="rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <!-- Horizontal step timeline -->
+      <div class="border-b border-stone-200 bg-stone-50/60 px-6 py-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span class="dot-amber h-2.5 w-2.5 rounded-full"></span>
+            <div>
+              <div class="text-xs font-medium text-stone-700">Pending</div>
+              <div class="text-[11px] text-stone-500">
+                3/23/2025, 4:19 AM · Karen De Moura Martins
+              </div>
+            </div>
+          </div>
+          <div class="mx-3 h-px flex-1 bg-stone-300"></div>
+          <div class="flex items-center gap-2">
+            <span class="dot-emerald h-2.5 w-2.5 rounded-full"></span>
+            <div>
+              <div class="text-xs font-medium text-stone-700">Approved</div>
+              <div class="text-[11px] text-stone-500">
+                3/23/2025, 9:57 AM · Peter Pavao
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Employee -->
+      <div class="px-6 py-5">
+        <div class="mb-3 flex items-center gap-3">
+          <h2 class="text-sm font-semibold tracking-wide text-stone-700">
+            Employee
+          </h2>
+          <div class="h-px flex-1 bg-stone-200"></div>
+        </div>
+        <dl class="grid grid-cols-1 gap-x-12 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="flex items-baseline justify-between gap-4">
+            <dt
+              class="text-[11px] tracking-wider text-stone-400 uppercase whitespace-nowrap"
+            >
+              Employee
+            </dt>
+            <dd class="text-right text-sm font-medium">Elvie Nobriga</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Section: Dates -->
+      <div class="px-6 py-5">
+        <div class="mb-3 flex items-center gap-3">
+          <h2 class="text-sm font-semibold tracking-wide text-stone-700">
+            Dates
+          </h2>
+          <div class="h-px flex-1 bg-stone-200"></div>
+        </div>
+        <dl class="grid grid-cols-1 gap-x-12 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="flex items-baseline justify-between gap-4">
+            <dt
+              class="text-[11px] tracking-wider text-stone-400 uppercase whitespace-nowrap"
+            >
+              Start Date
+            </dt>
+            <dd class="text-right text-sm font-medium">Mar 24, 2025</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4">
+            <dt
+              class="text-[11px] tracking-wider text-stone-400 uppercase whitespace-nowrap"
+            >
+              Return Date
+            </dt>
+            <dd class="text-right text-sm font-medium">Mar 26, 2025</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Section: Allocation -->
+      <div class="px-6 py-5">
+        <div class="mb-3 flex items-center gap-3">
+          <h2 class="text-sm font-semibold tracking-wide text-stone-700">
+            Allocation
+          </h2>
+          <div class="h-px flex-1 bg-stone-200"></div>
+        </div>
+        <dl class="grid grid-cols-1 gap-x-12 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="flex items-baseline justify-between gap-4">
+            <dt
+              class="text-[11px] tracking-wider text-stone-400 uppercase whitespace-nowrap"
+            >
+              PTO Days
+            </dt>
+            <dd class="text-right text-sm font-medium">2</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4">
+            <dt
+              class="text-[11px] tracking-wider text-stone-400 uppercase whitespace-nowrap"
+            >
+              Sick Days
+            </dt>
+            <dd class="text-right text-sm text-stone-300">—</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4">
+            <dt
+              class="text-[11px] tracking-wider text-stone-400 uppercase whitespace-nowrap"
+            >
+              Unpaid Days
+            </dt>
+            <dd class="text-right text-sm text-stone-300">—</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Section: Request -->
+      <div class="px-6 py-5">
+        <div class="mb-3 flex items-center gap-3">
+          <h2 class="text-sm font-semibold tracking-wide text-stone-700">
+            Request
+          </h2>
+          <div class="h-px flex-1 bg-stone-200"></div>
+        </div>
+        <p class="max-w-3xl text-sm leading-relaxed">
+          Family wedding on the Big Island; will return Wednesday morning.
+        </p>
+      </div>
+
+      <!-- Audit -->
+      <div
+        class="flex items-center gap-5 border-t border-stone-200 bg-stone-50/60 px-6 py-3 text-[11px] text-stone-500"
+      >
+        <span>Created Mar 23, 2025</span>
+        <span>·</span>
+        <span>Updated Mar 23, 2025</span>
+      </div>
+    </section>
+
+    <!-- =============== VARIANT B: Hero strip + KPI tiles + flat sections -->
+    <section class="variant">
+      <div class="variant-header">
+        Variant B — hero strip with KPI tiles, fields below
+      </div>
+
+      <!-- Hero -->
+      <div class="border-b border-stone-200 bg-gradient-to-r from-emerald-50 via-white to-white px-6 py-5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <button class="flex items-center gap-2 text-sm text-stone-500">
+              ← Back
+            </button>
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-base font-semibold text-emerald-700 ring-2 ring-emerald-200"
+            >
+              EN
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base font-semibold">Elvie Nobriga</span>
+                <span class="text-sm text-stone-400">"Elvie"</span>
+                <span
+                  class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800"
+                >
+                  Approved
+                </span>
+              </div>
+              <div class="mt-0.5 text-xs text-stone-500">
+                Reviewed by <span class="font-medium">Peter Pavao</span> on Mar
+                23, 2025 · Requested by Karen De Moura Martins
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              class="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50"
+            >
+              Edit
+            </button>
+            <button
+              class="rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI strip -->
+        <div class="mt-5 flex items-stretch gap-3">
+          <div class="flex-1 rounded-lg border border-stone-200 bg-white px-4 py-3">
+            <div class="text-[10px] tracking-wider text-stone-400 uppercase">
+              Start
+            </div>
+            <div class="mt-0.5 text-sm font-semibold">Mar 24, 2025</div>
+          </div>
+          <div class="flex-1 rounded-lg border border-stone-200 bg-white px-4 py-3">
+            <div class="text-[10px] tracking-wider text-stone-400 uppercase">
+              Return
+            </div>
+            <div class="mt-0.5 text-sm font-semibold">Mar 26, 2025</div>
+          </div>
+          <div class="flex-1 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+            <div class="text-[10px] tracking-wider text-blue-700 uppercase">
+              PTO
+            </div>
+            <div class="mt-0.5 text-sm font-semibold text-blue-900">2 days</div>
+          </div>
+          <div class="flex-1 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+            <div class="text-[10px] tracking-wider text-amber-700 uppercase">
+              Sick
+            </div>
+            <div class="mt-0.5 text-sm font-semibold text-amber-900">—</div>
+          </div>
+          <div class="flex-1 rounded-lg border border-violet-200 bg-violet-50 px-4 py-3">
+            <div class="text-[10px] tracking-wider text-violet-700 uppercase">
+              Unpaid
+            </div>
+            <div class="mt-0.5 text-sm font-semibold text-violet-900">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sections -->
+      <div class="grid grid-cols-1 gap-x-12 gap-y-6 px-6 py-5 lg:grid-cols-2">
+        <div>
+          <h2
+            class="mb-3 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+          >
+            Request
+          </h2>
+          <p class="max-w-2xl text-sm leading-relaxed">
+            Family wedding on the Big Island; will return Wednesday morning.
+          </p>
+        </div>
+        <div>
+          <h2
+            class="mb-3 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+          >
+            Workflow
+          </h2>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+              <span class="dot-amber h-2 w-2 rounded-full"></span>
+              <span class="text-xs">Pending · Mar 23, 4:19 AM</span>
+            </div>
+            <span class="text-stone-300">→</span>
+            <div class="flex items-center gap-2">
+              <span class="dot-emerald h-2 w-2 rounded-full"></span>
+              <span class="text-xs">Approved · Mar 23, 9:57 AM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== VARIANT C: Two-column split, label left + value right -->
+    <section class="variant">
+      <div class="variant-header">
+        Variant C — two-column split, no section dividers, very dense
+      </div>
+
+      <!-- Top bar -->
+      <div class="flex items-center justify-between border-b border-stone-200 px-6 py-3">
+        <div class="flex items-center gap-4">
+          <button class="flex items-center gap-2 text-sm text-stone-500">
+            ← Back
+          </button>
+          <div class="h-5 w-px bg-stone-200"></div>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700 ring-2 ring-stone-200"
+            >
+              EN
+            </div>
+            <span class="text-sm font-semibold">Elvie Nobriga</span>
+            <span class="text-sm text-stone-400">"Elvie"</span>
+            <span
+              class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700"
+            >
+              Approved
+            </span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            class="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50"
+          >
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <!-- Two-column grid: left = facts, right = workflow + reason -->
+      <div class="grid grid-cols-1 gap-0 lg:grid-cols-3">
+        <!-- LEFT: 2/3 facts -->
+        <div class="border-stone-200 px-6 py-5 lg:col-span-2 lg:border-r">
+          <table class="w-full text-sm">
+            <tbody>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="w-44 py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Employee
+                </td>
+                <td class="py-2 font-medium">Elvie Nobriga</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Comp Manager
+                </td>
+                <td class="py-2 font-medium">Peter Pavao</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Start Date
+                </td>
+                <td class="py-2 font-medium">Mar 24, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Return Date
+                </td>
+                <td class="py-2 font-medium">Mar 26, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  PTO
+                </td>
+                <td class="py-2 font-medium">2</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Sick / Unpaid
+                </td>
+                <td class="py-2 text-stone-300">— / —</td>
+              </tr>
+              <tr>
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Requested By
+                </td>
+                <td class="py-2 font-medium">
+                  Karen De Moura Martins
+                  <span class="text-stone-400">· Mar 23, 4:19 AM</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RIGHT: workflow + reason aside -->
+        <aside class="bg-stone-50/60 px-6 py-5">
+          <div class="mb-4">
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Status
+            </h2>
+            <div class="flex items-center gap-2">
+              <span class="dot-emerald h-2.5 w-2.5 rounded-full"></span>
+              <div>
+                <div class="text-sm font-medium">Approved</div>
+                <div class="text-xs text-stone-500">
+                  Peter Pavao · Mar 23, 9:57 AM
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Reason
+            </h2>
+            <p class="text-sm leading-relaxed">
+              Family wedding on the Big Island; will return Wednesday morning.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- =============== VARIANT D: C's split + B's gradient header + B's workflow -->
+    <section class="variant">
+      <div class="variant-header">
+        Variant D — C's two-column split with B's gradient hero + horizontal
+        workflow
+      </div>
+
+      <!-- Hero: gradient header from B -->
+      <div
+        class="border-b border-stone-200 bg-gradient-to-r from-emerald-50 via-white to-white px-6 py-5"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <button class="flex items-center gap-2 text-sm text-stone-500">
+              ← Back
+            </button>
+            <div class="h-5 w-px bg-stone-200"></div>
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-base font-semibold text-emerald-700 ring-2 ring-emerald-200"
+            >
+              EN
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base font-semibold">Elvie Nobriga</span>
+                <span class="text-sm text-stone-400">"Elvie"</span>
+                <span
+                  class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800"
+                >
+                  Approved
+                </span>
+              </div>
+              <div class="mt-0.5 text-xs text-stone-500">
+                Reviewed by <span class="font-medium">Peter Pavao</span> on Mar
+                23, 2025 · Requested by Karen De Moura Martins
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              class="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50"
+            >
+              Edit
+            </button>
+            <button
+              class="rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Horizontal workflow strip from B -->
+        <div class="mt-4 flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span class="dot-amber h-2 w-2 rounded-full"></span>
+            <span class="text-xs text-stone-700">
+              Pending
+              <span class="text-stone-400">
+                · Mar 23, 4:19 AM · Karen De Moura Martins
+              </span>
+            </span>
+          </div>
+          <span class="text-stone-300">→</span>
+          <div class="flex items-center gap-2">
+            <span class="dot-emerald h-2 w-2 rounded-full"></span>
+            <span class="text-xs text-stone-700">
+              Approved
+              <span class="text-stone-400">
+                · Mar 23, 9:57 AM · Peter Pavao
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column grid from C: facts left, aside right -->
+      <div class="grid grid-cols-1 gap-0 lg:grid-cols-3">
+        <!-- LEFT: 2/3 facts table -->
+        <div class="border-stone-200 px-6 py-5 lg:col-span-2 lg:border-r">
+          <table class="w-full text-sm">
+            <tbody>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="w-44 py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Employee
+                </td>
+                <td class="py-2 font-medium">Elvie Nobriga</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Comp Manager
+                </td>
+                <td class="py-2 font-medium">Peter Pavao</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Start Date
+                </td>
+                <td class="py-2 font-medium">Mar 24, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Return Date
+                </td>
+                <td class="py-2 font-medium">Mar 26, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  PTO
+                </td>
+                <td class="py-2 font-medium">2</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Sick / Unpaid
+                </td>
+                <td class="py-2 text-stone-300">— / —</td>
+              </tr>
+              <tr>
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Requested By
+                </td>
+                <td class="py-2 font-medium">
+                  Karen De Moura Martins
+                  <span class="text-stone-400">· Mar 23, 4:19 AM</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RIGHT: aside, gradient-tinted to echo the hero -->
+        <aside
+          class="bg-gradient-to-b from-emerald-50/40 to-white px-6 py-5"
+        >
+          <div class="mb-4">
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Status
+            </h2>
+            <div class="flex items-center gap-2">
+              <span class="dot-emerald h-2.5 w-2.5 rounded-full"></span>
+              <div>
+                <div class="text-sm font-medium">Approved</div>
+                <div class="text-xs text-stone-500">
+                  Peter Pavao · Mar 23, 9:57 AM
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Reason
+            </h2>
+            <p class="text-sm leading-relaxed">
+              Family wedding on the Big Island; will return Wednesday morning.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- =============== VARIANT E: C header + workflow on left + gradient on right -->
+    <section class="variant">
+      <div class="variant-header">
+        Variant E — C-style compact header, workflow above the facts table,
+        gradient confined to the right-side status aside
+      </div>
+
+      <!-- Top bar: compact, like C -->
+      <div
+        class="flex items-center justify-between border-b border-stone-200 px-6 py-3"
+      >
+        <div class="flex items-center gap-4">
+          <button class="flex items-center gap-2 text-sm text-stone-500">
+            ← Back
+          </button>
+          <div class="h-5 w-px bg-stone-200"></div>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700 ring-2 ring-stone-200"
+            >
+              EN
+            </div>
+            <span class="text-sm font-semibold">Elvie Nobriga</span>
+            <span class="text-sm text-stone-400">"Elvie"</span>
+            <span
+              class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700"
+            >
+              Approved
+            </span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            class="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50"
+          >
+            Edit
+          </button>
+          <button
+            class="rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <!-- Two-column grid: workflow + facts on left, gradient status aside on right -->
+      <div class="grid grid-cols-1 gap-0 lg:grid-cols-3">
+        <!-- LEFT: 2/3 — workflow strip + facts table -->
+        <div class="border-stone-200 px-6 py-5 lg:col-span-2 lg:border-r">
+          <!-- Workflow strip (moved out of the header) -->
+          <div class="mb-5">
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Workflow
+            </h2>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
+                <span class="dot-amber h-2 w-2 rounded-full"></span>
+                <span class="text-xs text-stone-700">
+                  Pending
+                  <span class="text-stone-400">
+                    · Mar 23, 4:19 AM · Karen De Moura Martins
+                  </span>
+                </span>
+              </div>
+              <span class="text-stone-300">→</span>
+              <div class="flex items-center gap-2">
+                <span class="dot-emerald h-2 w-2 rounded-full"></span>
+                <span class="text-xs text-stone-700">
+                  Approved
+                  <span class="text-stone-400">
+                    · Mar 23, 9:57 AM · Peter Pavao
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Facts table -->
+          <table class="w-full text-sm">
+            <tbody>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="w-44 py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Employee
+                </td>
+                <td class="py-2 font-medium">Elvie Nobriga</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Comp Manager
+                </td>
+                <td class="py-2 font-medium">Peter Pavao</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Start Date
+                </td>
+                <td class="py-2 font-medium">Mar 24, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Return Date
+                </td>
+                <td class="py-2 font-medium">Mar 26, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  PTO
+                </td>
+                <td class="py-2 font-medium">2</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Sick / Unpaid
+                </td>
+                <td class="py-2 text-stone-300">— / —</td>
+              </tr>
+              <tr>
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase"
+                >
+                  Requested By
+                </td>
+                <td class="py-2 font-medium">
+                  Karen De Moura Martins
+                  <span class="text-stone-400">· Mar 23, 4:19 AM</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RIGHT: gradient status aside -->
+        <aside
+          class="bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-white px-6 py-5"
+        >
+          <div class="mb-4">
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Status
+            </h2>
+            <div class="flex items-center gap-2">
+              <span class="dot-emerald h-2.5 w-2.5 rounded-full"></span>
+              <div>
+                <div class="text-sm font-medium">Approved</div>
+                <div class="text-xs text-stone-500">
+                  Peter Pavao · Mar 23, 9:57 AM
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Reason
+            </h2>
+            <p class="text-sm leading-relaxed">
+              Family wedding on the Big Island; will return Wednesday morning.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- =============== VARIANT F: workflow inline (after Requested By) + bottom audit strip -->
+    <section class="variant">
+      <div class="variant-header">
+        Variant F — workflow embedded as the final row of the facts table;
+        Created / Updated live in a thin footer strip below the whole layout
+      </div>
+
+      <!-- Top bar -->
+      <div
+        class="flex items-center justify-between border-b border-stone-200 px-6 py-3"
+      >
+        <div class="flex items-center gap-4">
+          <button class="flex items-center gap-2 text-sm text-stone-500">
+            ← Back
+          </button>
+          <div class="h-5 w-px bg-stone-200"></div>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700 ring-2 ring-stone-200"
+            >
+              EN
+            </div>
+            <span class="text-sm font-semibold">Elvie Nobriga</span>
+            <span class="text-sm text-stone-400">"Elvie"</span>
+            <span
+              class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700"
+            >
+              Approved
+            </span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            class="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50"
+          >
+            Edit
+          </button>
+          <button
+            class="rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <!-- Two-column grid -->
+      <div class="grid grid-cols-1 gap-0 lg:grid-cols-3">
+        <!-- LEFT: facts table; workflow ends the table -->
+        <div class="border-stone-200 px-6 py-5 lg:col-span-2 lg:border-r">
+          <table class="w-full text-sm">
+            <tbody>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="w-44 py-2 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Employee
+                </td>
+                <td class="py-2 font-medium">Elvie Nobriga</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Comp Manager
+                </td>
+                <td class="py-2 font-medium">Peter Pavao</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Start Date
+                </td>
+                <td class="py-2 font-medium">Mar 24, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Return Date
+                </td>
+                <td class="py-2 font-medium">Mar 26, 2025</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  PTO
+                </td>
+                <td class="py-2 font-medium">2</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Sick
+                </td>
+                <td class="py-2 text-stone-300">—</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-2 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Unpaid
+                </td>
+                <td class="py-2 text-stone-300">—</td>
+              </tr>
+              <tr class="border-b border-stone-100">
+                <td
+                  class="py-3 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Requested
+                </td>
+                <td class="py-3">
+                  <div class="text-sm font-medium">Mar 23, 4:19 AM</div>
+                  <div class="text-xs text-stone-500">
+                    Karen De Moura Martins
+                  </div>
+                </td>
+              </tr>
+              <!-- Workflow row, 2-line per state -->
+              <tr>
+                <td
+                  class="py-3 text-[11px] tracking-wider text-stone-400 uppercase align-top"
+                >
+                  Workflow
+                </td>
+                <td class="py-3">
+                  <div class="flex items-start gap-6">
+                    <div class="flex items-start gap-2">
+                      <span class="dot-amber mt-1.5 h-2 w-2 rounded-full"></span>
+                      <div>
+                        <div class="text-sm font-medium">
+                          Pending
+                          <span class="font-normal text-stone-500">
+                            · Mar 23, 4:19 AM
+                          </span>
+                        </div>
+                        <div class="text-xs text-stone-500">
+                          Karen De Moura Martins
+                        </div>
+                      </div>
+                    </div>
+                    <span class="mt-2 text-stone-300">→</span>
+                    <div class="flex items-start gap-2">
+                      <span
+                        class="dot-emerald mt-1.5 h-2 w-2 rounded-full"
+                      ></span>
+                      <div>
+                        <div class="text-sm font-medium">
+                          Approved
+                          <span class="font-normal text-stone-500">
+                            · Mar 23, 9:57 AM
+                          </span>
+                        </div>
+                        <div class="text-xs text-stone-500">Peter Pavao</div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RIGHT: gradient status aside -->
+        <aside
+          class="bg-gradient-to-b from-emerald-50 via-emerald-50/40 to-white px-6 py-5"
+        >
+          <div class="mb-4">
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Status
+            </h2>
+            <div class="flex items-center gap-2">
+              <span class="dot-emerald h-2.5 w-2.5 rounded-full"></span>
+              <div>
+                <div class="text-sm font-medium">Approved</div>
+                <div class="text-xs text-stone-500">
+                  Peter Pavao · Mar 23, 9:57 AM
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2
+              class="mb-2 text-[11px] font-semibold tracking-wider text-stone-500 uppercase"
+            >
+              Reason
+            </h2>
+            <p class="text-sm leading-relaxed">
+              Family wedding on the Big Island; will return Wednesday morning.
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Bottom audit strip: thin footer, full width, muted -->
+      <div
+        class="flex items-center gap-5 border-t border-stone-200 bg-stone-50/60 px-6 py-2.5 text-[11px] text-stone-500"
+      >
+        <span>📅 Created Mar 23, 2025</span>
+        <span class="text-stone-300">·</span>
+        <span>🕒 Updated Mar 23, 2025</span>
+      </div>
+    </section>
+
+    <div class="mx-auto max-w-[1200px] px-6 pt-2 pb-12">
+      <p class="text-sm text-stone-500">
+        Tell me <strong>A</strong>, <strong>B</strong>, <strong>C</strong>,
+        <strong>D</strong>, <strong>E</strong>, or <strong>F</strong> — or
+        mix. I'll port it to the React component.
+      </p>
+    </div>
+  </body>
+</html>

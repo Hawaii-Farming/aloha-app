@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { useFetcher, useNavigate } from 'react-router';
 
-import { ArrowLeft, Calendar, Clock, Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -16,20 +16,18 @@ import {
   AlertDialogTrigger,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
-import { Separator } from '@aloha/ui/separator';
 import { Trans } from '@aloha/ui/trans';
-import { WorkflowHistory } from '@aloha/ui/workflow-history';
 import { WorkflowStatusBadge } from '@aloha/ui/workflow-status-badge';
 import { WorkflowTransitionButtons } from '@aloha/ui/workflow-transition';
 
 import { EditPanel } from '~/components/crud/edit-panel';
-import { InlineField } from '~/components/crud/inline-field';
 import type {
   CrudModuleConfig,
   DetailViewProps,
   FormFieldConfig,
 } from '~/lib/crud/types';
 import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
+import type { WorkflowHistoryEntry } from '~/lib/crud/workflow-helpers';
 import { AccessGate } from '~/lib/workspace/access-gate';
 
 function formatDate(value: string): string {
@@ -38,6 +36,17 @@ function formatDate(value: string): string {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+  });
+}
+
+function formatDateTime(value: string): string {
+  const d = new Date(value);
+  return d.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   });
 }
 
@@ -71,8 +80,6 @@ function buildFkKeyMap(
   );
 
   for (const field of fkFields) {
-    // Multi-column FK labels are resolved separately via resolveFkLabelColumns;
-    // skip them here so the single-key map only handles fkLabelColumn fields.
     if (field.fkLabelColumns && field.fkLabelColumns.length > 0) {
       continue;
     }
@@ -151,7 +158,7 @@ function resolveFieldValue(
 
   const raw = record[field.key];
 
-  if (raw === null || raw === undefined) return '--';
+  if (raw === null || raw === undefined) return '—';
   if (typeof raw === 'boolean') return raw ? 'Yes' : 'No';
 
   const str = String(raw);
@@ -216,26 +223,53 @@ function getRecordSubtitle(
   return null;
 }
 
-interface FieldSection {
-  title: string | null;
-  fields: FormFieldConfig[];
-}
+const STATE_DOT_CLASS: Record<string, string> = {
+  default: 'bg-stone-400',
+  success: 'bg-emerald-500',
+  warning: 'bg-amber-500',
+  destructive: 'bg-red-500',
+  secondary: 'bg-stone-400',
+};
 
-function buildSections(formFields: FormFieldConfig[]): FieldSection[] {
-  const sections: FieldSection[] = [];
-  let current: FieldSection = { title: null, fields: [] };
-
-  for (const field of formFields) {
-    if (field.section) {
-      if (current.fields.length > 0) sections.push(current);
-      current = { title: field.section, fields: [field] };
-    } else {
-      current.fields.push(field);
-    }
-  }
-
-  if (current.fields.length > 0) sections.push(current);
-  return sections;
+function WorkflowInline({ entries }: { entries: WorkflowHistoryEntry[] }) {
+  if (entries.length === 0) return null;
+  return (
+    <div className="flex flex-wrap items-start gap-x-3 gap-y-3">
+      {entries.map((entry, i) => (
+        <div
+          key={`${entry.action}-${i}`}
+          className="flex items-start gap-2 last:after:hidden"
+        >
+          <span
+            className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+              STATE_DOT_CLASS[entry.color ?? 'default']
+            }`}
+          />
+          <div>
+            <div className="text-foreground text-sm font-medium">
+              {entry.action}
+              {entry.at && (
+                <span className="text-muted-foreground/80 ml-1.5 text-[11px] font-normal">
+                  · {formatDateTime(entry.at)}
+                </span>
+              )}
+            </div>
+            {entry.by && (
+              <div className="text-muted-foreground text-xs">{entry.by}</div>
+            )}
+          </div>
+          {i < entries.length - 1 && (
+            <span
+              aria-hidden="true"
+              className="text-muted-foreground/40 mt-0.5 ml-2 select-none"
+            >
+              →
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function CardDetailView({
@@ -281,13 +315,43 @@ export function CardDetailView({
   const photoUrl = getRecordPhotoUrl(record);
   const initials = getInitials(title);
   const formFields = config?.formFields ?? [];
-  const sections = buildSections(formFields);
   const fkKeyMap = buildFkKeyMap(config, record);
+
+  // Pull the first textarea field out — it becomes the right-aside "highlight".
+  const highlightField = formFields.find((f) => f.type === 'textarea');
+  const highlightValue = highlightField
+    ? resolveFieldValue(highlightField, record, fkKeyMap)
+    : null;
+
+  // Everything else lives in the left-side facts table. Skip UI-only meta
+  // fields (pto-allocation is a write-time helper, not a stored value).
+  const factFields = formFields.filter(
+    (f) => f.key !== highlightField?.key && f.type !== 'pto-allocation',
+  );
+
+  const currentStatus =
+    hasWorkflow && workflowConfig
+      ? (record[workflowConfig.statusColumn] as string)
+      : null;
+  const currentStateColor =
+    currentStatus && workflowConfig
+      ? (workflowConfig.states[currentStatus]?.color ?? 'default')
+      : 'default';
+
+  const historyEntries =
+    hasWorkflow && workflowConfig
+      ? buildHistoryEntries(record, workflowConfig)
+      : [];
+
+  // The right-side aside renders when there's something distinct to put
+  // there — workflow status or a textarea highlight. Otherwise the facts
+  // table fills the full width (Register, etc.).
+  const renderAside = hasWorkflow || (highlightField && highlightValue);
 
   return (
     <>
       <div
-        className="flex min-h-0 flex-1 flex-col"
+        className="bg-card flex min-h-0 flex-1 flex-col"
         data-test="crud-detail-page"
       >
         {/* Top bar: back + actions */}
@@ -402,83 +466,118 @@ export function CardDetailView({
 
         {/* Scrollable content */}
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="px-8 py-8">
-            {/* Workflow history */}
-            {hasWorkflow && workflowConfig && (
-              <div className="mb-8">
-                <WorkflowHistory
-                  entries={buildHistoryEntries(record, workflowConfig)}
-                />
-              </div>
-            )}
+          <div
+            className={`grid grid-cols-1 ${renderAside ? 'lg:grid-cols-3' : ''}`}
+          >
+            {/* LEFT: facts table */}
+            <div className={`px-6 py-5 ${renderAside ? 'lg:col-span-2' : ''}`}>
+              <table className="w-full text-sm">
+                <tbody>
+                  {factFields.map((field) => {
+                    const value = resolveFieldValue(field, record, fkKeyMap);
+                    const isEmpty = value === '—';
 
-            {/* Field sections */}
-            <div className="space-y-8">
-              {sections.map((section, i) => (
-                <div key={section.title ?? i}>
-                  {section.title && (
-                    <div className="mb-4 flex items-center gap-3">
-                      <h2 className="text-foreground text-base font-semibold tracking-wide">
-                        {section.title}
-                      </h2>
-                      <Separator className="flex-1" />
-                    </div>
+                    return (
+                      <tr
+                        key={field.key}
+                        className="border-border/60 border-b last:border-b-0"
+                      >
+                        <td className="text-muted-foreground/70 w-44 py-2 align-top text-[11px] font-normal tracking-wider uppercase">
+                          {field.label}
+                        </td>
+                        <td className="text-foreground py-2 align-top text-sm font-medium">
+                          {isEmpty ? (
+                            <span className="text-muted-foreground/30">—</span>
+                          ) : (
+                            value
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {/* Workflow timeline row */}
+                  {hasWorkflow && historyEntries.length > 0 && (
+                    <tr className="border-border/60 border-b last:border-b-0">
+                      <td className="text-muted-foreground/70 w-44 py-3 align-top text-[11px] font-normal tracking-wider uppercase">
+                        Workflow
+                      </td>
+                      <td className="py-3">
+                        <WorkflowInline entries={historyEntries} />
+                      </td>
+                    </tr>
                   )}
+                  {/* Audit rows (Created / Updated) inline at the end */}
+                  {typeof record['created_at'] === 'string' && (
+                    <tr className="border-border/60 border-b last:border-b-0">
+                      <td className="text-muted-foreground/70 w-44 py-2 align-top text-[11px] font-normal tracking-wider uppercase">
+                        Created
+                      </td>
+                      <td className="text-foreground py-2 align-top text-sm font-medium">
+                        {formatDateTime(record['created_at'])}
+                      </td>
+                    </tr>
+                  )}
+                  {typeof record['updated_at'] === 'string' && (
+                    <tr>
+                      <td className="text-muted-foreground/70 w-44 py-2 align-top text-[11px] font-normal tracking-wider uppercase">
+                        Updated
+                      </td>
+                      <td className="text-foreground py-2 align-top text-sm font-medium">
+                        {formatDateTime(record['updated_at'])}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-                  {!section.title && i > 0 && <Separator className="mb-4" />}
-
-                  <div className="grid grid-cols-1 gap-x-12 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-                    {section.fields.map((field) => {
-                      const value = resolveFieldValue(field, record, fkKeyMap);
-                      const fkOptionsForField =
-                        field.type === 'fk'
-                          ? (fkOptions?.[field.key] ?? [])
-                          : [];
-                      const comboboxOptionsForField =
-                        field.type === 'combobox'
-                          ? (comboboxOptions?.[field.key] ?? [])
-                          : [];
-
-                      return (
-                        <div key={field.key} className="min-w-0">
-                          <dt className="text-muted-foreground mb-1 text-sm font-medium tracking-wider uppercase">
-                            {field.label}
-                          </dt>
-                          <dd>
-                            <InlineField
-                              field={field}
-                              displayValue={value}
-                              rawValue={record[field.key]}
-                              fkOptions={fkOptionsForField}
-                              comboboxOptions={comboboxOptionsForField}
-                              canEdit={false}
-                            />
-                          </dd>
+            {/* RIGHT: status + highlight aside */}
+            {renderAside && (
+              <aside className="px-6 py-5">
+                {hasWorkflow && currentStatus && workflowConfig && (
+                  <div className="mb-5">
+                    <h2 className="text-muted-foreground mb-2 text-[11px] font-semibold tracking-wider uppercase">
+                      Status
+                    </h2>
+                    <div className="flex items-start gap-2">
+                      <span
+                        className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
+                          STATE_DOT_CLASS[currentStateColor]
+                        }`}
+                      />
+                      <div>
+                        <div className="text-foreground text-sm font-medium">
+                          {workflowConfig.states[currentStatus]?.label ??
+                            currentStatus}
                         </div>
-                      );
-                    })}
+                        {historyEntries.length > 0 && (
+                          <div className="text-muted-foreground text-xs">
+                            {(() => {
+                              const last =
+                                historyEntries[historyEntries.length - 1];
+                              const parts = [];
+                              if (last?.by) parts.push(last.by);
+                              if (last?.at) parts.push(formatDateTime(last.at));
+                              return parts.join(' · ');
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Audit footer */}
-            <div className="border-border mt-10 border-t pt-4">
-              <div className="text-muted-foreground flex flex-wrap items-center gap-5 text-xs">
-                {typeof record['created_at'] === 'string' && (
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    Created {formatDate(record['created_at'])}
-                  </span>
                 )}
-                {typeof record['updated_at'] === 'string' && (
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    Updated {formatDate(record['updated_at'])}
-                  </span>
+                {highlightField && highlightValue && highlightValue !== '—' && (
+                  <div>
+                    <h2 className="text-muted-foreground mb-2 text-[11px] font-semibold tracking-wider uppercase">
+                      {highlightField.label}
+                    </h2>
+                    <p className="text-foreground text-sm leading-relaxed">
+                      {highlightValue}
+                    </p>
+                  </div>
                 )}
-              </div>
-            </div>
+              </aside>
+            )}
           </div>
         </div>
       </div>

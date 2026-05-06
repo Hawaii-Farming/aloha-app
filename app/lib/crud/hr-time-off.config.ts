@@ -235,6 +235,17 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       required: true,
       section: 'Employee',
     },
+    // Detail-only: read-only manager column resolved via cross-table selfJoin.
+    // Hidden from create/edit because the manager comes from the employee record.
+    {
+      key: 'subject_compensation_manager_id',
+      label: 'Comp Manager',
+      type: 'fk',
+      fkTable: 'hr_employee',
+      fkLabelColumns: ['first_name', 'last_name'],
+      showOnCreate: false,
+      showOnEdit: false,
+    },
     {
       key: 'start_date',
       label: 'Start Date',
