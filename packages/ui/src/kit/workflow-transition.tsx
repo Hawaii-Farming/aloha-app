@@ -78,14 +78,14 @@ export function WorkflowTransitionButtons({
             disabled={disabled}
             aria-label={label}
             title={label}
-            className="aspect-square h-9 w-9 rounded-full p-0 sm:aspect-auto sm:h-9 sm:w-auto sm:rounded-md sm:px-3"
+            className="aspect-square h-9 w-9 rounded-full p-0 lg:aspect-auto lg:h-9 lg:w-auto lg:rounded-md lg:px-3"
             onClick={() => {
               setPromptValue('');
               setConfirmStatus(nextState);
             }}
           >
-            <Icon className="h-4 w-4 sm:mr-1.5" />
-            <span className="hidden sm:inline">
+            <Icon className="h-4 w-4 lg:mr-1.5" />
+            <span className="hidden lg:inline">
               <Trans i18nKey={label} defaults={label} />
             </span>
           </Button>

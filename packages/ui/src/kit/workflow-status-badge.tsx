@@ -63,7 +63,7 @@ export function WorkflowStatusBadge({
       {/* Mobile: just the colored dot (with aria/title for context) */}
       <span
         className={cn(
-          'inline-block h-2.5 w-2.5 shrink-0 rounded-full sm:hidden',
+          'inline-block h-2.5 w-2.5 shrink-0 rounded-full lg:hidden',
           dotColorMap[config.color],
         )}
         aria-label={config.label}
@@ -73,7 +73,7 @@ export function WorkflowStatusBadge({
       {/* sm+: full text pill */}
       <Badge
         variant={colorVariantMap[config.color]}
-        className={cn('hidden sm:inline-flex', colorClassMap[config.color])}
+        className={cn('hidden lg:inline-flex', colorClassMap[config.color])}
         data-test={`status-badge-${status}-text`}
       >
         <Trans i18nKey={config.label} defaults={config.label} />
