@@ -1,8 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useFetcher, useNavigate } from 'react-router';
 
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, HomeIcon, Trash2 } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -16,6 +17,7 @@ import {
   AlertDialogTrigger,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
+import { toast } from '@aloha/ui/sonner';
 import { Trans } from '@aloha/ui/trans';
 import { WorkflowStatusBadge } from '@aloha/ui/workflow-status-badge';
 import { WorkflowTransitionButtons } from '@aloha/ui/workflow-transition';
@@ -247,6 +249,7 @@ function WorkflowInline({ entries }: { entries: WorkflowHistoryEntry[] }) {
 export function CardDetailView({
   record,
   config,
+  accountSlug,
   subModuleDisplayName,
   hasWorkflow,
   workflowConfig,
@@ -254,8 +257,14 @@ export function CardDetailView({
   comboboxOptions,
 }: DetailViewProps) {
   const fetcher = useFetcher();
+  const unassignFetcher = useFetcher();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
+  // Capture housing_id at click time so we can navigate back after the
+  // server clears it on the record.
+  const previousHousingIdRef = useRef<string | null>(null);
+  const unassignHandledRef = useRef(false);
 
   const handleDelete = useCallback(() => {
     fetcher.submit(
@@ -263,6 +272,65 @@ export function CardDetailView({
       { method: 'POST', encType: 'application/json' },
     );
   }, [fetcher]);
+
+  const handleUnassignHousing = useCallback(() => {
+    const tenantId = String(record.id ?? '');
+    if (!tenantId) return;
+    previousHousingIdRef.current = record.housing_id
+      ? String(record.housing_id)
+      : null;
+    unassignHandledRef.current = false;
+    unassignFetcher.submit(
+      { intent: 'unassign_tenant', tenantId },
+      { method: 'POST', encType: 'application/json' },
+    );
+  }, [unassignFetcher, record.id, record.housing_id]);
+
+  // After the server clears housing_id, redirect back to the housing detail
+  // page (where the user came from). Falls back to navigate(-1) when we
+  // didn't capture a housing_id (e.g. button was rendered then disabled
+  // before record loaded).
+  useEffect(() => {
+    if (unassignFetcher.state !== 'idle' || unassignHandledRef.current) return;
+    const data = unassignFetcher.data as
+      | { success: boolean; error?: string }
+      | undefined;
+    if (data?.success) {
+      unassignHandledRef.current = true;
+      const prev = previousHousingIdRef.current;
+      toast.success('Removed from housing');
+      // Invalidate the housing-tenants cache for the site we're returning
+      // to so the previously-cached tenants list (still containing this
+      // employee) is refetched on landing.
+      if (prev && accountSlug) {
+        queryClient.invalidateQueries({
+          queryKey: ['housing-tenants', prev, accountSlug],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['housing-eligible-employees', accountSlug],
+        });
+        navigate(
+          `/home/${accountSlug}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Housing')}/${encodeURIComponent(prev)}`,
+        );
+      } else {
+        navigate(-1);
+      }
+    } else if (data?.error) {
+      unassignHandledRef.current = true;
+      toast.error(data.error);
+    }
+  }, [
+    unassignFetcher.state,
+    unassignFetcher.data,
+    accountSlug,
+    navigate,
+    queryClient,
+  ]);
+
+  const showRemoveFromHousing =
+    config?.tableName === 'hr_employee' &&
+    record.housing_id != null &&
+    record.housing_id !== '';
 
   const handleTransition = useCallback(
     (newStatus: string) => {
@@ -392,6 +460,21 @@ export function CardDetailView({
                   onTransition={handleTransition}
                   disabled={fetcher.state !== 'idle'}
                 />
+              </AccessGate>
+            )}
+
+            {showRemoveFromHousing && (
+              <AccessGate permission="can_edit">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleUnassignHousing}
+                  disabled={isDeleting || unassignFetcher.state !== 'idle'}
+                  data-test="employee-remove-from-housing"
+                >
+                  <HomeIcon className="mr-1.5 h-3.5 w-3.5" />
+                  Remove from housing
+                </Button>
               </AccessGate>
             )}
 
