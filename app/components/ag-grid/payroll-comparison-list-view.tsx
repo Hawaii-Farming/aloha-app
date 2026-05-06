@@ -149,7 +149,6 @@ const byTaskColDefs: ColDef[] = [
   numericCol('discretionary_overtime_hours', 'OT Hours', {
     formatter: hoursFormatter,
   }),
-  numericCol('regular_pay', 'Regular Pay', { currency: true, width: 130 }),
   deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
   deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
 ];
@@ -188,7 +187,6 @@ const byEmployeeColDefs: ColDef[] = [
   numericCol('discretionary_overtime_hours', 'OT Hours', {
     formatter: hoursFormatter,
   }),
-  numericCol('regular_pay', 'Regular Pay', { currency: true, width: 130 }),
   deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
   deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
 ];
