@@ -10,7 +10,6 @@ import { numericColDef } from '~/components/ag-grid/cell-renderers/number-format
 import {
   DatePillRenderer,
   EmailPillRenderer,
-  HashPillRenderer,
 } from '~/components/ag-grid/cell-renderers/pill-renderer';
 import { StatusBadgeRenderer } from '~/components/ag-grid/cell-renderers/status-badge-renderer';
 import type { ColumnConfig } from '~/lib/crud/types';
@@ -59,11 +58,6 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
         if (!value) return '';
         return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
       };
-    }
-
-    // badge render: categorical values shown as colored badges
-    if (col.render === 'badge') {
-      colDef.cellRenderer = HashPillRenderer;
     }
 
     // phone render: format as (XXX) XXX-XXXX
