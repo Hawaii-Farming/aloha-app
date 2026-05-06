@@ -47,67 +47,65 @@ export function buildDefaultValues(
   return defaults;
 }
 
+function resolveByDisplay(
+  record: Record<string, unknown>,
+  byField: string | undefined,
+): string | null {
+  if (!byField) return null;
+  const first = record[`${byField}_first_name`];
+  const last = record[`${byField}_last_name`];
+  const composed = [first, last]
+    .filter((v) => typeof v === 'string' && v.length > 0)
+    .join(' ');
+  if (composed) return composed;
+  const raw = record[byField];
+  return raw == null ? null : (raw as string);
+}
+
 export function buildHistoryEntries(
   record: Record<string, unknown>,
   workflow: WorkflowConfig,
 ): WorkflowHistoryEntry[] {
-  const entries: WorkflowHistoryEntry[] = [];
+  const currentStatus = record[workflow.statusColumn] as string | undefined;
+  if (!currentStatus) return [];
 
-  if (workflow.initialEntry) {
+  // If the current status matches the configured initial state (e.g. Pending),
+  // source the entry from the creation columns (requested_at / requested_by).
+  if (
+    workflow.initialEntry &&
+    workflow.initialEntry.state === currentStatus &&
+    record[workflow.initialEntry.atField]
+  ) {
     const { state, atField, byField } = workflow.initialEntry;
-    if (record[atField]) {
-      entries.push({
+    return [
+      {
         action: workflow.states[state]?.label ?? state,
         at: record[atField] as string,
-        by: byField ? (record[byField] as string | null) : null,
+        by: resolveByDisplay(record, byField),
         color: workflow.states[state]?.color,
-      });
-    }
+      },
+    ];
   }
 
-  if (!workflow.transitionFields) {
-    return entries;
-  }
+  // Otherwise, emit the entry for the current transitioned-to state.
+  const fields = workflow.transitionFields?.[currentStatus];
+  if (!fields) return [];
 
-  const currentStatus = record[workflow.statusColumn] as string | undefined;
+  const atField = Object.entries(fields).find(
+    ([_key, value]) => value === 'now',
+  )?.[0];
+  const byField = Object.entries(fields).find(
+    ([_key, value]) => value === 'currentEmployee',
+  )?.[0];
 
-  // Group statuses by their `at` field. When multiple statuses share the
-  // same column (e.g. Approved + Denied both write `reviewed_at`), only
-  // the current status reflects what actually happened — emitting both
-  // would duplicate the same timestamp under two different actions.
-  const statusesByAtField = new Map<string, string[]>();
-  for (const [status, fields] of Object.entries(workflow.transitionFields)) {
-    const atField = Object.entries(fields).find(
-      ([_key, value]) => value === 'now',
-    )?.[0];
-    if (!atField) continue;
-    const list = statusesByAtField.get(atField) ?? [];
-    list.push(status);
-    statusesByAtField.set(atField, list);
-  }
+  if (!atField || !record[atField]) return [];
 
-  for (const [status, fields] of Object.entries(workflow.transitionFields)) {
-    const atField = Object.entries(fields).find(
-      ([_key, value]) => value === 'now',
-    )?.[0];
-    const byField = Object.entries(fields).find(
-      ([_key, value]) => value === 'currentEmployee',
-    )?.[0];
-
-    if (!atField || !record[atField]) continue;
-
-    const sharedWith = statusesByAtField.get(atField) ?? [];
-    if (sharedWith.length > 1 && status !== currentStatus) continue;
-
-    entries.push({
-      action: workflow.states[status]?.label ?? status,
+  return [
+    {
+      action: workflow.states[currentStatus]?.label ?? currentStatus,
       at: record[atField] as string,
-      by: byField ? (record[byField] as string | null) : null,
-      color: workflow.states[status]?.color,
-    });
-  }
-
-  entries.sort((a, b) => new Date(a.at!).getTime() - new Date(b.at!).getTime());
-
-  return entries;
+      by: resolveByDisplay(record, byField),
+      color: workflow.states[currentStatus]?.color,
+    },
+  ];
 }

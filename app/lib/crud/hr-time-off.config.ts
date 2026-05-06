@@ -63,12 +63,12 @@ const timeOffColumns: ColumnConfig[] = [
   { key: 'request_reason', label: 'Reason', priority: 'low' },
   { key: 'denial_reason', label: 'Denial Reason', priority: 'low' },
   {
-    key: 'requester_preferred_name',
+    key: 'requester_full_name',
     label: 'Requested By',
     priority: 'low',
   },
   {
-    key: 'reviewer_preferred_name',
+    key: 'reviewer_full_name',
     label: 'Reviewed By',
     priority: 'low',
   },
@@ -109,6 +109,26 @@ const timeOffColDefs = [
           const last =
             (params.data
               ?.subject_compensation_manager_id_last_name as string) ?? '';
+          return [first, last].filter(Boolean).join(' ');
+        },
+      };
+    }
+    if (col.field === 'requester_full_name') {
+      return {
+        ...col,
+        valueGetter: (params: ValueGetterParams) => {
+          const first = (params.data?.requester_first_name as string) ?? '';
+          const last = (params.data?.requester_last_name as string) ?? '';
+          return [first, last].filter(Boolean).join(' ');
+        },
+      };
+    }
+    if (col.field === 'reviewer_full_name') {
+      return {
+        ...col,
+        valueGetter: (params: ValueGetterParams) => {
+          const first = (params.data?.reviewer_first_name as string) ?? '';
+          const last = (params.data?.reviewer_last_name as string) ?? '';
           return [first, last].filter(Boolean).join(' ');
         },
       };
@@ -161,14 +181,24 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   select: [
     '*',
     'subject:hr_employee!hr_time_off_request_hr_employee_id_emp_fkey(first_name,last_name,preferred_name,profile_photo_url,hr_department_id,hr_work_authorization_id,compensation_manager_id)',
-    'requester:hr_employee!hr_time_off_request_requested_by_emp_fkey(preferred_name)',
-    'reviewer:hr_employee!hr_time_off_request_reviewed_by_emp_fkey(preferred_name)',
+    'requester:hr_employee!hr_time_off_request_requested_by_emp_fkey(first_name,last_name,preferred_name)',
+    'reviewer:hr_employee!hr_time_off_request_reviewed_by_emp_fkey(first_name,last_name,preferred_name)',
   ].join(', '),
 
   // No FK constraint on hr_employee.compensation_manager_id, so PostgREST
-  // can't embed manager info. Instead, look up by id in hr_employee.
+  // can't embed manager info. Cross-table lookups also enrich the
+  // workflow-history `by` ids (requested_by / reviewed_by) so the detail
+  // page can show "First Last" instead of the raw employee id.
   selfJoins: {
     subject_compensation_manager_id: {
+      table: 'hr_employee',
+      displayFields: ['first_name', 'last_name'],
+    },
+    requested_by: {
+      table: 'hr_employee',
+      displayFields: ['first_name', 'last_name'],
+    },
+    reviewed_by: {
       table: 'hr_employee',
       displayFields: ['first_name', 'last_name'],
     },
