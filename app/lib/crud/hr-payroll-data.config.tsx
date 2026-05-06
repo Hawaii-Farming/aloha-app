@@ -42,10 +42,7 @@ const rateFormatter = (params: ValueFormatterParams): string => {
   if (value == null) return '';
   const n = Number(value);
   if (n === 0) return '—';
-  return n.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return Math.round(n).toLocaleString('en-US');
 };
 
 const wholeNumberFormatter = (params: ValueFormatterParams): string => {

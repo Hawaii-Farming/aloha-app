@@ -26,6 +26,7 @@ import {
 } from '~/components/ag-grid/column-state';
 import { useDetailRow } from '~/components/ag-grid/detail-row-wrapper';
 import {
+  CurrencyDeltaRenderer,
   CurrencyRenderer,
   hoursFormatter,
 } from '~/components/ag-grid/payroll-formatters';
@@ -77,7 +78,7 @@ function DeltaRenderer(
       <div
         className={`flex h-full w-full items-center ${isPinned ? 'font-bold' : ''}`}
       >
-        <CurrencyRenderer {...props} />
+        <CurrencyDeltaRenderer {...props} />
       </div>
     );
   }
