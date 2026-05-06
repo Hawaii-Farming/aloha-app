@@ -417,7 +417,7 @@ export default function HousingDetailView({
   const [assignOpen, setAssignOpen] = useState(false);
 
   const siteId = String(record.id ?? '');
-  const name = String(record.name ?? 'Housing');
+  const name = String(record.name ?? record.id ?? 'Housing');
   const notes = record.notes ? String(record.notes) : null;
   const availableBeds = Number(record.available_beds ?? 0);
 
