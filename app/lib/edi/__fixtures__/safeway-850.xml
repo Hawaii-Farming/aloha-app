@@ -1,0 +1,132 @@
+<Order>
+    <Header>
+        <OrderHeader>
+            <TradingPartnerId>768ALLJTLFARMIN</TradingPartnerId>
+            <PurchaseOrderNumber>901845</PurchaseOrderNumber>
+            <TsetPurposeCode>00</TsetPurposeCode>
+            <PrimaryPOTypeCode>SA</PrimaryPOTypeCode>
+            <PurchaseOrderDate>2026-04-28</PurchaseOrderDate>
+        </OrderHeader>
+        <Dates>
+            <DateTimeQualifier>002</DateTimeQualifier>
+            <Date>2026-05-18</Date>
+        </Dates>
+        <Contacts>
+            <ContactTypeCode>BD</ContactTypeCode>
+            <ContactName>DEREK UCHINO</ContactName>
+            <PrimaryPhone>8082069533</PrimaryPhone>
+        </Contacts>
+        <Address>
+            <AddressTypeCode>ST</AddressTypeCode>
+            <LocationCodeQualifier>9</LocationCodeQualifier>
+            <AddressLocationNumber>0091372092528</AddressLocationNumber>
+            <AddressName>SAFEWAY INC. A SUB. OF ALBERTSONS COMPANIES, INC.</AddressName>
+            <AddressAlternateName>Hawaii Produce</AddressAlternateName>
+            <Address1>1081 Makepono St</Address1>
+            <City>Honolulu</City>
+            <State>HI</State>
+            <PostalCode>96819</PostalCode>
+        </Address>
+        <Address>
+            <AddressTypeCode>BT</AddressTypeCode>
+            <LocationCodeQualifier>9</LocationCodeQualifier>
+            <AddressLocationNumber>0091372091700</AddressLocationNumber>
+            <AddressName>ALBERTSONS COMPANIES, INC.</AddressName>
+            <AddressAlternateName>NATIONAL SERVICES CENTER</AddressAlternateName>
+            <Address1>P.O. BOX 29093</Address1>
+            <City>PHOENIX</City>
+            <State>AZ</State>
+            <PostalCode>85038</PostalCode>
+        </Address>
+        <Address>
+            <AddressTypeCode>VN</AddressTypeCode>
+            <LocationCodeQualifier>9</LocationCodeQualifier>
+            <AddressLocationNumber>117233238</AddressLocationNumber>
+            <AddressName>HAWAII FARMING LLC</AddressName>
+            <Address1>66-1247 LALAMILO FARM ROAD</Address1>
+            <City>KAMUELA</City>
+            <State>HI</State>
+            <PostalCode>96743</PostalCode>
+        </Address>
+        <FOBRelatedInstruction>
+            <FOBPayCode>PP</FOBPayCode>
+        </FOBRelatedInstruction>
+        <CarrierInformation>
+            <CarrierTransMethodCode>M</CarrierTransMethodCode>
+            <CarrierRouting>TRUCK</CarrierRouting>
+        </CarrierInformation>
+        <Notes>
+            <Note>66-1247 LALAMILO FARM RD</Note>
+        </Notes>
+        <Notes>
+            <Note>KAMUELA, HI 94743</Note>
+        </Notes>
+        <Notes>
+            <Note>PO IS GOVERNED BY ANY SUPPLY AGREEMENT BETWEEN THE PARTIES AND THE CCG TERMS FOU</Note>
+        </Notes>
+        <Notes>
+            <Note>ND AT</Note>
+        </Notes>
+        <Notes>
+            <Note>https://suppliers.safeway.com/docs/Form%201060_CCG_Template%2001312024.pdf</Note>
+        </Notes>
+        <Notes>
+            <Note>TO SCHEDULE AN APPOINTMENT PLEASE LOG ONTO ONE NETWORK.</Note>
+        </Notes>
+        <Notes>
+            <Note>ALL OF THE TERMS AND CONDITIONS OF WHICH ARE INCORPORATED HEREIN BY THIS</Note>
+        </Notes>
+        <Notes>
+            <Note>REFERENCE AND SUPERSEDE CONTRARY TERMS IN ANY VENDOR DOCUMENT.</Note>
+        </Notes>
+        <Notes>
+            <Note>PO NUMBER AND ITEMIZED BILL OF LADING REQD TENDER SORTED AND SEGREGATD.NO BACK O</Note>
+        </Notes>
+        <Notes>
+            <Note>RDERS</Note>
+        </Notes>
+        <QuantityTotals>
+            <QuantityTotalsQualifier>SQT</QuantityTotalsQualifier>
+            <Quantity>1312</Quantity>
+        </QuantityTotals>
+    </Header>
+    <LineItem>
+        <OrderLine>
+            <LineSequenceNumber>1</LineSequenceNumber>
+            <BuyerPartNumber>84360025</BuyerPartNumber>
+            <UPCCaseCode>085523900400</UPCCaseCode>
+            <OrderQty>84</OrderQty>
+            <OrderQtyUOM>CA</OrderQtyUOM>
+            <PurchasePrice>46</PurchasePrice>
+        </OrderLine>
+        <PriceInformation>
+            <PriceTypeIDCode>RTL</PriceTypeIDCode>
+            <UnitPrice>46</UnitPrice>
+        </PriceInformation>
+        <ProductOrItemDescription>
+            <ProductCharacteristicCode>08</ProductCharacteristicCode>
+            <ProductDescription>CUCUMBERS PERSIAN MINI BAG      12/LB</ProductDescription>
+        </ProductOrItemDescription>
+    </LineItem>
+    <LineItem>
+        <OrderLine>
+            <LineSequenceNumber>2</LineSequenceNumber>
+            <BuyerPartNumber>84360023</BuyerPartNumber>
+            <UPCCaseCode>048436002301</UPCCaseCode>
+            <OrderQty>30</OrderQty>
+            <OrderQtyUOM>CA</OrderQtyUOM>
+            <PurchasePrice>62.25</PurchasePrice>
+        </OrderLine>
+        <PriceInformation>
+            <PriceTypeIDCode>RTL</PriceTypeIDCode>
+            <UnitPrice>62.25</UnitPrice>
+        </PriceInformation>
+        <ProductOrItemDescription>
+            <ProductCharacteristicCode>08</ProductCharacteristicCode>
+            <ProductDescription>CUCUMBERS JAPANESE KAMUELA      18/3 CT</ProductDescription>
+        </ProductOrItemDescription>
+    </LineItem>
+    <Summary>
+        <TotalLineItemNumber>2</TotalLineItemNumber>
+    </Summary>
+</Order>

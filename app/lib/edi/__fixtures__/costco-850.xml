@@ -1,0 +1,105 @@
+<Order>
+    <Header>
+        <OrderHeader>
+            <TradingPartnerId>065ALLHAWAIIFAR</TradingPartnerId>
+            <PurchaseOrderNumber>001200427283</PurchaseOrderNumber>
+            <TsetPurposeCode>00</TsetPurposeCode>
+            <PrimaryPOTypeCode>SA</PrimaryPOTypeCode>
+            <PurchaseOrderDate>2026-04-27</PurchaseOrderDate>
+            <Department>65</Department>
+            <DepartmentDescription>COSTCO DEPARTMENT</DepartmentDescription>
+            <Vendor>0010007502</Vendor>
+            <Division>NW</Division>
+        </OrderHeader>
+        <PaymentTerms>
+            <TermsType>01</TermsType>
+            <TermsBasisDateCode>2</TermsBasisDateCode>
+            <TermsNetDueDays>30</TermsNetDueDays>
+            <TermsDescription>ROG 30</TermsDescription>
+        </PaymentTerms>
+        <Dates>
+            <DateTimeQualifier>001</DateTimeQualifier>
+            <Date>2026-05-08</Date>
+        </Dates>
+        <Dates>
+            <DateTimeQualifier>002</DateTimeQualifier>
+            <Date>2026-05-08</Date>
+        </Dates>
+        <Dates>
+            <DateTimeQualifier>010</DateTimeQualifier>
+            <Date>2026-05-08</Date>
+        </Dates>
+        <Address>
+            <AddressTypeCode>ST</AddressTypeCode>
+            <LocationCodeQualifier>9</LocationCodeQualifier>
+            <AddressLocationNumber>1033918430120</AddressLocationNumber>
+            <AddressName>COSTCO HAWAII KAI</AddressName>
+            <Address1>333 A KEAHOLE STREET</Address1>
+            <City>HONOLULU</City>
+            <State>HI</State>
+            <PostalCode>96825</PostalCode>
+            <Contacts>
+                <ContactTypeCode>RE</ContactTypeCode>
+                <PrimaryPhone>8083965543</PrimaryPhone>
+            </Contacts>
+        </Address>
+        <FOBRelatedInstruction>
+            <FOBPayCode>PP</FOBPayCode>
+            <FOBLocationQualifier>OR</FOBLocationQualifier>
+            <FOBLocationDescription>NA</FOBLocationDescription>
+        </FOBRelatedInstruction>
+        <CarrierInformation>
+            <CarrierRouting>VENDORS CHOICE</CarrierRouting>
+        </CarrierInformation>
+        <References>
+            <ReferenceQual>YD</ReferenceQual>
+            <ReferenceID>75746</ReferenceID>
+            <Description>BUYER VENDOR NUMBER</Description>
+        </References>
+        <References>
+            <ReferenceQual>YD</ReferenceQual>
+            <ReferenceID>00</ReferenceID>
+            <Description>BUYER VENDOR SUFFIX</Description>
+        </References>
+        <References>
+            <ReferenceQual>YD</ReferenceQual>
+            <ReferenceID>NW755</ReferenceID>
+            <Description>CREATED BY</Description>
+        </References>
+        <References>
+            <ReferenceQual>19</ReferenceQual>
+            <Description>COSTCO REGION</Description>
+        </References>
+        <Notes>
+            <NoteCode>SPE</NoteCode>
+            <Note>LEGAL DISCLAIMER:This order incorporates the Costco Wholesale Standard Terms,</Note>
+        </Notes>
+        <Notes>
+            <NoteCode>SPE</NoteCode>
+            <Note>LEGAL DISCLAIMER:as they may be amended from time to time, and any applicable</Note>
+        </Notes>
+        <Notes>
+            <NoteCode>SPE</NoteCode>
+            <Note>LEGAL DISCLAIMER:signed agreements between us.</Note>
+        </Notes>
+        <QuantityTotals>
+            <QuantityTotalsQualifier>SQT</QuantityTotalsQualifier>
+            <Quantity>40</Quantity>
+        </QuantityTotals>
+    </Header>
+    <LineItem>
+        <OrderLine>
+            <LineSequenceNumber>1</LineSequenceNumber>
+            <BuyerPartNumber>1791845</BuyerPartNumber>
+            <OrderQty>40</OrderQty>
+            <OrderQtyUOM>CA</OrderQtyUOM>
+            <PurchasePrice>66</PurchasePrice>
+        </OrderLine>
+        <ProductOrItemDescription>
+            <ProductDescription>SPRING MIX</ProductDescription>
+        </ProductOrItemDescription>
+    </LineItem>
+    <Summary>
+        <TotalLineItemNumber>1</TotalLineItemNumber>
+    </Summary>
+</Order>
