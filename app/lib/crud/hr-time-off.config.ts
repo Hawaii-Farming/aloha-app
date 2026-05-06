@@ -311,7 +311,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
     },
     transitions: {
       Pending: ['Approved', 'Denied', 'Cancelled'],
-      Approved: ['Cancelled'],
+      Approved: [],
       Denied: ['Pending'],
       Cancelled: [],
     },
