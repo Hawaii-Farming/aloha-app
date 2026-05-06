@@ -141,7 +141,7 @@ const agGridColDefs: ColDef[] = [
     field: 'invoice_number',
     headerName: 'Invoice #',
     type: 'numericColumn',
-    cellClass: 'font-mono',
+    cellClass: 'font-mono text-right',
   },
   hours('regular_hours', 'Regular Hrs'),
   hours('overtime_hours', 'OT Hrs'),
