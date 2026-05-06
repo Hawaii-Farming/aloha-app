@@ -185,6 +185,11 @@ const byEmployeeColDefs: ColDef[] = [
     minWidth: 220,
     pinned: 'left',
   },
+  {
+    field: 'hr_employee_hr_work_authorization_id',
+    headerName: 'Work Auth',
+    minWidth: 120,
+  },
   numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
   numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
   deltaCol('hours_delta', 'Δ Hours', 'hours'),
@@ -338,7 +343,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   }, []);
 
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    restoreColumnState('payroll_comparison_v3', event.api);
+    restoreColumnState('payroll_comparison_v4', event.api);
   }, []);
 
   const debouncedSaveState = useCallback((api: GridApi) => {
@@ -346,7 +351,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       clearTimeout(saveDebounceRef.current);
     }
     saveDebounceRef.current = setTimeout(() => {
-      saveColumnState('payroll_comparison_v3', api);
+      saveColumnState('payroll_comparison_v4', api);
     }, 300);
   }, []);
 

@@ -237,7 +237,9 @@ export const loader = async (args: {
       if (employeeIds.size > 0) {
         const { data: empData } = await client
           .from('hr_employee' as never)
-          .select('id, preferred_name, profile_photo_url, hr_department_id')
+          .select(
+            'id, preferred_name, profile_photo_url, hr_department_id, hr_work_authorization_id',
+          )
           .in('id', Array.from(employeeIds));
         const empMap = new Map<string, Record<string, unknown>>();
         for (const e of castRows(empData)) {
@@ -252,6 +254,7 @@ export const loader = async (args: {
             hr_employee_preferred_name: emp.preferred_name,
             hr_employee_profile_photo_url: emp.profile_photo_url,
             hr_employee_hr_department_id: emp.hr_department_id,
+            hr_employee_hr_work_authorization_id: emp.hr_work_authorization_id,
           };
         });
       }
