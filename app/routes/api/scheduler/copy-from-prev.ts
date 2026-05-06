@@ -63,7 +63,11 @@ export const action = async ({ request }: { request: Request }) => {
 
   if ((currentCount ?? 0) > 0) {
     return Response.json(
-      { success: false, error: 'Current week already has records' },
+      {
+        success: false,
+        error:
+          'Current week already has records. Please select an empty week.',
+      },
       { status: 409 },
     );
   }

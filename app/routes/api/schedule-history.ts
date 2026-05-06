@@ -1,6 +1,7 @@
 import { castRows } from '~/lib/crud/typed-query.server';
 import {
   addDaysToDate,
+  dayOfWeekIndex,
   dayOfWeekName,
   diffHours,
   extractDate,
@@ -92,6 +93,12 @@ export const loader = async ({ request }: { request: Request }) => {
   }
 
   if (mode === 'summary') {
+    // Look back 13 weeks (~3 months) of schedule history.
+    const today = new Date();
+    const lookbackStart = new Date(today);
+    lookbackStart.setDate(today.getDate() - 13 * 7);
+    const lookbackStartIso = lookbackStart.toISOString().slice(0, 10);
+
     const { data, error } = await client
       .from('ops_task_schedule' as never)
       .select('start_time, stop_time, hr_employee_id')
@@ -99,8 +106,9 @@ export const loader = async ({ request }: { request: Request }) => {
       .eq('is_deleted', false)
       .not('start_time', 'is', null)
       .is('ops_task_tracker_id' as never, null)
+      .gte('start_time', `${lookbackStartIso}T00:00:00`)
       .order('start_time', { ascending: false })
-      .limit(500);
+      .limit(10000);
 
     if (error) {
       return Response.json({ error: error.message }, { status: 500 });
@@ -108,7 +116,7 @@ export const loader = async ({ request }: { request: Request }) => {
 
     const rows = castRows(data);
 
-    const byDate = new Map<
+    const byWeek = new Map<
       string,
       { employees: Set<string>; totalHours: number }
     >();
@@ -121,7 +129,11 @@ export const loader = async ({ request }: { request: Request }) => {
       const dateKey = extractDate(start);
       if (!dateKey) continue;
 
-      const entry = byDate.get(dateKey) ?? {
+      const dow = dayOfWeekIndex(dateKey);
+      if (dow < 0) continue;
+      const weekStartKey = addDaysToDate(dateKey, -dow);
+
+      const entry = byWeek.get(weekStartKey) ?? {
         employees: new Set<string>(),
         totalHours: 0,
       };
@@ -133,16 +145,16 @@ export const loader = async ({ request }: { request: Request }) => {
         entry.totalHours += hours;
       }
 
-      byDate.set(dateKey, entry);
+      byWeek.set(weekStartKey, entry);
     }
 
-    const summary = Array.from(byDate.entries())
-      .map(([date, entry]) => ({
-        date,
+    const summary = Array.from(byWeek.entries())
+      .map(([week_start, entry]) => ({
+        week_start,
         employee_count: entry.employees.size,
-        total_hours: Math.round(entry.totalHours * 100) / 100,
+        total_hours: Math.round(entry.totalHours),
       }))
-      .sort((a, b) => b.date.localeCompare(a.date));
+      .sort((a, b) => b.week_start.localeCompare(a.week_start));
 
     return Response.json({ data: summary });
   }

@@ -97,3 +97,26 @@ html {
 *::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
 }
+
+/* Print mode for scheduler grid (and other [data-print-target]) */
+@media print {
+  @page {
+    size: landscape;
+    margin: 0.4in;
+  }
+
+  body.print-schedule * {
+    visibility: hidden;
+  }
+  body.print-schedule [data-print-target],
+  body.print-schedule [data-print-target] * {
+    visibility: visible;
+  }
+  body.print-schedule [data-print-target] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+}

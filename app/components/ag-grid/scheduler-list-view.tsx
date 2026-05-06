@@ -20,7 +20,7 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
@@ -78,7 +78,7 @@ function formatWeekLabel(weekStartStr: string): string {
 }
 
 interface HistoryRow {
-  date: string;
+  week_start: string;
   employee_count: number;
   total_hours: number;
 }
@@ -144,6 +144,10 @@ export default function SchedulerListView(props: ListViewProps) {
       if (json.success) {
         toast.success(`Copied ${json.copied ?? 0} entries from previous week`);
         revalidator.revalidate();
+      } else if (res.status === 409) {
+        toast.error('Current week already has records', {
+          description: 'Please select an empty week.',
+        });
       } else {
         toast.error(json.error ?? 'Failed to copy previous week');
       }
@@ -154,35 +158,80 @@ export default function SchedulerListView(props: ListViewProps) {
     }
   }, [accountSlug, currentWeek, revalidator]);
 
+  const fetchHistorySummary = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/schedule-history?mode=summary&orgId=${encodeURIComponent(accountSlug)}`,
+      );
+      const json = (await res.json()) as { data?: HistoryRow[] };
+      if (json.data) setHistoryData(json.data);
+    } catch {
+      // Silently handle fetch errors
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [accountSlug]);
+
   // Fetch history summary on mount
-  // Justified: both tables render simultaneously, history needs its own data
+  // Justified: drawer needs its own data fetch separate from main table loader
   useEffect(() => {
-    let cancelled = false;
+    fetchHistorySummary();
+  }, [fetchHistorySummary]);
 
-    async function fetchSummary() {
+  const handleDeleteEmployeeWeek = useCallback(
+    async (employeeId: string, employeeName: string) => {
+      const confirmed = window.confirm(
+        `Delete ${employeeName}'s schedule for the week of ${format(
+          parseISO(currentWeek),
+          'MMM d, yyyy',
+        )}?`,
+      );
+      if (!confirmed) return;
       try {
-        const res = await fetch(
-          `/api/schedule-history?mode=summary&orgId=${encodeURIComponent(accountSlug)}`,
-        );
-        const json = (await res.json()) as { data?: HistoryRow[] };
-
-        if (!cancelled && json.data) {
-          setHistoryData(json.data);
+        const res = await fetch('/api/scheduler/delete-week', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accountSlug,
+            weekStart: currentWeek,
+            employeeId,
+          }),
+        });
+        const json = (await res.json()) as {
+          success?: boolean;
+          deleted?: number;
+          error?: string;
+        };
+        if (json.success) {
+          toast.success(`Deleted ${json.deleted ?? 0} entries`);
+          await fetchHistorySummary();
+          revalidator.revalidate();
+        } else {
+          toast.error(json.error ?? 'Failed to delete week');
         }
       } catch {
-        // Silently handle fetch errors
-      } finally {
-        if (!cancelled) {
-          setHistoryLoading(false);
-        }
+        toast.error('Failed to delete week');
       }
-    }
+    },
+    [accountSlug, currentWeek, fetchHistorySummary, revalidator],
+  );
 
-    fetchSummary();
-    return () => {
-      cancelled = true;
+  const handlePrint = useCallback(() => {
+    const api = gridRef.current?.api;
+    document.body.classList.add('print-schedule');
+    api?.setColumnsVisible(['profile_photo_url', 'delete'], false);
+    api?.setGridOption('domLayout', 'print');
+
+    const cleanup = () => {
+      api?.setGridOption('domLayout', 'normal');
+      api?.setColumnsVisible(['profile_photo_url', 'delete'], true);
+      document.body.classList.remove('print-schedule');
+      window.removeEventListener('afterprint', cleanup);
     };
-  }, [accountSlug]);
+    window.addEventListener('afterprint', cleanup);
+
+    setTimeout(() => window.print(), 50);
+  }, []);
 
   const handleEditRow = useCallback((employeeId: string) => {
     setEditEmployeeId(employeeId);
@@ -208,11 +257,6 @@ export default function SchedulerListView(props: ListViewProps) {
         minWidth: 220,
         pinned: 'left' as const,
       },
-      {
-        headerName: 'Work Auth',
-        field: 'work_authorization_name',
-        minWidth: 120,
-      },
       ...['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({
         headerName: day,
         field: [
@@ -236,8 +280,38 @@ export default function SchedulerListView(props: ListViewProps) {
         type: 'numericColumn',
         minWidth: 100,
       },
+      {
+        headerName: '',
+        colId: 'delete',
+        width: 56,
+        maxWidth: 56,
+        sortable: false,
+        filter: false,
+        resizable: false,
+        suppressMovable: true,
+        cellRenderer: (p: { data?: RowData }) => {
+          const empId = p.data?.hr_employee_id as string | undefined;
+          const name =
+            (p.data?.full_name as string | undefined) ?? 'this employee';
+          if (!empId) return null;
+          return (
+            <button
+              type="button"
+              aria-label="Delete employee week"
+              title="Delete employee week"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteEmployeeWeek(empId, name);
+              }}
+              className="text-muted-foreground hover:text-destructive flex h-full w-full items-center justify-center transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          );
+        },
+      },
     ],
-    [],
+    [handleDeleteEmployeeWeek],
   );
 
   // Full column defs including checkbox and avatar
@@ -250,9 +324,11 @@ export default function SchedulerListView(props: ListViewProps) {
   const historyColDefs: ColDef[] = useMemo(
     () => [
       {
-        headerName: 'Date',
-        field: 'date',
-        minWidth: 120,
+        headerName: 'Week Of',
+        field: 'week_start',
+        minWidth: 140,
+        valueFormatter: (p: { value?: string | null }) =>
+          p.value ? format(parseISO(p.value), 'MMM d, yyyy') : '',
       },
       {
         headerName: 'Employees',
@@ -332,10 +408,20 @@ export default function SchedulerListView(props: ListViewProps) {
           onHistoryOpen={() => setHistoryOpen(true)}
           onCopyFromPrev={handleCopyFromPrev}
           copyPending={copyPending}
+          onPrint={handlePrint}
         />
 
         {/* Weekly Schedule — full width */}
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div
+          className="flex min-h-0 flex-1 flex-col"
+          data-print-target="scheduler-grid"
+        >
+          {/* Print-only header — week range */}
+          <div className="hidden print:mb-3 print:block">
+            <h1 className="text-base font-semibold">
+              Schedule — Week of {formatWeekLabel(currentWeek)}
+            </h1>
+          </div>
           <AgGridWrapper
             gridRef={gridRef}
             colDefs={colDefs}

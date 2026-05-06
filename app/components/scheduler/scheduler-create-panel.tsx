@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFetcher, useRevalidator } from 'react-router';
 
 import { addDays, format, parseISO } from 'date-fns';
-import { Check, ChevronsUpDown, X } from 'lucide-react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Check, ChevronDown, ChevronsUpDown, Plus, X } from 'lucide-react';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@aloha/ui/button';
 import {
@@ -235,6 +235,33 @@ function isRowFilled(d: DayEntry): boolean {
   return !!(d.start_time || d.stop_time || d.ops_task_id);
 }
 
+// Returns the set of slot indices that overlap another slot on the same date.
+function findOverlappingSlots(slots: DayEntry[]): Set<number> {
+  const overlapping = new Set<number>();
+  const byDate = new Map<string, number[]>();
+  slots.forEach((s, i) => {
+    if (!s.date || !s.start_time || !s.stop_time) return;
+    if (s.start_time >= s.stop_time) return;
+    const arr = byDate.get(s.date) ?? [];
+    arr.push(i);
+    byDate.set(s.date, arr);
+  });
+  for (const idxs of byDate.values()) {
+    if (idxs.length < 2) continue;
+    for (let a = 0; a < idxs.length; a++) {
+      for (let b = a + 1; b < idxs.length; b++) {
+        const sa = slots[idxs[a]!]!;
+        const sb = slots[idxs[b]!]!;
+        if (sa.start_time < sb.stop_time && sb.start_time < sa.stop_time) {
+          overlapping.add(idxs[a]!);
+          overlapping.add(idxs[b]!);
+        }
+      }
+    }
+  }
+  return overlapping;
+}
+
 export function SchedulerCreatePanel({
   open,
   onOpenChange,
@@ -256,6 +283,11 @@ export function SchedulerCreatePanel({
     defaultValues: buildDefaults(currentWeek),
   });
 
+  const { fields, append, remove, replace } = useFieldArray({
+    control: form.control,
+    name: 'days',
+  });
+
   const employeeId = useWatch({
     control: form.control,
     name: 'hr_employee_id',
@@ -266,17 +298,20 @@ export function SchedulerCreatePanel({
     [watchedDays],
   );
 
+  const overlapping = useMemo(() => findOverlappingSlots(days), [days]);
+
   // After the user attempts to save once, escalate to strict checks
   // (required fields). Resets automatically when form.reset() is called.
   const isSubmitted = form.formState.isSubmitted;
   const rowErrors = useMemo(() => {
     const errs = new Map<number, string>();
     days.forEach((d, i) => {
-      const err = isSubmitted ? computeRowError(d) : computeInlineRowError(d);
+      let err = isSubmitted ? computeRowError(d) : computeInlineRowError(d);
+      if (!err && overlapping.has(i)) err = 'Overlaps another slot on this day';
       if (err) errs.set(i, err);
     });
     return errs;
-  }, [days, isSubmitted]);
+  }, [days, isSubmitted, overlapping]);
 
   const filledCount = useMemo(() => days.filter(isRowFilled).length, [days]);
 
@@ -309,10 +344,8 @@ export function SchedulerCreatePanel({
   useEffect(() => {
     if (!open) return;
     form.setValue('week_start', currentWeek, { shouldDirty: false });
-    form.setValue('days', buildDefaultDays(currentWeek), {
-      shouldDirty: false,
-    });
-  }, [open, currentWeek, form]);
+    replace(buildDefaultDays(currentWeek));
+  }, [open, currentWeek, form, replace]);
 
   // Justified useEffect #1: cross-system fetch on drawer open + employee change.
   // - Create mode: pull employee history (any week), use most-recent week
@@ -343,20 +376,33 @@ export function SchedulerCreatePanel({
 
         const seeded = buildDefaultDays(anchor);
 
+        // Tracks how many slots already exist per dow (0..6). The base seeded
+        // array has one slot per dow; the first hit fills it, subsequent hits
+        // append extra slots.
+        const slotsPerDow = new Array<number>(7).fill(1);
+
         if (isEdit) {
           // In edit mode the API already restricted rows to currentWeek.
           for (const row of rows) {
             if (!row.date) continue;
             const dow = dayOfWeekIndex(row.date);
             if (dow < 0 || dow > 6) continue;
-            const day = seeded[dow];
-            if (!day) continue;
-            if (day.start_time || day.stop_time || day.ops_task_id) continue;
-            day.start_time = extractHHmm(row.start_time);
-            day.stop_time = extractHHmm(row.stop_time);
-            day.ops_task_id = row.ops_task_id ?? '';
+            const base = seeded[dow]!;
+            if (!base.start_time && !base.stop_time && !base.ops_task_id) {
+              base.start_time = extractHHmm(row.start_time);
+              base.stop_time = extractHHmm(row.stop_time);
+              base.ops_task_id = row.ops_task_id ?? '';
+            } else {
+              seeded.push({
+                date: base.date,
+                start_time: extractHHmm(row.start_time),
+                stop_time: extractHHmm(row.stop_time),
+                ops_task_id: row.ops_task_id ?? '',
+              });
+              slotsPerDow[dow]! += 1;
+            }
           }
-          form.setValue('days', seeded, { shouldDirty: false });
+          replace(seeded);
           return;
         }
 
@@ -373,15 +419,23 @@ export function SchedulerCreatePanel({
           if (getWeekStartFromDate(row.date) !== targetWeekStart) continue;
           const dow = new Date(`${row.date}T00:00:00`).getDay();
           if (dow < 0 || dow > 6) continue;
-          const day = seeded[dow];
-          if (!day) continue;
-          if (day.start_time || day.stop_time || day.ops_task_id) continue;
-          day.start_time = extractHHmm(row.start_time);
-          day.stop_time = extractHHmm(row.stop_time);
-          day.ops_task_id = row.ops_task_id ?? '';
+          const base = seeded[dow]!;
+          if (!base.start_time && !base.stop_time && !base.ops_task_id) {
+            base.start_time = extractHHmm(row.start_time);
+            base.stop_time = extractHHmm(row.stop_time);
+            base.ops_task_id = row.ops_task_id ?? '';
+          } else {
+            seeded.push({
+              date: base.date,
+              start_time: extractHHmm(row.start_time),
+              stop_time: extractHHmm(row.stop_time),
+              ops_task_id: row.ops_task_id ?? '',
+            });
+            slotsPerDow[dow]! += 1;
+          }
         }
 
-        form.setValue('days', seeded, { shouldDirty: false });
+        replace(seeded);
       } catch {
         // Aborted or network error — silent (drawer still works without prefill)
       }
@@ -389,7 +443,7 @@ export function SchedulerCreatePanel({
 
     loadPrefill();
     return () => controller.abort();
-  }, [open, employeeId, accountSlug, currentWeek, isEdit, form]);
+  }, [open, employeeId, accountSlug, currentWeek, isEdit, form, replace]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
@@ -411,6 +465,9 @@ export function SchedulerCreatePanel({
   useEffect(() => {
     if (fetcher.state !== 'idle' || hasHandledSuccess.current) return;
     if (fetcherData === undefined) return;
+    // Ignore fetcher results while the drawer is closed — prevents stale
+    // error/success toasts from firing the next time the drawer reopens.
+    if (!open) return;
 
     if (fetcherData.success) {
       hasHandledSuccess.current = true;
@@ -423,14 +480,16 @@ export function SchedulerCreatePanel({
       hasHandledSuccess.current = true;
       toast.error(fetcherData.error ?? 'Failed to save schedule');
     }
-  }, [fetcher.state, fetcherData, revalidator, handleOpenChange, isEdit]);
+  }, [fetcher.state, fetcherData, revalidator, handleOpenChange, isEdit, open]);
 
-  // Justified useEffect #3: reset success-tracking ref when drawer reopens.
+  // Reset success-tracking ref when a NEW submission starts, so the next
+  // result is handled. (Not on drawer reopen — that would resurface the
+  // previous failed submission's toast.)
   useEffect(() => {
-    if (open && fetcher.state === 'idle') {
+    if (fetcher.state === 'submitting') {
       hasHandledSuccess.current = false;
     }
-  }, [open, fetcher.state]);
+  }, [fetcher.state]);
 
   const onSubmit = useCallback(
     (values: WeeklyFormValues) => {
@@ -451,6 +510,12 @@ export function SchedulerCreatePanel({
         return;
       }
 
+      const hasOverlap = findOverlappingSlots(values.days).size > 0;
+      if (hasOverlap) {
+        toast.error('Fix overlapping slots before saving');
+        return;
+      }
+
       hasHandledSuccess.current = false;
       fetcher.submit(
         {
@@ -462,7 +527,11 @@ export function SchedulerCreatePanel({
             stop_time: d.stop_time,
             ops_task_id: d.ops_task_id,
           })),
-          ...(isEdit ? { weekStart: currentWeek } : {}),
+          // Always send weekStart so the server uses replace-week semantics
+          // (soft-delete existing planned rows in the week for this employee,
+          // then insert). Prevents duplicate-key errors when the employee
+          // already has any rows for the week.
+          weekStart: currentWeek,
         },
         {
           method: 'POST',
@@ -471,7 +540,7 @@ export function SchedulerCreatePanel({
         },
       );
     },
-    [fetcher, accountSlug, isEdit, currentWeek],
+    [fetcher, accountSlug, currentWeek],
   );
 
   const submitVerb = isEdit ? 'Update' : 'Create';
@@ -486,13 +555,39 @@ export function SchedulerCreatePanel({
     [form, onSubmit],
   );
 
-  const clearDay = useCallback(
-    (i: number) => {
-      form.setValue(`days.${i}.start_time`, '', { shouldDirty: true });
-      form.setValue(`days.${i}.stop_time`, '', { shouldDirty: true });
-      form.setValue(`days.${i}.ops_task_id`, '', { shouldDirty: true });
+  // Reset the first slot of a day and remove any extra slots for that date.
+  const resetDay = useCallback(
+    (firstIndex: number, date: string) => {
+      const current = (form.getValues('days') as DayEntry[]) ?? [];
+      const extras: number[] = [];
+      current.forEach((s, i) => {
+        if (i !== firstIndex && s.date === date) extras.push(i);
+      });
+      // Remove from highest to lowest to keep indices stable.
+      extras
+        .sort((a, b) => b - a)
+        .forEach((i) => {
+          remove(i);
+        });
+      form.setValue(`days.${firstIndex}.start_time`, '', { shouldDirty: true });
+      form.setValue(`days.${firstIndex}.stop_time`, '', { shouldDirty: true });
+      form.setValue(`days.${firstIndex}.ops_task_id`, '', { shouldDirty: true });
     },
-    [form],
+    [form, remove],
+  );
+
+  const removeSlot = useCallback(
+    (i: number) => {
+      remove(i);
+    },
+    [remove],
+  );
+
+  const appendSlotForDate = useCallback(
+    (date: string) => {
+      append({ date, start_time: '', stop_time: '', ops_task_id: '' });
+    },
+    [append],
   );
 
   return (
@@ -525,85 +620,149 @@ export function SchedulerCreatePanel({
               />
             </div>
 
-            <div className="flex-1 space-y-1.5 overflow-y-auto px-3 py-2 sm:px-6">
-              {days.map((day, i) => {
-                const filled = isRowFilled(day);
-                const err = rowErrors.get(i);
+            <div className="flex-1 space-y-3 overflow-y-auto px-3 py-2 sm:px-6">
+              {[0, 1, 2, 3, 4, 5, 6].map((dow) => {
+                const dayDate = format(
+                  addDays(parseISO(currentWeek), dow),
+                  'yyyy-MM-dd',
+                );
+                const slotIndices: number[] = [];
+                fields.forEach((f, i) => {
+                  const slot = days[i];
+                  if (slot?.date === dayDate) slotIndices.push(i);
+                });
+                if (slotIndices.length === 0) return null;
+                const firstIndex = slotIndices[0]!;
                 return (
-                  <div
-                    key={i}
-                    data-test={`scheduler-day-card-${i}`}
-                    className={cn(
-                      'rounded-md border px-2.5 py-2 transition-colors',
-                      filled
-                        ? 'border-primary/50 bg-primary/5 ring-primary/20 shadow-sm ring-1'
-                        : 'border-border/60 bg-muted/20 border-dashed opacity-70',
-                      err && 'border-destructive ring-destructive/30',
-                    )}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold tracking-wide uppercase tabular-nums">
-                        {DAY_NAMES[i]}{' '}
-                        {day.date ? format(parseISO(day.date), 'dd') : ''}
-                      </span>
+                  <div key={dow} className="space-y-1.5">
+                    <div className="text-muted-foreground px-1 text-xs font-semibold tracking-wide uppercase tabular-nums">
+                      {DAY_NAMES[dow]} {format(parseISO(dayDate), 'dd')}
                     </div>
-
-                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                      <Controller
-                        control={form.control}
-                        name={`days.${i}.start_time` as const}
-                        render={({ field }) => (
-                          <CompactTimePicker
-                            value={field.value}
-                            onChange={field.onChange}
-                            placeholder="Start time"
-                          />
-                        )}
-                      />
-                      <span className="text-muted-foreground text-xs">→</span>
-                      <Controller
-                        control={form.control}
-                        name={`days.${i}.stop_time` as const}
-                        render={({ field }) => (
-                          <CompactTimePicker
-                            value={field.value}
-                            onChange={field.onChange}
-                            placeholder="End time"
-                          />
-                        )}
-                      />
-                      <div className="min-w-[140px] flex-1">
-                        <Controller
-                          control={form.control}
-                          name={`days.${i}.ops_task_id` as const}
-                          render={({ field }) => (
-                            <CompactCombobox
-                              value={field.value}
-                              onChange={field.onChange}
-                              options={taskOptions}
-                              placeholder="Select task…"
-                            />
+                    {slotIndices.map((i, slotPos) => {
+                      const day = days[i] ?? {
+                        date: dayDate,
+                        start_time: '',
+                        stop_time: '',
+                        ops_task_id: '',
+                      };
+                      const filled = isRowFilled(day);
+                      const err = rowErrors.get(i);
+                      const isFirst = slotPos === 0;
+                      const isLast = slotPos === slotIndices.length - 1;
+                      const fieldKey = fields[i]?.id ?? `${dow}-${slotPos}`;
+                      return (
+                        <div
+                          key={fieldKey}
+                          data-test={`scheduler-day-card-${i}`}
+                          className={cn(
+                            'rounded-md border px-2.5 py-2 transition-colors',
+                            filled
+                              ? 'border-primary/50 bg-primary/5 ring-primary/20 shadow-sm ring-1'
+                              : 'border-border/60 bg-muted/20 border-dashed opacity-70',
+                            err && 'border-destructive ring-destructive/30',
                           )}
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => clearDay(i)}
-                        disabled={!filled}
-                        aria-label={`Reset ${DAY_NAMES[i]}`}
-                        title="Reset day"
-                        data-test={`scheduler-day-reset-${i}`}
-                        className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 shrink-0 rounded-full"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+                        >
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <Controller
+                              control={form.control}
+                              name={`days.${i}.start_time` as const}
+                              render={({ field }) => (
+                                <CompactTimePicker
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  placeholder="Start time"
+                                />
+                              )}
+                            />
+                            <span className="text-muted-foreground text-xs">
+                              →
+                            </span>
+                            <Controller
+                              control={form.control}
+                              name={`days.${i}.stop_time` as const}
+                              render={({ field }) => (
+                                <CompactTimePicker
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  placeholder="End time"
+                                />
+                              )}
+                            />
+                            <div className="min-w-[140px] flex-1">
+                              <Controller
+                                control={form.control}
+                                name={`days.${i}.ops_task_id` as const}
+                                render={({ field }) => (
+                                  <CompactCombobox
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    options={taskOptions}
+                                    placeholder="Select task…"
+                                  />
+                                )}
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => appendSlotForDate(dayDate)}
+                              disabled={!isLast}
+                              aria-label={`Add slot to ${DAY_NAMES[dow]}`}
+                              title={
+                                isLast
+                                  ? 'Add another slot for this day'
+                                  : 'More slots below'
+                              }
+                              data-test={`scheduler-day-add-${i}`}
+                              className={cn(
+                                'h-8 w-8 shrink-0 rounded-full',
+                                isLast
+                                  ? 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                  : 'border-dashed text-muted-foreground/40 disabled:opacity-100',
+                              )}
+                            >
+                              {isLast ? (
+                                <Plus className="h-3.5 w-3.5" />
+                              ) : (
+                                <ChevronDown className="h-3.5 w-3.5" />
+                              )}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() =>
+                                isFirst
+                                  ? resetDay(firstIndex, dayDate)
+                                  : removeSlot(i)
+                              }
+                              disabled={
+                                isFirst &&
+                                !filled &&
+                                slotIndices.length === 1
+                              }
+                              aria-label={
+                                isFirst
+                                  ? `Reset ${DAY_NAMES[dow]}`
+                                  : 'Remove slot'
+                              }
+                              title={isFirst ? 'Reset day' : 'Remove slot'}
+                              data-test={`scheduler-day-reset-${i}`}
+                              className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 shrink-0 rounded-full"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
 
-                    {err && (
-                      <p className="text-destructive mt-1.5 text-xs">{err}</p>
-                    )}
+                          {err && (
+                            <p className="text-destructive mt-1.5 text-xs">
+                              {err}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}

@@ -29,8 +29,6 @@ export function RootProviders(
   return (
     <Suspense>
       <I18nProvider settings={settings} resolver={i18nResolver}>
-        <Toaster richColors={true} theme={props.theme} position="top-center" />
-
         <ClientOnly>
           <GlobalLoader displaySpinner={false} />
         </ClientOnly>
@@ -44,6 +42,7 @@ export function RootProviders(
               defaultTheme={props.theme}
               enableColorScheme={false}
             >
+              <Toaster richColors={true} position="top-center" />
               {props.children}
             </ThemeProvider>
           </AuthProvider>

@@ -50,20 +50,24 @@ export const action = async ({ request }: { request: Request }) => {
     updated_by: employeeId,
   }));
 
-  // Replace-week semantics when `weekStart` is provided: soft-delete any
-  // existing rows for this employee in [weekStart, weekStart+7d) before
-  // inserting the new set. Without `weekStart` the action is a plain
-  // insert (legacy create flow).
+  // Replace-week semantics when `weekStart` is provided: hard-delete any
+  // existing PLANNED rows (ops_task_tracker_id IS NULL) for this employee in
+  // [weekStart, weekStart+7d) before inserting the new set. Hard delete is
+  // required because `uq_ops_task_schedule_planned` is a partial unique index
+  // that doesn't include `is_deleted` in its WHERE clause — a soft-delete
+  // doesn't free the unique slot, so a subsequent insert with the same
+  // (org_id, hr_employee_id, start_time) collides. Real time entries
+  // (ops_task_tracker_id IS NOT NULL) are preserved.
   if (parsed.data.weekStart) {
     const start = parsed.data.weekStart;
     const end = addDaysToDate(start, 7);
 
     const { error: clearError } = await client
       .from('ops_task_schedule')
-      .update({ is_deleted: true, updated_by: employeeId })
+      .delete()
       .eq('org_id', orgId)
       .eq('hr_employee_id', parsed.data.hr_employee_id)
-      .eq('is_deleted', false)
+      .is('ops_task_tracker_id', null)
       .gte('start_time', `${start}T00:00:00`)
       .lt('start_time', `${end}T00:00:00`);
 

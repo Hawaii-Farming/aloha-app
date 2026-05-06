@@ -6,6 +6,7 @@ import {
   Copy,
   History,
   Loader2,
+  Printer,
 } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
@@ -18,6 +19,7 @@ interface SchedulerNavbarToolsProps {
   onHistoryOpen: () => void;
   onCopyFromPrev: () => void;
   copyPending: boolean;
+  onPrint: () => void;
 }
 
 // Slots rendered by WorkspaceNavbar (desktop) and WorkspaceMobileHeader (mobile).
@@ -36,6 +38,7 @@ export function SchedulerNavbarTools({
   onHistoryOpen,
   onCopyFromPrev,
   copyPending,
+  onPrint,
 }: SchedulerNavbarToolsProps) {
   const desktopSlot = getSlot('workspace-navbar-filter-slot');
   const mobileSlot = getSlot('workspace-mobile-header-filter-slot');
@@ -87,7 +90,7 @@ export function SchedulerNavbarTools({
         </button>
       </div>
 
-      {/* Copy-from-prev-week button — THIRD (rightmost) */}
+      {/* Copy-from-prev-week button — THIRD */}
       <Button
         variant="outline"
         onClick={onCopyFromPrev}
@@ -102,6 +105,18 @@ export function SchedulerNavbarTools({
         ) : (
           <Copy className="h-4 w-4" />
         )}
+      </Button>
+
+      {/* Print button — FOURTH (rightmost) */}
+      <Button
+        variant="outline"
+        onClick={onPrint}
+        data-test="print-schedule"
+        aria-label="Print schedule"
+        title="Print schedule"
+        className="h-9 w-9 rounded-full p-0"
+      >
+        <Printer className="h-4 w-4" />
       </Button>
     </div>
   );
