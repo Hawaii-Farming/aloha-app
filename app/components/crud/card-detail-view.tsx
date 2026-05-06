@@ -179,6 +179,7 @@ function getRecordTitle(
     (record['name'] as string) ??
     (record['preferred_name'] as string) ??
     (record['subject_preferred_name'] as string) ??
+    (record['employee_name'] as string) ??
     (record[config.pkColumn ?? 'id'] as string) ??
     'Record'
   );
