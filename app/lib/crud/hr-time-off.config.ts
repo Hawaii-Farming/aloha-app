@@ -220,7 +220,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       key: 'status',
       label: 'Status',
       type: 'select',
-      options: ['Pending', 'Approved', 'Denied'],
+      options: ['Pending', 'Approved', 'Denied', 'Cancelled'],
     },
   ],
 
@@ -307,11 +307,13 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       Pending: { label: 'Pending', color: 'warning' },
       Approved: { label: 'Approved', color: 'success' },
       Denied: { label: 'Denied', color: 'destructive' },
+      Cancelled: { label: 'Cancelled', color: 'secondary' },
     },
     transitions: {
-      Pending: ['Approved', 'Denied'],
-      Approved: [],
+      Pending: ['Approved', 'Denied', 'Cancelled'],
+      Approved: ['Cancelled'],
       Denied: ['Pending'],
+      Cancelled: [],
     },
     transitionFields: {
       Approved: {
@@ -319,6 +321,10 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
         reviewed_at: 'now',
       },
       Denied: {
+        reviewed_by: 'currentEmployee',
+        reviewed_at: 'now',
+      },
+      Cancelled: {
         reviewed_by: 'currentEmployee',
         reviewed_at: 'now',
       },

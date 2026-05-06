@@ -32,14 +32,19 @@ function StatusIcon({ status }: { status: string }) {
       return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
     case 'Denied':
       return <XCircle className="h-4 w-4 text-red-500" />;
+    case 'Cancelled':
+      return <XCircle className="text-muted-foreground h-4 w-4" />;
     default:
       return <Clock className="h-4 w-4 text-amber-500" />;
   }
 }
 
-function statusVariant(status: string): 'success' | 'destructive' | 'warning' {
+function statusVariant(
+  status: string,
+): 'success' | 'destructive' | 'warning' | 'secondary' {
   if (status === 'Approved') return 'success';
   if (status === 'Denied') return 'destructive';
+  if (status === 'Cancelled') return 'secondary';
   return 'warning';
 }
 
