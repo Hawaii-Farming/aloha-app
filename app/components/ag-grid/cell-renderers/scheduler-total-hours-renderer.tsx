@@ -6,8 +6,11 @@ import { cn } from '@aloha/ui/utils';
  * AG Grid cell renderer for the scheduler weekly Total Hrs column.
  *
  * Top line: weekly OT threshold from the view, small + muted, left-aligned.
- * Bottom line: actual total hours, larger, right-aligned. Amber when the
- * view flags `is_over_ot_threshold`.
+ * Bottom line: actual total hours, larger, right-aligned. Color follows the
+ * view's `ot_status` (sum-of-tasks vs threshold at employee+week level):
+ *   - below → emerald (healthy under)
+ *   - at    → amber (at cap, no headroom)
+ *   - above → red (overtime)
  */
 export function SchedulerTotalHoursRenderer(props: CustomCellRendererProps) {
   const total = props.value as number | null | undefined;
@@ -15,8 +18,10 @@ export function SchedulerTotalHoursRenderer(props: CustomCellRendererProps) {
     | number
     | null
     | undefined;
-  const isOverOt = props.data?.is_over_ot_threshold as
-    | boolean
+  const otStatus = props.data?.ot_status as
+    | 'below'
+    | 'at'
+    | 'above'
     | null
     | undefined;
 
@@ -25,6 +30,15 @@ export function SchedulerTotalHoursRenderer(props: CustomCellRendererProps) {
 
   const showThreshold =
     typeof otThresholdWeekly === 'number' && otThresholdWeekly > 0;
+
+  const statusColor =
+    otStatus === 'above'
+      ? 'text-red-600 dark:text-red-400'
+      : otStatus === 'at'
+        ? 'text-amber-600 dark:text-amber-400'
+        : otStatus === 'below'
+          ? 'text-emerald-600 dark:text-emerald-400'
+          : '';
 
   return (
     <div className="flex h-full flex-col justify-center leading-tight">
@@ -36,7 +50,7 @@ export function SchedulerTotalHoursRenderer(props: CustomCellRendererProps) {
       <span
         className={cn(
           'text-right font-mono text-sm font-medium tabular-nums',
-          isOverOt === true && 'text-amber-600 dark:text-amber-400',
+          statusColor,
         )}
       >
         {totalRounded ?? '—'}

@@ -12,33 +12,242 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
+      edi_crodeon_weather: {
+        Row: {
+          atmospheric_pressure: number | null
+          inside_humidity: number | null
+          inside_par: number | null
+          inside_temperature: number | null
+          org_id: string
+          outside_dew_point_temperature: number | null
+          outside_humidity: number | null
+          outside_rain: number | null
+          outside_temperature: number | null
+          outside_wet_bulb_temperature: number | null
+          outside_wind_average_max_speed: number | null
+          outside_wind_average_speed: number | null
+          outside_wind_direction: string | null
+          power_supply: string | null
+          reading_at: string
+        }
+        Insert: {
+          atmospheric_pressure?: number | null
+          inside_humidity?: number | null
+          inside_par?: number | null
+          inside_temperature?: number | null
+          org_id: string
+          outside_dew_point_temperature?: number | null
+          outside_humidity?: number | null
+          outside_rain?: number | null
+          outside_temperature?: number | null
+          outside_wet_bulb_temperature?: number | null
+          outside_wind_average_max_speed?: number | null
+          outside_wind_average_speed?: number | null
+          outside_wind_direction?: string | null
+          power_supply?: string | null
+          reading_at: string
+        }
+        Update: {
+          atmospheric_pressure?: number | null
+          inside_humidity?: number | null
+          inside_par?: number | null
+          inside_temperature?: number | null
+          org_id?: string
+          outside_dew_point_temperature?: number | null
+          outside_humidity?: number | null
+          outside_rain?: number | null
+          outside_temperature?: number | null
+          outside_wet_bulb_temperature?: number | null
+          outside_wind_average_max_speed?: number | null
+          outside_wind_average_speed?: number | null
+          outside_wind_direction?: string | null
+          power_supply?: string | null
+          reading_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grow_weather_reading_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edi_qb_expense: {
+        Row: {
+          account_name: string | null
+          id: string
+          is_credit: boolean
+          org_id: string
+          payee_name: string | null
+          synced_at: string
+          transaction_date: string | null
+        }
+        Insert: {
+          account_name?: string | null
+          id: string
+          is_credit?: boolean
+          org_id: string
+          payee_name?: string | null
+          synced_at?: string
+          transaction_date?: string | null
+        }
+        Update: {
+          account_name?: string | null
+          id?: string
+          is_credit?: boolean
+          org_id?: string
+          payee_name?: string | null
+          synced_at?: string
+          transaction_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edi_qb_expense_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edi_qb_expense_line: {
+        Row: {
+          account_name: string | null
+          amount: number | null
+          class_name: string | null
+          description: string | null
+          expense_id: string
+          line_num: number
+          org_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          amount?: number | null
+          class_name?: string | null
+          description?: string | null
+          expense_id: string
+          line_num: number
+          org_id: string
+        }
+        Update: {
+          account_name?: string | null
+          amount?: number | null
+          class_name?: string | null
+          description?: string | null
+          expense_id?: string
+          line_num?: number
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edi_qb_expense_line_org_id_expense_id_fkey"
+            columns: ["org_id", "expense_id"]
+            isOneToOne: false
+            referencedRelation: "edi_qb_expense"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "edi_qb_expense_line_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edi_qb_invoice: {
+        Row: {
+          customer_id: string | null
+          customer_name: string | null
+          id: string
+          invoice_date: string | null
+          invoice_number: string | null
+          org_id: string
+          synced_at: string
+          total_amount: number | null
+        }
+        Insert: {
+          customer_id?: string | null
+          customer_name?: string | null
+          id: string
+          invoice_date?: string | null
+          invoice_number?: string | null
+          org_id: string
+          synced_at?: string
+          total_amount?: number | null
+        }
+        Update: {
+          customer_id?: string | null
+          customer_name?: string | null
+          id?: string
+          invoice_date?: string | null
+          invoice_number?: string | null
+          org_id?: string
+          synced_at?: string
+          total_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edi_qb_invoice_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edi_qb_invoice_line: {
+        Row: {
+          amount: number | null
+          cases: number | null
+          description: string | null
+          invoice_id: string
+          item_name: string | null
+          line_num: number
+          org_id: string
+          service_date: string | null
+        }
+        Insert: {
+          amount?: number | null
+          cases?: number | null
+          description?: string | null
+          invoice_id: string
+          item_name?: string | null
+          line_num: number
+          org_id: string
+          service_date?: string | null
+        }
+        Update: {
+          amount?: number | null
+          cases?: number | null
+          description?: string | null
+          invoice_id?: string
+          item_name?: string | null
+          line_num?: number
+          org_id?: string
+          service_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edi_qb_invoice_line_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edi_qb_invoice_line_org_id_invoice_id_fkey"
+            columns: ["org_id", "invoice_id"]
+            isOneToOne: false
+            referencedRelation: "edi_qb_invoice"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
       fin_expense: {
         Row: {
           account_name: string | null
@@ -2832,96 +3041,6 @@ export type Database = {
           },
           {
             foreignKeyName: "grow_variety_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      grow_weather_reading: {
-        Row: {
-          atmospheric_pressure: number | null
-          created_at: string
-          created_by: string | null
-          farm_id: string | null
-          id: string
-          inside_humidity: number | null
-          inside_par: number | null
-          inside_temperature: number | null
-          is_deleted: boolean
-          org_id: string
-          outside_dew_point_temperature: number | null
-          outside_humidity: number | null
-          outside_rain: number | null
-          outside_temperature: number | null
-          outside_wet_bulb_temperature: number | null
-          outside_wind_average_max_speed: number | null
-          outside_wind_average_speed: number | null
-          outside_wind_direction: string | null
-          power_supply: string | null
-          reading_at: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          atmospheric_pressure?: number | null
-          created_at?: string
-          created_by?: string | null
-          farm_id?: string | null
-          id?: string
-          inside_humidity?: number | null
-          inside_par?: number | null
-          inside_temperature?: number | null
-          is_deleted?: boolean
-          org_id: string
-          outside_dew_point_temperature?: number | null
-          outside_humidity?: number | null
-          outside_rain?: number | null
-          outside_temperature?: number | null
-          outside_wet_bulb_temperature?: number | null
-          outside_wind_average_max_speed?: number | null
-          outside_wind_average_speed?: number | null
-          outside_wind_direction?: string | null
-          power_supply?: string | null
-          reading_at: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          atmospheric_pressure?: number | null
-          created_at?: string
-          created_by?: string | null
-          farm_id?: string | null
-          id?: string
-          inside_humidity?: number | null
-          inside_par?: number | null
-          inside_temperature?: number | null
-          is_deleted?: boolean
-          org_id?: string
-          outside_dew_point_temperature?: number | null
-          outside_humidity?: number | null
-          outside_rain?: number | null
-          outside_temperature?: number | null
-          outside_wet_bulb_temperature?: number | null
-          outside_wind_average_max_speed?: number | null
-          outside_wind_average_speed?: number | null
-          outside_wind_direction?: string | null
-          power_supply?: string | null
-          reading_at?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "grow_weather_reading_farm_fkey"
-            columns: ["org_id", "farm_id"]
-            isOneToOne: false
-            referencedRelation: "org_farm"
-            referencedColumns: ["org_id", "id"]
-          },
-          {
-            foreignKeyName: "grow_weather_reading_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "org"
@@ -10064,15 +10183,89 @@ export type Database = {
       }
     }
     Views: {
-      audit_pre_check: {
+      edi_crodeon_weather_dli: {
         Row: {
-          check_id: number | null
-          row_count: number | null
-          source: string | null
-          target: string | null
-          title: string | null
+          atmospheric_pressure: number | null
+          dli: number | null
+          inside_humidity: number | null
+          inside_par: number | null
+          inside_temperature: number | null
+          org_id: string | null
+          outside_dew_point_temperature: number | null
+          outside_humidity: number | null
+          outside_rain: number | null
+          outside_temperature: number | null
+          outside_wet_bulb_temperature: number | null
+          outside_wind_average_max_speed: number | null
+          outside_wind_average_speed: number | null
+          outside_wind_direction: string | null
+          power_supply: string | null
+          reading_at: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "grow_weather_reading_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edi_qb_expense_summary: {
+        Row: {
+          amount: number | null
+          class_name: string | null
+          description: string | null
+          expense_account: string | null
+          funding_account: string | null
+          is_credit: boolean | null
+          line_num: number | null
+          org_id: string | null
+          payee_name: string | null
+          transaction_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edi_qb_expense_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edi_qb_invoice_summary: {
+        Row: {
+          amount: number | null
+          cases: number | null
+          customer_group: string | null
+          customer_name: string | null
+          farm: string | null
+          invoice_date: string | null
+          invoice_number: string | null
+          item_name: string | null
+          line_num: number | null
+          org_id: string | null
+          pounds: number | null
+          service_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edi_qb_invoice_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "org"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_customer_sales_customer_group_id_fkey"
+            columns: ["customer_group"]
+            isOneToOne: false
+            referencedRelation: "sales_customer_group"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fin_expense_v: {
         Row: {
@@ -10277,49 +10470,6 @@ export type Database = {
           start_time: string | null
         }
         Relationships: []
-      }
-      grow_weather_reading_dli: {
-        Row: {
-          atmospheric_pressure: number | null
-          created_at: string | null
-          created_by: string | null
-          dli: number | null
-          farm_id: string | null
-          id: string | null
-          inside_humidity: number | null
-          inside_par: number | null
-          inside_temperature: number | null
-          is_deleted: boolean | null
-          org_id: string | null
-          outside_dew_point_temperature: number | null
-          outside_humidity: number | null
-          outside_rain: number | null
-          outside_temperature: number | null
-          outside_wet_bulb_temperature: number | null
-          outside_wind_average_max_speed: number | null
-          outside_wind_average_speed: number | null
-          outside_wind_direction: string | null
-          power_supply: string | null
-          reading_at: string | null
-          updated_at: string | null
-          updated_by: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "grow_weather_reading_farm_fkey"
-            columns: ["org_id", "farm_id"]
-            isOneToOne: false
-            referencedRelation: "org_farm"
-            referencedColumns: ["org_id", "id"]
-          },
-          {
-            foreignKeyName: "grow_weather_reading_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "org"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       hr_payroll_by_task: {
         Row: {
@@ -10749,16 +10899,12 @@ export type Database = {
       }
       ops_task_weekly_schedule: {
         Row: {
-          department_name: string | null
-          farm_name: string | null
           friday: string | null
           full_name: string | null
-          hr_department_id: string | null
           hr_employee_id: string | null
-          hr_work_authorization_id: string | null
-          is_over_ot_threshold: boolean | null
           monday: string | null
           org_id: string | null
+          ot_status: string | null
           ot_threshold_weekly: number | null
           profile_photo_url: string | null
           saturday: string | null
@@ -10769,7 +10915,6 @@ export type Database = {
           tuesday: string | null
           wednesday: string | null
           week_start_date: string | null
-          work_authorization_name: string | null
         }
         Relationships: [
           {
@@ -10982,456 +11127,6 @@ export type Database = {
       [_ in never]: never
     }
   }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      buckets_analytics: {
-        Row: {
-          created_at: string
-          deleted_at: string | null
-          format: string
-          id: string
-          name: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      buckets_vectors: {
-        Row: {
-          created_at: string
-          id: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          user_metadata: Json | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          metadata: Json | null
-          owner_id: string | null
-          upload_signature: string
-          user_metadata: Json | null
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          metadata?: Json | null
-          owner_id?: string | null
-          upload_signature: string
-          user_metadata?: Json | null
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          metadata?: Json | null
-          owner_id?: string | null
-          upload_signature?: string
-          user_metadata?: Json | null
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vector_indexes: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id: string
-          metadata_configuration: Json | null
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id?: string
-          metadata_configuration?: Json | null
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          data_type?: string
-          dimension?: number
-          distance_metric?: string
-          id?: string
-          metadata_configuration?: Json | null
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vector_indexes_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_vectors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      allow_any_operation: {
-        Args: { expected_operations: string[] }
-        Returns: boolean
-      }
-      allow_only_operation: {
-        Args: { expected_operation: string }
-        Returns: boolean
-      }
-      can_insert_object: {
-        Args: { bucketid: string; metadata: Json; name: string; owner: string }
-        Returns: undefined
-      }
-      extension: { Args: { name: string }; Returns: string }
-      filename: { Args: { name: string }; Returns: string }
-      foldername: { Args: { name: string }; Returns: string[] }
-      get_common_prefix: {
-        Args: { p_delimiter: string; p_key: string; p_prefix: string }
-        Returns: string
-      }
-      get_size_by_bucket: {
-        Args: never
-        Returns: {
-          bucket_id: string
-          size: number
-        }[]
-      }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-          prefix_param: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-        }[]
-      }
-      list_objects_with_delimiter: {
-        Args: {
-          _bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_token?: string
-          prefix_param: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      operation: { Args: never; Returns: string }
-      search: {
-        Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
-          prefix: string
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_by_timestamp: {
-        Args: {
-          p_bucket_id: string
-          p_level: number
-          p_limit: number
-          p_prefix: string
-          p_sort_column: string
-          p_sort_column_after: string
-          p_sort_order: string
-          p_start_after: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_v2: {
-        Args: {
-          bucket_name: string
-          levels?: number
-          limits?: number
-          prefix: string
-          sort_column?: string
-          sort_column_after?: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-    }
-    Enums: {
-      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
@@ -11552,15 +11247,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
-  },
-  storage: {
-    Enums: {
-      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
-    },
   },
 } as const

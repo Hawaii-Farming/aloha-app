@@ -42,9 +42,9 @@ export const opsTaskScheduleConfig: CrudModuleConfig<
     { key: 'saturday', label: 'Sat', type: 'text' },
     { key: 'total_hours', label: 'Total Hrs', type: 'number', sortable: true },
     {
-      key: 'is_over_ot_threshold',
+      key: 'ot_status',
       label: 'OT',
-      type: 'boolean',
+      type: 'text',
       priority: 'low',
     },
   ],
