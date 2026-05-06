@@ -95,9 +95,26 @@ const timeOffColDefs = [
     timeOffColumns.filter(
       (c) => c.key !== 'subject_last_name' && c.key !== 'status',
     ),
-  ).map((col) =>
-    col.field === 'request_reason' ? { ...col, minWidth: 320, flex: 1 } : col,
-  ),
+  ).map((col) => {
+    if (col.field === 'request_reason') {
+      return { ...col, minWidth: 320, flex: 1 };
+    }
+    if (col.field === 'subject_compensation_manager_id') {
+      return {
+        ...col,
+        valueGetter: (params: ValueGetterParams) => {
+          const first =
+            (params.data
+              ?.subject_compensation_manager_id_first_name as string) ?? '';
+          const last =
+            (params.data
+              ?.subject_compensation_manager_id_last_name as string) ?? '';
+          return [first, last].filter(Boolean).join(' ');
+        },
+      };
+    }
+    return col;
+  }),
   {
     headerName: 'Status',
     field: 'status',
@@ -147,6 +164,15 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
     'requester:hr_employee!hr_time_off_request_requested_by_emp_fkey(preferred_name)',
     'reviewer:hr_employee!hr_time_off_request_reviewed_by_emp_fkey(preferred_name)',
   ].join(', '),
+
+  // No FK constraint on hr_employee.compensation_manager_id, so PostgREST
+  // can't embed manager info. Instead, look up by id in hr_employee.
+  selfJoins: {
+    subject_compensation_manager_id: {
+      table: 'hr_employee',
+      displayFields: ['first_name', 'last_name'],
+    },
+  },
 
   columns: timeOffColumns,
 

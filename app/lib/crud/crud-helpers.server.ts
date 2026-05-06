@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '~/lib/database.types';
 
 import { castRow, castRows } from './typed-query.server';
+import type { SelfJoinSpec } from './types';
 
 /** Flattens nested FK objects from Supabase embedded selects.
  *  e.g. { compensation_manager: { preferred_name: 'Joe' } }
@@ -35,50 +36,77 @@ async function resolveSelfJoins(
   client: SupabaseClient<Database>,
   tableName: string,
   rows: Record<string, unknown>[],
-  selfJoins: Record<string, string>,
+  selfJoins: Record<string, SelfJoinSpec>,
 ) {
-  const displayFields = [...new Set(Object.values(selfJoins))];
-  const fkColumns = Object.keys(selfJoins);
-
-  const ids = new Set<string>();
-
-  for (const row of rows) {
-    for (const fkCol of fkColumns) {
-      const val = row[fkCol];
-
-      if (typeof val === 'string' && val) {
-        ids.add(val);
-      }
+  // Group joins by lookup table so we batch one query per target table.
+  const byTable = new Map<
+    string,
+    {
+      table: string;
+      fields: Set<string>;
+      entries: Array<{ fkCol: string; fields: string[] }>;
     }
+  >();
+
+  for (const [fkCol, spec] of Object.entries(selfJoins)) {
+    const table =
+      typeof spec === 'string' ? tableName : (spec.table ?? tableName);
+    const fields = typeof spec === 'string' ? [spec] : spec.displayFields;
+
+    let group = byTable.get(table);
+    if (!group) {
+      group = { table, fields: new Set(), entries: [] };
+      byTable.set(table, group);
+    }
+    for (const f of fields) group.fields.add(f);
+    group.entries.push({ fkCol, fields });
   }
 
-  if (ids.size === 0) return rows;
+  // Run lookups in parallel: one per target table.
+  const lookupPerTable = new Map<
+    string,
+    Map<string, Record<string, unknown>>
+  >();
 
-  const { data: lookupData } = await client
-    .from(tableName as never)
-    .select(`id, ${displayFields.join(', ')}`)
-    .in('id', Array.from(ids));
-
-  const lookup = new Map<string, Record<string, unknown>>();
-
-  for (const item of castRows(lookupData)) {
-    lookup.set(String(item.id), item);
-  }
+  await Promise.all(
+    [...byTable.values()].map(async (group) => {
+      const ids = new Set<string>();
+      for (const row of rows) {
+        for (const { fkCol } of group.entries) {
+          const val = row[fkCol];
+          if (typeof val === 'string' && val) ids.add(val);
+        }
+      }
+      if (ids.size === 0) {
+        lookupPerTable.set(group.table, new Map());
+        return;
+      }
+      const { data } = await client
+        .from(group.table as never)
+        .select(`id, ${[...group.fields].join(', ')}`)
+        .in('id', Array.from(ids));
+      const map = new Map<string, Record<string, unknown>>();
+      for (const item of castRows(data)) map.set(String(item.id), item);
+      lookupPerTable.set(group.table, map);
+    }),
+  );
 
   return rows.map((row) => {
     const enriched = { ...row };
-
-    for (const [fkCol, displayField] of Object.entries(selfJoins)) {
+    for (const [fkCol, spec] of Object.entries(selfJoins)) {
+      const table =
+        typeof spec === 'string' ? tableName : (spec.table ?? tableName);
+      const fields = typeof spec === 'string' ? [spec] : spec.displayFields;
       const refId = row[fkCol];
-
-      if (typeof refId === 'string' && refId) {
-        const ref = lookup.get(refId);
-        enriched[`${fkCol}_${displayField}`] = ref?.[displayField] ?? null;
-      } else {
-        enriched[`${fkCol}_${displayField}`] = null;
+      const lookup = lookupPerTable.get(table);
+      const ref =
+        typeof refId === 'string' && refId && lookup
+          ? lookup.get(refId)
+          : undefined;
+      for (const f of fields) {
+        enriched[`${fkCol}_${f}`] = ref?.[f] ?? null;
       }
     }
-
     return enriched;
   });
 }
@@ -92,7 +120,7 @@ export interface LoadTableDataParams {
   defaultSort?: { column: string; ascending: boolean };
   pageSize?: number;
   select?: string;
-  selfJoins?: Record<string, string>;
+  selfJoins?: Record<string, SelfJoinSpec>;
   /** Whitelist of column keys allowed for sort/filter from URL params.
    *  If omitted, sort and filter URL params are ignored entirely. */
   allowedColumns?: string[];
@@ -202,7 +230,7 @@ export interface LoadDetailDataParams {
   pkColumn: string;
   pkValue: string;
   select?: string;
-  selfJoins?: Record<string, string>;
+  selfJoins?: Record<string, SelfJoinSpec>;
 }
 
 export async function loadDetailData<T = Record<string, unknown>>(

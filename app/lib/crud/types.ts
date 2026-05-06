@@ -13,6 +13,12 @@ export type ListViewType =
 
 export type DetailViewType = 'card' | 'workspace' | 'custom';
 
+/** Same-table self-join (string) or cross-table lookup (object).
+ *  String form looks up the FK in the config's own tableName.
+ *  Object form looks up in a different table; each displayField is
+ *  written back as `{fkColumn}_{displayField}`. */
+export type SelfJoinSpec = string | { table: string; displayFields: string[] };
+
 export interface ListViewProps {
   data: Record<string, unknown>[];
   config: CrudModuleConfig;
@@ -193,7 +199,7 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
    *  from the same table. Each entry maps: fkColumn → displayField.
    *  e.g. { compensation_manager_id: 'preferred_name' } adds
    *  `compensation_manager_id_preferred_name` to each row. */
-  selfJoins?: Record<string, string>;
+  selfJoins?: Record<string, SelfJoinSpec>;
   columns: ColumnConfig[];
   search?: SearchConfig;
   filters?: FilterConfig[];
