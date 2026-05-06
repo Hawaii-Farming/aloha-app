@@ -7,6 +7,7 @@ import {
   History,
   Loader2,
   Printer,
+  Trash2,
 } from 'lucide-react';
 
 import { Button } from '@aloha/ui/button';
@@ -19,6 +20,8 @@ interface SchedulerNavbarToolsProps {
   onHistoryOpen: () => void;
   onCopyFromPrev: () => void;
   copyPending: boolean;
+  onDeleteWeek: () => void;
+  deletePending: boolean;
   onPrint: () => void;
 }
 
@@ -38,6 +41,8 @@ export function SchedulerNavbarTools({
   onHistoryOpen,
   onCopyFromPrev,
   copyPending,
+  onDeleteWeek,
+  deletePending,
   onPrint,
 }: SchedulerNavbarToolsProps) {
   const desktopSlot = getSlot('workspace-navbar-filter-slot');
@@ -108,7 +113,24 @@ export function SchedulerNavbarTools({
         )}
       </Button>
 
-      {/* Print button — FOURTH (rightmost) */}
+      {/* Delete-week button — FOURTH */}
+      <Button
+        variant="outline"
+        onClick={onDeleteWeek}
+        disabled={deletePending}
+        data-test="delete-week"
+        aria-label="Delete week"
+        title="Delete all records for this week"
+        className="h-9 w-9 shrink-0 rounded-full p-0"
+      >
+        {deletePending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Trash2 className="h-4 w-4" />
+        )}
+      </Button>
+
+      {/* Print button — FIFTH (rightmost) */}
       <Button
         variant="outline"
         onClick={onPrint}

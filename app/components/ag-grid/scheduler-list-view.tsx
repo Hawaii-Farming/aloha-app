@@ -22,6 +22,16 @@ import {
 } from 'date-fns';
 import { Plus, X } from 'lucide-react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 import { toast } from '@aloha/ui/sonner';
@@ -99,6 +109,8 @@ export default function SchedulerListView(props: ListViewProps) {
   const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [copyPending, setCopyPending] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
+  const [deleteWeekConfirmOpen, setDeleteWeekConfirmOpen] = useState(false);
   const revalidator = useRevalidator();
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -208,6 +220,34 @@ export default function SchedulerListView(props: ListViewProps) {
     },
     [accountSlug, currentWeek, fetchHistorySummary, revalidator],
   );
+
+  const handleDeleteWeek = useCallback(async () => {
+    setDeletePending(true);
+    try {
+      const res = await fetch('/api/scheduler/delete-week', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountSlug, weekStart: currentWeek }),
+      });
+      const json = (await res.json()) as {
+        success?: boolean;
+        deleted?: number;
+        error?: string;
+      };
+      if (json.success) {
+        toast.success(`Deleted ${json.deleted ?? 0} entries for the week`);
+        await fetchHistorySummary();
+        revalidator.revalidate();
+      } else {
+        toast.error(json.error ?? 'Failed to delete week');
+      }
+    } catch {
+      toast.error('Failed to delete week');
+    } finally {
+      setDeletePending(false);
+      setDeleteWeekConfirmOpen(false);
+    }
+  }, [accountSlug, currentWeek, fetchHistorySummary, revalidator]);
 
   const handlePrint = useCallback(() => {
     const api = gridRef.current?.api;
@@ -407,6 +447,8 @@ export default function SchedulerListView(props: ListViewProps) {
           onHistoryOpen={() => setHistoryOpen(true)}
           onCopyFromPrev={handleCopyFromPrev}
           copyPending={copyPending}
+          onDeleteWeek={() => setDeleteWeekConfirmOpen(true)}
+          deletePending={deletePending}
           onPrint={handlePrint}
         />
 
@@ -483,6 +525,39 @@ export default function SchedulerListView(props: ListViewProps) {
         currentWeek={currentWeek}
         editEmployeeId={editEmployeeId}
       />
+
+      <AlertDialog
+        open={deleteWeekConfirmOpen}
+        onOpenChange={setDeleteWeekConfirmOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete week schedule?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will delete all schedule entries for{' '}
+              <span className="font-medium">
+                {formatWeekLabel(currentWeek)}
+              </span>
+              . This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletePending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteWeek();
+              }}
+              disabled={deletePending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deletePending ? 'Deleting…' : 'Delete week'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
