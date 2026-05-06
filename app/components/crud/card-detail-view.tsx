@@ -96,14 +96,18 @@ function resolveFkLabelColumns(
     return null;
   }
   const baseKey = field.key.replace(/_id$/, '');
+  const embedAlias = field.fkEmbedAlias;
   const parts: string[] = [];
   for (const col of field.fkLabelColumns) {
     const selfJoinKey = `${field.key}_${col}`;
     const aliasKey = `${baseKey}_${col}`;
+    const embedKey = embedAlias ? `${embedAlias}_${col}` : null;
     const raw =
-      record[selfJoinKey] !== undefined
-        ? record[selfJoinKey]
-        : record[aliasKey];
+      embedKey && record[embedKey] !== undefined
+        ? record[embedKey]
+        : record[selfJoinKey] !== undefined
+          ? record[selfJoinKey]
+          : record[aliasKey];
     if (raw !== null && raw !== undefined && String(raw).length > 0) {
       parts.push(String(raw));
     }

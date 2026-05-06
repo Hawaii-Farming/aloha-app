@@ -111,6 +111,10 @@ export interface FormFieldConfig {
    *  to produce the display label (e.g. ['preferred_name', 'last_name']).
    *  When set, takes precedence over fkLabelColumn. */
   fkLabelColumns?: string[];
+  /** For type='fk': embed alias used in the config's `select` (e.g. 'subject'
+   *  for `subject:hr_employee!fkey(...)`). When set, the detail view resolves
+   *  label columns from `${alias}_${col}` keys on the flattened row. */
+  fkEmbedAlias?: string;
   /** For type='select' or 'radio': allowed values */
   options?: Array<string | { value: string; label: string }>;
   /** Set to false for system-level FK tables that don't have org_id.

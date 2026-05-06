@@ -4,6 +4,7 @@ export interface WorkflowHistoryEntry {
   action: string;
   at: string | null;
   by: string | null;
+  color?: 'default' | 'success' | 'warning' | 'destructive' | 'secondary';
 }
 
 export function buildDefaultValues(
@@ -69,6 +70,7 @@ export function buildHistoryEntries(
         action: workflow.states[status]?.label ?? status,
         at: record[atField] as string,
         by: byField ? (record[byField] as string | null) : null,
+        color: workflow.states[status]?.color,
       });
     }
   }
