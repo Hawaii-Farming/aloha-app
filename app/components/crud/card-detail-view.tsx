@@ -165,9 +165,14 @@ function getRecordTitle(
 
   if (first && last) return `${first} ${last}`;
 
+  const subjectFirst = (record['subject_first_name'] as string) ?? '';
+  const subjectLast = (record['subject_last_name'] as string) ?? '';
+  if (subjectFirst && subjectLast) return `${subjectFirst} ${subjectLast}`;
+
   return (
     (record['name'] as string) ??
     (record['preferred_name'] as string) ??
+    (record['subject_preferred_name'] as string) ??
     (record[config.pkColumn ?? 'id'] as string) ??
     'Record'
   );
@@ -181,6 +186,10 @@ function getRecordSubtitle(
 
   if (record['preferred_name'] && record['first_name']) {
     return `"${record['preferred_name']}"`;
+  }
+
+  if (record['subject_preferred_name'] && record['subject_first_name']) {
+    return `"${record['subject_preferred_name']}"`;
   }
 
   if (select.includes('hr_department') && record['hr_department_name']) {
