@@ -290,6 +290,12 @@ export default function SchedulerListView(props: ListViewProps) {
         cellRenderer: SchedulerEmployeeRenderer,
         minWidth: 220,
         pinned: 'left' as const,
+        sortable: true,
+        sort: 'asc' as const,
+        comparator: (a: unknown, b: unknown) =>
+          String(a ?? '')
+            .toLowerCase()
+            .localeCompare(String(b ?? '').toLowerCase()),
       },
       {
         headerName: 'Task',
