@@ -220,7 +220,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       key: 'status',
       label: 'Status',
       type: 'select',
-      options: ['Pending', 'Approved', 'Denied', 'Cancelled'],
+      options: ['Pending', 'Approved', 'Denied'],
     },
   ],
 
@@ -307,24 +307,23 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
       Pending: { label: 'Pending', color: 'warning' },
       Approved: { label: 'Approved', color: 'success' },
       Denied: { label: 'Denied', color: 'destructive' },
-      Cancelled: { label: 'Cancelled', color: 'secondary' },
     },
     transitions: {
-      Pending: ['Approved', 'Denied', 'Cancelled'],
+      Pending: ['Approved', 'Denied'],
       Approved: [],
-      Denied: ['Pending'],
-      Cancelled: [],
+      Denied: [],
     },
+    // Pending requests are user-cancellable: Cancel deletes the row
+    // outright (mistake correction). Approved/Denied are terminal —
+    // any change there belongs in a separate process, not the
+    // requester's hands.
+    cancellableOnStates: ['Pending'],
     transitionFields: {
       Approved: {
         reviewed_by: 'currentEmployee',
         reviewed_at: 'now',
       },
       Denied: {
-        reviewed_by: 'currentEmployee',
-        reviewed_at: 'now',
-      },
-      Cancelled: {
         reviewed_by: 'currentEmployee',
         reviewed_at: 'now',
       },

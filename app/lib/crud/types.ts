@@ -187,6 +187,10 @@ export interface WorkflowConfig {
    *  reason) inside the workflow confirm dialog. The value is sent as
    *  extraFields[field] alongside the transition. */
   transitionPrompts?: Record<string, WorkflowTransitionPrompt>;
+  /** Source statuses on which a "Cancel Request" button is shown on the
+   *  detail page. Cancel issues a hard delete (mistake correction) — the
+   *  row is removed entirely, not transitioned to a Cancelled state. */
+  cancellableOnStates?: string[];
   /** Synthetic history entry for the initial state (e.g. Pending) sourced
    *  from creation columns like requested_at/requested_by. */
   initialEntry?: {

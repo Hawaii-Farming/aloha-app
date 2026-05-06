@@ -412,6 +412,44 @@ export function CardDetailView({
               </AccessGate>
             )}
 
+            {hasWorkflow &&
+              workflowConfig?.cancellableOnStates?.includes(
+                currentStatus ?? '',
+              ) && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isDeleting}
+                      data-test="cancel-request"
+                    >
+                      Cancel Request
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel Request</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This permanently removes the request. This cannot be
+                        undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>
+                        <Trans i18nKey="common:cancel" defaults="Keep" />
+                      </AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>
+                        <Trans
+                          i18nKey="common:cancelRequest"
+                          defaults="Cancel Request"
+                        />
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+
             <AccessGate permission="can_delete">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
