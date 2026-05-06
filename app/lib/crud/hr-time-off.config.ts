@@ -1,3 +1,4 @@
+import type { ValueGetterParams } from 'ag-grid-community';
 import { z } from 'zod';
 
 import { SchedulerEmployeeRenderer } from '~/components/ag-grid/cell-renderers/scheduler-employee-renderer';
@@ -24,7 +25,7 @@ const hrTimeOffSchema = z.object({
 //   `requester:hr_employee!requested_by(...)`        -> requester_*
 //   `reviewer:hr_employee!reviewed_by(...)`          -> reviewer_*
 const timeOffColumns: ColumnConfig[] = [
-  { key: 'subject_preferred_name', label: 'Employee' },
+  { key: 'subject_last_name', label: 'Employee' },
   {
     key: 'subject_compensation_manager_id',
     label: 'Comp Manager',
@@ -84,13 +85,18 @@ const timeOffColumns: ColumnConfig[] = [
 const timeOffColDefs = [
   {
     headerName: 'Employee',
-    field: 'subject_preferred_name',
+    colId: 'employee_full_name',
     cellRenderer: SchedulerEmployeeRenderer,
     minWidth: 200,
+    valueGetter: (params: ValueGetterParams) => {
+      const first = (params.data?.subject_first_name as string) ?? '';
+      const last = (params.data?.subject_last_name as string) ?? '';
+      return [first, last].filter(Boolean).join(' ');
+    },
   },
   ...mapColumnsToColDefs(
     timeOffColumns.filter(
-      (c) => c.key !== 'subject_preferred_name' && c.key !== 'status',
+      (c) => c.key !== 'subject_last_name' && c.key !== 'status',
     ),
   ).map((col) =>
     col.field === 'request_reason' ? { ...col, minWidth: 320, flex: 1 } : col,
@@ -140,7 +146,7 @@ export const hrTimeOffConfig: CrudModuleConfig<typeof hrTimeOffSchema> = {
   // and the TimeOffDetailRow renderer reference.
   select: [
     '*',
-    'subject:hr_employee!hr_time_off_request_hr_employee_id_emp_fkey(preferred_name,profile_photo_url,hr_department_id,hr_work_authorization_id,compensation_manager_id)',
+    'subject:hr_employee!hr_time_off_request_hr_employee_id_emp_fkey(first_name,last_name,preferred_name,profile_photo_url,hr_department_id,hr_work_authorization_id,compensation_manager_id)',
     'requester:hr_employee!hr_time_off_request_requested_by_emp_fkey(preferred_name)',
     'reviewer:hr_employee!hr_time_off_request_reviewed_by_emp_fkey(preferred_name)',
   ].join(', '),

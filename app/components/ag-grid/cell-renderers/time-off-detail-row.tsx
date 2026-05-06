@@ -74,7 +74,11 @@ export function TimeOffDetailRow({ data }: TimeOffDetailRowProps) {
   //   subject:hr_employee!hr_employee_id(...) -> subject_*
   //   requester:hr_employee!requested_by(...)  -> requester_*
   //   reviewer:hr_employee!reviewed_by(...)    -> reviewer_*
-  const fullName = (data['subject_preferred_name'] as string) ?? '';
+  const firstName = (data['subject_first_name'] as string) ?? '';
+  const lastName = (data['subject_last_name'] as string) ?? '';
+  const fullName =
+    [firstName, lastName].filter(Boolean).join(' ') ||
+    ((data['subject_preferred_name'] as string) ?? '');
   const photoUrl = data['subject_profile_photo_url'] as string | undefined;
   const initials = getInitials(fullName);
   const status = (data['status'] as string) ?? 'Pending';
