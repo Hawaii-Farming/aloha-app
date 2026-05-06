@@ -97,11 +97,7 @@ function DeltaRenderer(
 }
 
 function formatSignedHours(n: number) {
-  const abs = Math.abs(n);
-  const formatted = abs.toLocaleString(undefined, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 2,
-  });
+  const formatted = Math.round(Math.abs(n)).toLocaleString();
   const sign = n > 0 ? '+' : n < 0 ? '−' : '';
   return `${sign}${formatted}`;
 }

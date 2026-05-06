@@ -51,8 +51,7 @@ export function CurrencyDeltaRenderer(props: CustomCellRendererProps) {
     );
   }
   const formatted = Math.abs(value).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 0,
   });
   const isNeg = value < 0;
   return (
