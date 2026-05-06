@@ -46,6 +46,7 @@ import {
   restoreColumnState,
   saveColumnState,
 } from '~/components/ag-grid/column-state';
+import { InactiveToggle } from '~/components/ag-grid/inactive-toggle';
 import { CreatePanel } from '~/components/crud/create-panel';
 import { getModuleConfig } from '~/lib/crud/registry';
 import type { ListViewProps, WorkflowConfig } from '~/lib/crud/types';
@@ -304,6 +305,8 @@ export default function AgGridListView({
           />
         </div>
       </div>
+
+      {subModuleSlug === 'Register' && <InactiveToggle />}
 
       {(config?.formFields?.length ?? 0) > 0 && (
         <Button

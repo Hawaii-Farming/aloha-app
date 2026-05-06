@@ -133,6 +133,9 @@ export interface LoadTableDataParams {
   /** Skip the `.eq('is_deleted', false)` filter when the view already
    *  filters deleted rows internally and doesn't expose the column. */
   skipDeletedFilter?: boolean;
+  /** Invert the deleted filter — return only soft-deleted rows
+   *  (`is_deleted = true`). Useful for "inactive" / archive views. */
+  showDeleted?: boolean;
 }
 
 /** Strip PostgREST filter delimiters from search input to prevent
@@ -174,7 +177,7 @@ export async function loadTableData<T = Record<string, unknown>>(
     .eq('org_id', params.orgId);
 
   if (!params.skipDeletedFilter) {
-    query = query.eq('is_deleted', false);
+    query = query.eq('is_deleted', params.showDeleted ?? false);
   }
 
   // Text search (TABLE-05) using PostgREST .or() syntax

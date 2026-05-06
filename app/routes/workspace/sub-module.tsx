@@ -414,6 +414,7 @@ export const loader = async (args: {
     selfJoins: config?.selfJoins,
     allowedColumns: config?.columns.map((c) => c.key),
     skipDeletedFilter: config?.skipDeletedFilter,
+    showDeleted: url.searchParams.get('inactive') === '1',
   });
 
   const { fkOptions, comboboxOptions } = await loadFormOptions({
