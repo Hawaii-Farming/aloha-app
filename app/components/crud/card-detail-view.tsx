@@ -330,9 +330,11 @@ export function CardDetailView({
         className="bg-card flex min-h-0 flex-1 flex-col"
         data-test="crud-detail-page"
       >
-        {/* Top bar: back + actions */}
-        <div className="border-border flex items-center justify-between border-b px-6 py-3">
-          <div className="flex items-center gap-4">
+        {/* Top bar: back + actions. Stacks on mobile so the action
+            cluster sits on its own row (no overflow / icon collisions
+            with the status dot). */}
+        <div className="border-border flex flex-col gap-2 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => navigate(-1)}
@@ -367,12 +369,12 @@ export function CardDetailView({
                   {initials}
                 </div>
               )}
-              <div className="min-w-0">
-                <span className="text-foreground text-sm font-semibold">
+              <div className="min-w-0 flex-1">
+                <span className="text-foreground truncate text-sm font-semibold">
                   {title}
                 </span>
                 {subtitle && (
-                  <span className="text-muted-foreground ml-1.5 text-sm">
+                  <span className="text-muted-foreground ml-1.5 truncate text-sm">
                     {subtitle}
                   </span>
                 )}
@@ -386,7 +388,7 @@ export function CardDetailView({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2 sm:justify-start">
             {hasWorkflow && workflowConfig && (
               <AccessGate permission="can_edit">
                 <WorkflowTransitionButtons
