@@ -31,10 +31,31 @@ import { cn } from '@aloha/ui/utils';
 
 import { dayOfWeekIndex, extractHHmm } from '~/lib/scheduler/wallclock-time';
 
-const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) =>
-  i.toString().padStart(2, '0'),
-);
+const HOUR12_OPTIONS = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
 const MINUTE_OPTIONS = ['00', '15', '30', '45'];
+const MERIDIEM_OPTIONS = ['AM', 'PM'] as const;
+
+type Meridiem = (typeof MERIDIEM_OPTIONS)[number];
+
+// Convert "HH:mm" (24h) → { hour12, meridiem }. Returns empty strings when
+// the input is not a fully-formed time.
+function to12Hour(value: string): { hour12: string; meridiem: Meridiem | '' } {
+  if (!value) return { hour12: '', meridiem: '' };
+  const [hStr] = value.split(':');
+  const h24 = Number(hStr);
+  if (Number.isNaN(h24)) return { hour12: '', meridiem: '' };
+  const meridiem: Meridiem = h24 >= 12 ? 'PM' : 'AM';
+  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+  return { hour12: h12.toString(), meridiem };
+}
+
+function to24Hour(hour12: string, meridiem: Meridiem): string {
+  const h12 = Number(hour12);
+  if (Number.isNaN(h12)) return '00';
+  if (meridiem === 'AM')
+    return (h12 === 12 ? 0 : h12).toString().padStart(2, '0');
+  return (h12 === 12 ? 12 : h12 + 12).toString().padStart(2, '0');
+}
 
 interface CompactTimePickerProps {
   value: string;
@@ -47,19 +68,28 @@ function CompactTimePicker({
   onChange,
   placeholder,
 }: CompactTimePickerProps) {
-  const [h, m] = value ? value.split(':') : ['', ''];
-  const commit = (nextH: string, nextM: string) => {
-    if (!nextH && !nextM) return onChange('');
-    onChange(`${nextH || '00'}:${nextM || '00'}`);
+  const { hour12, meridiem } = to12Hour(value);
+  const [, mRaw] = value ? value.split(':') : ['', ''];
+  const m = mRaw ?? '';
+
+  const commit = (nextH12: string, nextM: string, nextMer: Meridiem | '') => {
+    if (!nextH12 && !nextM && !nextMer) return onChange('');
+    const mer: Meridiem = nextMer || 'AM';
+    const h24 = to24Hour(nextH12 || '12', mer);
+    onChange(`${h24}:${nextM || '00'}`);
   };
+
   return (
     <div className="flex items-center gap-0.5" aria-label={placeholder}>
-      <Select value={h ?? ''} onValueChange={(next) => commit(next, m ?? '')}>
-        <SelectTrigger className="h-8 w-[58px] px-2 text-xs">
-          <SelectValue placeholder="HH" />
+      <Select
+        value={hour12}
+        onValueChange={(next) => commit(next, m, meridiem)}
+      >
+        <SelectTrigger className="h-8 w-[48px] px-1.5 text-xs">
+          <SelectValue placeholder="H" />
         </SelectTrigger>
         <SelectContent>
-          {HOUR_OPTIONS.map((opt) => (
+          {HOUR12_OPTIONS.map((opt) => (
             <SelectItem key={opt} value={opt}>
               {opt}
             </SelectItem>
@@ -67,12 +97,30 @@ function CompactTimePicker({
         </SelectContent>
       </Select>
       <span className="text-muted-foreground px-0.5 text-xs">:</span>
-      <Select value={m ?? ''} onValueChange={(next) => commit(h ?? '', next)}>
-        <SelectTrigger className="h-8 w-[58px] px-2 text-xs">
+      <Select
+        value={m}
+        onValueChange={(next) => commit(hour12, next, meridiem)}
+      >
+        <SelectTrigger className="h-8 w-[48px] px-1.5 text-xs">
           <SelectValue placeholder="MM" />
         </SelectTrigger>
         <SelectContent>
           {MINUTE_OPTIONS.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select
+        value={meridiem}
+        onValueChange={(next) => commit(hour12, m, next as Meridiem)}
+      >
+        <SelectTrigger className="h-8 w-[54px] px-1.5 text-xs">
+          <SelectValue placeholder="AM" />
+        </SelectTrigger>
+        <SelectContent>
+          {MERIDIEM_OPTIONS.map((opt) => (
             <SelectItem key={opt} value={opt}>
               {opt}
             </SelectItem>
@@ -571,7 +619,9 @@ export function SchedulerCreatePanel({
         });
       form.setValue(`days.${firstIndex}.start_time`, '', { shouldDirty: true });
       form.setValue(`days.${firstIndex}.stop_time`, '', { shouldDirty: true });
-      form.setValue(`days.${firstIndex}.ops_task_id`, '', { shouldDirty: true });
+      form.setValue(`days.${firstIndex}.ops_task_id`, '', {
+        shouldDirty: true,
+      });
     },
     [form, remove],
   );
@@ -662,97 +712,99 @@ export function SchedulerCreatePanel({
                             err && 'border-destructive ring-destructive/30',
                           )}
                         >
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <Controller
-                              control={form.control}
-                              name={`days.${i}.start_time` as const}
-                              render={({ field }) => (
-                                <CompactTimePicker
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                  placeholder="Start time"
-                                />
-                              )}
-                            />
-                            <span className="text-muted-foreground text-xs">
-                              →
-                            </span>
-                            <Controller
-                              control={form.control}
-                              name={`days.${i}.stop_time` as const}
-                              render={({ field }) => (
-                                <CompactTimePicker
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                  placeholder="End time"
-                                />
-                              )}
-                            />
-                            <div className="min-w-[140px] flex-1">
+                          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-1.5">
+                            <div className="flex items-center gap-1 sm:gap-1.5">
                               <Controller
                                 control={form.control}
-                                name={`days.${i}.ops_task_id` as const}
+                                name={`days.${i}.start_time` as const}
                                 render={({ field }) => (
-                                  <CompactCombobox
+                                  <CompactTimePicker
                                     value={field.value}
                                     onChange={field.onChange}
-                                    options={taskOptions}
-                                    placeholder="Select task…"
+                                    placeholder="Start time"
+                                  />
+                                )}
+                              />
+                              <span className="text-muted-foreground text-xs">
+                                →
+                              </span>
+                              <Controller
+                                control={form.control}
+                                name={`days.${i}.stop_time` as const}
+                                render={({ field }) => (
+                                  <CompactTimePicker
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    placeholder="End time"
                                   />
                                 )}
                               />
                             </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={() => appendSlotForDate(dayDate)}
-                              disabled={!isLast}
-                              aria-label={`Add slot to ${DAY_NAMES[dow]}`}
-                              title={
-                                isLast
-                                  ? 'Add another slot for this day'
-                                  : 'More slots below'
-                              }
-                              data-test={`scheduler-day-add-${i}`}
-                              className={cn(
-                                'h-8 w-8 shrink-0 rounded-full',
-                                isLast
-                                  ? 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                                  : 'border-dashed text-muted-foreground/40 disabled:opacity-100',
-                              )}
-                            >
-                              {isLast ? (
-                                <Plus className="h-3.5 w-3.5" />
-                              ) : (
-                                <ChevronDown className="h-3.5 w-3.5" />
-                              )}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={() =>
-                                isFirst
-                                  ? resetDay(firstIndex, dayDate)
-                                  : removeSlot(i)
-                              }
-                              disabled={
-                                isFirst &&
-                                !filled &&
-                                slotIndices.length === 1
-                              }
-                              aria-label={
-                                isFirst
-                                  ? `Reset ${DAY_NAMES[dow]}`
-                                  : 'Remove slot'
-                              }
-                              title={isFirst ? 'Reset day' : 'Remove slot'}
-                              data-test={`scheduler-day-reset-${i}`}
-                              className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 shrink-0 rounded-full"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </Button>
+                            <div className="flex items-center gap-1.5 sm:flex-1">
+                              <div className="min-w-[100px] flex-1">
+                                <Controller
+                                  control={form.control}
+                                  name={`days.${i}.ops_task_id` as const}
+                                  render={({ field }) => (
+                                    <CompactCombobox
+                                      value={field.value}
+                                      onChange={field.onChange}
+                                      options={taskOptions}
+                                      placeholder="Select task…"
+                                    />
+                                  )}
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => appendSlotForDate(dayDate)}
+                                disabled={!isLast}
+                                aria-label={`Add slot to ${DAY_NAMES[dow]}`}
+                                title={
+                                  isLast
+                                    ? 'Add another slot for this day'
+                                    : 'More slots below'
+                                }
+                                data-test={`scheduler-day-add-${i}`}
+                                className={cn(
+                                  'h-8 w-8 shrink-0 rounded-full',
+                                  isLast
+                                    ? 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                    : 'text-muted-foreground/40 border-dashed disabled:opacity-100',
+                                )}
+                              >
+                                {isLast ? (
+                                  <Plus className="h-3.5 w-3.5" />
+                                ) : (
+                                  <ChevronDown className="h-3.5 w-3.5" />
+                                )}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() =>
+                                  isFirst
+                                    ? resetDay(firstIndex, dayDate)
+                                    : removeSlot(i)
+                                }
+                                disabled={
+                                  isFirst && !filled && slotIndices.length === 1
+                                }
+                                aria-label={
+                                  isFirst
+                                    ? `Reset ${DAY_NAMES[dow]}`
+                                    : 'Remove slot'
+                                }
+                                title={isFirst ? 'Reset day' : 'Remove slot'}
+                                data-test={`scheduler-day-reset-${i}`}
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 shrink-0 rounded-full"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           </div>
 
                           {err && (
