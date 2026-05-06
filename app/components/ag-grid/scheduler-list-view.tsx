@@ -257,6 +257,11 @@ export default function SchedulerListView(props: ListViewProps) {
         minWidth: 220,
         pinned: 'left' as const,
       },
+      {
+        headerName: 'Task',
+        field: 'task',
+        minWidth: 140,
+      },
       ...['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({
         headerName: day,
         field: [
