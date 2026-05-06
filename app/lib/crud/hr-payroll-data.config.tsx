@@ -33,10 +33,10 @@ function HoursRenderer(props: CustomCellRendererProps) {
   );
 }
 
-function boolFormatter(params: ValueFormatterParams): string {
-  const value = params.value as boolean | null;
-  if (value == null) return '';
-  return value ? 'True' : 'False';
+function BoolTextRenderer(props: CustomCellRendererProps) {
+  const value = props.value as boolean | null;
+  if (value == null) return null;
+  return <span>{value ? 'True' : 'False'}</span>;
 }
 
 function CurrencyRenderer(props: CustomCellRendererProps) {
@@ -131,7 +131,8 @@ const agGridColDefs: ColDef[] = [
   {
     field: 'is_standard',
     headerName: 'Is Standard',
-    valueFormatter: boolFormatter,
+    cellRenderer: BoolTextRenderer,
+    cellDataType: 'text',
     maxWidth: 110,
   },
   {
