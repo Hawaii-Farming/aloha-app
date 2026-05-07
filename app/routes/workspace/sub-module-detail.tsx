@@ -46,24 +46,26 @@ export const loader = async (args: {
   const viewName = config?.views.detail ?? subModuleSlug;
   const pkColumn = config?.pkColumn ?? 'id';
 
-  const record = await loadDetailData<Record<string, unknown>>({
-    client,
-    viewName,
-    orgId: accountSlug,
-    pkColumn,
-    pkValue: recordId,
-    select: config?.select,
-    selfJoins: config?.selfJoins,
-  });
-
+  // Detail row and form options share no dependency — fire in parallel.
+  const [record, formOptions] = await Promise.all([
+    loadDetailData<Record<string, unknown>>({
+      client,
+      viewName,
+      orgId: accountSlug,
+      pkColumn,
+      pkValue: recordId,
+      select: config?.select,
+      selfJoins: config?.selfJoins,
+    }),
+    loadFormOptions({
+      client,
+      config,
+      orgId: accountSlug,
+      subModuleSlug,
+    }),
+  ]);
+  const { fkOptions, comboboxOptions } = formOptions;
   const workflowConfig = config?.workflow ?? null;
-
-  const { fkOptions, comboboxOptions } = await loadFormOptions({
-    client,
-    config,
-    orgId: accountSlug,
-    subModuleSlug,
-  });
 
   return {
     config,

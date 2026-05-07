@@ -78,24 +78,25 @@ export const loader = async (args: {
   const viewName = config?.views.detail ?? subModuleSlug;
   const pkColumn = config?.pkColumn ?? 'id';
 
-  let record: Record<string, unknown> | null = null;
-
-  if (recordId) {
-    record = await loadDetailData<Record<string, unknown>>({
+  // Detail row (edit mode only) and form options share no dependency.
+  const [record, formOptions] = await Promise.all([
+    recordId
+      ? loadDetailData<Record<string, unknown>>({
+          client,
+          viewName,
+          orgId: accountSlug,
+          pkColumn,
+          pkValue: recordId,
+        })
+      : Promise.resolve(null),
+    loadFormOptions({
       client,
-      viewName,
+      config,
       orgId: accountSlug,
-      pkColumn,
-      pkValue: recordId,
-    });
-  }
-
-  const { fkOptions, comboboxOptions } = await loadFormOptions({
-    client,
-    config,
-    orgId: accountSlug,
-    subModuleSlug,
-  });
+      subModuleSlug,
+    }),
+  ]);
+  const { fkOptions, comboboxOptions } = formOptions;
 
   return {
     moduleAccess,

@@ -40,12 +40,25 @@ export async function loadOrgWorkspace(params: {
 }): Promise<OrgWorkspace> {
   const user = await requireUserLoader(params.request);
 
-  // Query hr_employee directly — RLS ensures org-scoped access
-  const { data: employees, error: empError } = await params.client
-    .from('hr_employee')
-    .select('id, org_id, sys_access_level_id, org:org!inner(name)')
-    .eq('user_id', user.sub)
-    .eq('is_deleted', false);
+  // Run both queries in parallel — they share no data dependency.
+  // hr_employee filters by user_id; hr_rba_navigation filters by orgSlug
+  // (already known from URL). Worst case: a redirect path wastes the nav
+  // result, but the happy path saves a full Supabase RTT (~100-200ms).
+  const [empResult, navResult] = await Promise.all([
+    params.client
+      .from('hr_employee')
+      .select('id, org_id, sys_access_level_id, org:org!inner(name)')
+      .eq('user_id', user.sub)
+      .eq('is_deleted', false),
+    queryUntypedView(params.client, 'hr_rba_navigation')
+      .select(
+        'module_id, sub_module_id, module_display_order, sub_module_display_order, can_edit, can_delete, can_verify',
+      )
+      .eq('org_id', params.orgSlug),
+  ]);
+
+  const { data: employees, error: empError } = empResult;
+  const { data: navRows, error: navError } = navResult;
 
   const allOrgs = castRows<EmployeeOrgRow>(employees);
 
@@ -66,14 +79,6 @@ export async function loadOrgWorkspace(params: {
     access_level_id: current.sys_access_level_id,
   };
 
-  // Single view query — not in generated types, use queryUntypedView helper
-  const { data: navRows, error: navError } = await queryUntypedView(
-    params.client,
-    'hr_rba_navigation',
-  )
-    .select('*')
-    .eq('org_id', params.orgSlug);
-
   if (navError) {
     console.error(
       `[loadOrgWorkspace] hr_rba_navigation query failed for org ${params.orgSlug}:`,
@@ -82,7 +87,7 @@ export async function loadOrgWorkspace(params: {
     throw new Response('Failed to load workspace navigation', { status: 500 });
   }
 
-  const rows = castRows<AppNavigationRow>(navRows);
+  const rows = castRows<AppNavigationRow>(navRows ?? []);
   const { modules, subModules } = deriveNavigation(rows, params.orgSlug);
 
   return {

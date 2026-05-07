@@ -402,27 +402,30 @@ export const loader = async (args: {
   const pageSize = config?.noPagination
     ? 10000
     : Number(url.searchParams.get('pageSize') ?? '25');
-  const tableData = await loadTableData({
-    client,
-    viewName,
-    orgId: accountSlug,
-    searchParams: url.searchParams,
-    searchColumns,
-    defaultSort: { column: defaultSortCol, ascending: true },
-    pageSize,
-    select: config?.select,
-    selfJoins: config?.selfJoins,
-    allowedColumns: config?.columns.map((c) => c.key),
-    skipDeletedFilter: config?.skipDeletedFilter,
-    showDeleted: url.searchParams.get('inactive') === '1',
-  });
-
-  const { fkOptions, comboboxOptions } = await loadFormOptions({
-    client,
-    config,
-    orgId: accountSlug,
-    subModuleSlug,
-  });
+  // tableData and form options share no dependency — fire in parallel.
+  const [tableData, formOptions] = await Promise.all([
+    loadTableData({
+      client,
+      viewName,
+      orgId: accountSlug,
+      searchParams: url.searchParams,
+      searchColumns,
+      defaultSort: { column: defaultSortCol, ascending: true },
+      pageSize,
+      select: config?.select,
+      selfJoins: config?.selfJoins,
+      allowedColumns: config?.columns.map((c) => c.key),
+      skipDeletedFilter: config?.skipDeletedFilter,
+      showDeleted: url.searchParams.get('inactive') === '1',
+    }),
+    loadFormOptions({
+      client,
+      config,
+      orgId: accountSlug,
+      subModuleSlug,
+    }),
+  ]);
+  const { fkOptions, comboboxOptions } = formOptions;
 
   return {
     config,

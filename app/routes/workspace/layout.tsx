@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Outlet, useLocation } from 'react-router';
+import {
+  Outlet,
+  type ShouldRevalidateFunctionArgs,
+  useLocation,
+} from 'react-router';
 
 import { z } from 'zod';
 
@@ -36,6 +40,16 @@ export const loader = async (args: Route.LoaderArgs) => {
     accountSlug,
   };
 };
+
+// Layout loader fetches workspace nav + employee context — both depend only
+// on `accountSlug` and the session. Skip re-running it on every GET nav
+// within the same account; revalidate on account switch and after any
+// mutation (which may have changed permissions or org membership).
+export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
+  if (args.currentParams.account !== args.nextParams.account) return true;
+  if (args.formMethod && args.formMethod.toUpperCase() !== 'GET') return true;
+  return false;
+}
 
 export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
   const { layoutState, workspace, accountSlug } = props.loaderData;
