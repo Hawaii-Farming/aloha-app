@@ -108,6 +108,8 @@ export function TimeOffDetailRow({ data }: TimeOffDetailRowProps) {
           <img
             src={photoUrl}
             alt={fullName}
+            loading="lazy"
+            decoding="async"
             className="ring-border h-14 w-14 rounded-full object-cover ring-2"
             onError={(e) => {
               const target = e.currentTarget;

@@ -186,6 +186,8 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
           <img
             src={photoUrl}
             alt={fullName}
+            loading="lazy"
+            decoding="async"
             className="h-14 w-14 rounded-full object-cover"
             onError={(e) => {
               const target = e.currentTarget;

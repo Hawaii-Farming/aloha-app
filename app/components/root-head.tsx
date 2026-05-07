@@ -31,10 +31,6 @@ export function RootHead() {
         color="#000000"
       />
 
-      <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-
-      <link rel="preconnect" href="https://fonts.gstatic.com" />
-
       <meta name="msapplication-TileColor" content="#ffffff" />
       <meta name="theme-color" content={appConfig.themeColor} />
 

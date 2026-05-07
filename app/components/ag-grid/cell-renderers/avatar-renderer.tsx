@@ -48,6 +48,8 @@ export function AvatarRenderer(props: CustomCellRendererProps) {
         <img
           src={profile_photo_url}
           alt={displayName}
+          loading="lazy"
+          decoding="async"
           className="h-9 w-9 shrink-0 rounded-full object-cover"
           onError={(e) => {
             const target = e.currentTarget;
