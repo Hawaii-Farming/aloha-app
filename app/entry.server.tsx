@@ -22,6 +22,42 @@ getServerEnv();
  */
 const ABORT_DELAY = 5_000;
 
+/**
+ * Apply baseline security headers to every SSR response. These cover
+ * transport security, MIME sniffing, framing, referrer leakage, and a
+ * conservative Permissions-Policy. CSP is intentionally NOT set here —
+ * it requires a per-build inline-script/style audit and a nonce strategy.
+ */
+function applySecurityHeaders(headers: Headers) {
+  if (!headers.has('Strict-Transport-Security')) {
+    headers.set(
+      'Strict-Transport-Security',
+      'max-age=63072000; includeSubDomains; preload',
+    );
+  }
+  if (!headers.has('X-Content-Type-Options')) {
+    headers.set('X-Content-Type-Options', 'nosniff');
+  }
+  if (!headers.has('X-Frame-Options')) {
+    headers.set('X-Frame-Options', 'DENY');
+  }
+  if (!headers.has('Referrer-Policy')) {
+    headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  }
+  if (!headers.has('Permissions-Policy')) {
+    headers.set(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+    );
+  }
+  if (!headers.has('Cross-Origin-Opener-Policy')) {
+    headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  }
+  if (!headers.has('X-DNS-Prefetch-Control')) {
+    headers.set('X-DNS-Prefetch-Control', 'on');
+  }
+}
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -66,6 +102,7 @@ async function handleBotRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set('Content-Type', 'text/html');
+          applySecurityHeaders(responseHeaders);
 
           resolve(
             new Response(stream, {
@@ -115,6 +152,7 @@ async function handleBrowserRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set('Content-Type', 'text/html');
+          applySecurityHeaders(responseHeaders);
 
           resolve(
             new Response(stream, {

@@ -71,8 +71,12 @@ jobs:
             --memory=1Gi \
             --cpu=1 \
             --cpu-boost \
+            --no-cpu-throttling \
             --min-instances=1 \
-            --max-instances=3 \
+            --max-instances=10 \
+            --concurrency=80 \
+            --execution-environment=gen2 \
+            --session-affinity \
             --set-env-vars="NODE_ENV=production" \
             --set-env-vars="VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" \
             --set-env-vars="VITE_SUPABASE_PUBLIC_KEY=${{ secrets.VITE_SUPABASE_PUBLIC_KEY }}" \
