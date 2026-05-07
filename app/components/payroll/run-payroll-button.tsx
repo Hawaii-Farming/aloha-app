@@ -263,7 +263,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
                 disabled={pending}
                 className="gap-1.5"
               >
-                <CloudDownload className="h-3.5 w-3.5" />
+                <GoogleDriveLogo className="h-3.5 w-3.5" />
                 Google Drive
               </TabsTrigger>
               <TabsTrigger
@@ -281,12 +281,6 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               className="mt-4 flex h-[20rem] flex-col justify-between gap-4"
             >
               <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <GoogleDriveLogo className="h-6 w-6" />
-                  <span className="text-sm font-medium">
-                    Connected to Google Drive
-                  </span>
-                </div>
                 <ol className="w-full">
                   {GOOGLE_STEPS.map((step, i) => {
                     const Icon = step.icon;
