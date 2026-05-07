@@ -152,6 +152,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                 ) : (
                   <Link
                     to={modulePath}
+                    prefetch="intent"
                     onClick={() => {
                       onNavigate?.();
                       setOpen(true);
@@ -218,6 +219,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                           ) : (
                             <Link
                               to={modulePath}
+                              prefetch="intent"
                               onClick={() => onNavigate?.()}
                             >
                               {createElement(IconComponent, {
@@ -262,6 +264,7 @@ export function ModuleSidebarNavigation(props: ModuleSidebarNavigationProps) {
                             <Link
                               key={sm.sub_module_id}
                               to={subModulePath}
+                              prefetch="intent"
                               onClick={() => onNavigate?.()}
                               title={sm.display_name}
                               className={cn(

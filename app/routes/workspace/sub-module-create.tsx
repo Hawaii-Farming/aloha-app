@@ -293,6 +293,7 @@ export default function SubModuleCreatePage(props: {
                   <Button variant="outline" asChild>
                     <Link
                       to={`/home/${accountSlug}/${moduleAccess.module_slug}/${subModuleAccess.sub_module_slug}`}
+                      prefetch="intent"
                     >
                       <Trans i18nKey="common:cancel" />
                     </Link>

@@ -33,6 +33,7 @@ export function NavbarBreadcrumbs() {
             ) : (
               <Link
                 to={href}
+                prefetch="intent"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 {label}

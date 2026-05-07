@@ -1,4 +1,6 @@
-# Stage 1: Build
+# syntax=docker/dockerfile:1.7
+
+# ---- Stage 1: build ----
 FROM node:20-slim AS build
 RUN corepack enable
 WORKDIR /app
@@ -24,11 +26,24 @@ ARG VITE_DISPLAY_TERMS_AND_CONDITIONS_CHECKBOX=false
 ARG VITE_LOCALES_PATH=public/locales
 ARG VITE_ENABLE_SIDEBAR_TRIGGER=false
 
+# Install layer — cached as long as lockfile + workspace manifests don't
+# change. Copying only manifests first means a typical app source edit
+# does NOT re-run pnpm install (this stage was invalidated on every push
+# under the previous `COPY . .` ordering).
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages ./packages
+COPY e2e/package.json ./e2e/package.json
+RUN find packages -mindepth 2 ! -name 'package.json' ! -path '*/.*' -type f -delete \
+    && find packages -type d -empty -delete
+
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# Source layer — invalidated on app changes, but reuses the install layer.
 COPY . .
-RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
-# Stage 2: Production
+# ---- Stage 2: production ----
 FROM node:20-slim AS production
 RUN corepack enable
 WORKDIR /app
