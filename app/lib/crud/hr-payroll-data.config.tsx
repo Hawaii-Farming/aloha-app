@@ -630,7 +630,7 @@ export const hrPayrollDataConfig: CrudModuleConfig<typeof schema> = {
 
   viewType: { list: 'custom' },
   customViews: {
-    list: () => import('~/components/ag-grid/ag-grid-list-view'),
+    list: () => import('~/components/ag-grid/payroll-data-list-view'),
   },
   noPagination: true,
   noDetailRow: true,

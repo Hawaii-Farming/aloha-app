@@ -20,6 +20,7 @@ const apiRoutes = [
     'routes/api/scheduler/copy-from-prev.ts',
   ),
   route('api/scheduler/delete-week', 'routes/api/scheduler/delete-week.ts'),
+  route('api/payroll/run', 'routes/api/payroll/run.ts'),
   route('api/housing-tenants', 'routes/api/housing-tenants.ts'),
   route('api/housing-rooms', 'routes/api/housing-rooms.ts'),
   route('api/quickbooks/connect', 'routes/api/quickbooks/connect.ts'),
