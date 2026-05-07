@@ -208,15 +208,14 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
           if (!pending) setOpen(o);
         }}
       >
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader className="items-center text-center sm:items-center sm:text-center">
-            <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/25">
-              <Zap className="h-6 w-6 text-white" strokeWidth={2.5} />
+            <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-md shadow-green-500/25">
+              <Zap className="h-5 w-5 text-white" strokeWidth={2.5} />
             </div>
-            <DialogTitle className="text-lg">Run payroll</DialogTitle>
-            <DialogDescription className="max-w-xs text-balance">
-              Validate against the employee register and insert merged rows.
-              Existing rows are never modified.
+            <DialogTitle className="text-base">Run payroll</DialogTitle>
+            <DialogDescription className="sr-only">
+              Run payroll from Google Drive or an uploaded xlsx file
             </DialogDescription>
           </DialogHeader>
 
@@ -242,7 +241,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
             <TabsContent
               value="google"
-              className="mt-4 flex h-[20rem] flex-col justify-between gap-4"
+              className="mt-4 flex h-[17rem] flex-col justify-between gap-3"
             >
               <div className="flex flex-col items-center gap-3">
                 <ol className="w-full">
@@ -300,7 +299,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
             <TabsContent
               value="upload"
-              className="mt-4 flex h-[20rem] flex-col justify-between gap-4"
+              className="mt-4 flex h-[17rem] flex-col justify-between gap-3"
             >
               <div className="space-y-2">
                 <p className="text-foreground text-xs font-medium">
