@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { type ElementType, useCallback, useRef, useState } from 'react';
 
 import { createPortal } from 'react-dom';
 
@@ -64,6 +64,66 @@ const ALLOWED = new Set(['Admin', 'Owner']);
 function getSlot(id: string): HTMLElement | null {
   return typeof document === 'undefined' ? null : document.getElementById(id);
 }
+
+function GoogleDriveLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 87.3 78"
+      className={className}
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill="#0066da"
+        d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z"
+      />
+      <path
+        fill="#00ac47"
+        d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0-1.2 4.5h27.5z"
+      />
+      <path
+        fill="#ea4335"
+        d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z"
+      />
+      <path
+        fill="#00832d"
+        d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z"
+      />
+      <path
+        fill="#2684fc"
+        d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z"
+      />
+      <path
+        fill="#ffba00"
+        d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z"
+      />
+    </svg>
+  );
+}
+
+interface TimelineStep {
+  icon: ElementType;
+  title: string;
+  desc: string;
+}
+
+const GOOGLE_STEPS: TimelineStep[] = [
+  {
+    icon: CloudDownload,
+    title: 'Read source sheet',
+    desc: 'Pulls all 6 HRB tabs over the Sheets API',
+  },
+  {
+    icon: Archive,
+    title: 'Archive snapshot',
+    desc: 'Saves a dated .xlsx copy to Storage',
+  },
+  {
+    icon: Eraser,
+    title: 'Clear source tabs',
+    desc: 'Empties the sheet so the next run starts clean',
+  },
+];
 
 export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
   const layoutData = useRouteLoaderData('routes/workspace/layout') as
@@ -220,20 +280,46 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               value="google"
               className="mt-4 flex h-[20rem] flex-col justify-between gap-4"
             >
-              <ul className="text-muted-foreground space-y-2 text-xs">
-                <li className="flex items-center gap-2">
-                  <CloudDownload className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Reads the configured HRB sheet</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Archive className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Archives a snapshot to Storage</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Eraser className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Clears the source tabs after import</span>
-                </li>
-              </ul>
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <GoogleDriveLogo className="h-6 w-6" />
+                  <span className="text-sm font-medium">
+                    Connected to Google Drive
+                  </span>
+                </div>
+                <ol className="w-full">
+                  {GOOGLE_STEPS.map((step, i) => {
+                    const Icon = step.icon;
+                    const isLast = i === GOOGLE_STEPS.length - 1;
+                    return (
+                      <li
+                        key={step.title}
+                        className="relative flex gap-3 pb-4 last:pb-0"
+                      >
+                        <div className="flex flex-col items-center">
+                          <div className="ring-background relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-md ring-4 shadow-green-500/20">
+                            <Icon
+                              className="h-4 w-4 text-white"
+                              strokeWidth={2.5}
+                            />
+                          </div>
+                          {!isLast && (
+                            <div className="from-primary/40 to-primary/40 absolute top-8 bottom-0 w-0.5 bg-gradient-to-b" />
+                          )}
+                        </div>
+                        <div className="flex-1 pt-1">
+                          <p className="text-foreground text-sm leading-none font-medium">
+                            {step.title}
+                          </p>
+                          <p className="text-muted-foreground mt-1 text-xs">
+                            {step.desc}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
               <Button
                 onClick={runFromGoogle}
                 disabled={pending}
