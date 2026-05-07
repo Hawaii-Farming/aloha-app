@@ -13,7 +13,11 @@ import {
 } from './sheets-client.server';
 
 export function parseXlsxToHrbTabs(bytes: Uint8Array): HrbTabs {
-  const wb = XLSX.read(bytes, { type: 'array', cellDates: false });
+  // cellDates:true makes Excel date cells come out as JS Date objects;
+  // run-payroll's isoDate() handles those via its `instanceof Date` branch.
+  // Without this, dates come back as serial numbers (e.g. 45000) and get
+  // misread as year 45000 → Postgres timestamp overflow.
+  const wb = XLSX.read(bytes, { type: 'array', cellDates: true });
   const tabs = {} as HrbTabs;
   const missing: string[] = [];
 
