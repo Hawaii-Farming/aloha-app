@@ -65,60 +65,6 @@ function getSlot(id: string): HTMLElement | null {
   return typeof document === 'undefined' ? null : document.getElementById(id);
 }
 
-function ExcelLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect x="2.5" y="3" width="19" height="18" rx="2" fill="#107C41" />
-      <rect x="2.5" y="3" width="19" height="4" fill="#0E6B38" />
-      <path
-        d="M8.6 8.5h2.2l1.7 2.6 1.7-2.6h2.2l-2.7 3.9 2.8 4.1h-2.2l-1.8-2.8-1.8 2.8H8.5l2.8-4.1z"
-        fill="#fff"
-      />
-    </svg>
-  );
-}
-
-function GoogleDriveLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 87.3 78"
-      className={className}
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        fill="#0066da"
-        d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z"
-      />
-      <path
-        fill="#00ac47"
-        d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0-1.2 4.5h27.5z"
-      />
-      <path
-        fill="#ea4335"
-        d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z"
-      />
-      <path
-        fill="#00832d"
-        d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z"
-      />
-      <path
-        fill="#2684fc"
-        d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z"
-      />
-      <path
-        fill="#ffba00"
-        d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z"
-      />
-    </svg>
-  );
-}
-
 interface TimelineStep {
   icon: ElementType;
   title: string;
@@ -281,7 +227,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
                 disabled={pending}
                 className="gap-1.5"
               >
-                <GoogleDriveLogo className="h-3.5 w-3.5" />
+                <CloudDownload className="h-3.5 w-3.5" />
                 Google Drive
               </TabsTrigger>
               <TabsTrigger
@@ -289,7 +235,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
                 disabled={pending}
                 className="gap-1.5"
               >
-                <ExcelLogo className="h-3.5 w-3.5" />
+                <Upload className="h-3.5 w-3.5" />
                 Upload .xlsx
               </TabsTrigger>
             </TabsList>
