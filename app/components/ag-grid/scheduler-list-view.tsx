@@ -452,6 +452,7 @@ export default function SchedulerListView(props: ListViewProps) {
             rowClassRules={otWarningRowClassRules}
             pagination={false}
             quickFilterText={query}
+            autoSizeColumns={false}
             onCellClicked={handleCellClicked}
             onGridReady={handleGridReady}
             onColumnMoved={handleColumnMoved}

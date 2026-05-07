@@ -103,9 +103,8 @@ export function WorkspaceNavbar({
               >
                 <Search size={16} className="shrink-0" />
                 <span className="truncate text-sm">Search...</span>
-                <span className="ml-auto hidden shrink-0 items-center gap-1 font-mono text-xs lg:flex">
-                  <span>/</span>
-                  <span>K</span>
+                <span className="ml-auto hidden shrink-0 items-center font-mono text-xs lg:flex">
+                  /
                 </span>
               </button>
             )}

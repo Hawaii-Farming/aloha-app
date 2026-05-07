@@ -91,6 +91,10 @@ export interface AgGridInnerProps {
   onSortChanged?: (event: SortChangedEvent) => void;
   onColumnVisible?: (event: ColumnVisibleEvent) => void;
   getRowStyle?: (params: RowClassParams) => Record<string, string> | undefined;
+  /** Disable the wrapper's autoSize-then-fill on grid ready and size changes.
+   * Set to false when restoring persisted column widths via onGridReady so
+   * the wrapper does not immediately recompute and override them. */
+  autoSizeColumns?: boolean;
 }
 
 function AgGridInner({
@@ -121,6 +125,7 @@ function AgGridInner({
   onSortChanged,
   onColumnVisible,
   getRowStyle,
+  autoSizeColumns = true,
 }: AgGridInnerProps) {
   const { resolvedTheme } = useTheme();
   const theme = useMemo(() => getAgGridTheme(), []);
@@ -145,11 +150,13 @@ function AgGridInner({
           defaultState: { pinned: null },
         });
       }
-      setTimeout(() => {
-        autoSizeThenFill(event.api);
-      }, 0);
+      if (autoSizeColumns) {
+        setTimeout(() => {
+          autoSizeThenFill(event.api);
+        }, 0);
+      }
     },
-    [onGridReady, isMobile],
+    [onGridReady, isMobile, autoSizeColumns],
   );
 
   const handleGridSizeChanged = useCallback(
@@ -161,9 +168,10 @@ function AgGridInner({
       };
       clientWidth?: number;
     }) => {
+      if (!autoSizeColumns) return;
       autoSizeThenFill(event.api);
     },
-    [],
+    [autoSizeColumns],
   );
 
   const defaultColDef = useMemo(
