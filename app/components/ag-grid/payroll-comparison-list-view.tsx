@@ -11,6 +11,7 @@ import type {
   GridReadyEvent,
   RowClassParams,
   SortChangedEvent,
+  ValueGetterParams,
 } from 'ag-grid-community';
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 
@@ -99,11 +100,12 @@ function formatSignedHours(n: number) {
   return `${sign}${formatted}`;
 }
 
+const UNIFORM_MIN_WIDTH = 70;
+
 const numericCol = (
   field: string,
   headerName: string,
   opts?: {
-    width?: number;
     formatter?: typeof hoursFormatter;
     currency?: boolean;
   },
@@ -112,7 +114,7 @@ const numericCol = (
   headerName,
   type: 'numericColumn',
   flex: 1,
-  minWidth: opts?.width ?? 80,
+  minWidth: UNIFORM_MIN_WIDTH,
   valueFormatter: opts?.currency ? undefined : opts?.formatter,
   cellRenderer: opts?.currency ? CurrencyRenderer : undefined,
 });
@@ -126,42 +128,73 @@ const deltaCol = (
   headerName,
   type: 'numericColumn',
   flex: 1,
-  minWidth: 90,
+  minWidth: UNIFORM_MIN_WIDTH,
   cellRenderer: (p: CustomCellRendererProps) => DeltaRenderer({ ...p, format }),
 });
+
+// hours_variance = total_hours − scheduled_hours, computed client-side
+// (neither view exposes it as a column). valueGetter runs on pinned
+// rows too, so the TOTAL row gets the right delta of summed hours.
+function hoursVarianceGetter(params: ValueGetterParams): number | null {
+  const total = Number(params.data?.total_hours);
+  const sched = Number(params.data?.scheduled_hours);
+  if (Number.isNaN(total) && Number.isNaN(sched)) return null;
+  return (total || 0) - (sched || 0);
+}
+
+const hoursVarianceCol: ColDef = {
+  colId: 'hours_variance',
+  headerName: 'Hours Variance',
+  type: 'numericColumn',
+  flex: 1,
+  minWidth: UNIFORM_MIN_WIDTH,
+  valueGetter: hoursVarianceGetter,
+  cellRenderer: (p: CustomCellRendererProps) =>
+    DeltaRenderer({ ...p, format: 'hours' }),
+};
 
 // Source view: hr_payroll_task_comparison (one row per task with deltas
 // vs prior period). No employee/department dimension.
 const byTaskColDefs: ColDef[] = [
-  { field: 'task', headerName: 'Task', minWidth: 160, pinned: 'left' },
+  {
+    field: 'task',
+    headerName: 'Task',
+    flex: 1,
+    minWidth: UNIFORM_MIN_WIDTH,
+    pinned: 'left',
+  },
   {
     field: 'hr_work_authorization_id',
     headerName: 'Work Auth',
-    minWidth: 100,
+    flex: 1,
+    minWidth: UNIFORM_MIN_WIDTH,
   },
   {
     field: 'compensation_manager_name',
-    headerName: 'Comp Manager',
-    minWidth: 130,
+    headerName: 'Comp Mgr',
+    flex: 1,
+    minWidth: UNIFORM_MIN_WIDTH,
   },
-  numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
-  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
-  deltaCol('hours_delta', 'Δ Hours', 'hours'),
-  numericCol('total_cost', 'Total Cost', { currency: true, width: 110 }),
-  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
-  numericCol('discretionary_overtime_hours', 'OT Hours', {
+  numericCol('scheduled_hours', 'Sched', { formatter: hoursFormatter }),
+  numericCol('total_hours', 'Hours', { formatter: hoursFormatter }),
+  hoursVarianceCol,
+  deltaCol('hours_delta', 'Δ Hrs', 'hours'),
+  numericCol('total_cost', 'Cost', { currency: true }),
+  deltaCol('total_cost_delta', 'Δ Cost', 'currency'),
+  numericCol('discretionary_overtime_hours', 'OT', {
     formatter: hoursFormatter,
   }),
-  deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
-  deltaCol('discretionary_overtime_pay_delta', 'Δ OT Pay', 'currency'),
+  deltaCol('regular_pay_delta', 'Δ Reg', 'currency'),
+  deltaCol('discretionary_overtime_pay_delta', 'Δ OT', 'currency'),
+  deltaCol('other_pay_delta', 'Δ Other', 'currency'),
 ];
 
 const AVATAR_COL: ColDef = {
   headerName: '',
   field: 'hr_employee_profile_photo_url',
   cellRenderer: PinnedAwareAvatarRenderer,
-  maxWidth: 60,
-  minWidth: 60,
+  maxWidth: 44,
+  minWidth: 44,
   sortable: false,
   filter: false,
   resizable: false,
@@ -179,24 +212,28 @@ const byEmployeeColDefs: ColDef[] = [
     field: 'hr_employee_preferred_name',
     headerName: 'Employee',
     cellRenderer: EmployeeNameRenderer,
-    minWidth: 160,
+    flex: 1,
+    minWidth: UNIFORM_MIN_WIDTH,
     pinned: 'left',
   },
   {
     field: 'hr_employee_hr_work_authorization_id',
     headerName: 'Work Auth',
-    minWidth: 100,
+    flex: 1,
+    minWidth: UNIFORM_MIN_WIDTH,
   },
-  numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
-  numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
-  deltaCol('hours_delta', 'Δ Hours', 'hours'),
-  numericCol('total_cost', 'Total Cost', { currency: true, width: 110 }),
-  deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
-  numericCol('discretionary_overtime_hours', 'Disc OT Hours', {
+  numericCol('scheduled_hours', 'Sched', { formatter: hoursFormatter }),
+  numericCol('total_hours', 'Hours', { formatter: hoursFormatter }),
+  hoursVarianceCol,
+  deltaCol('hours_delta', 'Δ Hrs', 'hours'),
+  numericCol('total_cost', 'Cost', { currency: true }),
+  deltaCol('total_cost_delta', 'Δ Cost', 'currency'),
+  numericCol('discretionary_overtime_hours', 'OT', {
     formatter: hoursFormatter,
   }),
-  deltaCol('regular_pay_delta', 'Δ Reg Pay', 'currency'),
-  deltaCol('discretionary_overtime_pay_delta', 'Δ Disc OT Pay', 'currency'),
+  deltaCol('regular_pay_delta', 'Δ Reg', 'currency'),
+  deltaCol('discretionary_overtime_pay_delta', 'Δ OT', 'currency'),
+  deltaCol('other_pay_delta', 'Δ Other', 'currency'),
 ];
 
 export default function PayrollComparisonListView(props: ListViewProps) {
@@ -235,6 +272,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
     'regular_pay_delta',
     'discretionary_overtime_pay_delta',
     'total_cost_delta',
+    'other_pay_delta',
   ]);
   const baseColDefs = isByEmployee ? byEmployeeColDefs : byTaskColDefs;
   const colDefs = isTeamLead
@@ -319,6 +357,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       'regular_pay_delta',
       'discretionary_overtime_pay_delta',
       'total_cost_delta',
+      'other_pay_delta',
     ];
     const totals: RowData = isByEmployee
       ? { hr_employee_preferred_name: 'TOTAL' }
@@ -340,7 +379,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   }, []);
 
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    restoreColumnState('payroll_comparison_v4', event.api);
+    restoreColumnState('payroll_comparison_v12', event.api);
   }, []);
 
   const debouncedSaveState = useCallback((api: GridApi) => {
@@ -348,7 +387,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       clearTimeout(saveDebounceRef.current);
     }
     saveDebounceRef.current = setTimeout(() => {
-      saveColumnState('payroll_comparison_v4', api);
+      saveColumnState('payroll_comparison_v12', api);
     }, 300);
   }, []);
 
