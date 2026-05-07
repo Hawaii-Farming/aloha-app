@@ -3,11 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFetcher, useRevalidator } from 'react-router';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type {
-  CellClickedEvent,
-  ColDef,
-  GridReadyEvent,
-} from 'ag-grid-community';
+import type { CellClickedEvent, ColDef } from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
 import { ChevronsUpDown, Home, Plus, Trash2, X } from 'lucide-react';
 
@@ -99,26 +95,28 @@ function buildTenantColDefs(
     {
       headerName: '',
       cellRenderer: TenantInitialsRenderer,
-      maxWidth: 56,
-      minWidth: 56,
+      width: 48,
+      maxWidth: 48,
+      minWidth: 32,
       sortable: false,
       filter: false,
       resizable: false,
       suppressMovable: true,
     },
-    { field: 'full_name', headerName: 'Name', flex: 1, minWidth: 160 },
+    { field: 'full_name', headerName: 'Name', flex: 2, minWidth: 50 },
     {
       field: 'department_name',
       headerName: 'Department',
       flex: 1,
-      minWidth: 120,
+      minWidth: 40,
       valueFormatter: (p) => (p.value ? String(p.value) : '—'),
     },
     {
       colId: 'remove',
       headerName: '',
+      width: 48,
       maxWidth: 48,
-      minWidth: 48,
+      minWidth: 28,
       sortable: false,
       filter: false,
       resizable: false,
@@ -156,20 +154,20 @@ function TenantsGrid({
     // No-op: panel context is read-only browse; remove column handles itself.
   }, []);
 
-  const handleGridReady = useCallback((event: GridReadyEvent) => {
-    setTimeout(() => event.api.sizeColumnsToFit(), 20);
-  }, []);
-
   const colDefs = buildTenantColDefs(onRemove);
 
+  // autoSizeColumns=false so AG Grid's native `flex` on the name/department
+  // columns drives layout — they refit automatically on container resize.
+  // With autoSizeColumns=true the wrapper would call autoSizeAllColumns on
+  // every size change and snap them back to content width.
   return (
     <AgGridWrapper
       colDefs={colDefs}
       rowData={tenants as unknown as Record<string, unknown>[]}
       pagination={false}
       domLayout="autoHeight"
+      autoSizeColumns={false}
       onCellClicked={handleCellClicked}
-      onGridReady={handleGridReady}
     />
   );
 }
@@ -275,6 +273,7 @@ interface HousingSitePanelProps {
   accountSlug: string;
   detailActionUrl: string | null;
   onClose: () => void;
+  isMobile?: boolean;
 }
 
 export default function HousingSitePanel({
@@ -282,6 +281,7 @@ export default function HousingSitePanel({
   accountSlug,
   detailActionUrl,
   onClose,
+  isMobile = false,
 }: HousingSitePanelProps) {
   const open = !!site;
   const assignFetcher = useFetcher();
@@ -404,6 +404,9 @@ export default function HousingSitePanel({
   const tooMany = selected.size > availableBeds;
 
   if (!site) {
+    // On mobile, the table takes full width when the panel is closed —
+    // no empty placeholder, no border. Hide the panel entirely.
+    if (isMobile) return null;
     return (
       <aside
         className="bg-card border-border flex h-full min-h-0 min-w-0 flex-1 flex-col border-l"

@@ -10,6 +10,8 @@ import type {
 import type { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 import { Home } from 'lucide-react';
 
+import { useIsMobile } from '@aloha/ui/hooks/use-mobile';
+
 import {
   useActiveTableSearch,
   useRegisterActiveTable,
@@ -112,46 +114,48 @@ const numberCmp = pinTotalLast<number>((a, b) => (a ?? 0) - (b ?? 0));
 
 const TABLE_WIDTH = 620;
 
-const colDefs: ColDef[] = [
-  {
-    colId: 'home_icon',
-    headerName: '',
-    cellRenderer: HomeIconRenderer,
-    width: 50,
-    minWidth: 50,
-    sortable: false,
-    filter: false,
-    resizable: false,
-    suppressMovable: true,
-  },
-  {
-    field: 'name',
-    headerName: 'Name',
-    width: 170,
-    comparator: stringCmp,
-  },
-  {
-    field: 'maximumBeds',
-    headerName: 'Max Beds',
-    type: 'numericColumn',
-    width: 100,
-    comparator: numberCmp,
-  },
-  {
-    field: 'tenantCount',
-    headerName: 'Tenants',
-    type: 'numericColumn',
-    width: 100,
-    comparator: numberCmp,
-  },
-  {
-    field: 'availableBeds',
-    headerName: 'Vacancy',
-    cellRenderer: VacancyCellRenderer,
-    width: 200,
-    comparator: numberCmp,
-  },
-];
+function buildColDefs(stretchVacancy: boolean): ColDef[] {
+  return [
+    {
+      colId: 'home_icon',
+      headerName: '',
+      cellRenderer: HomeIconRenderer,
+      width: 50,
+      minWidth: 50,
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMovable: true,
+    },
+    {
+      field: 'name',
+      headerName: 'Name',
+      width: 170,
+      comparator: stringCmp,
+    },
+    {
+      field: 'maximumBeds',
+      headerName: 'Max Beds',
+      type: 'numericColumn',
+      width: 100,
+      comparator: numberCmp,
+    },
+    {
+      field: 'tenantCount',
+      headerName: 'Tenants',
+      type: 'numericColumn',
+      width: 100,
+      comparator: numberCmp,
+    },
+    {
+      field: 'availableBeds',
+      headerName: 'Vacancy',
+      cellRenderer: VacancyCellRenderer,
+      ...(stretchVacancy ? { flex: 1, minWidth: 200 } : { width: 200 }),
+      comparator: numberCmp,
+    },
+  ];
+}
 
 export default function HousingMapView(props: ListViewProps) {
   const { tableData, accountSlug } = props;
@@ -160,8 +164,14 @@ export default function HousingMapView(props: ListViewProps) {
   const { query } = useActiveTableSearch();
   useRegisterActiveTable('housing', props.subModuleDisplayName ?? 'Housing');
 
+  const isMobile = useIsMobile();
   const gridRef = useRef<AgGridReact>(null);
   const [panelSite, setPanelSite] = useState<HousingSitePanelSite | null>(null);
+
+  // Stretch the Vacancy column to fill the table on mobile (full-width grid).
+  // On desktop, columns stay at declared widths so the header ends cleanly
+  // at the edge of the 620px table.
+  const colDefs = useMemo(() => buildColDefs(isMobile), [isMobile]);
 
   const rawData = tableData.data as RowData[];
 
@@ -220,12 +230,19 @@ export default function HousingMapView(props: ListViewProps) {
     [],
   );
 
+  // Mobile (< md): single-pane drill-down — table OR panel, never both.
+  //   panel closed: table is full width, panel hidden (no empty placeholder)
+  //   panel open:   panel is full width, table hidden
+  // md+: side-by-side — table fixed at TABLE_WIDTH, panel/empty-state fills rest.
+  const tableClassName = panelSite
+    ? 'hidden md:flex min-h-0 md:shrink-0 flex-col overflow-hidden'
+    : 'flex flex-1 min-h-0 flex-col overflow-hidden md:flex-none md:shrink-0';
+  const tableStyle =
+    !isMobile || panelSite ? { width: TABLE_WIDTH } : undefined;
+
   return (
     <div className="flex min-h-0 flex-1 flex-row" data-test="housing-list-view">
-      <div
-        className="flex min-h-0 shrink-0 flex-col overflow-hidden"
-        style={{ width: TABLE_WIDTH }}
-      >
+      <div className={tableClassName} style={tableStyle}>
         <AgGridWrapper
           gridRef={gridRef}
           colDefs={colDefs}
@@ -243,6 +260,7 @@ export default function HousingMapView(props: ListViewProps) {
         accountSlug={accountSlug}
         detailActionUrl={detailActionUrl}
         onClose={() => setPanelSite(null)}
+        isMobile={isMobile}
       />
     </div>
   );
