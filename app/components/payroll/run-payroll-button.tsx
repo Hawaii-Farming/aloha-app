@@ -218,7 +218,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
             <TabsContent
               value="google"
-              className="mt-4 flex min-h-[14rem] flex-col justify-between space-y-4"
+              className="mt-4 flex h-[20rem] flex-col justify-between gap-4"
             >
               <ul className="text-muted-foreground space-y-2 text-xs">
                 <li className="flex items-center gap-2">
@@ -256,7 +256,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
             <TabsContent
               value="upload"
-              className="mt-4 flex min-h-[14rem] flex-col justify-between space-y-4"
+              className="mt-4 flex h-[20rem] flex-col justify-between gap-4"
             >
               <p className="text-muted-foreground text-xs">
                 Use an HRB export matching{' '}
