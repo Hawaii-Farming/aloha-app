@@ -28,7 +28,34 @@ export const ErrorBoundary = RootErrorBoundary;
 
 const csrfProtect = createCsrfProtect();
 
-export const links = () => [{ rel: 'stylesheet', href: styles }];
+// Preconnect to the Supabase API origin so the browser starts DNS + TCP
+// + TLS handshake during HTML parse, in parallel with critical CSS.
+// Auth state, loader data, and any client-side React Query call goes to
+// this origin, so the handshake savings (~50–150ms on cold connections)
+// apply on essentially every page load.
+const supabaseOrigin = (() => {
+  const raw = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  try {
+    return raw ? new URL(raw).origin : null;
+  } catch {
+    return null;
+  }
+})();
+
+export const links = () => {
+  const out: Array<Record<string, string>> = [
+    { rel: 'stylesheet', href: styles },
+  ];
+  if (supabaseOrigin) {
+    out.push({
+      rel: 'preconnect',
+      href: supabaseOrigin,
+      crossOrigin: 'anonymous',
+    });
+    out.push({ rel: 'dns-prefetch', href: supabaseOrigin });
+  }
+  return out;
+};
 
 export const meta = () => {
   return [
