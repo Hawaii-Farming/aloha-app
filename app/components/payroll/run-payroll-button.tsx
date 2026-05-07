@@ -65,6 +65,24 @@ function getSlot(id: string): HTMLElement | null {
   return typeof document === 'undefined' ? null : document.getElementById(id);
 }
 
+function ExcelLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="2.5" y="3" width="19" height="18" rx="2" fill="#107C41" />
+      <rect x="2.5" y="3" width="19" height="4" fill="#0E6B38" />
+      <path
+        d="M8.6 8.5h2.2l1.7 2.6 1.7-2.6h2.2l-2.7 3.9 2.8 4.1h-2.2l-1.8-2.8-1.8 2.8H8.5l2.8-4.1z"
+        fill="#fff"
+      />
+    </svg>
+  );
+}
+
 function GoogleDriveLogo({ className }: { className?: string }) {
   return (
     <svg
@@ -271,7 +289,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
                 disabled={pending}
                 className="gap-1.5"
               >
-                <Upload className="h-3.5 w-3.5" />
+                <ExcelLogo className="h-3.5 w-3.5" />
                 Upload .xlsx
               </TabsTrigger>
             </TabsList>
