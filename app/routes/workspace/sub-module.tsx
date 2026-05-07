@@ -260,24 +260,19 @@ export const loader = async (args: {
       }
     }
 
-    // Enrich by_task rows with comp-manager name and per-task work
-    // authorization labels. The comparison view groups by
-    // (compensation_manager_id, task, status) but only exposes the
-    // manager id and no work-auth dimension at all. We derive both
-    // here so the UI can render Comp Manager + Work Auth columns
-    // without extra round-trips from the client.
+    // Enrich by_task rows with comp-manager name. The comparison view
+    // groups by (compensation_manager_id, task, status) and exposes the
+    // work-auth as `status` already — alias it to hr_work_authorization_id
+    // so the AG Grid column renders without extra round-trips.
     if (
       (subModuleSlug === 'Payroll Comparison' ||
         subModuleSlug === 'Payroll Comp') &&
       (url.searchParams.get('view') ?? 'by_task') === 'by_task'
     ) {
       const managerIds = new Set<string>();
-      const taskNames = new Set<string>();
       for (const r of rows) {
         const mid = r.compensation_manager_id;
         if (typeof mid === 'string' && mid) managerIds.add(mid);
-        const t = r.task;
-        if (typeof t === 'string' && t) taskNames.add(t);
       }
 
       const managerNameMap = new Map<string, string>();
@@ -295,61 +290,12 @@ export const loader = async (args: {
         }
       }
 
-      // hr_payroll has no `task` column — task lives on the
-      // hr_payroll_by_task view, which carries hr_employee_id but no
-      // work-auth. Two-step: by_task gives us {task, employee_id};
-      // hr_employee gives us {employee_id, hr_work_authorization_id}.
-      const taskWorkAuthMap = new Map<string, Set<string>>();
-      if (taskNames.size > 0) {
-        const { data: byTaskRows } = await queryUntypedView(
-          client,
-          'hr_payroll_by_task',
-        )
-          .select('task, hr_employee_id')
-          .eq('org_id', accountSlug)
-          .in('task', Array.from(taskNames));
-        const byTaskList = castRows(byTaskRows);
-        const empIds = new Set<string>();
-        for (const r of byTaskList) {
-          const eid = r.hr_employee_id;
-          if (typeof eid === 'string' && eid) empIds.add(eid);
-        }
-
-        const empWorkAuthMap = new Map<string, string>();
-        if (empIds.size > 0) {
-          const { data: empWaRows } = await client
-            .from('hr_employee' as never)
-            .select('id, hr_work_authorization_id')
-            .in('id', Array.from(empIds));
-          for (const e of castRows(empWaRows)) {
-            const id = String(e.id ?? '');
-            const wa = e.hr_work_authorization_id;
-            if (id && typeof wa === 'string' && wa) {
-              empWorkAuthMap.set(id, wa);
-            }
-          }
-        }
-
-        for (const r of byTaskList) {
-          const t = String(r.task ?? '');
-          const eid = String(r.hr_employee_id ?? '');
-          const wa = empWorkAuthMap.get(eid);
-          if (!t || !wa) continue;
-          const set = taskWorkAuthMap.get(t) ?? new Set<string>();
-          set.add(wa);
-          taskWorkAuthMap.set(t, set);
-        }
-      }
-
       rows = rows.map((r) => {
         const mid = String(r.compensation_manager_id ?? '');
-        const t = String(r.task ?? '');
         return {
           ...r,
           compensation_manager_name: managerNameMap.get(mid) ?? mid,
-          hr_work_authorization_id: [...(taskWorkAuthMap.get(t) ?? [])].join(
-            ', ',
-          ),
+          hr_work_authorization_id: r.status ?? null,
         };
       });
     }
