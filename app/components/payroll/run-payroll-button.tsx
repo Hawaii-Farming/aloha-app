@@ -184,7 +184,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
           if (!pending) setOpen(o);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader className="items-center text-center sm:items-center sm:text-center">
             <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/25">
               <Zap className="h-6 w-6 text-white" strokeWidth={2.5} />
@@ -216,7 +216,10 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="google" className="mt-4 space-y-4">
+            <TabsContent
+              value="google"
+              className="mt-4 flex min-h-[14rem] flex-col justify-between space-y-4"
+            >
               <ul className="text-muted-foreground space-y-2 text-xs">
                 <li className="flex items-center gap-2">
                   <CloudDownload className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -251,7 +254,10 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               </Button>
             </TabsContent>
 
-            <TabsContent value="upload" className="mt-4 space-y-4">
+            <TabsContent
+              value="upload"
+              className="mt-4 flex min-h-[14rem] flex-col justify-between space-y-4"
+            >
               <p className="text-muted-foreground text-xs">
                 Use an HRB export matching{' '}
                 <code className="bg-muted rounded px-1 py-0.5 text-[11px]">
