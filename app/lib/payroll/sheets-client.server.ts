@@ -1,8 +1,11 @@
 import { JWT } from 'google-auth-library';
 
 const SHEETS_API_BASE = 'https://sheets.googleapis.com/v4/spreadsheets';
+const DRIVE_API_BASE = 'https://www.googleapis.com/drive/v3/files';
+const XLSX_MIME =
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 const SCOPES = [
-  'https://www.googleapis.com/auth/spreadsheets.readonly',
+  'https://www.googleapis.com/auth/spreadsheets',
   'https://www.googleapis.com/auth/drive.readonly',
 ];
 
@@ -96,4 +99,36 @@ export async function fetchHrbTabs(sheetId: string): Promise<HrbTabs> {
     tabs[name] = rowsToObjects(json.valueRanges[i]?.values ?? []);
   });
   return tabs;
+}
+
+/** Clears row 2+ on every HRB tab, leaving headers intact. */
+export async function clearHrbTabs(sheetId: string): Promise<void> {
+  const token = await getAccessToken();
+  const ranges = HRB_TAB_NAMES.map((n) => `'${n}'!A2:Z`);
+  const res = await fetch(`${SHEETS_API_BASE}/${sheetId}/values:batchClear`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ ranges }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Sheets batchClear ${res.status}: ${body}`);
+  }
+}
+
+/** Exports the spreadsheet as xlsx via the Drive API. Returns the raw bytes. */
+export async function exportSheetAsXlsx(sheetId: string): Promise<Uint8Array> {
+  const token = await getAccessToken();
+  const url = `${DRIVE_API_BASE}/${sheetId}/export?mimeType=${encodeURIComponent(XLSX_MIME)}`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Drive export ${res.status}: ${body}`);
+  }
+  return new Uint8Array(await res.arrayBuffer());
 }

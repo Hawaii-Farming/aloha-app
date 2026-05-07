@@ -30,6 +30,8 @@ interface RunPayrollResponse {
   success: boolean;
   rowsInserted?: number;
   batchId?: string | null;
+  archivePath?: string;
+  warnings?: string[];
   error?: string;
   missingEmployees?: { payroll_id: string; full_name: string }[];
   conflicts?: PayrollConflict[];
@@ -90,6 +92,9 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
         toast.success(
           `Imported ${inserted} payroll row${inserted === 1 ? '' : 's'}`,
         );
+      }
+      if (json.warnings?.length) {
+        for (const w of json.warnings) toast.warning(w);
       }
       revalidator.revalidate();
     } catch (e) {

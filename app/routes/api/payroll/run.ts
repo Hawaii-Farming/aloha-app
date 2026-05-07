@@ -4,13 +4,19 @@ import {
   type EmployeeLookup,
   buildPayrollRows,
 } from '~/lib/payroll/run-payroll.server';
-import { fetchHrbTabs } from '~/lib/payroll/sheets-client.server';
+import {
+  clearHrbTabs,
+  exportSheetAsXlsx,
+  fetchHrbTabs,
+} from '~/lib/payroll/sheets-client.server';
 import { getSupabaseServerAdminClient } from '~/lib/supabase/clients/server-admin-client.server';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 
 const ALLOWED_ROLES = new Set(['Admin', 'Owner']);
 const INSERT_BATCH_SIZE = 100;
+const XLSX_MIME =
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
 export const action = async ({ request }: { request: Request }) => {
   if (request.method !== 'POST') {
@@ -191,5 +197,34 @@ export const action = async ({ request }: { request: Request }) => {
     inserted += chunk.length;
   }
 
-  return Response.json({ success: true, rowsInserted: inserted, batchId });
+  const maxCheckDate = rows
+    .map((r) => r.check_date)
+    .sort()
+    .pop()!;
+  const archivePath = `${orgId}/${batchId}__${maxCheckDate}.xlsx`;
+  const warnings: string[] = [];
+  try {
+    const bucket = process.env.HRB_ARCHIVE_BUCKET ?? 'payroll-archives';
+    const xlsxBytes = await exportSheetAsXlsx(sheetId);
+    const { error: uploadErr } = await admin.storage
+      .from(bucket)
+      .upload(archivePath, xlsxBytes, { contentType: XLSX_MIME });
+    if (uploadErr) warnings.push(`Archive upload failed: ${uploadErr.message}`);
+  } catch (e) {
+    warnings.push(`Archive export failed: ${(e as Error).message}`);
+  }
+
+  try {
+    await clearHrbTabs(sheetId);
+  } catch (e) {
+    warnings.push(`Source sheet clear failed: ${(e as Error).message}`);
+  }
+
+  return Response.json({
+    success: true,
+    rowsInserted: inserted,
+    batchId,
+    archivePath,
+    warnings: warnings.length > 0 ? warnings : undefined,
+  });
 };
