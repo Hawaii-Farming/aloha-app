@@ -29,7 +29,7 @@ function scoreDisplay(value: unknown): { text: string; className: string } {
 function formatDate(d: unknown): string {
   if (!d) return '';
   try {
-    return format(parseISO(String(d)), 'MM/dd/yyyy');
+    return format(parseISO(String(d)), 'MM/dd/yy');
   } catch {
     return String(d);
   }

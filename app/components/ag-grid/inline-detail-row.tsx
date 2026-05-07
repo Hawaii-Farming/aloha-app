@@ -7,7 +7,7 @@ import type { CrudModuleConfig, FormFieldConfig } from '~/lib/crud/types';
 
 function formatDate(value: string): string {
   const d = new Date(value);
-  return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
+  return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
 }
 
 function formatPhone(value: string): string {

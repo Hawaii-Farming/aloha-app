@@ -5,11 +5,11 @@ import { currencyFormatter } from '../cell-renderers/currency-formatter';
 import { dateFormatter } from '../cell-renderers/date-formatter';
 
 describe('dateFormatter', () => {
-  it('formats ISO date string to MM/DD/YYYY', () => {
+  it('formats ISO date string to MM/DD/YY', () => {
     const result = dateFormatter({
       value: '2024-03-15',
     } as ValueFormatterParams);
-    expect(result).toBe('03/15/2024');
+    expect(result).toBe('03/15/24');
   });
 
   it('returns empty string for null value', () => {

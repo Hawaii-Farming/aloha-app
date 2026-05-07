@@ -69,7 +69,7 @@ export function HousingDetailRow({ data }: HousingDetailRowProps) {
   const formatDate = (d: string | null): string => {
     if (!d) return '';
     try {
-      return format(parseISO(d), 'MM/dd/yyyy');
+      return format(parseISO(d), 'MM/dd/yy');
     } catch {
       return d;
     }

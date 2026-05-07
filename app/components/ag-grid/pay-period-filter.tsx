@@ -38,7 +38,7 @@ export function PayPeriodFilter({ periods }: PayPeriodFilterProps) {
 
   const formatLabel = (start: string, end: string): string => {
     try {
-      return `${format(parseISO(start), 'MM/dd/yyyy')} - ${format(parseISO(end), 'MM/dd/yyyy')}`;
+      return `${format(parseISO(start), 'MM/dd/yy')} - ${format(parseISO(end), 'MM/dd/yy')}`;
     } catch {
       return `${start} - ${end}`;
     }
