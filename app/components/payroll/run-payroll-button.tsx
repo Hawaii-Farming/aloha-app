@@ -302,14 +302,29 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               value="upload"
               className="mt-4 flex h-[20rem] flex-col justify-between gap-4"
             >
-              <p className="text-muted-foreground text-xs">
-                Use an HRB export matching{' '}
-                <code className="bg-muted rounded px-1 py-0.5 text-[11px]">
-                  HF_Payroll_Template
-                </code>{' '}
-                ($data, NetPay, Hours, PTOBank, WC, TDI). The file is archived;
-                nothing is cleared.
-              </p>
+              <div className="space-y-2">
+                <p className="text-foreground text-xs font-medium">
+                  Required tabs in your{' '}
+                  <code className="bg-muted rounded px-1 py-0.5 font-mono text-[11px]">
+                    .xlsx
+                  </code>
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {['$data', 'NetPay', 'Hours', 'PTOBank', 'WC', 'TDI'].map(
+                    (tab) => (
+                      <span
+                        key={tab}
+                        className="bg-muted text-muted-foreground inline-flex items-center rounded-md px-2 py-0.5 font-mono text-[11px]"
+                      >
+                        {tab}
+                      </span>
+                    ),
+                  )}
+                </div>
+                <p className="text-muted-foreground text-[11px]">
+                  The uploaded file is archived. Source is left untouched.
+                </p>
+              </div>
 
               <button
                 type="button"
