@@ -10,8 +10,20 @@ export function PayrollDataFilterBar() {
   const [searchParams, setSearchParams] = useSearchParams();
   const periodStart = searchParams.get('period_start') ?? '';
   const periodEnd = searchParams.get('period_end') ?? '';
-  const periodValue =
-    periodStart && periodEnd ? `${periodStart}|${periodEnd}` : '';
+  const showAll = searchParams.get('period') === 'all';
+
+  // Mirror the loader's default-to-most-recent behaviour so the filter
+  // chip reflects what's actually being queried.
+  const defaultPeriod = (payPeriods[0] ?? {}) as Record<string, unknown>;
+  const defaultStart = String(defaultPeriod.pay_period_start ?? '');
+  const defaultEnd = String(defaultPeriod.pay_period_end ?? '');
+  const effectiveStart = periodStart || (showAll ? '' : defaultStart);
+  const effectiveEnd = periodEnd || (showAll ? '' : defaultEnd);
+  const periodValue = showAll
+    ? 'all'
+    : effectiveStart && effectiveEnd
+      ? `${effectiveStart}|${effectiveEnd}`
+      : '';
 
   return (
     <NavbarFilterButton
@@ -24,14 +36,17 @@ export function PayrollDataFilterBar() {
           value: periodValue,
           onChange: (v) => {
             const next = new URLSearchParams(searchParams);
-            if (v === '') {
+            if (v === '' || v === 'all') {
+              // Explicit "All" — opt out of the recent-period default.
               next.delete('period_start');
               next.delete('period_end');
+              next.set('period', 'all');
             } else {
               const [start, end] = v.split('|');
               if (start && end) {
                 next.set('period_start', start);
                 next.set('period_end', end);
+                next.delete('period');
               }
             }
             setSearchParams(next, { preventScrollReset: true });

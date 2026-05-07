@@ -62,21 +62,33 @@ export const loader = async (args: {
 
   // Custom loader path for views that need non-standard query logic
   if (config?.viewType?.list === 'custom') {
-    // Pre-load pay periods for all payroll submodules (needed before query
-    // for payroll_data default period selection)
+    // Phase 1 — prerequisites needed before the main query is built.
+    // Pay periods only feed default-period selection in Payroll Data and
+    // Hours Comp; comparison views auto-anchor server-side, so skip the
+    // scan there entirely.
+    const needsPayPeriods =
+      subModuleSlug === 'Payroll Data' || subModuleSlug === 'Hours Comp';
+    const needsReviewYears = subModuleSlug === 'Employee Review';
+
+    const [periodResult, reviewYearResult] = await Promise.all([
+      needsPayPeriods
+        ? queryUntypedView(client, 'hr_payroll')
+            .select('pay_period_start, pay_period_end')
+            .eq('org_id', accountSlug)
+            .eq('is_deleted', false)
+            .order('pay_period_start', { ascending: false })
+        : Promise.resolve({ data: null }),
+      needsReviewYears
+        ? queryUntypedView(client, 'hr_employee_review')
+            .select('review_year')
+            .eq('org_id', accountSlug)
+        : Promise.resolve({ data: null }),
+    ]);
+
     let payPeriods: Record<string, unknown>[] = [];
-    if (
-      subModuleSlug.startsWith('Payroll') ||
-      subModuleSlug === 'Payroll Comp' ||
-      subModuleSlug === 'Hours Comp'
-    ) {
-      const { data: periodData } = await queryUntypedView(client, 'hr_payroll')
-        .select('pay_period_start, pay_period_end')
-        .eq('org_id', accountSlug)
-        .eq('is_deleted', false)
-        .order('pay_period_start', { ascending: false });
+    if (needsPayPeriods) {
       const seen = new Set<string>();
-      payPeriods = castRows(periodData).filter((r) => {
+      payPeriods = castRows(periodResult.data).filter((r) => {
         const key = `${r.pay_period_start}|${r.pay_period_end}`;
         if (seen.has(key)) return false;
         seen.add(key);
@@ -84,17 +96,10 @@ export const loader = async (args: {
       });
     }
 
-    // Load distinct review years for YearQuarterFilter
     let reviewYears: number[] = [];
-    if (subModuleSlug === 'Employee Review') {
-      const { data: yearData } = await queryUntypedView(
-        client,
-        'hr_employee_review',
-      )
-        .select('review_year')
-        .eq('org_id', accountSlug);
+    if (needsReviewYears) {
       const yearSet = new Set<number>();
-      castRows(yearData).forEach((r) => {
+      castRows(reviewYearResult.data).forEach((r) => {
         const y = Number(r.review_year);
         if (y) yearSet.add(y);
       });
@@ -172,10 +177,22 @@ export const loader = async (args: {
       }
       query = query.order('hr_employee_id');
     } else if (subModuleSlug === 'Payroll Data') {
-      const periodStart = url.searchParams.get('period_start');
-      const periodEnd = url.searchParams.get('period_end');
+      let periodStart = url.searchParams.get('period_start');
+      let periodEnd = url.searchParams.get('period_end');
+      const showAll = url.searchParams.get('period') === 'all';
 
-      // Empty params = "All Pay Periods" — no filter applied.
+      // Default to most recent pay period when nothing selected and user
+      // hasn't explicitly opted into "All Pay Periods" (?period=all).
+      if (!showAll && !periodStart && !periodEnd && payPeriods.length > 0) {
+        const defaultPeriod = payPeriods[0] as Record<string, unknown>;
+        const defStart = String(defaultPeriod.pay_period_start ?? '');
+        const defEnd = String(defaultPeriod.pay_period_end ?? '');
+        if (defStart && defEnd) {
+          periodStart = defStart;
+          periodEnd = defEnd;
+        }
+      }
+
       if (periodStart && periodEnd) {
         query = query
           .eq('pay_period_start', periodStart)
@@ -195,7 +212,27 @@ export const loader = async (args: {
       query = query.order('created_at', { ascending: false });
     }
 
-    const { data, error } = await query;
+    // Phase 2 — main query, form options, and the distinct-managers
+    // lookup are mutually independent. Fire them in parallel.
+    const needsManagers = subModuleSlug === 'Payroll Comp Manager';
+
+    const [mainResult, formOptions, mgrDistinctResult] = await Promise.all([
+      query,
+      loadFormOptions({
+        client,
+        config,
+        orgId: accountSlug,
+        subModuleSlug,
+      }),
+      needsManagers
+        ? queryUntypedView(client, 'hr_payroll_employee_comparison')
+            .select('compensation_manager_id')
+            .eq('org_id', accountSlug)
+        : Promise.resolve({ data: null }),
+    ]);
+
+    const { data, error } = mainResult;
+    const { fkOptions, comboboxOptions } = formOptions;
 
     if (error) {
       throw new Response(error.message, { status: 500 });
@@ -207,113 +244,88 @@ export const loader = async (args: {
     // loadTableData's behaviour for the regular path.
     let rows = config?.select ? rawRows.map((r) => flattenRow(r)) : rawRows;
 
-    // Enrich payroll-summary views with employee display fields. The
-    // hr_payroll_employee_comparison view exposes hr_employee_id but not
-    // preferred_name / department / photo, and PostgREST embeds aren't
-    // reliable on these views. Fetch a single batch and merge by id.
-    // (hr_payroll_task_comparison has no employee dimension; the loop
-    // is a no-op there since employeeIds will be empty.)
-    if (
+    // Phase 3 — single merged enrichment pass. The comparison and Hours
+    // Comp views expose only hr_employee_id / compensation_manager_id;
+    // we need preferred_name + department + photo + work-auth for
+    // employees, plus name for managers. One `IN` query covers both.
+    const enrichEmployees =
       subModuleSlug === 'Payroll Comparison' ||
       subModuleSlug === 'Payroll Comp' ||
       subModuleSlug === 'Payroll Comp Manager' ||
-      subModuleSlug === 'Hours Comp'
-    ) {
-      const employeeIds = new Set<string>();
+      subModuleSlug === 'Hours Comp';
+    const isByTask =
+      (subModuleSlug === 'Payroll Comparison' ||
+        subModuleSlug === 'Payroll Comp') &&
+      (url.searchParams.get('view') ?? 'by_task') === 'by_task';
+
+    if (enrichEmployees || isByTask) {
+      const idSet = new Set<string>();
       for (const r of rows) {
-        const eid = r.hr_employee_id;
-        if (typeof eid === 'string' && eid) employeeIds.add(eid);
+        if (enrichEmployees) {
+          const eid = r.hr_employee_id;
+          if (typeof eid === 'string' && eid) idSet.add(eid);
+        }
+        if (isByTask) {
+          const mid = r.compensation_manager_id;
+          if (typeof mid === 'string' && mid) idSet.add(mid);
+        }
       }
-      if (employeeIds.size > 0) {
+
+      const empMap = new Map<string, Record<string, unknown>>();
+      if (idSet.size > 0) {
         const { data: empData } = await client
           .from('hr_employee' as never)
           .select(
-            'id, preferred_name, profile_photo_url, hr_department_id, hr_work_authorization_id',
+            'id, preferred_name, first_name, last_name, profile_photo_url, hr_department_id, hr_work_authorization_id',
           )
-          .in('id', Array.from(employeeIds));
-        const empMap = new Map<string, Record<string, unknown>>();
+          .in('id', Array.from(idSet));
         for (const e of castRows(empData)) {
           empMap.set(String(e.id), e);
-        }
-        rows = rows.map((r) => {
-          const eid = String(r.hr_employee_id ?? '');
-          const emp = empMap.get(eid);
-          if (!emp) return r;
-          return {
-            ...r,
-            hr_employee_preferred_name: emp.preferred_name,
-            hr_employee_profile_photo_url: emp.profile_photo_url,
-            hr_employee_hr_department_id: emp.hr_department_id,
-            hr_employee_hr_work_authorization_id: emp.hr_work_authorization_id,
-          };
-        });
-      }
-    }
-
-    // Enrich by_task rows with comp-manager name. The comparison view
-    // groups by (compensation_manager_id, task, status) and exposes the
-    // work-auth as `status` already — alias it to hr_work_authorization_id
-    // so the AG Grid column renders without extra round-trips.
-    if (
-      (subModuleSlug === 'Payroll Comparison' ||
-        subModuleSlug === 'Payroll Comp') &&
-      (url.searchParams.get('view') ?? 'by_task') === 'by_task'
-    ) {
-      const managerIds = new Set<string>();
-      for (const r of rows) {
-        const mid = r.compensation_manager_id;
-        if (typeof mid === 'string' && mid) managerIds.add(mid);
-      }
-
-      const managerNameMap = new Map<string, string>();
-      if (managerIds.size > 0) {
-        const { data: mgrRows } = await client
-          .from('hr_employee' as never)
-          .select('id, preferred_name, first_name, last_name')
-          .in('id', Array.from(managerIds));
-        for (const m of castRows(mgrRows)) {
-          const id = String(m.id ?? '');
-          const name =
-            (m.preferred_name as string) ||
-            [m.first_name, m.last_name].filter(Boolean).join(' ');
-          if (id) managerNameMap.set(id, name);
         }
       }
 
       rows = rows.map((r) => {
-        const mid = String(r.compensation_manager_id ?? '');
-        return {
-          ...r,
-          compensation_manager_name: managerNameMap.get(mid) ?? mid,
-          hr_work_authorization_id: r.status ?? null,
-        };
+        let next = r;
+        if (enrichEmployees) {
+          const emp = empMap.get(String(r.hr_employee_id ?? ''));
+          if (emp) {
+            next = {
+              ...next,
+              hr_employee_preferred_name: emp.preferred_name,
+              hr_employee_profile_photo_url: emp.profile_photo_url,
+              hr_employee_hr_department_id: emp.hr_department_id,
+              hr_employee_hr_work_authorization_id:
+                emp.hr_work_authorization_id,
+            };
+          }
+        }
+        if (isByTask) {
+          const mid = String(r.compensation_manager_id ?? '');
+          const mgr = empMap.get(mid);
+          const name = mgr
+            ? (mgr.preferred_name as string) ||
+              [mgr.first_name, mgr.last_name].filter(Boolean).join(' ')
+            : mid;
+          next = {
+            ...next,
+            compensation_manager_name: name,
+            hr_work_authorization_id: r.status ?? null,
+          };
+        }
+        return next;
       });
     }
 
-    // Load distinct managers for payroll_comp_manager
     let managers: Record<string, unknown>[] = [];
-    if (subModuleSlug === 'Payroll Comp Manager') {
-      const { data: mgrData } = await queryUntypedView(
-        client,
-        'hr_payroll_employee_comparison',
-      )
-        .select('compensation_manager_id')
-        .eq('org_id', accountSlug);
+    if (needsManagers) {
       const mgrSeen = new Set<string>();
-      managers = castRows(mgrData).filter((r) => {
+      managers = castRows(mgrDistinctResult.data).filter((r) => {
         const id = r.compensation_manager_id as string;
         if (!id || mgrSeen.has(id)) return false;
         mgrSeen.add(id);
         return true;
       });
     }
-
-    const { fkOptions, comboboxOptions } = await loadFormOptions({
-      client,
-      config,
-      orgId: accountSlug,
-      subModuleSlug,
-    });
 
     return {
       config,
