@@ -4,7 +4,16 @@ import { createPortal } from 'react-dom';
 
 import { useRevalidator, useRouteLoaderData } from 'react-router';
 
-import { CloudDownload, Loader2, Upload } from 'lucide-react';
+import {
+  Archive,
+  CheckCircle2,
+  CloudDownload,
+  Eraser,
+  FileSpreadsheet,
+  Loader2,
+  Upload,
+  Zap,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -176,30 +185,52 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
         }}
       >
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Run payroll</DialogTitle>
-            <DialogDescription>
-              Pull the latest HRB data, validate against the employee
-              register, and insert merged rows. Existing rows are not
-              modified.
+          <DialogHeader className="items-center text-center sm:items-center sm:text-center">
+            <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/25">
+              <Zap className="h-6 w-6 text-white" strokeWidth={2.5} />
+            </div>
+            <DialogTitle className="text-lg">Run payroll</DialogTitle>
+            <DialogDescription className="max-w-xs text-balance">
+              Validate against the employee register and insert merged rows.
+              Existing rows are never modified.
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs defaultValue="google" className="mt-2">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="google" disabled={pending}>
-                From Google Drive
+          <Tabs defaultValue="google" className="mt-3">
+            <TabsList className="grid h-10 w-full grid-cols-2">
+              <TabsTrigger
+                value="google"
+                disabled={pending}
+                className="gap-1.5"
+              >
+                <CloudDownload className="h-3.5 w-3.5" />
+                Google Drive
               </TabsTrigger>
-              <TabsTrigger value="upload" disabled={pending}>
-                From Upload
+              <TabsTrigger
+                value="upload"
+                disabled={pending}
+                className="gap-1.5"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Upload .xlsx
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="google" className="mt-4 space-y-3">
-              <p className="text-muted-foreground text-sm">
-                Reads the configured HRB sheet, archives a snapshot, and
-                clears the source tabs after import.
-              </p>
+            <TabsContent value="google" className="mt-4 space-y-4">
+              <ul className="text-muted-foreground space-y-2 text-xs">
+                <li className="flex items-center gap-2">
+                  <CloudDownload className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Reads the configured HRB sheet</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Archive className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Archives a snapshot to Storage</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Eraser className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Clears the source tabs after import</span>
+                </li>
+              </ul>
               <Button
                 onClick={runFromGoogle}
                 disabled={pending}
@@ -220,25 +251,65 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               </Button>
             </TabsContent>
 
-            <TabsContent value="upload" className="mt-4 space-y-3">
-              <p className="text-muted-foreground text-sm">
-                Upload an .xlsx export from HRB matching the
-                HF_Payroll_Template tabs ($data, NetPay, Hours, PTOBank, WC,
-                TDI). The uploaded file is archived; nothing is cleared.
+            <TabsContent value="upload" className="mt-4 space-y-4">
+              <p className="text-muted-foreground text-xs">
+                Use an HRB export matching{' '}
+                <code className="bg-muted rounded px-1 py-0.5 text-[11px]">
+                  HF_Payroll_Template
+                </code>{' '}
+                ($data, NetPay, Hours, PTOBank, WC, TDI). The file is archived;
+                nothing is cleared.
               </p>
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={pending}
+                className={`group hover:border-primary hover:bg-accent flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed py-6 transition-colors ${
+                  uploadFile ? 'border-primary bg-accent/50' : 'border-border'
+                }`}
+                data-test="run-payroll-upload-dropzone"
+              >
+                {uploadFile ? (
+                  <>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/50">
+                      <FileSpreadsheet className="h-5 w-5 text-emerald-700 dark:text-emerald-400" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-foreground max-w-[16rem] truncate px-3 text-sm font-medium">
+                        {uploadFile.name}
+                      </p>
+                      <p className="text-muted-foreground mt-0.5 text-xs">
+                        {(uploadFile.size / 1024).toFixed(1)} KB · click to
+                        replace
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-muted group-hover:bg-background flex h-10 w-10 items-center justify-center rounded-full transition-colors">
+                      <Upload className="text-muted-foreground group-hover:text-primary h-5 w-5 transition-colors" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-foreground text-sm font-medium">
+                        Choose an .xlsx file
+                      </p>
+                      <p className="text-muted-foreground mt-0.5 text-xs">
+                        Must match the HRB template
+                      </p>
+                    </div>
+                  </>
+                )}
+              </button>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept=".xlsx"
                 onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-muted file:px-3 file:py-2 file:text-foreground hover:file:bg-muted/80"
+                className="hidden"
                 data-test="run-payroll-upload-file"
               />
-              {uploadFile && (
-                <p className="text-muted-foreground text-xs">
-                  {uploadFile.name} ({(uploadFile.size / 1024).toFixed(1)} KB)
-                </p>
-              )}
+
               <Button
                 onClick={runFromUpload}
                 disabled={pending || !uploadFile}
@@ -252,7 +323,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
                   </>
                 ) : (
                   <>
-                    <Upload className="mr-2 h-4 w-4" />
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
                     Run from file
                   </>
                 )}
@@ -271,8 +342,8 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
             <AlertDialogTitle>Missing employees in register</AlertDialogTitle>
             <AlertDialogDescription>
               The payroll source references {missing?.length ?? 0} employee
-              {missing?.length === 1 ? '' : 's'} not found in the register.
-              Add them (or fix their payroll IDs) before re-running.
+              {missing?.length === 1 ? '' : 's'} not found in the register. Add
+              them (or fix their payroll IDs) before re-running.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="text-muted-foreground max-h-64 overflow-y-auto rounded-md border p-3 text-sm">
@@ -304,17 +375,15 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
             <AlertDialogTitle>Payroll already imported</AlertDialogTitle>
             <AlertDialogDescription>
               {conflicts?.length ?? 0} row
-              {conflicts?.length === 1 ? '' : 's'} from the source already
-              exist in payroll. Delete them first if you need to re-import,
-              or remove the duplicates from the source.
+              {conflicts?.length === 1 ? '' : 's'} from the source already exist
+              in payroll. Delete them first if you need to re-import, or remove
+              the duplicates from the source.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="text-muted-foreground max-h-64 overflow-y-auto rounded-md border p-3 text-sm">
             <ul className="space-y-1">
               {conflicts?.map((c) => (
-                <li
-                  key={`${c.payroll_id}-${c.check_date}-${c.invoice_number}`}
-                >
+                <li key={`${c.payroll_id}-${c.check_date}-${c.invoice_number}`}>
                   <span className="text-foreground">{c.employee_name}</span>{' '}
                   <span className="text-muted-foreground">
                     ({c.payroll_id}) — check {c.check_date}
