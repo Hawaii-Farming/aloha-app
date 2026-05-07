@@ -172,20 +172,10 @@ export const loader = async (args: {
       }
       query = query.order('hr_employee_id');
     } else if (subModuleSlug === 'Payroll Data') {
-      let periodStart = url.searchParams.get('period_start');
-      let periodEnd = url.searchParams.get('period_end');
+      const periodStart = url.searchParams.get('period_start');
+      const periodEnd = url.searchParams.get('period_end');
 
-      // Default to most recent pay period when none selected
-      if (!periodStart && !periodEnd && payPeriods.length > 0) {
-        const defaultPeriod = payPeriods[0] as Record<string, unknown>;
-        const defStart = String(defaultPeriod.pay_period_start ?? '');
-        const defEnd = String(defaultPeriod.pay_period_end ?? '');
-        if (defStart && defEnd) {
-          periodStart = defStart;
-          periodEnd = defEnd;
-        }
-      }
-
+      // Empty params = "All Pay Periods" — no filter applied.
       if (periodStart && periodEnd) {
         query = query
           .eq('pay_period_start', periodStart)
