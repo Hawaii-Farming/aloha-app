@@ -95,12 +95,18 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
           <WorkspaceNavbar
             user={user}
             orgName={workspace.currentOrg?.org_name ?? null}
+            currentOrgId={workspace.currentOrg?.org_id ?? null}
+            accessLevelId={workspace.currentOrg?.access_level_id ?? null}
+            userOrgs={workspace.userOrgs}
             searchItems={searchItems}
             className="hidden lg:flex"
           />
           <WorkspaceMobileHeader
             user={user}
             orgName={workspace.currentOrg?.org_name ?? null}
+            currentOrgId={workspace.currentOrg?.org_id ?? null}
+            accessLevelId={workspace.currentOrg?.access_level_id ?? null}
+            userOrgs={workspace.userOrgs}
             searchItems={searchItems}
             onOpenDrawer={() => setDrawerOpen(true)}
             drawerOpen={drawerOpen}

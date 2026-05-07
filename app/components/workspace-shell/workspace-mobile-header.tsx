@@ -14,6 +14,9 @@ import { WorkspaceNavbarProfileMenu } from './workspace-navbar-profile-menu';
 interface WorkspaceMobileHeaderProps {
   user: JwtPayload;
   orgName?: string | null;
+  currentOrgId?: string | null;
+  accessLevelId?: string | null;
+  userOrgs?: Array<{ org_id: string; org_name: string }>;
   searchItems: NavbarSearchItem[];
   onOpenDrawer: () => void;
   drawerOpen: boolean;
@@ -24,6 +27,9 @@ interface WorkspaceMobileHeaderProps {
 export function WorkspaceMobileHeader({
   user,
   orgName,
+  currentOrgId,
+  accessLevelId,
+  userOrgs,
   searchItems,
   onOpenDrawer,
   drawerOpen,
@@ -77,7 +83,13 @@ export function WorkspaceMobileHeader({
             </button>
           )}
         />
-        <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
+        <WorkspaceNavbarProfileMenu
+          user={user}
+          orgName={orgName}
+          currentOrgId={currentOrgId}
+          accessLevelId={accessLevelId}
+          userOrgs={userOrgs}
+        />
       </div>
     </header>
   );

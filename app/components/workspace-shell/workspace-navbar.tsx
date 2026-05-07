@@ -16,6 +16,9 @@ import { WorkspaceNavbarProfileMenu } from './workspace-navbar-profile-menu';
 interface WorkspaceNavbarProps {
   user: JwtPayload;
   orgName?: string | null;
+  currentOrgId?: string | null;
+  accessLevelId?: string | null;
+  userOrgs?: Array<{ org_id: string; org_name: string }>;
   searchItems: NavbarSearchItem[];
   className?: string;
 }
@@ -65,6 +68,9 @@ function NavbarSidebarHeader() {
 export function WorkspaceNavbar({
   user,
   orgName,
+  currentOrgId,
+  accessLevelId,
+  userOrgs,
   searchItems,
   className,
 }: WorkspaceNavbarProps) {
@@ -117,7 +123,13 @@ export function WorkspaceNavbar({
             data-test="workspace-navbar-actions-slot"
             className="flex shrink-0 items-center gap-2"
           />
-          <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
+          <WorkspaceNavbarProfileMenu
+            user={user}
+            orgName={orgName}
+            currentOrgId={currentOrgId}
+            accessLevelId={accessLevelId}
+            userOrgs={userOrgs}
+          />
         </div>
       </div>
     </header>
