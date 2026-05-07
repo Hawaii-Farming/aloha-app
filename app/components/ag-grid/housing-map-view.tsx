@@ -185,12 +185,16 @@ export default function HousingMapView(props: ListViewProps) {
   const handleRowClicked = useCallback((event: RowClickedEvent) => {
     const row = event.data as HousingRow | undefined;
     if (!row?.id || row.isTotal) return;
-    setPanelSite({
-      id: row.id,
-      name: row.name,
-      maximumBeds: row.maximumBeds,
-      availableBeds: row.availableBeds,
-    });
+    setPanelSite((prev) =>
+      prev?.id === row.id
+        ? null
+        : {
+            id: row.id,
+            name: row.name,
+            maximumBeds: row.maximumBeds,
+            availableBeds: row.availableBeds,
+          },
+    );
   }, []);
 
   const detailActionUrl =
