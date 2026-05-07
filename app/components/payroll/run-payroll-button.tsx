@@ -17,13 +17,7 @@ import {
   AlertDialogTitle,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@aloha/ui/dialog';
+import { Popover, PopoverAnchor, PopoverContent } from '@aloha/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@aloha/ui/tabs';
 
 interface PayrollConflict {
@@ -66,6 +60,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
   const revalidator = useRevalidator();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [missing, setMissing] = useState<
     { payroll_id: string; full_name: string }[] | null
   >(null);
@@ -146,10 +141,13 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
   if (!allowed) return null;
 
-  const button = (
+  const renderButton = () => (
     <Button
       variant="outline"
-      onClick={() => setOpen(true)}
+      onClick={(e) => {
+        setAnchorEl(e.currentTarget);
+        setOpen(true);
+      }}
       disabled={pending}
       data-test="run-payroll"
       aria-label="Run payroll"
@@ -166,26 +164,30 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
   return (
     <>
-      {desktopSlot && createPortal(button, desktopSlot)}
-      {mobileSlot && createPortal(button, mobileSlot)}
+      {desktopSlot && createPortal(renderButton(), desktopSlot)}
+      {mobileSlot && createPortal(renderButton(), mobileSlot)}
 
-      <Dialog
+      <Popover
         open={open}
         onOpenChange={(o) => {
           if (!pending) setOpen(o);
         }}
       >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Run payroll</DialogTitle>
-            <DialogDescription>
-              Pull the latest HRB data, validate against the employee
-              register, and insert merged rows. Existing rows are not
-              modified.
-            </DialogDescription>
-          </DialogHeader>
+        {anchorEl ? <PopoverAnchor virtualRef={{ current: anchorEl }} /> : null}
+        <PopoverContent
+          align="end"
+          sideOffset={8}
+          className="w-[24rem] max-w-[calc(100vw-1rem)]"
+        >
+          <div className="mb-3">
+            <h4 className="text-sm font-semibold">Run payroll</h4>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Pull the latest HRB data, validate against the employee register,
+              and insert merged rows. Existing rows are not modified.
+            </p>
+          </div>
 
-          <Tabs defaultValue="google" className="mt-2">
+          <Tabs defaultValue="google">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="google" disabled={pending}>
                 From Google Drive
@@ -195,10 +197,10 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="google" className="mt-4 space-y-3">
-              <p className="text-muted-foreground text-sm">
-                Reads the configured HRB sheet, archives a snapshot, and
-                clears the source tabs after import.
+            <TabsContent value="google" className="mt-3 space-y-3">
+              <p className="text-muted-foreground text-xs">
+                Reads the configured HRB sheet, archives a snapshot, and clears
+                the source tabs after import.
               </p>
               <Button
                 onClick={runFromGoogle}
@@ -220,18 +222,17 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               </Button>
             </TabsContent>
 
-            <TabsContent value="upload" className="mt-4 space-y-3">
-              <p className="text-muted-foreground text-sm">
-                Upload an .xlsx export from HRB matching the
-                HF_Payroll_Template tabs ($data, NetPay, Hours, PTOBank, WC,
-                TDI). The uploaded file is archived; nothing is cleared.
+            <TabsContent value="upload" className="mt-3 space-y-3">
+              <p className="text-muted-foreground text-xs">
+                Upload an .xlsx matching HF_Payroll_Template ($data, NetPay,
+                Hours, PTOBank, WC, TDI). File is archived; nothing is cleared.
               </p>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept=".xlsx"
                 onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-muted file:px-3 file:py-2 file:text-foreground hover:file:bg-muted/80"
+                className="file:bg-muted file:text-foreground hover:file:bg-muted/80 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:px-3 file:py-1.5"
                 data-test="run-payroll-upload-file"
               />
               {uploadFile && (
@@ -259,8 +260,8 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
               </Button>
             </TabsContent>
           </Tabs>
-        </DialogContent>
-      </Dialog>
+        </PopoverContent>
+      </Popover>
 
       <AlertDialog
         open={missing !== null}
@@ -271,8 +272,8 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
             <AlertDialogTitle>Missing employees in register</AlertDialogTitle>
             <AlertDialogDescription>
               The payroll source references {missing?.length ?? 0} employee
-              {missing?.length === 1 ? '' : 's'} not found in the register.
-              Add them (or fix their payroll IDs) before re-running.
+              {missing?.length === 1 ? '' : 's'} not found in the register. Add
+              them (or fix their payroll IDs) before re-running.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="text-muted-foreground max-h-64 overflow-y-auto rounded-md border p-3 text-sm">
@@ -304,17 +305,15 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
             <AlertDialogTitle>Payroll already imported</AlertDialogTitle>
             <AlertDialogDescription>
               {conflicts?.length ?? 0} row
-              {conflicts?.length === 1 ? '' : 's'} from the source already
-              exist in payroll. Delete them first if you need to re-import,
-              or remove the duplicates from the source.
+              {conflicts?.length === 1 ? '' : 's'} from the source already exist
+              in payroll. Delete them first if you need to re-import, or remove
+              the duplicates from the source.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="text-muted-foreground max-h-64 overflow-y-auto rounded-md border p-3 text-sm">
             <ul className="space-y-1">
               {conflicts?.map((c) => (
-                <li
-                  key={`${c.payroll_id}-${c.check_date}-${c.invoice_number}`}
-                >
+                <li key={`${c.payroll_id}-${c.check_date}-${c.invoice_number}`}>
                   <span className="text-foreground">{c.employee_name}</span>{' '}
                   <span className="text-muted-foreground">
                     ({c.payroll_id}) — check {c.check_date}
