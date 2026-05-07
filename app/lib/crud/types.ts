@@ -270,4 +270,14 @@ export interface CrudModuleConfig<TSchema extends z.ZodType = z.ZodType> {
 
   /** Additional AG Grid options passed through to AgGridReact. */
   agGridOptions?: Partial<GridOptions>;
+
+  /** PostgREST count mode for the list view query.
+   *  - `'exact'` (default): full materialization for accurate page totals
+   *  - `'planned'`: EXPLAIN-based estimate; 5–10x faster on derived
+   *    views, but page totals become approximate
+   *  - `'estimated'`: pg_class.reltuples; instant but often stale on views
+   *  Use `'planned'` for slow aggregating views (payroll comparisons,
+   *  weather time-series) where waiting for an exact count costs more
+   *  than approximate pagination. */
+  countMode?: 'exact' | 'planned' | 'estimated';
 }

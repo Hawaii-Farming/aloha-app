@@ -136,6 +136,12 @@ export interface LoadTableDataParams {
   /** Invert the deleted filter — return only soft-deleted rows
    *  (`is_deleted = true`). Useful for "inactive" / archive views. */
   showDeleted?: boolean;
+  /** PostgREST count mode. Default `'exact'` for accurate pagination
+   *  totals. Use `'planned'` (EXPLAIN-based estimate) for slow derived
+   *  views where the full materialization required by `'exact'` is the
+   *  bottleneck — pagination totals become approximate but the query
+   *  returns 5–10x faster. */
+  countMode?: 'exact' | 'planned' | 'estimated';
 }
 
 /** Strip PostgREST filter delimiters from search input to prevent
@@ -173,7 +179,7 @@ export async function loadTableData<T = Record<string, unknown>>(
 
   let query = params.client
     .from(params.viewName as never)
-    .select(params.select ?? '*', { count: 'exact' })
+    .select(params.select ?? '*', { count: params.countMode ?? 'exact' })
     .eq('org_id', params.orgId);
 
   if (!params.skipDeletedFilter) {

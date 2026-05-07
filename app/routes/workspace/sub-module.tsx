@@ -417,6 +417,7 @@ export const loader = async (args: {
       allowedColumns: config?.columns.map((c) => c.key),
       skipDeletedFilter: config?.skipDeletedFilter,
       showDeleted: url.searchParams.get('inactive') === '1',
+      countMode: config?.countMode,
     }),
     loadFormOptions({
       client,
