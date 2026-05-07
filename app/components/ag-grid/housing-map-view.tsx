@@ -69,7 +69,7 @@ function VacancyCellRenderer(props: CustomCellRendererProps) {
   return (
     <div className="flex h-full items-center justify-end gap-3">
       <div
-        className="bg-muted h-1.5 w-32 overflow-hidden rounded-full"
+        className="bg-muted hidden h-1.5 w-32 overflow-hidden rounded-full md:block"
         role="progressbar"
         aria-valuenow={vacant}
         aria-valuemax={capacity}
@@ -114,7 +114,7 @@ const numberCmp = pinTotalLast<number>((a, b) => (a ?? 0) - (b ?? 0));
 
 const TABLE_WIDTH = 620;
 
-function buildColDefs(stretchVacancy: boolean): ColDef[] {
+function buildColDefs(isMobile: boolean): ColDef[] {
   return [
     {
       colId: 'home_icon',
@@ -130,28 +130,28 @@ function buildColDefs(stretchVacancy: boolean): ColDef[] {
     {
       field: 'name',
       headerName: 'Name',
-      width: 170,
+      width: isMobile ? 100 : 170,
       comparator: stringCmp,
     },
     {
       field: 'maximumBeds',
-      headerName: 'Max Beds',
+      headerName: isMobile ? 'Max' : 'Max Beds',
       type: 'numericColumn',
-      width: 100,
+      width: isMobile ? 60 : 100,
       comparator: numberCmp,
     },
     {
       field: 'tenantCount',
-      headerName: 'Tenants',
+      headerName: isMobile ? 'Used' : 'Tenants',
       type: 'numericColumn',
-      width: 100,
+      width: isMobile ? 60 : 100,
       comparator: numberCmp,
     },
     {
       field: 'availableBeds',
       headerName: 'Vacancy',
       cellRenderer: VacancyCellRenderer,
-      ...(stretchVacancy ? { flex: 1, minWidth: 200 } : { width: 200 }),
+      ...(isMobile ? { flex: 1, minWidth: 100 } : { width: 200 }),
       comparator: numberCmp,
     },
   ];
