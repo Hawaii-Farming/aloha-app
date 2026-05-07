@@ -42,12 +42,14 @@ export function SchedulerNavbarTools({
   deletePending,
   onPrint,
 }: SchedulerNavbarToolsProps) {
-  const desktopSlot = getSlot('workspace-navbar-filter-slot');
-  const mobileSlot = getSlot('workspace-mobile-header-filter-slot');
+  const desktopFilterSlot = getSlot('workspace-navbar-filter-slot');
+  const mobileFilterSlot = getSlot('workspace-mobile-header-filter-slot');
+  const desktopActionsSlot = getSlot('workspace-navbar-actions-slot');
+  const mobileActionsSlot = getSlot('workspace-mobile-header-actions-slot');
 
-  const content = (
+  // Filter slot (left): week navigator + print
+  const filterContent = (
     <div className="flex min-w-0 items-center gap-1.5 lg:gap-2">
-      {/* Week navigator pill */}
       <div
         className="border-border bg-background inline-flex shrink-0 items-center overflow-hidden rounded-full border"
         data-test="week-navigator"
@@ -82,41 +84,6 @@ export function SchedulerNavbarTools({
         </button>
       </div>
 
-      {/* Copy-from-prev-week button — THIRD */}
-      <Button
-        variant="outline"
-        onClick={onCopyFromPrev}
-        disabled={copyPending}
-        data-test="copy-from-prev-week"
-        aria-label="Copy previous week"
-        title="Copy previous week (only when current week is empty)"
-        className="h-9 w-9 shrink-0 rounded-full p-0"
-      >
-        {copyPending ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Copy className="h-4 w-4" />
-        )}
-      </Button>
-
-      {/* Delete-week button — FOURTH */}
-      <Button
-        variant="outline"
-        onClick={onDeleteWeek}
-        disabled={deletePending}
-        data-test="delete-week"
-        aria-label="Delete week"
-        title="Delete all records for this week"
-        className="h-9 w-9 shrink-0 rounded-full p-0"
-      >
-        {deletePending ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Trash2 className="h-4 w-4" />
-        )}
-      </Button>
-
-      {/* Print button — FIFTH (rightmost) */}
       <Button
         variant="outline"
         onClick={onPrint}
@@ -130,10 +97,57 @@ export function SchedulerNavbarTools({
     </div>
   );
 
+  // Actions slot (right, near profile avatar): Copy + Delete with labels.
+  const actionsContent = (
+    <div className="flex min-w-0 items-center gap-1.5 lg:gap-2">
+      <Button
+        variant="outline"
+        onClick={onCopyFromPrev}
+        disabled={copyPending}
+        data-test="copy-from-prev-week"
+        aria-label="Copy previous week"
+        title="Copy previous week (only when current week is empty)"
+        className="h-9 shrink-0 rounded-full"
+      >
+        {copyPending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
+        <span className="hidden lg:ml-1.5 lg:inline">Copy week</span>
+      </Button>
+
+      <Button
+        variant="outline"
+        onClick={onDeleteWeek}
+        disabled={deletePending}
+        data-test="delete-week"
+        aria-label="Delete week"
+        title="Delete all records for this week"
+        className="h-9 shrink-0 rounded-full"
+      >
+        {deletePending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Trash2 className="h-4 w-4" />
+        )}
+        <span className="hidden lg:ml-1.5 lg:inline">Delete week</span>
+      </Button>
+    </div>
+  );
+
   return (
     <>
-      {desktopSlot ? createPortal(content, desktopSlot) : null}
-      {mobileSlot ? createPortal(content, mobileSlot) : null}
+      {desktopFilterSlot
+        ? createPortal(filterContent, desktopFilterSlot)
+        : null}
+      {mobileFilterSlot ? createPortal(filterContent, mobileFilterSlot) : null}
+      {desktopActionsSlot
+        ? createPortal(actionsContent, desktopActionsSlot)
+        : null}
+      {mobileActionsSlot
+        ? createPortal(actionsContent, mobileActionsSlot)
+        : null}
     </>
   );
 }

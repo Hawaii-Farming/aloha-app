@@ -20,7 +20,7 @@ import {
   startOfWeek,
   subWeeks,
 } from 'date-fns';
-import { Plus, X } from 'lucide-react';
+import { Calendar, Copy, Loader2, Plus, Trash2, X } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -108,6 +108,7 @@ export default function SchedulerListView(props: ListViewProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null);
   const [copyPending, setCopyPending] = useState(false);
+  const [copyWeekConfirmOpen, setCopyWeekConfirmOpen] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [deleteWeekConfirmOpen, setDeleteWeekConfirmOpen] = useState(false);
   const [pendingEmployeeDelete, setPendingEmployeeDelete] = useState<{
@@ -171,6 +172,7 @@ export default function SchedulerListView(props: ListViewProps) {
       toast.error('Failed to copy previous week');
     } finally {
       setCopyPending(false);
+      setCopyWeekConfirmOpen(false);
     }
   }, [accountSlug, currentWeek, revalidator]);
 
@@ -427,7 +429,7 @@ export default function SchedulerListView(props: ListViewProps) {
           onPrev={handlePrev}
           onNext={handleNext}
           onToday={handleToday}
-          onCopyFromPrev={handleCopyFromPrev}
+          onCopyFromPrev={() => setCopyWeekConfirmOpen(true)}
           copyPending={copyPending}
           onDeleteWeek={() => setDeleteWeekConfirmOpen(true)}
           deletePending={deletePending}
@@ -492,22 +494,111 @@ export default function SchedulerListView(props: ListViewProps) {
       />
 
       <AlertDialog
-        open={deleteWeekConfirmOpen}
-        onOpenChange={setDeleteWeekConfirmOpen}
+        open={copyWeekConfirmOpen}
+        onOpenChange={(next) => {
+          if (!copyPending) setCopyWeekConfirmOpen(next);
+        }}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete week schedule?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will delete all schedule entries for{' '}
-              <span className="font-medium">
-                {formatWeekLabel(currentWeek)}
-              </span>
-              . This action cannot be undone.
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader className="items-center text-center sm:items-center sm:text-center">
+            <div className="bg-primary/10 ring-primary/20 mb-2 flex h-12 w-12 items-center justify-center rounded-full ring-4">
+              <Copy className="text-primary h-6 w-6" />
+            </div>
+            <AlertDialogTitle className="text-lg">
+              Copy previous week
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground text-sm">
+              Duplicate every schedule entry from the week before into the
+              current view.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deletePending}>
+
+          <div className="border-border bg-muted/40 flex items-center gap-3 rounded-lg border p-3">
+            <div className="bg-background flex h-9 w-9 items-center justify-center rounded-md border">
+              <Calendar className="text-muted-foreground h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
+                Target week
+              </p>
+              <p className="text-foreground truncate text-sm font-medium">
+                {formatWeekLabel(currentWeek)}
+              </p>
+            </div>
+          </div>
+
+          <p className="text-muted-foreground text-xs">
+            The current week must be empty. If any entries already exist the
+            copy will be rejected and nothing will change.
+          </p>
+
+          <AlertDialogFooter className="gap-2 sm:gap-2">
+            <AlertDialogCancel disabled={copyPending} className="rounded-full">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleCopyFromPrev();
+              }}
+              disabled={copyPending}
+              className="rounded-full"
+            >
+              {copyPending ? (
+                <>
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                  Copying…
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-1.5 h-4 w-4" />
+                  Copy week
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteWeekConfirmOpen}
+        onOpenChange={(next) => {
+          if (!deletePending) setDeleteWeekConfirmOpen(next);
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader className="items-center text-center sm:items-center sm:text-center">
+            <div className="bg-destructive/10 ring-destructive/20 mb-2 flex h-12 w-12 items-center justify-center rounded-full ring-4">
+              <Trash2 className="text-destructive h-6 w-6" />
+            </div>
+            <AlertDialogTitle className="text-lg">
+              Delete week schedule
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground text-sm">
+              Remove every schedule entry for the selected week. This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="border-destructive/20 bg-destructive/5 flex items-center gap-3 rounded-lg border p-3">
+            <div className="bg-background border-destructive/30 flex h-9 w-9 items-center justify-center rounded-md border">
+              <Calendar className="text-destructive h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-destructive/80 text-[11px] font-medium tracking-wide uppercase">
+                Week to delete
+              </p>
+              <p className="text-foreground truncate text-sm font-medium">
+                {formatWeekLabel(currentWeek)}
+              </p>
+            </div>
+          </div>
+
+          <AlertDialogFooter className="gap-2 sm:gap-2">
+            <AlertDialogCancel
+              disabled={deletePending}
+              className="rounded-full"
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -516,9 +607,19 @@ export default function SchedulerListView(props: ListViewProps) {
                 handleDeleteWeek();
               }}
               disabled={deletePending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full"
             >
-              {deletePending ? 'Deleting…' : 'Delete week'}
+              {deletePending ? (
+                <>
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                  Deleting…
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-1.5 h-4 w-4" />
+                  Delete week
+                </>
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

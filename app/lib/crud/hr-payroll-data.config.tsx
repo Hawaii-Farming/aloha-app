@@ -105,14 +105,14 @@ const agGridColDefs: ColDef[] = [
     field: 'employee_name',
     headerName: 'Employee',
     cellRenderer: EmployeeInfoRenderer,
-    minWidth: 200,
+    minWidth: 160,
     pinned: 'left',
   },
-  { field: 'hr_department_id', headerName: 'Department', minWidth: 140 },
+  { field: 'hr_department_id', headerName: 'Department', minWidth: 110 },
   {
     field: 'hr_work_authorization_id',
     headerName: 'Work Auth',
-    minWidth: 120,
+    minWidth: 100,
   },
   { field: 'pay_structure', headerName: 'Pay Structure' },
   {
@@ -133,7 +133,7 @@ const agGridColDefs: ColDef[] = [
     headerName: 'Is Standard',
     cellRenderer: BoolTextRenderer,
     cellDataType: 'text',
-    maxWidth: 110,
+    maxWidth: 100,
   },
   {
     field: 'check_date',

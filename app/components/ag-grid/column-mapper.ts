@@ -42,7 +42,7 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
     // full_name render: rich employee cell with name, alias, badges
     if (col.render === 'full_name') {
       colDef.cellRenderer = EmployeeCellRenderer;
-      colDef.minWidth = 170;
+      colDef.minWidth = 140;
       colDef.valueGetter = (params: ValueGetterParams) => {
         const first = (params.data?.first_name as string) ?? '';
         const last = (params.data?.last_name as string) ?? '';
@@ -79,7 +79,7 @@ export function mapColumnsToColDefs(columns: ColumnConfig[]): ColDef[] {
     // email render: pill
     if (col.render === 'email') {
       colDef.cellRenderer = EmailPillRenderer;
-      colDef.minWidth = 160;
+      colDef.minWidth = 130;
     }
 
     // code render: monospace text in a dark badge (IDs, codes)

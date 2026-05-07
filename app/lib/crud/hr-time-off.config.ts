@@ -84,7 +84,7 @@ const timeOffColDefs = [
     headerName: 'Employee',
     colId: 'employee_full_name',
     cellRenderer: SchedulerEmployeeRenderer,
-    minWidth: 200,
+    minWidth: 160,
     valueGetter: (params: ValueGetterParams) => {
       const first = (params.data?.subject_first_name as string) ?? '';
       const last = (params.data?.subject_last_name as string) ?? '';
@@ -97,7 +97,7 @@ const timeOffColDefs = [
     ),
   ).map((col) => {
     if (col.field === 'request_reason') {
-      return { ...col, minWidth: 320, flex: 1 };
+      return { ...col, minWidth: 220, flex: 1 };
     }
     if (col.field === 'subject_compensation_manager_id') {
       return {
@@ -141,8 +141,8 @@ const timeOffColDefs = [
     cellRenderer: StatusBadgeRenderer,
     filter: false,
     resizable: false,
-    width: 130,
-    minWidth: 120,
+    width: 110,
+    minWidth: 100,
     pinned: 'right' as const,
     cellClass: 'ag-cell-no-ellipsis',
   },
@@ -153,8 +153,8 @@ const timeOffColDefs = [
     sortable: false,
     filter: false,
     resizable: false,
-    maxWidth: 120,
-    minWidth: 100,
+    maxWidth: 100,
+    minWidth: 90,
     pinned: 'right' as const,
   },
 ];

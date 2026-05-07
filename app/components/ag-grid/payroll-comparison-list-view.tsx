@@ -116,7 +116,7 @@ const numericCol = (
   headerName,
   type: 'numericColumn',
   flex: 1,
-  minWidth: opts?.width ?? 100,
+  minWidth: opts?.width ?? 80,
   valueFormatter: opts?.currency ? undefined : opts?.formatter,
   cellRenderer: opts?.currency ? CurrencyRenderer : undefined,
 });
@@ -130,28 +130,28 @@ const deltaCol = (
   headerName,
   type: 'numericColumn',
   flex: 1,
-  minWidth: 110,
+  minWidth: 90,
   cellRenderer: (p: CustomCellRendererProps) => DeltaRenderer({ ...p, format }),
 });
 
 // Source view: hr_payroll_task_comparison (one row per task with deltas
 // vs prior period). No employee/department dimension.
 const byTaskColDefs: ColDef[] = [
-  { field: 'task', headerName: 'Task', minWidth: 220, pinned: 'left' },
+  { field: 'task', headerName: 'Task', minWidth: 160, pinned: 'left' },
   {
     field: 'hr_work_authorization_id',
     headerName: 'Work Auth',
-    minWidth: 120,
+    minWidth: 100,
   },
   {
     field: 'compensation_manager_name',
     headerName: 'Comp Manager',
-    minWidth: 160,
+    minWidth: 130,
   },
   numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
   numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
   deltaCol('hours_delta', 'Δ Hours', 'hours'),
-  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
+  numericCol('total_cost', 'Total Cost', { currency: true, width: 110 }),
   deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
   numericCol('discretionary_overtime_hours', 'OT Hours', {
     formatter: hoursFormatter,
@@ -183,18 +183,18 @@ const byEmployeeColDefs: ColDef[] = [
     field: 'hr_employee_preferred_name',
     headerName: 'Employee',
     cellRenderer: EmployeeNameRenderer,
-    minWidth: 220,
+    minWidth: 160,
     pinned: 'left',
   },
   {
     field: 'hr_employee_hr_work_authorization_id',
     headerName: 'Work Auth',
-    minWidth: 120,
+    minWidth: 100,
   },
   numericCol('scheduled_hours', 'Scheduled', { formatter: hoursFormatter }),
   numericCol('total_hours', 'Total Hours', { formatter: hoursFormatter }),
   deltaCol('hours_delta', 'Δ Hours', 'hours'),
-  numericCol('total_cost', 'Total Cost', { currency: true, width: 130 }),
+  numericCol('total_cost', 'Total Cost', { currency: true, width: 110 }),
   deltaCol('total_cost_delta', 'Δ Total Cost', 'currency'),
   numericCol('discretionary_overtime_hours', 'Disc OT Hours', {
     formatter: hoursFormatter,

@@ -87,13 +87,13 @@ const colDefs: ColDef[] = [
     field: 'hr_employee_preferred_name',
     headerName: 'Employee',
     cellRenderer: EmployeeDeptRenderer,
-    minWidth: 200,
+    minWidth: 160,
     pinned: 'left',
   },
   {
     field: 'hr_employee_hr_department_id',
     headerName: 'Department',
-    minWidth: 140,
+    minWidth: 110,
   },
   {
     field: 'total_hours',
@@ -101,7 +101,7 @@ const colDefs: ColDef[] = [
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
     flex: 1,
-    minWidth: 100,
+    minWidth: 80,
   },
   {
     field: 'hours_delta',
@@ -109,7 +109,7 @@ const colDefs: ColDef[] = [
     type: 'numericColumn',
     valueFormatter: hoursFormatter,
     flex: 1,
-    minWidth: 100,
+    minWidth: 80,
   },
   {
     field: 'regular_pay',
@@ -117,7 +117,7 @@ const colDefs: ColDef[] = [
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
     flex: 1,
-    minWidth: 120,
+    minWidth: 100,
   },
   {
     field: 'regular_pay_delta',
@@ -125,7 +125,7 @@ const colDefs: ColDef[] = [
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
     flex: 1,
-    minWidth: 120,
+    minWidth: 100,
   },
   {
     field: 'total_cost',
@@ -133,7 +133,7 @@ const colDefs: ColDef[] = [
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
     flex: 1,
-    minWidth: 120,
+    minWidth: 100,
   },
   {
     field: 'total_cost_delta',
@@ -141,7 +141,7 @@ const colDefs: ColDef[] = [
     cellRenderer: CurrencyRenderer,
     type: 'numericColumn',
     flex: 1,
-    minWidth: 120,
+    minWidth: 100,
   },
 ];
 

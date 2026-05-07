@@ -49,15 +49,12 @@ function autoSizeThenFill(api: {
   sizeColumnsToFit: () => void;
   getColumns: () => { getActualWidth: () => number }[] | null;
 }) {
+  // Size columns to their content width only — do NOT call
+  // sizeColumnsToFit afterwards. Stretching columns to fill the
+  // viewport produced loose, sparse-feeling tables; the user prefers
+  // tight content-width columns even if it leaves empty space on
+  // the right of narrow grids.
   api.autoSizeAllColumns(false);
-  const cols = api.getColumns();
-  if (!cols) return;
-  const total = cols.reduce((sum, c) => sum + c.getActualWidth(), 0);
-  const viewport = document.querySelector(
-    '.ag-center-cols-viewport',
-  ) as HTMLElement | null;
-  const width = viewport?.clientWidth ?? 0;
-  if (width > 0 && total < width) api.sizeColumnsToFit();
 }
 
 export interface AgGridInnerProps {

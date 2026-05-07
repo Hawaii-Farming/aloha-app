@@ -208,10 +208,14 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
         }}
       >
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-base">Run payroll</DialogTitle>
-            <DialogDescription className="sr-only">
-              Run payroll from Google Drive or an uploaded xlsx file
+          <DialogHeader className="items-center text-center sm:items-center sm:text-center">
+            <div className="bg-primary/10 ring-primary/20 mb-2 flex h-12 w-12 items-center justify-center rounded-full ring-4">
+              <CloudDownload className="text-primary h-6 w-6" />
+            </div>
+            <DialogTitle className="text-lg">Run payroll</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm">
+              Pull this period&rsquo;s payroll from Google Drive or upload the
+              HRB .xlsx directly.
             </DialogDescription>
           </DialogHeader>
 
