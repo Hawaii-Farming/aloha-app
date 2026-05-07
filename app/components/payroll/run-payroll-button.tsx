@@ -297,14 +297,14 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
                         className="relative flex gap-3 pb-4 last:pb-0"
                       >
                         <div className="flex flex-col items-center">
-                          <div className="ring-background relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-md ring-4 shadow-green-500/20">
+                          <div className="bg-muted ring-background relative z-10 flex h-8 w-8 items-center justify-center rounded-full ring-4">
                             <Icon
-                              className="h-4 w-4 text-white"
-                              strokeWidth={2.5}
+                              className="text-muted-foreground h-4 w-4"
+                              strokeWidth={2}
                             />
                           </div>
                           {!isLast && (
-                            <div className="from-primary/40 to-primary/40 absolute top-8 bottom-0 w-0.5 bg-gradient-to-b" />
+                            <div className="bg-border absolute top-8 bottom-0 w-px" />
                           )}
                         </div>
                         <div className="flex-1 pt-1">
