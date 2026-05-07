@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useParams, useRevalidator, useSearchParams } from 'react-router';
 
@@ -33,7 +33,6 @@ import {
   AlertDialogTitle,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@aloha/ui/sheet';
 import { toast } from '@aloha/ui/sonner';
 
 import {
@@ -42,7 +41,6 @@ import {
 } from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
 import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
-import { HoursHeatmapRenderer } from '~/components/ag-grid/cell-renderers/hours-heatmap-renderer';
 import { ScheduleDayRenderer } from '~/components/ag-grid/cell-renderers/schedule-day-renderer';
 import { SchedulerEmployeeRenderer } from '~/components/ag-grid/cell-renderers/scheduler-employee-renderer';
 import { SchedulerTotalHoursRenderer } from '~/components/ag-grid/cell-renderers/scheduler-total-hours-renderer';
@@ -97,12 +95,6 @@ function formatWeekLabel(weekStartStr: string): string {
   return `${format(weekStart, 'MMM d')} – ${format(weekEnd, 'MMM d')}`;
 }
 
-interface HistoryRow {
-  week_start: string;
-  employee_count: number;
-  total_hours: number;
-}
-
 export default function SchedulerListView(props: ListViewProps) {
   const { tableData, fkOptions, config, subModuleDisplayName } = props;
   const accountSlug = props.accountSlug;
@@ -115,9 +107,6 @@ export default function SchedulerListView(props: ListViewProps) {
   const gridRef = useRef<AgGridReact>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [historyData, setHistoryData] = useState<HistoryRow[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(true);
   const [copyPending, setCopyPending] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [deleteWeekConfirmOpen, setDeleteWeekConfirmOpen] = useState(false);
@@ -180,26 +169,6 @@ export default function SchedulerListView(props: ListViewProps) {
     }
   }, [accountSlug, currentWeek, revalidator]);
 
-  const fetchHistorySummary = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `/api/schedule-history?mode=summary&orgId=${encodeURIComponent(accountSlug)}`,
-      );
-      const json = (await res.json()) as { data?: HistoryRow[] };
-      if (json.data) setHistoryData(json.data);
-    } catch {
-      // Silently handle fetch errors
-    } finally {
-      setHistoryLoading(false);
-    }
-  }, [accountSlug]);
-
-  // Fetch history summary on mount
-  // Justified: drawer needs its own data fetch separate from main table loader
-  useEffect(() => {
-    fetchHistorySummary();
-  }, [fetchHistorySummary]);
-
   const handleDeleteEmployeeWeek = useCallback(
     async (employeeId: string, _employeeName: string) => {
       try {
@@ -219,7 +188,6 @@ export default function SchedulerListView(props: ListViewProps) {
         };
         if (json.success) {
           toast.success(`Deleted ${json.deleted ?? 0} entries`);
-          await fetchHistorySummary();
           revalidator.revalidate();
         } else {
           toast.error(json.error ?? 'Failed to delete week');
@@ -228,7 +196,7 @@ export default function SchedulerListView(props: ListViewProps) {
         toast.error('Failed to delete week');
       }
     },
-    [accountSlug, currentWeek, fetchHistorySummary, revalidator],
+    [accountSlug, currentWeek, revalidator],
   );
 
   const handleDeleteWeek = useCallback(async () => {
@@ -246,7 +214,6 @@ export default function SchedulerListView(props: ListViewProps) {
       };
       if (json.success) {
         toast.success(`Deleted ${json.deleted ?? 0} entries for the week`);
-        await fetchHistorySummary();
         revalidator.revalidate();
       } else {
         toast.error(json.error ?? 'Failed to delete week');
@@ -257,7 +224,7 @@ export default function SchedulerListView(props: ListViewProps) {
       setDeletePending(false);
       setDeleteWeekConfirmOpen(false);
     }
-  }, [accountSlug, currentWeek, fetchHistorySummary, revalidator]);
+  }, [accountSlug, currentWeek, revalidator]);
 
   const handlePrint = useCallback(() => {
     const api = gridRef.current?.api;
@@ -391,33 +358,6 @@ export default function SchedulerListView(props: ListViewProps) {
     [dataColDefs],
   );
 
-  // History summary column definitions
-  const historyColDefs: ColDef[] = useMemo(
-    () => [
-      {
-        headerName: 'Week Of',
-        field: 'week_start',
-        minWidth: 140,
-        valueFormatter: (p: { value?: string | null }) =>
-          p.value ? format(parseISO(p.value), 'MMM d, yyyy') : '',
-      },
-      {
-        headerName: 'Employees',
-        field: 'employee_count',
-        type: 'numericColumn',
-        minWidth: 100,
-      },
-      {
-        headerName: 'Total Hours',
-        field: 'total_hours',
-        cellRenderer: HoursHeatmapRenderer,
-        type: 'numericColumn',
-        minWidth: 110,
-      },
-    ],
-    [],
-  );
-
   // Column state persistence
   const handleGridReady = useCallback((event: GridReadyEvent) => {
     const api = event.api;
@@ -476,7 +416,6 @@ export default function SchedulerListView(props: ListViewProps) {
           onPrev={handlePrev}
           onNext={handleNext}
           onToday={handleToday}
-          onHistoryOpen={() => setHistoryOpen(true)}
           onCopyFromPrev={handleCopyFromPrev}
           copyPending={copyPending}
           onDeleteWeek={() => setDeleteWeekConfirmOpen(true)}
@@ -511,24 +450,6 @@ export default function SchedulerListView(props: ListViewProps) {
           />
         </div>
       </div>
-
-      {/* Historical Data drawer */}
-      <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
-        <SheetContent side="right" className="w-[440px] sm:w-[480px]">
-          <SheetHeader>
-            <SheetTitle>Historical Data</SheetTitle>
-          </SheetHeader>
-          <div className="mt-4 h-[calc(100vh-120px)]">
-            <AgGridWrapper
-              colDefs={historyColDefs}
-              rowData={historyData as unknown as RowData[]}
-              loading={historyLoading}
-              pagination={false}
-              emptyMessage="No schedule history found"
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
 
       {(config?.formFields?.length ?? 0) > 0 && (
         <Button
