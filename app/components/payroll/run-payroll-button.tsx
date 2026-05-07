@@ -1,16 +1,15 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { createPortal } from 'react-dom';
 
 import { useRevalidator, useRouteLoaderData } from 'react-router';
 
-import { CloudDownload, Loader2 } from 'lucide-react';
+import { CloudDownload, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -18,6 +17,14 @@ import {
   AlertDialogTitle,
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@aloha/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@aloha/ui/tabs';
 
 interface PayrollConflict {
   employee_name: string;
@@ -36,6 +43,7 @@ interface RunPayrollResponse {
   missingEmployees?: { payroll_id: string; full_name: string }[];
   conflicts?: PayrollConflict[];
   message?: string;
+  source?: 'google' | 'upload';
 }
 
 interface RunPayrollButtonProps {
@@ -56,23 +64,17 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
   const allowed = ALLOWED.has(accessLevel);
 
   const revalidator = useRevalidator();
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [missing, setMissing] = useState<
     { payroll_id: string; full_name: string }[] | null
   >(null);
   const [conflicts, setConflicts] = useState<PayrollConflict[] | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const runPayroll = useCallback(async () => {
-    setPending(true);
-    try {
-      const res = await fetch('/api/payroll/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountSlug }),
-      });
-      const json = (await res.json()) as RunPayrollResponse;
-
+  const handleResult = useCallback(
+    (res: Response, json: RunPayrollResponse) => {
       if (res.status === 422 && json.missingEmployees?.length) {
         setMissing(json.missingEmployees);
         return;
@@ -97,13 +99,47 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
         for (const w of json.warnings) toast.warning(w);
       }
       revalidator.revalidate();
+      setOpen(false);
+    },
+    [revalidator],
+  );
+
+  const runFromGoogle = useCallback(async () => {
+    setPending(true);
+    try {
+      const res = await fetch('/api/payroll/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountSlug }),
+      });
+      const json = (await res.json()) as RunPayrollResponse;
+      handleResult(res, json);
     } catch (e) {
       toast.error(`Payroll run failed: ${(e as Error).message}`);
     } finally {
       setPending(false);
-      setConfirmOpen(false);
     }
-  }, [accountSlug, revalidator]);
+  }, [accountSlug, handleResult]);
+
+  const runFromUpload = useCallback(async () => {
+    if (!uploadFile) return;
+    setPending(true);
+    try {
+      const fd = new FormData();
+      fd.append('accountSlug', accountSlug);
+      fd.append('file', uploadFile);
+      const res = await fetch('/api/payroll/run', {
+        method: 'POST',
+        body: fd,
+      });
+      const json = (await res.json()) as RunPayrollResponse;
+      handleResult(res, json);
+    } catch (e) {
+      toast.error(`Payroll run failed: ${(e as Error).message}`);
+    } finally {
+      setPending(false);
+    }
+  }, [accountSlug, handleResult, uploadFile]);
 
   const desktopSlot = getSlot('workspace-navbar-filter-slot');
   const mobileSlot = getSlot('workspace-mobile-header-filter-slot');
@@ -113,7 +149,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
   const button = (
     <Button
       variant="outline"
-      onClick={() => setConfirmOpen(true)}
+      onClick={() => setOpen(true)}
       disabled={pending}
       data-test="run-payroll"
       aria-label="Run payroll"
@@ -133,36 +169,110 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
       {desktopSlot && createPortal(button, desktopSlot)}
       {mobileSlot && createPortal(button, mobileSlot)}
 
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Run payroll?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This fetches the latest data from the HRB Google Sheet, validates
-              it against the employee register, and inserts merged rows into the
-              payroll table. Existing rows are not modified or deleted.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={runPayroll} disabled={pending}>
-              {pending ? 'Running…' : 'Run'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          if (!pending) setOpen(o);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Run payroll</DialogTitle>
+            <DialogDescription>
+              Pull the latest HRB data, validate against the employee
+              register, and insert merged rows. Existing rows are not
+              modified.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Tabs defaultValue="google" className="mt-2">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="google" disabled={pending}>
+                From Google Drive
+              </TabsTrigger>
+              <TabsTrigger value="upload" disabled={pending}>
+                From Upload
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="google" className="mt-4 space-y-3">
+              <p className="text-muted-foreground text-sm">
+                Reads the configured HRB sheet, archives a snapshot, and
+                clears the source tabs after import.
+              </p>
+              <Button
+                onClick={runFromGoogle}
+                disabled={pending}
+                className="w-full"
+                data-test="run-payroll-google"
+              >
+                {pending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Running…
+                  </>
+                ) : (
+                  <>
+                    <CloudDownload className="mr-2 h-4 w-4" />
+                    Fetch &amp; run
+                  </>
+                )}
+              </Button>
+            </TabsContent>
+
+            <TabsContent value="upload" className="mt-4 space-y-3">
+              <p className="text-muted-foreground text-sm">
+                Upload an .xlsx export from HRB matching the
+                HF_Payroll_Template tabs ($data, NetPay, Hours, PTOBank, WC,
+                TDI). The uploaded file is archived; nothing is cleared.
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx"
+                onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+                className="block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-muted file:px-3 file:py-2 file:text-foreground hover:file:bg-muted/80"
+                data-test="run-payroll-upload-file"
+              />
+              {uploadFile && (
+                <p className="text-muted-foreground text-xs">
+                  {uploadFile.name} ({(uploadFile.size / 1024).toFixed(1)} KB)
+                </p>
+              )}
+              <Button
+                onClick={runFromUpload}
+                disabled={pending || !uploadFile}
+                className="w-full"
+                data-test="run-payroll-upload-submit"
+              >
+                {pending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Running…
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Run from file
+                  </>
+                )}
+              </Button>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog
         open={missing !== null}
-        onOpenChange={(open) => !open && setMissing(null)}
+        onOpenChange={(o) => !o && setMissing(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Missing employees in register</AlertDialogTitle>
             <AlertDialogDescription>
-              The HRB sheet references {missing?.length ?? 0} employee
-              {missing?.length === 1 ? '' : 's'} not found in the register. Add
-              them (or fix their payroll IDs) before re-running.
+              The payroll source references {missing?.length ?? 0} employee
+              {missing?.length === 1 ? '' : 's'} not found in the register.
+              Add them (or fix their payroll IDs) before re-running.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="text-muted-foreground max-h-64 overflow-y-auto rounded-md border p-3 text-sm">
@@ -187,22 +297,24 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
       <AlertDialog
         open={conflicts !== null}
-        onOpenChange={(open) => !open && setConflicts(null)}
+        onOpenChange={(o) => !o && setConflicts(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Payroll already imported</AlertDialogTitle>
             <AlertDialogDescription>
               {conflicts?.length ?? 0} row
-              {conflicts?.length === 1 ? '' : 's'} from the source sheet already
-              exist in payroll. Delete them first if you need to re-import, or
-              remove the duplicates from the source sheet.
+              {conflicts?.length === 1 ? '' : 's'} from the source already
+              exist in payroll. Delete them first if you need to re-import,
+              or remove the duplicates from the source.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="text-muted-foreground max-h-64 overflow-y-auto rounded-md border p-3 text-sm">
             <ul className="space-y-1">
               {conflicts?.map((c) => (
-                <li key={`${c.payroll_id}-${c.check_date}-${c.invoice_number}`}>
+                <li
+                  key={`${c.payroll_id}-${c.check_date}-${c.invoice_number}`}
+                >
                   <span className="text-foreground">{c.employee_name}</span>{' '}
                   <span className="text-muted-foreground">
                     ({c.payroll_id}) — check {c.check_date}
