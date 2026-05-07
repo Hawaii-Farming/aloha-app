@@ -32,6 +32,7 @@ import {
 } from '~/components/ag-grid/payroll-formatters';
 import { PayrollTaskEmployeeDetail } from '~/components/ag-grid/payroll-task-employee-detail';
 import { PayrollViewToggle } from '~/components/ag-grid/payroll-view-toggle';
+import { RunPayrollButton } from '~/components/payroll/run-payroll-button';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -390,6 +391,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       data-test="payroll-comparison-list-view"
     >
       <PayrollViewToggle />
+      <RunPayrollButton accountSlug={props.accountSlug} />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <AgGridWrapper

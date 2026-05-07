@@ -91,21 +91,34 @@ export function NavbarFilterButton({
   // 3-way toggle visual rhythm and removes a wasted click.
   if (filters.length === 1) {
     const f = filters[0]!;
+    const isActive = f.value !== '';
     const single = (
       <Select
         value={f.value || 'all'}
         onValueChange={(v) => f.onChange(v === 'all' ? '' : v)}
       >
         <SelectTrigger
-          className="h-10 shrink-0 gap-2 rounded-full px-3 text-sm font-medium tabular-nums lg:min-w-[12rem] lg:px-4"
+          className={
+            isActive
+              ? 'relative h-10 w-10 shrink-0 justify-center gap-0 rounded-full p-0 text-sm font-medium tabular-nums xl:w-auto xl:justify-start xl:gap-2 xl:px-4 [&>svg:last-child]:hidden xl:[&>svg:last-child]:flex'
+              : 'h-10 w-10 shrink-0 justify-center gap-0 rounded-full p-0 [&>svg:last-child]:hidden'
+          }
           data-test={`${testKey}-${f.key}`}
           aria-label={f.label}
           title={f.label}
         >
           <SlidersHorizontal className="h-4 w-4 shrink-0" />
-          <span className="hidden truncate lg:inline">
-            <SelectValue placeholder={f.allLabel ?? `All ${f.label}`} />
-          </span>
+          {isActive && (
+            <>
+              <i
+                aria-hidden="true"
+                className="bg-primary border-card pointer-events-none absolute top-1.5 right-1.5 block h-2 w-2 rounded-full border xl:hidden"
+              />
+              <span className="!hidden truncate xl:!inline">
+                <SelectValue placeholder={f.allLabel ?? `All ${f.label}`} />
+              </span>
+            </>
+          )}
         </SelectTrigger>
         <SelectContent className="tabular-nums">
           <SelectItem value="all">{f.allLabel ?? `All ${f.label}`}</SelectItem>
