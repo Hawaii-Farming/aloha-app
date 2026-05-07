@@ -9,8 +9,18 @@ import type {
   GridReadyEvent,
 } from 'ag-grid-community';
 import type { CustomCellRendererProps } from 'ag-grid-react';
-import { ChevronsUpDown, Home, Plus, X } from 'lucide-react';
+import { ChevronsUpDown, Home, Plus, Trash2, X } from 'lucide-react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
 import {
   Command,
@@ -280,6 +290,10 @@ export default function HousingSitePanel({
   const queryClient = useQueryClient();
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [pendingRemove, setPendingRemove] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const assignHandledRef = useRef(false);
   const removeHandledRef = useRef(false);
 
@@ -367,22 +381,24 @@ export default function HousingSitePanel({
     );
   }, [assignFetcher, selected, availableBeds, detailActionUrl]);
 
-  const handleRemove = useCallback(
-    (tenantId: string, fullName: string) => {
-      if (!detailActionUrl) return;
-      removeHandledRef.current = false;
-      removeFetcher.submit(
-        { intent: 'unassign_tenant', tenantId },
-        {
-          method: 'POST',
-          encType: 'application/json',
-          action: detailActionUrl,
-        },
-      );
-      toast.success(`Removed ${fullName}`);
-    },
-    [removeFetcher, detailActionUrl],
-  );
+  const handleRemove = useCallback((tenantId: string, fullName: string) => {
+    setPendingRemove({ id: tenantId, name: fullName });
+  }, []);
+
+  const confirmRemove = useCallback(() => {
+    if (!detailActionUrl || !pendingRemove) return;
+    removeHandledRef.current = false;
+    removeFetcher.submit(
+      { intent: 'unassign_tenant', tenantId: pendingRemove.id },
+      {
+        method: 'POST',
+        encType: 'application/json',
+        action: detailActionUrl,
+      },
+    );
+    toast.success(`Removed ${pendingRemove.name}`);
+    setPendingRemove(null);
+  }, [removeFetcher, detailActionUrl, pendingRemove]);
 
   const isAssigning = assignFetcher.state !== 'idle';
   const tooMany = selected.size > availableBeds;
@@ -405,89 +421,123 @@ export default function HousingSitePanel({
   }
 
   return (
-    <aside
-      className="bg-card border-border flex h-full min-h-0 min-w-0 flex-1 flex-col border-l"
-      data-test="housing-site-panel"
-    >
-      <div className="border-border bg-muted flex h-[47px] shrink-0 items-center justify-between border-b px-4">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <Home className="text-muted-foreground h-4 w-4 shrink-0" />
-          <span className="text-foreground truncate text-sm font-semibold">
-            {siteName || '—'}
-          </span>
-          <span className="text-muted-foreground shrink-0 text-xs">
-            · {tenants.length} tenant{tenants.length === 1 ? '' : 's'} ·{' '}
-            {availableBeds} bed{availableBeds === 1 ? '' : 's'} available
-          </span>
-        </div>
-        <button
-          type="button"
-          aria-label="Close panel"
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-
-      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-5 py-4">
-        <AccessGate permission="can_edit">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-foreground text-sm font-semibold">
-                Assign tenants
-              </h3>
-              <span className="text-muted-foreground text-xs">
-                {selected.size} selected
-              </span>
-            </div>
-            <EligiblePicker
-              accountSlug={accountSlug}
-              selected={selected}
-              toggle={toggle}
-              open={open}
-            />
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="brand"
-                size="sm"
-                onClick={handleAssign}
-                disabled={
-                  isAssigning ||
-                  selected.size === 0 ||
-                  tooMany ||
-                  !detailActionUrl
-                }
-              >
-                <Plus className="mr-1.5 h-4 w-4" />
-                {isAssigning
-                  ? 'Assigning…'
-                  : `Assign ${selected.size || ''}`.trim()}
-              </Button>
-              {tooMany && (
-                <p className="text-destructive text-xs">
-                  Only {availableBeds} bed
-                  {availableBeds === 1 ? '' : 's'} available
-                </p>
-              )}
-            </div>
+    <>
+      <aside
+        className="bg-card border-border flex h-full min-h-0 min-w-0 flex-1 flex-col border-l"
+        data-test="housing-site-panel"
+      >
+        <div className="border-border bg-muted flex h-[47px] shrink-0 items-center justify-between border-b px-4">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Home className="text-muted-foreground h-4 w-4 shrink-0" />
+            <span className="text-foreground truncate text-sm font-semibold">
+              {siteName || '—'}
+            </span>
+            <span className="text-muted-foreground shrink-0 text-xs">
+              · {tenants.length} tenant{tenants.length === 1 ? '' : 's'} ·{' '}
+              {availableBeds} bed{availableBeds === 1 ? '' : 's'} available
+            </span>
           </div>
-        </AccessGate>
-
-        <div className="flex flex-col gap-3">
-          <h3 className="text-foreground text-sm font-semibold">
-            Current tenants
-          </h3>
-          {tenants.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No tenants currently assigned.
-            </p>
-          ) : (
-            <TenantsGrid tenants={tenants} onRemove={handleRemove} />
-          )}
+          <button
+            type="button"
+            aria-label="Close panel"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
-      </div>
-    </aside>
+
+        <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-5 py-4">
+          <AccessGate permission="can_edit">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-foreground text-sm font-semibold">
+                  Assign tenants
+                </h3>
+                <span className="text-muted-foreground text-xs">
+                  {selected.size} selected
+                </span>
+              </div>
+              <EligiblePicker
+                accountSlug={accountSlug}
+                selected={selected}
+                toggle={toggle}
+                open={open}
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="sm"
+                  onClick={handleAssign}
+                  disabled={
+                    isAssigning ||
+                    selected.size === 0 ||
+                    tooMany ||
+                    !detailActionUrl
+                  }
+                >
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  {isAssigning
+                    ? 'Assigning…'
+                    : `Assign ${selected.size || ''}`.trim()}
+                </Button>
+                {tooMany && (
+                  <p className="text-destructive text-xs">
+                    Only {availableBeds} bed
+                    {availableBeds === 1 ? '' : 's'} available
+                  </p>
+                )}
+              </div>
+            </div>
+          </AccessGate>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="text-foreground text-sm font-semibold">
+              Current tenants
+            </h3>
+            {tenants.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No tenants currently assigned.
+              </p>
+            ) : (
+              <TenantsGrid tenants={tenants} onRemove={handleRemove} />
+            )}
+          </div>
+        </div>
+      </aside>
+
+      <AlertDialog
+        open={pendingRemove !== null}
+        onOpenChange={(next) => {
+          if (!next) setPendingRemove(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove tenant?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will unassign{' '}
+              <span className="font-medium">{pendingRemove?.name}</span> from{' '}
+              <span className="font-medium">{siteName}</span>. The bed will
+              become available for other employees.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                confirmRemove();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              <Trash2 className="mr-1.5 h-4 w-4" />
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
