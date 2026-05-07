@@ -61,7 +61,7 @@ function PinnedAwareAvatarRenderer(props: CustomCellRendererProps) {
   return <AvatarRenderer {...props} />;
 }
 
-// Delta renderer: signed value with arrow, no color coding.
+// Delta renderer: signed value, no arrow, no color coding.
 // Currency deltas defer to CurrencyRenderer for consistent app-wide
 // formatting. Hours deltas stay inline.
 function DeltaRenderer(
@@ -72,7 +72,6 @@ function DeltaRenderer(
   const n = Number(raw);
   if (!Number.isFinite(n)) return null;
   const isPinned = props.node.rowPinned === 'bottom';
-  const arrow = isPinned ? '' : n > 0 ? '▲' : n < 0 ? '▼' : '·';
 
   if (props.format === 'currency') {
     return (
@@ -87,12 +86,9 @@ function DeltaRenderer(
   const text = formatSignedHours(n);
   return (
     <div
-      className={`flex h-full w-full items-center justify-between text-sm ${isPinned ? 'font-bold' : ''}`}
+      className={`flex h-full w-full items-center justify-end font-mono text-sm ${isPinned ? 'font-bold' : ''}`}
     >
-      <span aria-hidden className="shrink-0">
-        {arrow}
-      </span>
-      <span>{text}</span>
+      {text}
     </div>
   );
 }
