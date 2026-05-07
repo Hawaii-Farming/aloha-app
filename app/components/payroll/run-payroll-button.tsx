@@ -173,8 +173,8 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
     }
   }, [accountSlug, handleResult, uploadFile]);
 
-  const desktopSlot = getSlot('workspace-navbar-filter-slot');
-  const mobileSlot = getSlot('workspace-mobile-header-filter-slot');
+  const desktopSlot = getSlot('workspace-navbar-actions-slot');
+  const mobileSlot = getSlot('workspace-mobile-header-actions-slot');
 
   if (!allowed) return null;
 

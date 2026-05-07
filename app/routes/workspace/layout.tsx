@@ -74,7 +74,7 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
             user={user}
             orgName={workspace.currentOrg?.org_name ?? null}
             searchItems={searchItems}
-            className="hidden md:flex"
+            className="hidden lg:flex"
           />
           <WorkspaceMobileHeader
             user={user}
@@ -86,7 +86,7 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
           />
 
           <div className="flex min-h-0 flex-1 overflow-hidden">
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <WorkspaceSidebar
                 account={accountSlug}
                 navigation={workspace.navigation}

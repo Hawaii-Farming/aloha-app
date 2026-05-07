@@ -77,19 +77,19 @@ export function WorkspaceNavbar({
       )}
     >
       <NavbarSidebarHeader />
-      {/* Flex layout: side slots take their natural width (shrink-0),
-          search fills remaining space (flex-1, min-w-0) capped at 28rem.
-          On wide viewports with little side content the search ends up
-          near visual center; when tools or profile crowd it, the search
-          shrinks instead of overlapping. */}
-      <div className="flex flex-1 items-center gap-3 px-4 sm:gap-4 sm:px-6">
+      {/* Three absolute clusters in a relative container so the search
+          stays mathematically centered regardless of side content width.
+          Left = filter slot, right = actions + profile, center = search.
+          Splitting left/right avoids the dead-click bug a single
+          full-width side layer would introduce. */}
+      <div className="relative h-full flex-1">
         <div
           id="workspace-navbar-filter-slot"
           data-test="workspace-navbar-filter-slot"
-          className="flex shrink-0 items-center gap-2"
+          className="absolute inset-y-0 left-0 flex items-center gap-2 px-4 sm:px-6"
         />
 
-        <div className="hidden min-w-0 flex-1 justify-center md:flex">
+        <div className="absolute inset-y-0 left-1/2 flex -translate-x-1/2 items-center">
           <NavbarSearch
             items={searchItems}
             variant="desktop"
@@ -99,7 +99,7 @@ export function WorkspaceNavbar({
                 onClick={open}
                 data-test="workspace-navbar-search-trigger"
                 aria-label="Open search"
-                className="bg-muted text-muted-foreground/60 hover:bg-muted/80 hover:text-muted-foreground/80 flex w-full max-w-[28rem] min-w-0 items-center gap-2 rounded-2xl px-4 py-2.5 transition-colors"
+                className="bg-muted text-muted-foreground/60 hover:bg-muted/80 hover:text-muted-foreground/80 flex w-[28rem] max-w-[calc(100vw-2rem)] items-center gap-2 rounded-2xl px-4 py-2.5 transition-colors"
               >
                 <Search size={16} className="shrink-0" />
                 <span className="truncate text-sm">Search...</span>
@@ -112,7 +112,12 @@ export function WorkspaceNavbar({
           />
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="absolute inset-y-0 right-0 flex items-center gap-2 px-4 sm:px-6">
+          <div
+            id="workspace-navbar-actions-slot"
+            data-test="workspace-navbar-actions-slot"
+            className="flex shrink-0 items-center gap-2"
+          />
           <WorkspaceNavbarProfileMenu user={user} orgName={orgName} />
         </div>
       </div>

@@ -34,7 +34,7 @@ export function WorkspaceMobileHeader({
     <header
       data-test="workspace-mobile-header"
       className={cn(
-        'bg-card border-border relative z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 md:hidden',
+        'bg-card border-border relative z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 lg:hidden',
         className,
       )}
     >
@@ -57,6 +57,11 @@ export function WorkspaceMobileHeader({
       />
 
       <div className="flex shrink-0 items-center gap-2">
+        <div
+          id="workspace-mobile-header-actions-slot"
+          data-test="workspace-mobile-header-actions-slot"
+          className="flex shrink-0 items-center gap-2"
+        />
         <NavbarSearch
           items={searchItems}
           variant="mobile"
