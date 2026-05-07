@@ -32,7 +32,7 @@ interface RunPayrollButtonProps {
   accountSlug: string;
 }
 
-const ALLOWED = new Set(['admin', 'owner']);
+const ALLOWED = new Set(['Admin', 'Owner']);
 
 function getSlot(id: string): HTMLElement | null {
   return typeof document === 'undefined' ? null : document.getElementById(id);

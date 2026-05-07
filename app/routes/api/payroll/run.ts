@@ -9,7 +9,7 @@ import { getSupabaseServerAdminClient } from '~/lib/supabase/clients/server-admi
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
 
-const ALLOWED_ROLES = new Set(['admin', 'owner']);
+const ALLOWED_ROLES = new Set(['Admin', 'Owner']);
 const INSERT_BATCH_SIZE = 100;
 
 export const action = async ({ request }: { request: Request }) => {
