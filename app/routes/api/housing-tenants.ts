@@ -25,7 +25,7 @@ export const loader = async ({ request }: { request: Request }) => {
     const today = new Date().toISOString().slice(0, 10);
     const { data, error } = await client
       .from('hr_employee')
-      .select('id, first_name, last_name, preferred_name')
+      .select('id, first_name, last_name')
       .eq('org_id', orgId)
       .eq('is_deleted', false)
       .is('housing_id', null)
@@ -36,12 +36,10 @@ export const loader = async ({ request }: { request: Request }) => {
       return Response.json({ error: error.message }, { status: 500 });
     }
 
-    const result = (data ?? []).map((e) => {
-      const display =
-        (e.preferred_name && e.preferred_name.trim()) ||
-        `${e.first_name ?? ''} ${e.last_name ?? ''}`.trim();
-      return { id: e.id, full_name: display };
-    });
+    const result = (data ?? []).map((e) => ({
+      id: e.id,
+      full_name: `${e.first_name ?? ''} ${e.last_name ?? ''}`.trim(),
+    }));
     return Response.json({ data: result });
   }
 
