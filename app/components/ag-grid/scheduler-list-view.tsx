@@ -59,8 +59,8 @@ const AVATAR_COL: ColDef = {
   headerName: '',
   field: 'profile_photo_url',
   cellRenderer: AvatarRenderer,
-  maxWidth: 60,
-  minWidth: 60,
+  maxWidth: 48,
+  minWidth: 48,
   sortable: false,
   filter: false,
   resizable: false,
@@ -110,6 +110,11 @@ export default function SchedulerListView(props: ListViewProps) {
   const [copyPending, setCopyPending] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [deleteWeekConfirmOpen, setDeleteWeekConfirmOpen] = useState(false);
+  const [pendingEmployeeDelete, setPendingEmployeeDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [employeeDeletePending, setEmployeeDeletePending] = useState(false);
   const revalidator = useRevalidator();
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -169,35 +174,37 @@ export default function SchedulerListView(props: ListViewProps) {
     }
   }, [accountSlug, currentWeek, revalidator]);
 
-  const handleDeleteEmployeeWeek = useCallback(
-    async (employeeId: string, _employeeName: string) => {
-      try {
-        const res = await fetch('/api/scheduler/delete-week', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            accountSlug,
-            weekStart: currentWeek,
-            employeeId,
-          }),
-        });
-        const json = (await res.json()) as {
-          success?: boolean;
-          deleted?: number;
-          error?: string;
-        };
-        if (json.success) {
-          toast.success(`Deleted ${json.deleted ?? 0} entries`);
-          revalidator.revalidate();
-        } else {
-          toast.error(json.error ?? 'Failed to delete week');
-        }
-      } catch {
-        toast.error('Failed to delete week');
+  const handleConfirmEmployeeDelete = useCallback(async () => {
+    if (!pendingEmployeeDelete) return;
+    setEmployeeDeletePending(true);
+    try {
+      const res = await fetch('/api/scheduler/delete-week', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accountSlug,
+          weekStart: currentWeek,
+          employeeId: pendingEmployeeDelete.id,
+        }),
+      });
+      const json = (await res.json()) as {
+        success?: boolean;
+        deleted?: number;
+        error?: string;
+      };
+      if (json.success) {
+        toast.success(`Deleted ${json.deleted ?? 0} entries`);
+        revalidator.revalidate();
+      } else {
+        toast.error(json.error ?? 'Failed to delete week');
       }
-    },
-    [accountSlug, currentWeek, revalidator],
-  );
+    } catch {
+      toast.error('Failed to delete week');
+    } finally {
+      setEmployeeDeletePending(false);
+      setPendingEmployeeDelete(null);
+    }
+  }, [accountSlug, currentWeek, pendingEmployeeDelete, revalidator]);
 
   const handleDeleteWeek = useCallback(async () => {
     setDeletePending(true);
@@ -283,7 +290,8 @@ export default function SchedulerListView(props: ListViewProps) {
         headerName: 'Employee',
         field: 'full_name',
         cellRenderer: SchedulerEmployeeRenderer,
-        minWidth: 220,
+        minWidth: 160,
+        flex: 1,
         pinned: 'left' as const,
         sortable: true,
         sort: 'asc' as const,
@@ -293,7 +301,8 @@ export default function SchedulerListView(props: ListViewProps) {
       {
         headerName: 'Task',
         field: 'task',
-        minWidth: 140,
+        minWidth: 100,
+        flex: 1,
       },
       ...['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => ({
         headerName: day,
@@ -309,20 +318,22 @@ export default function SchedulerListView(props: ListViewProps) {
         cellRenderer: ScheduleDayRenderer,
         sortable: false,
         filter: false,
-        minWidth: 100,
+        minWidth: 86,
+        flex: 1,
       })),
       {
-        headerName: 'Total Hrs',
+        headerName: 'Total',
         field: 'total_hours',
         cellRenderer: SchedulerTotalHoursRenderer,
         type: 'numericColumn',
-        minWidth: 100,
+        minWidth: 70,
+        maxWidth: 90,
       },
       {
         headerName: '',
         colId: 'delete',
-        width: 56,
-        maxWidth: 56,
+        width: 44,
+        maxWidth: 44,
         sortable: false,
         filter: false,
         resizable: false,
@@ -339,7 +350,7 @@ export default function SchedulerListView(props: ListViewProps) {
               title="Delete employee week"
               onClick={(e) => {
                 e.stopPropagation();
-                handleDeleteEmployeeWeek(empId, name);
+                setPendingEmployeeDelete({ id: empId, name });
               }}
               className="text-muted-foreground hover:text-destructive flex h-full w-full items-center justify-center transition-colors"
             >
@@ -349,7 +360,7 @@ export default function SchedulerListView(props: ListViewProps) {
         },
       },
     ],
-    [handleDeleteEmployeeWeek],
+    [],
   );
 
   // Full column defs including checkbox and avatar
@@ -361,7 +372,7 @@ export default function SchedulerListView(props: ListViewProps) {
   // Column state persistence
   const handleGridReady = useCallback((event: GridReadyEvent) => {
     const api = event.api;
-    restoreColumnState('scheduler', api);
+    restoreColumnState('scheduler-v2', api);
   }, []);
 
   const debouncedSaveState = useCallback((api: GridApi) => {
@@ -369,7 +380,7 @@ export default function SchedulerListView(props: ListViewProps) {
       clearTimeout(saveDebounceRef.current);
     }
     saveDebounceRef.current = setTimeout(() => {
-      saveColumnState('scheduler', api);
+      saveColumnState('scheduler-v2', api);
     }, 300);
   }, []);
 
@@ -507,6 +518,43 @@ export default function SchedulerListView(props: ListViewProps) {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deletePending ? 'Deleting…' : 'Delete week'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={pendingEmployeeDelete !== null}
+        onOpenChange={(next) => {
+          if (!next) setPendingEmployeeDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete employee schedule?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will delete all schedule entries for{' '}
+              <span className="font-medium">{pendingEmployeeDelete?.name}</span>{' '}
+              for the week of{' '}
+              <span className="font-medium">
+                {formatWeekLabel(currentWeek)}
+              </span>
+              . This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={employeeDeletePending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleConfirmEmployeeDelete();
+              }}
+              disabled={employeeDeletePending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {employeeDeletePending ? 'Deleting…' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

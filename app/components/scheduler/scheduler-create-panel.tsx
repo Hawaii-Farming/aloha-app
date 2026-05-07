@@ -195,7 +195,7 @@ function CompactCombobox({
   );
 }
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+const LUNCH_BREAK_MINUTES = 30;
 
 type DayEntry = {
   date: string; // 'yyyy-MM-dd'
@@ -283,6 +283,40 @@ function isRowFilled(d: DayEntry): boolean {
   return !!(d.start_time || d.stop_time || d.ops_task_id);
 }
 
+function slotMinutes(d: DayEntry): number {
+  if (!d.start_time || !d.stop_time || d.start_time >= d.stop_time) return 0;
+  const [shStr, smStr] = d.start_time.split(':');
+  const [ehStr, emStr] = d.stop_time.split(':');
+  const sh = Number(shStr);
+  const sm = Number(smStr);
+  const eh = Number(ehStr);
+  const em = Number(emStr);
+  if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return 0;
+  return eh * 60 + em - (sh * 60 + sm);
+}
+
+function formatHoursMinutes(hours: number): string {
+  const totalMin = Math.round(hours * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return `${h}h${m.toString().padStart(2, '0')}`;
+}
+
+// Hours for one day across all slots on that date, minus a 30-minute lunch
+// break when the earliest slot starts before noon. Days that begin in the
+// afternoon do not get a lunch deducted.
+function computeDayHours(daySlots: DayEntry[]): number {
+  const valid = daySlots.filter((s) => slotMinutes(s) > 0);
+  if (valid.length === 0) return 0;
+  const totalMin = valid.reduce((acc, d) => acc + slotMinutes(d), 0);
+  const earliestStart = valid.reduce(
+    (min, d) => (d.start_time < min ? d.start_time : min),
+    valid[0]!.start_time,
+  );
+  const lunchMin = earliestStart < '12:00' ? LUNCH_BREAK_MINUTES : 0;
+  return Math.max(0, totalMin - lunchMin) / 60;
+}
+
 // Returns the set of slot indices that overlap another slot on the same date.
 function findOverlappingSlots(slots: DayEntry[]): Set<number> {
   const overlapping = new Set<number>();
@@ -363,21 +397,25 @@ export function SchedulerCreatePanel({
 
   const filledCount = useMemo(() => days.filter(isRowFilled).length, [days]);
 
-  const totalHours = useMemo(() => {
-    return days.reduce((sum, d) => {
-      if (!d.start_time || !d.stop_time || d.start_time >= d.stop_time) {
-        return sum;
-      }
-      const [shStr, smStr] = d.start_time.split(':');
-      const [ehStr, emStr] = d.stop_time.split(':');
-      const sh = Number(shStr);
-      const sm = Number(smStr);
-      const eh = Number(ehStr);
-      const em = Number(emStr);
-      if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return sum;
-      return sum + (eh * 60 + em - (sh * 60 + sm)) / 60;
-    }, 0);
+  const hoursByDate = useMemo(() => {
+    const byDate = new Map<string, DayEntry[]>();
+    for (const d of days) {
+      if (!d.date) continue;
+      const arr = byDate.get(d.date) ?? [];
+      arr.push(d);
+      byDate.set(d.date, arr);
+    }
+    const result = new Map<string, number>();
+    for (const [date, slots] of byDate) {
+      result.set(date, computeDayHours(slots));
+    }
+    return result;
   }, [days]);
+
+  const totalHours = useMemo(
+    () => Array.from(hoursByDate.values()).reduce((sum, h) => sum + h, 0),
+    [hoursByDate],
+  );
 
   // Lock employee to editEmployeeId when drawer opens in edit mode.
   useEffect(() => {
@@ -683,10 +721,18 @@ export function SchedulerCreatePanel({
                 });
                 if (slotIndices.length === 0) return null;
                 const firstIndex = slotIndices[0]!;
+                const dayHours = hoursByDate.get(dayDate) ?? 0;
                 return (
                   <div key={dow} className="space-y-1.5">
-                    <div className="text-muted-foreground px-1 text-xs font-semibold tracking-wide uppercase tabular-nums">
-                      {DAY_NAMES[dow]} {format(parseISO(dayDate), 'dd')}
+                    <div className="flex items-baseline justify-between px-1">
+                      <span className="text-muted-foreground text-xs font-semibold tabular-nums">
+                        {format(parseISO(dayDate), 'EEE, MMM d')}
+                      </span>
+                      {dayHours > 0 && (
+                        <span className="text-muted-foreground text-xs tabular-nums">
+                          {formatHoursMinutes(dayHours)}
+                        </span>
+                      )}
                     </div>
                     {slotIndices.map((i, slotPos) => {
                       const day = days[i] ?? {
@@ -761,7 +807,7 @@ export function SchedulerCreatePanel({
                                 size="icon"
                                 onClick={() => appendSlotForDate(dayDate)}
                                 disabled={!isLast}
-                                aria-label={`Add slot to ${DAY_NAMES[dow]}`}
+                                aria-label={`Add slot to ${format(parseISO(dayDate), 'EEE')}`}
                                 title={
                                   isLast
                                     ? 'Add another slot for this day'
@@ -795,7 +841,7 @@ export function SchedulerCreatePanel({
                                 }
                                 aria-label={
                                   isFirst
-                                    ? `Reset ${DAY_NAMES[dow]}`
+                                    ? `Reset ${format(parseISO(dayDate), 'EEE')}`
                                     : 'Remove slot'
                                 }
                                 title={isFirst ? 'Reset day' : 'Remove slot'}
@@ -847,10 +893,7 @@ export function SchedulerCreatePanel({
                   Total
                 </span>
                 <span className="text-foreground text-base font-semibold tabular-nums">
-                  {totalHours.toFixed(2)}
-                </span>
-                <span className="text-muted-foreground text-xs font-medium">
-                  h
+                  {formatHoursMinutes(totalHours)}
                 </span>
               </div>
             </div>
