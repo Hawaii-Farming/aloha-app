@@ -1,10 +1,9 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import type {
   ColDef,
-  GridReadyEvent,
   RowClassParams,
   RowClickedEvent,
 } from 'ag-grid-community';
@@ -16,6 +15,9 @@ import {
   useRegisterActiveTable,
 } from '~/components/active-table-search-context';
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
+import HousingSitePanel, {
+  type HousingSitePanelSite,
+} from '~/components/ag-grid/housing-site-panel';
 import type { ListViewProps } from '~/lib/crud/types';
 
 type RowData = Record<string, unknown>;
@@ -54,12 +56,12 @@ function HomeIconRenderer(props: CustomCellRendererProps) {
   );
 }
 
-function OccupancyCellRenderer(props: CustomCellRendererProps) {
+function VacancyCellRenderer(props: CustomCellRendererProps) {
   const data = props.data as HousingRow | undefined;
   if (!data) return null;
-  const tenants = data.tenantCount;
+  const vacant = data.availableBeds;
   const capacity = data.maximumBeds;
-  const ratio = capacity > 0 ? Math.min(tenants / capacity, 1) : 0;
+  const ratio = capacity > 0 ? Math.min(vacant / capacity, 1) : 0;
   const pct = Math.round(ratio * 100);
 
   return (
@@ -67,7 +69,7 @@ function OccupancyCellRenderer(props: CustomCellRendererProps) {
       <div
         className="bg-muted h-1.5 w-32 overflow-hidden rounded-full"
         role="progressbar"
-        aria-valuenow={tenants}
+        aria-valuenow={vacant}
         aria-valuemax={capacity}
       >
         <div
@@ -78,19 +80,45 @@ function OccupancyCellRenderer(props: CustomCellRendererProps) {
         />
       </div>
       <span className="text-foreground w-16 shrink-0 text-right tabular-nums">
-        {tenants} / {capacity}
+        {vacant} / {capacity}
       </span>
     </div>
   );
 }
+
+// Keeps TOTAL row last regardless of sort direction.
+function pinTotalLast<T>(
+  cmp: (a: T, b: T) => number,
+): (
+  valueA: T,
+  valueB: T,
+  nodeA: { data?: HousingRow },
+  nodeB: { data?: HousingRow },
+  isDescending: boolean,
+) => number {
+  return (valueA, valueB, nodeA, nodeB, isDescending) => {
+    const aTotal = nodeA.data?.isTotal === true;
+    const bTotal = nodeB.data?.isTotal === true;
+    if (aTotal && !bTotal) return isDescending ? -1 : 1;
+    if (!aTotal && bTotal) return isDescending ? 1 : -1;
+    return cmp(valueA, valueB);
+  };
+}
+
+const stringCmp = pinTotalLast<string>((a, b) =>
+  String(a ?? '').localeCompare(String(b ?? '')),
+);
+const numberCmp = pinTotalLast<number>((a, b) => (a ?? 0) - (b ?? 0));
+
+const TABLE_WIDTH = 620;
 
 const colDefs: ColDef[] = [
   {
     colId: 'home_icon',
     headerName: '',
     cellRenderer: HomeIconRenderer,
-    maxWidth: 60,
-    minWidth: 60,
+    width: 50,
+    minWidth: 50,
     sortable: false,
     filter: false,
     resizable: false,
@@ -99,52 +127,49 @@ const colDefs: ColDef[] = [
   {
     field: 'name',
     headerName: 'Name',
-    flex: 1,
-    minWidth: 180,
+    width: 170,
+    comparator: stringCmp,
   },
   {
     field: 'maximumBeds',
     headerName: 'Max Beds',
     type: 'numericColumn',
-    flex: 1,
-    minWidth: 110,
-  },
-  {
-    field: 'availableBeds',
-    headerName: 'Available Beds',
-    type: 'numericColumn',
-    flex: 1,
-    minWidth: 130,
+    width: 100,
+    comparator: numberCmp,
   },
   {
     field: 'tenantCount',
-    headerName: 'Occupancy',
-    cellRenderer: OccupancyCellRenderer,
-    flex: 1,
-    minWidth: 200,
+    headerName: 'Tenants',
+    type: 'numericColumn',
+    width: 100,
+    comparator: numberCmp,
+  },
+  {
+    field: 'availableBeds',
+    headerName: 'Vacancy',
+    cellRenderer: VacancyCellRenderer,
+    width: 200,
+    comparator: numberCmp,
   },
 ];
 
 export default function HousingMapView(props: ListViewProps) {
-  const { tableData } = props;
+  const { tableData, accountSlug } = props;
 
-  const navigate = useNavigate();
   const { account } = useParams();
   const { query } = useActiveTableSearch();
   useRegisterActiveTable('housing', props.subModuleDisplayName ?? 'Housing');
 
   const gridRef = useRef<AgGridReact>(null);
+  const [panelSite, setPanelSite] = useState<HousingSitePanelSite | null>(null);
 
   const rawData = tableData.data as RowData[];
 
   const rowData = useMemo<HousingRow[]>(() => {
-    const rows: HousingRow[] = rawData.map(parseHousingRow);
-
+    const rows = rawData.map(parseHousingRow);
     if (rows.length === 0) return rows;
-
     const sum = (k: 'maximumBeds' | 'tenantCount' | 'availableBeds') =>
       rows.reduce((s, r) => s + (r[k] ?? 0), 0);
-
     rows.push({
       id: '__total__',
       name: 'TOTAL',
@@ -154,34 +179,24 @@ export default function HousingMapView(props: ListViewProps) {
       isActive: true,
       isTotal: true,
     });
-
     return rows;
   }, [rawData]);
 
-  const handleRowClicked = useCallback(
-    (event: RowClickedEvent) => {
-      const row = event.data as HousingRow | undefined;
-      if (!account || !row?.id || row.isTotal) return;
-      navigate(
-        `/home/${account}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Housing')}/${encodeURIComponent(row.id)}`,
-      );
-    },
-    [navigate, account],
-  );
-
-  const handleGridReady = useCallback((event: GridReadyEvent) => {
-    setTimeout(() => {
-      event.api.autoSizeAllColumns(false);
-      const cols = event.api.getColumns();
-      if (!cols) return;
-      const total = cols.reduce((sum, c) => sum + c.getActualWidth(), 0);
-      const viewport = document.querySelector(
-        '.ag-center-cols-viewport',
-      ) as HTMLElement | null;
-      const width = viewport?.clientWidth ?? 0;
-      if (width > 0 && total < width) event.api.sizeColumnsToFit();
-    }, 20);
+  const handleRowClicked = useCallback((event: RowClickedEvent) => {
+    const row = event.data as HousingRow | undefined;
+    if (!row?.id || row.isTotal) return;
+    setPanelSite({
+      id: row.id,
+      name: row.name,
+      maximumBeds: row.maximumBeds,
+      availableBeds: row.availableBeds,
+    });
   }, []);
+
+  const detailActionUrl =
+    account && panelSite
+      ? `/home/${account}/${encodeURIComponent('Human Resources')}/${encodeURIComponent('Housing')}/${encodeURIComponent(panelSite.id)}`
+      : null;
 
   const getRowStyle = useCallback(
     (params: RowClassParams): Record<string, string> | undefined => {
@@ -202,19 +217,29 @@ export default function HousingMapView(props: ListViewProps) {
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col" data-test="housing-list-view">
-      <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-row" data-test="housing-list-view">
+      <div
+        className="flex min-h-0 shrink-0 flex-col overflow-hidden"
+        style={{ width: TABLE_WIDTH }}
+      >
         <AgGridWrapper
           gridRef={gridRef}
           colDefs={colDefs}
           rowData={rowData as unknown as Record<string, unknown>[]}
           quickFilterText={query}
           pagination={false}
+          autoSizeColumns={false}
           getRowStyle={getRowStyle}
           onRowClicked={handleRowClicked}
-          onGridReady={handleGridReady}
         />
       </div>
+      <HousingSitePanel
+        key={panelSite?.id ?? 'empty'}
+        site={panelSite}
+        accountSlug={accountSlug}
+        detailActionUrl={detailActionUrl}
+        onClose={() => setPanelSite(null)}
+      />
     </div>
   );
 }
