@@ -19,12 +19,20 @@ import {
 } from '@aloha/ui/alert-dialog';
 import { Button } from '@aloha/ui/button';
 
+interface PayrollConflict {
+  employee_name: string;
+  payroll_id: string;
+  check_date: string;
+  invoice_number: string | null;
+}
+
 interface RunPayrollResponse {
   success: boolean;
   rowsInserted?: number;
   batchId?: string | null;
   error?: string;
   missingEmployees?: { payroll_id: string; full_name: string }[];
+  conflicts?: PayrollConflict[];
   message?: string;
 }
 
@@ -51,6 +59,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
   const [missing, setMissing] = useState<
     { payroll_id: string; full_name: string }[] | null
   >(null);
+  const [conflicts, setConflicts] = useState<PayrollConflict[] | null>(null);
 
   const runPayroll = useCallback(async () => {
     setPending(true);
@@ -64,6 +73,10 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
 
       if (res.status === 422 && json.missingEmployees?.length) {
         setMissing(json.missingEmployees);
+        return;
+      }
+      if (res.status === 409 && json.conflicts?.length) {
+        setConflicts(json.conflicts);
         return;
       }
       if (!json.success) {
@@ -161,6 +174,41 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
           </div>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setMissing(null)}>
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={conflicts !== null}
+        onOpenChange={(open) => !open && setConflicts(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Payroll already imported</AlertDialogTitle>
+            <AlertDialogDescription>
+              {conflicts?.length ?? 0} row
+              {conflicts?.length === 1 ? '' : 's'} from the source sheet already
+              exist in payroll. Delete them first if you need to re-import, or
+              remove the duplicates from the source sheet.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="text-muted-foreground max-h-64 overflow-y-auto rounded-md border p-3 text-sm">
+            <ul className="space-y-1">
+              {conflicts?.map((c) => (
+                <li key={`${c.payroll_id}-${c.check_date}-${c.invoice_number}`}>
+                  <span className="text-foreground">{c.employee_name}</span>{' '}
+                  <span className="text-muted-foreground">
+                    ({c.payroll_id}) — check {c.check_date}
+                    {c.invoice_number ? `, inv ${c.invoice_number}` : ''}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setConflicts(null)}>
               Close
             </AlertDialogAction>
           </AlertDialogFooter>

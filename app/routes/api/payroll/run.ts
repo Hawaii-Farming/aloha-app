@@ -118,6 +118,55 @@ export const action = async ({ request }: { request: Request }) => {
     });
   }
 
+  const checkDates = [...new Set(rows.map((r) => r.check_date))];
+  const invoiceNumbers = [
+    ...new Set(
+      rows.map((r) => r.invoice_number).filter((v): v is string => !!v),
+    ),
+  ];
+  const { data: existingRows, error: existingErr } = await admin
+    .from('hr_payroll')
+    .select('hr_employee_id, check_date, invoice_number, employee_name')
+    .eq('org_id', orgId)
+    .in('check_date', checkDates)
+    .in(
+      'invoice_number',
+      invoiceNumbers.length > 0 ? invoiceNumbers : ['__none__'],
+    );
+  if (existingErr) {
+    return Response.json(
+      { success: false, error: `Conflict check: ${existingErr.message}` },
+      { status: 500 },
+    );
+  }
+  const existingKeys = new Set(
+    (existingRows ?? []).map(
+      (r) => `${r.hr_employee_id}|${r.check_date}|${r.invoice_number ?? ''}`,
+    ),
+  );
+  const conflicts = rows
+    .filter((r) =>
+      existingKeys.has(
+        `${r.hr_employee_id}|${r.check_date}|${r.invoice_number ?? ''}`,
+      ),
+    )
+    .map((r) => ({
+      employee_name: r.employee_name,
+      payroll_id: r.payroll_id,
+      check_date: r.check_date,
+      invoice_number: r.invoice_number,
+    }));
+  if (conflicts.length > 0) {
+    return Response.json(
+      {
+        success: false,
+        error: 'Some payroll rows already exist for these employees',
+        conflicts,
+      },
+      { status: 409 },
+    );
+  }
+
   const batchId = randomUUID();
   const stamped = rows.map((r) => ({
     ...r,
