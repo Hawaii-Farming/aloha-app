@@ -12,7 +12,6 @@ import {
   FileSpreadsheet,
   Loader2,
   Upload,
-  Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -209,10 +208,7 @@ export function RunPayrollButton({ accountSlug }: RunPayrollButtonProps) {
         }}
       >
         <DialogContent className="sm:max-w-md">
-          <DialogHeader className="items-center text-center sm:items-center sm:text-center">
-            <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-md shadow-green-500/25">
-              <Zap className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
+          <DialogHeader>
             <DialogTitle className="text-base">Run payroll</DialogTitle>
             <DialogDescription className="sr-only">
               Run payroll from Google Drive or an uploaded xlsx file
