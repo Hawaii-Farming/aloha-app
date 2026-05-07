@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 
 import {
   Outlet,
@@ -13,9 +13,17 @@ import { SidebarProvider } from '@aloha/ui/shadcn-sidebar';
 
 import { ActiveTableSearchProvider } from '~/components/active-table-search-context';
 import { WorkspaceSidebar } from '~/components/sidebar/workspace-sidebar';
-import { WorkspaceMobileDrawer } from '~/components/workspace-shell/workspace-mobile-drawer';
 import { WorkspaceMobileHeader } from '~/components/workspace-shell/workspace-mobile-header';
 import { WorkspaceNavbar } from '~/components/workspace-shell/workspace-navbar';
+
+// Lazy-load the mobile drawer — it pulls in framer-motion (~150 KB) and
+// only renders when the user opens the hamburger menu on mobile. Keeps
+// the initial layout chunk lean for desktop visitors.
+const WorkspaceMobileDrawer = lazy(() =>
+  import('~/components/workspace-shell/workspace-mobile-drawer').then((m) => ({
+    default: m.WorkspaceMobileDrawer,
+  })),
+);
 import { layoutStyleCookie, sidebarStateCookie } from '~/lib/cookies';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { buildNavbarSearchItems } from '~/lib/workspace/build-search-items';
@@ -116,13 +124,17 @@ export default function TeamWorkspaceLayout(props: Route.ComponentProps) {
             </main>
           </div>
 
-          <WorkspaceMobileDrawer
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            account={accountSlug}
-            navigation={workspace.navigation}
-            hamburgerRef={hamburgerRef}
-          />
+          {drawerOpen && (
+            <Suspense fallback={null}>
+              <WorkspaceMobileDrawer
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                account={accountSlug}
+                navigation={workspace.navigation}
+                hamburgerRef={hamburgerRef}
+              />
+            </Suspense>
+          )}
         </div>
       </ActiveTableSearchProvider>
     </SidebarProvider>

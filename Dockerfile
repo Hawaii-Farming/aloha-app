@@ -28,8 +28,7 @@ ARG VITE_ENABLE_SIDEBAR_TRIGGER=false
 
 # Install layer — cached as long as lockfile + workspace manifests don't
 # change. Copying only manifests first means a typical app source edit
-# does NOT re-run pnpm install (this stage was invalidated on every push
-# under the previous `COPY . .` ordering).
+# does NOT re-run pnpm install.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages
 COPY e2e/package.json ./e2e/package.json
@@ -43,14 +42,40 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 COPY . .
 RUN pnpm build
 
-# ---- Stage 2: production ----
-FROM node:20-slim AS production
+# ---- Stage 2: prod-deps ----
+# Fresh install with --prod so devDependencies (vite, eslint, typescript,
+# tailwind, etc.) and their transitive trees never reach the runtime image.
+FROM node:20-slim AS prod-deps
 RUN corepack enable
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages ./packages
+COPY e2e/package.json ./e2e/package.json
+RUN find packages -mindepth 2 ! -name 'package.json' ! -path '*/.*' -type f -delete \
+    && find packages -type d -empty -delete
+
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --prod --frozen-lockfile --ignore-scripts
+
+# ---- Stage 3: production ----
+FROM node:20-slim AS production
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
 
-COPY --from=build /app ./
+# Build output (server bundle + client static assets)
+COPY --from=build /app/build ./build
+
+# Production-only node_modules and the workspace manifests pnpm needs at
+# resolve-time. Source code is intentionally NOT copied — Vite has
+# already inlined whatever the SSR bundle needs.
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=prod-deps /app/packages ./packages
+COPY --from=prod-deps /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 
 EXPOSE 8080
-CMD ["pnpm", "start"]
+
+# Bypass `pnpm start` so we don't depend on cross-env (which lives in
+# devDependencies). NODE_ENV is already set via ENV above.
+CMD ["node_modules/.bin/react-router-serve", "build/server/index.js"]
