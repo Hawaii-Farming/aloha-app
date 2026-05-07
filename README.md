@@ -337,13 +337,13 @@ All HR submodules use AG Grid Community tables with side-panel CRUD forms and de
 |-----------|------------|--------------|
 | Register | `hr_employee` | Employee list with photo, dept, status badges |
 | Scheduler | `ops_task_weekly_schedule` view | Week navigation, dept filter, OT highlighting, history |
-| Time Off | `app_hr_time_off_requests` view | Status filter tabs, inline approve/deny, denial reason |
-| Payroll Comparison | `app_hr_payroll_by_task/employee` views | By-task/by-employee toggle, pay period filter, pinned totals |
-| Payroll Comp Manager | `app_hr_payroll_by_manager` view | Manager selector, pay period filter, summary totals |
-| Payroll Data | `hr_payroll` | Column groups (Hours/Earnings/Deductions/Costs), employee/period filters |
-| Hours Comparison | `app_hr_hours_comparison` view | Scheduled vs payroll variance highlighting, daily drill-down |
-| Housing | `app_hr_housing` view | Occupancy grid, tenant detail rows via API |
-| Employee Review | `app_hr_employee_reviews` view | Score color coding (1=red/2=amber/3=green), Year-Quarter filter, lock enforcement |
+| Time Off | `hr_time_off_request` view | Status filter tabs, inline approve/deny, denial reason |
+| Payroll Comparison | `hr_payroll_task_comparison` / `hr_payroll_employee_comparison` views | By-task/by-employee toggle, pay period filter, pinned totals |
+| Payroll Comp Manager | `hr_payroll_employee_comparison` view | Manager selector, pay period filter, summary totals |
+| Payroll Data | `hr_payroll_data_secure` view | Column groups (Hours/Earnings/Deductions/Costs), employee/period filters |
+| Hours Comparison | `hr_payroll_employee_comparison` view | Scheduled vs payroll variance highlighting, daily drill-down |
+| Housing | `org_site_housing_tenant_count` view | Occupancy grid, tenant detail rows via API |
+| Employee Review | `hr_employee_review` table | Score color coding (1=red/2=amber/3=green), Year-Quarter filter, lock enforcement |
 
 ## Operations Module (14 tables, includes 1 view) — [Docs](docs/schemas/20260408000005_ops.md)
 
