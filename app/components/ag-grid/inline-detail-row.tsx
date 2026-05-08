@@ -4,6 +4,7 @@ import { Badge } from '@aloha/ui/badge';
 import { Separator } from '@aloha/ui/separator';
 
 import type { CrudModuleConfig, FormFieldConfig } from '~/lib/crud/types';
+import { resolveStoragePublicUrl } from '~/lib/supabase/storage-url';
 
 function formatDate(value: string): string {
   const d = new Date(value);
@@ -151,7 +152,10 @@ export function InlineDetailRow({ data, config }: InlineDetailRowProps) {
   const firstName = data['first_name'] as string | undefined;
   const lastName = data['last_name'] as string | undefined;
   const alias = data['preferred_name'] as string | undefined;
-  const photoUrl = data['profile_photo_url'] as string | undefined;
+  const photoUrl = resolveStoragePublicUrl(
+    data['profile_photo_url'] as string | undefined,
+    { width: 112, height: 112, resize: 'cover', quality: 70, format: 'webp' },
+  );
   const initials = getInitials(firstName, lastName);
   const fullName = [firstName, lastName].filter(Boolean).join(' ');
 

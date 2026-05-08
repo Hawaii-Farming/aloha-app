@@ -30,6 +30,7 @@ import { buildHistoryEntries } from '~/lib/crud/workflow-helpers';
 import type { WorkflowHistoryEntry } from '~/lib/crud/workflow-helpers';
 import { stateDotClass } from '~/lib/crud/workflow-state-color';
 import { formatDate, formatDateTime } from '~/lib/format/date';
+import { resolveStoragePublicUrl } from '~/lib/supabase/storage-url';
 import { AccessGate } from '~/lib/workspace/access-gate';
 
 function getInitials(fullName: string): string {
@@ -43,10 +44,21 @@ function getInitials(fullName: string): string {
 function getRecordPhotoUrl(
   record: Record<string, unknown>,
 ): string | undefined {
+  const transform = {
+    width: 256,
+    height: 256,
+    resize: 'cover' as const,
+    quality: 75,
+    format: 'webp' as const,
+  };
   const direct = record['profile_photo_url'];
-  if (typeof direct === 'string' && direct.length > 0) return direct;
+  if (typeof direct === 'string' && direct.length > 0) {
+    return resolveStoragePublicUrl(direct, transform) ?? undefined;
+  }
   const subject = record['subject_profile_photo_url'];
-  if (typeof subject === 'string' && subject.length > 0) return subject;
+  if (typeof subject === 'string' && subject.length > 0) {
+    return resolveStoragePublicUrl(subject, transform) ?? undefined;
+  }
   return undefined;
 }
 

@@ -13,6 +13,7 @@ import { Badge } from '@aloha/ui/badge';
 import { Separator } from '@aloha/ui/separator';
 
 import { formatDate } from '~/lib/format/date';
+import { resolveStoragePublicUrl } from '~/lib/supabase/storage-url';
 
 interface TimeOffDetailRowProps {
   data: Record<string, unknown>;
@@ -72,7 +73,10 @@ export function TimeOffDetailRow({ data }: TimeOffDetailRowProps) {
   const fullName =
     [firstName, lastName].filter(Boolean).join(' ') ||
     ((data['subject_preferred_name'] as string) ?? '');
-  const photoUrl = data['subject_profile_photo_url'] as string | undefined;
+  const photoUrl = resolveStoragePublicUrl(
+    data['subject_profile_photo_url'] as string | undefined,
+    { width: 112, height: 112, resize: 'cover', quality: 70, format: 'webp' },
+  );
   const initials = getInitials(fullName);
   const status = (data['status'] as string) ?? 'Pending';
   const deptName = data['subject_hr_department_id'] as string | undefined;

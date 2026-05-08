@@ -6,6 +6,8 @@ import { format, parseISO } from 'date-fns';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@aloha/ui/avatar';
 
+import { resolveStoragePublicUrl } from '~/lib/supabase/storage-url';
+
 type RowData = Record<string, unknown>;
 
 interface TenantData {
@@ -85,7 +87,19 @@ export function HousingDetailRow({ data }: HousingDetailRowProps) {
             className="flex items-center gap-3 rounded-md border px-3 py-2"
           >
             <Avatar className="h-8 w-8">
-              {t.profile_photo_url && <AvatarImage src={t.profile_photo_url} />}
+              {t.profile_photo_url && (
+                <AvatarImage
+                  src={
+                    resolveStoragePublicUrl(t.profile_photo_url, {
+                      width: 64,
+                      height: 64,
+                      resize: 'cover',
+                      quality: 70,
+                      format: 'webp',
+                    }) ?? ''
+                  }
+                />
+              )}
               <AvatarFallback className="text-xs">
                 {t.full_name
                   .split(' ')

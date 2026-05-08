@@ -30,6 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@aloha/ui/popover';
 import { toast } from '@aloha/ui/sonner';
 
 import { AgGridWrapper } from '~/components/ag-grid/ag-grid-wrapper';
+import { AvatarRenderer } from '~/components/ag-grid/cell-renderers/avatar-renderer';
 import { AccessGate } from '~/lib/workspace/access-gate';
 
 interface TenantRow {
@@ -70,31 +71,13 @@ async function fetchEligibleEmployees(
   return json.data ?? [];
 }
 
-function TenantInitialsRenderer(props: CustomCellRendererProps) {
-  const data = props.data as TenantRow | undefined;
-  if (!data) return null;
-  const initials = data.full_name
-    .split(' ')
-    .map((n) => n[0] ?? '')
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-  return (
-    <div className="flex h-full items-center justify-center">
-      <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
-        {initials}
-      </div>
-    </div>
-  );
-}
-
 function buildTenantColDefs(
   onRemove: (tenantId: string, fullName: string) => void,
 ): ColDef[] {
   return [
     {
       headerName: '',
-      cellRenderer: TenantInitialsRenderer,
+      cellRenderer: AvatarRenderer,
       width: 48,
       maxWidth: 48,
       minWidth: 32,
