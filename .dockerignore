@@ -15,6 +15,7 @@ build
 dist
 coverage
 e2e
+!e2e/package.json
 docs
 supabase/tests
 supabase/.temp
