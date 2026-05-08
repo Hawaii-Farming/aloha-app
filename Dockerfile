@@ -31,9 +31,10 @@ ARG VITE_ENABLE_SIDEBAR_TRIGGER=false
 # does NOT re-run pnpm install.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages
+COPY tooling ./tooling
 COPY e2e/package.json ./e2e/package.json
-RUN find packages -mindepth 2 ! -name 'package.json' ! -path '*/.*' -type f -delete \
-    && find packages -type d -empty -delete
+RUN find packages tooling -mindepth 2 ! -name 'package.json' ! -path '*/.*' -type f -delete \
+    && find packages tooling -type d -empty -delete
 
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
@@ -51,9 +52,10 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages
+COPY tooling ./tooling
 COPY e2e/package.json ./e2e/package.json
-RUN find packages -mindepth 2 ! -name 'package.json' ! -path '*/.*' -type f -delete \
-    && find packages -type d -empty -delete
+RUN find packages tooling -mindepth 2 ! -name 'package.json' ! -path '*/.*' -type f -delete \
+    && find packages tooling -type d -empty -delete
 
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --prod --frozen-lockfile --ignore-scripts
