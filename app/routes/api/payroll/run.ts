@@ -1,6 +1,6 @@
-import { randomUUID } from 'crypto';
-
 import type { SupabaseClient } from '@supabase/supabase-js';
+
+import { randomUUID } from 'crypto';
 
 import type { Database } from '~/lib/database.types';
 import {
@@ -9,12 +9,11 @@ import {
   buildPayrollRows,
 } from '~/lib/payroll/run-payroll.server';
 import {
+  type HrbTabs,
   clearHrbTabs,
   exportSheetAsXlsx,
   fetchHrbTabs,
-  type HrbTabs,
 } from '~/lib/payroll/sheets-client.server';
-import { parseXlsxToHrbTabs } from '~/lib/payroll/xlsx-parser.server';
 import { getSupabaseServerAdminClient } from '~/lib/supabase/clients/server-admin-client.server';
 import { getSupabaseServerClient } from '~/lib/supabase/clients/server-client.server';
 import { loadOrgWorkspace } from '~/lib/workspace/org-workspace-loader.server';
@@ -23,46 +22,38 @@ const ALLOWED_ROLES = new Set(['Admin', 'Owner']);
 const INSERT_BATCH_SIZE = 100;
 const XLSX_MIME =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+// Total-cost reconciliation: any difference larger than this (rounded
+// dollars) is reported as a discrepancy. Penny-level drift from float
+// summation is tolerated.
+const TOTAL_TOLERANCE_CENTS = 1;
 
 type AdminClient = SupabaseClient<Database>;
-type Source = 'google' | 'upload';
 
 interface ParsedRequest {
   accountSlug: string;
-  source: Source;
-  uploadBytes?: Uint8Array;
-  uploadFilename?: string;
+  expectedTotal: number;
 }
 
 async function parseRequest(request: Request): Promise<ParsedRequest> {
-  const contentType = request.headers.get('content-type') ?? '';
-  if (contentType.includes('multipart/form-data')) {
-    const form = await request.formData();
-    const file = form.get('file');
-    const accountSlug = form.get('accountSlug');
-    if (!(file instanceof File)) {
-      throw new Response('file required', { status: 400 });
-    }
-    if (typeof accountSlug !== 'string' || !accountSlug) {
-      throw new Response('accountSlug required', { status: 400 });
-    }
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    return {
-      accountSlug,
-      source: 'upload',
-      uploadBytes: bytes,
-      uploadFilename: file.name,
-    };
-  }
   const body = (await request.json().catch(() => ({}))) as Record<
     string,
     unknown
   >;
-  const accountSlug = body.accountSlug as string | undefined;
-  if (!accountSlug) {
+  const accountSlug = body.accountSlug;
+  if (typeof accountSlug !== 'string' || !accountSlug) {
     throw new Response('accountSlug required', { status: 400 });
   }
-  return { accountSlug, source: 'google' };
+  const expectedTotalRaw = body.expectedTotal;
+  const expectedTotal =
+    typeof expectedTotalRaw === 'number'
+      ? expectedTotalRaw
+      : Number(expectedTotalRaw);
+  if (!Number.isFinite(expectedTotal) || expectedTotal <= 0) {
+    throw new Response('expectedTotal must be a positive number', {
+      status: 400,
+    });
+  }
+  return { accountSlug, expectedTotal };
 }
 
 async function loadEmployees(
@@ -130,6 +121,33 @@ async function findConflicts(
     }));
 }
 
+interface InvoiceTotal {
+  invoice_number: string | null;
+  check_date: string;
+  total_cost: number;
+  rows: number;
+}
+
+function summarizeByInvoice(rows: HrPayrollInsert[]): InvoiceTotal[] {
+  const byKey = new Map<string, InvoiceTotal>();
+  for (const r of rows) {
+    const key = `${r.invoice_number ?? '—'}|${r.check_date}`;
+    const existing = byKey.get(key);
+    if (existing) {
+      existing.total_cost += r.total_cost;
+      existing.rows += 1;
+    } else {
+      byKey.set(key, {
+        invoice_number: r.invoice_number,
+        check_date: r.check_date,
+        total_cost: r.total_cost,
+        rows: 1,
+      });
+    }
+  }
+  return Array.from(byKey.values()).sort((a, b) => b.total_cost - a.total_cost);
+}
+
 async function insertBatched(
   admin: AdminClient,
   rows: (HrPayrollInsert & { created_by: string; updated_by: string })[],
@@ -151,6 +169,11 @@ async function insertBatched(
 }
 
 export const action = async ({ request }: { request: Request }) => {
+  const t0 = Date.now();
+  const log = (step: string, extra?: Record<string, unknown>) => {
+    console.info(`[payroll/run] +${Date.now() - t0}ms ${step}`, extra ?? '');
+  };
+
   if (request.method !== 'POST') {
     return Response.json(
       { success: false, error: 'Method not allowed' },
@@ -168,9 +191,10 @@ export const action = async ({ request }: { request: Request }) => {
       { status: 400 },
     );
   }
+  log('parsed request', { accountSlug: parsed.accountSlug });
 
   const sheetId = process.env.HRB_INPUT_SHEET_ID;
-  if (parsed.source === 'google' && !sheetId) {
+  if (!sheetId) {
     return Response.json(
       { success: false, error: 'HRB_INPUT_SHEET_ID not configured' },
       { status: 500 },
@@ -193,6 +217,7 @@ export const action = async ({ request }: { request: Request }) => {
   const orgId = workspace.currentOrg.org_id;
   const actingEmployeeId = workspace.currentOrg.employee_id;
   const admin = getSupabaseServerAdminClient();
+  log('auth ok');
 
   let employees: EmployeeLookup[];
   try {
@@ -203,31 +228,28 @@ export const action = async ({ request }: { request: Request }) => {
       { status: 500 },
     );
   }
+  log('loaded employees', { count: employees.length });
 
   let tabs: HrbTabs;
   try {
-    if (parsed.source === 'google') {
-      tabs = await fetchHrbTabs(sheetId!);
-    } else {
-      tabs = parseXlsxToHrbTabs(parsed.uploadBytes!);
-    }
+    tabs = await fetchHrbTabs(sheetId);
   } catch (e) {
     return Response.json(
-      {
-        success: false,
-        error:
-          parsed.source === 'google'
-            ? `Sheets API: ${(e as Error).message}`
-            : `Xlsx parse: ${(e as Error).message}`,
-      },
-      { status: parsed.source === 'google' ? 502 : 400 },
+      { success: false, error: `Sheets API: ${(e as Error).message}` },
+      { status: 502 },
     );
   }
+  log('fetched HRB tabs', {
+    $data: tabs.$data.length,
+    NetPay: tabs.NetPay.length,
+    Hours: tabs.Hours.length,
+  });
 
   const { rows, missing } = buildPayrollRows(tabs, employees, {
     orgId,
     payrollProcessor: 'HRB',
   });
+  log('built rows', { rows: rows.length, missing: missing.length });
 
   if (missing.length > 0) {
     return Response.json(
@@ -247,6 +269,30 @@ export const action = async ({ request }: { request: Request }) => {
       batchId: null,
       message: 'No payroll rows in source',
     });
+  }
+
+  // Reconcile against the total the user typed in. Computed in cents to
+  // avoid float drift. Mirrors the $data!Total Cost grand total in HRB.
+  const computedCents = Math.round(
+    rows.reduce((sum, r) => sum + r.total_cost * 100, 0),
+  );
+  const expectedCents = Math.round(parsed.expectedTotal * 100);
+  const deltaCents = computedCents - expectedCents;
+  if (Math.abs(deltaCents) > TOTAL_TOLERANCE_CENTS) {
+    return Response.json(
+      {
+        success: false,
+        error: 'Total cost mismatch — payroll not imported',
+        reconciliation: {
+          expected: expectedCents / 100,
+          computed: computedCents / 100,
+          delta: deltaCents / 100,
+          rowCount: rows.length,
+          invoices: summarizeByInvoice(rows),
+        },
+      },
+      { status: 409 },
+    );
   }
 
   let conflicts;
@@ -276,7 +322,9 @@ export const action = async ({ request }: { request: Request }) => {
     updated_by: actingEmployeeId,
   }));
 
+  log('inserting rows', { count: stamped.length });
   const insertResult = await insertBatched(admin, stamped);
+  log('insert done', { inserted: insertResult.ok ? insertResult.inserted : 0 });
   if (!insertResult.ok) {
     return Response.json(
       {
@@ -297,10 +345,7 @@ export const action = async ({ request }: { request: Request }) => {
   const bucket = process.env.HRB_ARCHIVE_BUCKET ?? 'payroll-archives';
 
   try {
-    const xlsxBytes =
-      parsed.source === 'google'
-        ? await exportSheetAsXlsx(sheetId!)
-        : parsed.uploadBytes!;
+    const xlsxBytes = await exportSheetAsXlsx(sheetId);
     const { error: uploadErr } = await admin.storage
       .from(bucket)
       .upload(archivePath, xlsxBytes, { contentType: XLSX_MIME });
@@ -309,20 +354,20 @@ export const action = async ({ request }: { request: Request }) => {
     warnings.push(`Archive failed: ${(e as Error).message}`);
   }
 
-  if (parsed.source === 'google') {
-    try {
-      await clearHrbTabs(sheetId!);
-    } catch (e) {
-      warnings.push(`Source sheet clear failed: ${(e as Error).message}`);
-    }
+  log('archive uploaded');
+
+  try {
+    await clearHrbTabs(sheetId);
+  } catch (e) {
+    warnings.push(`Source sheet clear failed: ${(e as Error).message}`);
   }
+  log('source cleared, returning');
 
   return Response.json({
     success: true,
     rowsInserted: insertResult.inserted,
     batchId,
     archivePath,
-    source: parsed.source,
     warnings: warnings.length > 0 ? warnings : undefined,
   });
 };

@@ -68,7 +68,11 @@ export function NavbarFilterButton({
 }: NavbarFilterButtonProps) {
   const { desktop: desktopSlot, mobile: mobileSlot } = useNavbarFilterSlots();
 
-  const activeFilters = filters.filter((f) => f.value !== '');
+  // 'all' is the Select sentinel for the "no filter" option — treat it as
+  // inactive even when callers explicitly route through it (e.g. payroll
+  // distinguishes auto-default vs. explicit-All via ?period=all).
+  const isInactiveValue = (v: string) => v === '' || v === 'all';
+  const activeFilters = filters.filter((f) => !isInactiveValue(f.value));
   const activeCount = activeFilters.length;
 
   // Short summary of active filter values shown next to the "Filters" label.
@@ -91,7 +95,7 @@ export function NavbarFilterButton({
   // 3-way toggle visual rhythm and removes a wasted click.
   if (filters.length === 1) {
     const f = filters[0]!;
-    const isActive = f.value !== '';
+    const isActive = !isInactiveValue(f.value);
     const single = (
       <Select
         value={f.value || 'all'}

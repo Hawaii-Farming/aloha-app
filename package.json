@@ -133,7 +133,6 @@
     "ag-grid-react": "^35.2.1",
     "fast-xml-parser": "^5.7.3",
     "framer-motion": "^12.38.0",
-    "google-auth-library": "^10.6.2",
-    "xlsx": "^0.18.5"
+    "google-auth-library": "^10.6.2"
   }
 }
