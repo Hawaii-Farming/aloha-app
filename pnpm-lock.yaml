@@ -154,6 +154,9 @@ importers:
       husky:
         specifier: ^9.1.7
         version: 9.1.7
+      i18next:
+        specifier: ^25.7.3
+        version: 25.7.3(typescript@5.9.3)
       i18next-resources-to-backend:
         specifier: ^1.2.1
         version: 1.2.1
