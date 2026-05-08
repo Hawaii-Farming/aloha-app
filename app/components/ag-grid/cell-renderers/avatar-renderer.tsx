@@ -18,6 +18,22 @@ interface EmployeeRow {
   first_name?: string;
   last_name?: string;
   full_name?: string;
+  preferred_name?: string;
+  hr_employee_profile_photo_url?: string | null;
+  hr_employee_first_name?: string;
+  hr_employee_last_name?: string;
+  hr_employee_full_name?: string;
+  hr_employee_preferred_name?: string;
+}
+
+function pickEmployeeFields(row: EmployeeRow) {
+  return {
+    photo: row.profile_photo_url ?? row.hr_employee_profile_photo_url ?? null,
+    first: row.first_name ?? row.hr_employee_first_name,
+    last: row.last_name ?? row.hr_employee_last_name,
+    full: row.full_name ?? row.hr_employee_full_name,
+    preferred: row.preferred_name ?? row.hr_employee_preferred_name,
+  };
 }
 
 const blobUrlCache = new Map<string, string>();
@@ -54,7 +70,9 @@ const BOX_STYLE = {
 export function AvatarRenderer(props: CustomCellRendererProps) {
   const data = props.data as EmployeeRow | undefined;
 
-  const photoSrc = resolveStoragePublicUrl(data?.profile_photo_url, {
+  const fields = data ? pickEmployeeFields(data) : null;
+
+  const photoSrc = resolveStoragePublicUrl(fields?.photo, {
     width: 72,
     height: 72,
     resize: 'cover',
@@ -77,20 +95,21 @@ export function AvatarRenderer(props: CustomCellRendererProps) {
 
   const blobUrl = photoSrc ? (blobUrlCache.get(photoSrc) ?? null) : null;
 
-  if (!data) return null;
+  if (!data || !fields) return null;
 
-  const { first_name, last_name, full_name } = data;
+  const { first, last, full, preferred } = fields;
   const displayName =
-    first_name && last_name
-      ? `${first_name} ${last_name}`
-      : full_name || last_name || first_name || '';
+    first && last
+      ? `${first} ${last}`
+      : full || preferred || last || first || '';
   const initials =
-    first_name || last_name
-      ? getInitials(first_name, last_name)
-      : getInitials(
-          full_name?.split(' ')[0],
-          full_name?.split(' ').slice(1).pop(),
-        );
+    first || last
+      ? getInitials(first, last)
+      : full
+        ? getInitials(full.split(' ')[0], full.split(' ').slice(1).pop())
+        : preferred
+          ? getInitials(preferred, undefined)
+          : '';
 
   return (
     <div className="flex h-full items-center justify-center">
