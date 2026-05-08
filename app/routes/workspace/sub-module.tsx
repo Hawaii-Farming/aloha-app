@@ -292,6 +292,8 @@ export const loader = async (args: {
             next = {
               ...next,
               hr_employee_preferred_name: emp.preferred_name,
+              hr_employee_first_name: emp.first_name,
+              hr_employee_last_name: emp.last_name,
               hr_employee_profile_photo_url: emp.profile_photo_url,
               hr_employee_hr_department_id: emp.hr_department_id,
               hr_employee_hr_work_authorization_id:

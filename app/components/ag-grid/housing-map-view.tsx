@@ -166,7 +166,7 @@ export default function HousingMapView(props: ListViewProps) {
 
   const isMobile = useIsMobile();
   const gridRef = useRef<AgGridReact>(null);
-  const [panelSite, setPanelSite] = useState<HousingSitePanelSite | null>(null);
+  const [panelSiteId, setPanelSiteId] = useState<string | null>(null);
 
   // Stretch the Vacancy column to fill the table on mobile (full-width grid).
   // On desktop, columns stay at declared widths so the header ends cleanly
@@ -192,19 +192,25 @@ export default function HousingMapView(props: ListViewProps) {
     return rows;
   }, [rawData]);
 
+  // Derive panel site live from rowData so tenant_count / available_beds
+  // refresh after revalidation (assign/unassign mutations) without forcing
+  // the user to re-click the row.
+  const panelSite = useMemo<HousingSitePanelSite | null>(() => {
+    if (!panelSiteId) return null;
+    const row = rowData.find((r) => r.id === panelSiteId && !r.isTotal);
+    if (!row) return null;
+    return {
+      id: row.id,
+      name: row.name,
+      maximumBeds: row.maximumBeds,
+      availableBeds: row.availableBeds,
+    };
+  }, [panelSiteId, rowData]);
+
   const handleRowClicked = useCallback((event: RowClickedEvent) => {
     const row = event.data as HousingRow | undefined;
     if (!row?.id || row.isTotal) return;
-    setPanelSite((prev) =>
-      prev?.id === row.id
-        ? null
-        : {
-            id: row.id,
-            name: row.name,
-            maximumBeds: row.maximumBeds,
-            availableBeds: row.availableBeds,
-          },
-    );
+    setPanelSiteId((prev) => (prev === row.id ? null : row.id));
   }, []);
 
   const detailActionUrl =
@@ -259,7 +265,7 @@ export default function HousingMapView(props: ListViewProps) {
         site={panelSite}
         accountSlug={accountSlug}
         detailActionUrl={detailActionUrl}
-        onClose={() => setPanelSite(null)}
+        onClose={() => setPanelSiteId(null)}
         isMobile={isMobile}
       />
     </div>

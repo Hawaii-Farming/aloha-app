@@ -41,13 +41,19 @@ type RowData = Record<string, unknown>;
 function EmployeeNameRenderer(props: CustomCellRendererProps) {
   const data = props.data as RowData | undefined;
   if (!data) return null;
-  const fullName = String(
-    data.hr_employee_preferred_name ??
-      data.full_name ??
-      data.employee_name ??
-      '',
-  );
   const pinned = props.node.rowPinned === 'bottom';
+  const first = data.hr_employee_first_name as string | undefined;
+  const last = data.hr_employee_last_name as string | undefined;
+  const composed = [first, last].filter(Boolean).join(' ');
+  const fullName = pinned
+    ? String(data.hr_employee_preferred_name ?? '')
+    : composed ||
+      String(
+        data.hr_employee_preferred_name ??
+          data.full_name ??
+          data.employee_name ??
+          '',
+      );
   return (
     <span
       className={`flex h-full items-center truncate text-sm ${pinned ? 'font-bold' : 'font-medium'}`}
@@ -209,9 +215,19 @@ const AVATAR_COL: ColDef = {
 const byEmployeeColDefs: ColDef[] = [
   AVATAR_COL,
   {
-    field: 'hr_employee_preferred_name',
+    colId: 'hr_employee_full_name',
     headerName: 'Employee',
     cellRenderer: EmployeeNameRenderer,
+    valueGetter: (p) => {
+      const d = p.data as RowData | undefined;
+      if (!d) return '';
+      const first = (d.hr_employee_first_name as string | undefined) ?? '';
+      const last = (d.hr_employee_last_name as string | undefined) ?? '';
+      const composed = [first, last].filter(Boolean).join(' ');
+      return (
+        composed || (d.hr_employee_preferred_name as string | undefined) || ''
+      );
+    },
     flex: 1,
     minWidth: UNIFORM_MIN_WIDTH,
     pinned: 'left',
@@ -379,7 +395,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
   }, []);
 
   const handleGridReady = useCallback((event: GridReadyEvent) => {
-    restoreColumnState('payroll_comparison_v12', event.api);
+    restoreColumnState('payroll_comparison_v13', event.api);
   }, []);
 
   const debouncedSaveState = useCallback((api: GridApi) => {
@@ -387,7 +403,7 @@ export default function PayrollComparisonListView(props: ListViewProps) {
       clearTimeout(saveDebounceRef.current);
     }
     saveDebounceRef.current = setTimeout(() => {
-      saveColumnState('payroll_comparison_v12', api);
+      saveColumnState('payroll_comparison_v13', api);
     }, 300);
   }, []);
 
